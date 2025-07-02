@@ -89,8 +89,9 @@
                             <label for="home-botao" class="block text-sm font-medium text-gray-700">Texto do Botão</label>
                             <input type="text" id="home-botao" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
-                        <div class="flex gap-4">
+                        <div class="flex flex-col sm:flex-row gap-4">
                             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Salvar Alterações da Home</button>
+                            <button type="button" id="load-home-data" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Carregar Dados Atuais</button>
                         </div>
                     </form>
                 </div>
@@ -241,35 +242,45 @@
                 notificationElement.classList.add('opacity-0');
             }, 3000);
         }
+        
+        // Função para carregar os dados da Home sob demanda
+        async function loadHomeData() {
+            const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
+            try {
+                const docSnap = await getDoc(homeDocRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('home-titulo').value = data.titulo || '';
+                    document.getElementById('home-subtitulo').value = data.subtitulo || '';
+                    document.getElementById('home-botao').value = data.botao || '';
+                    showNotification("Dados atuais carregados no formulário.");
+                } else {
+                    showNotification("Nenhum conteúdo salvo para a Home.", true);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar dados da Home: ", error);
+                showNotification("Erro ao carregar dados da Home.", true);
+            }
+        }
 
-        window.showForm = async (formId) => {
+        window.showForm = (formId) => {
             document.querySelectorAll('.form-section').forEach(section => {
                 section.classList.remove('active');
             });
             const formElement = document.getElementById(`${formId}-form`);
             if (formElement) {
                 formElement.classList.add('active');
-                if (formId === 'home') {
-                    const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
-                    try {
-                        const docSnap = await getDoc(homeDocRef);
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            document.getElementById('home-titulo').value = data.titulo || '';
-                            document.getElementById('home-subtitulo').value = data.subtitulo || '';
-                            document.getElementById('home-botao').value = data.botao || '';
-                        }
-                    } catch (error) {
-                        console.error("Erro ao carregar dados da Home: ", error);
-                        showNotification("Erro ao carregar dados da Home.", true);
-                    }
-                }
             }
+            // A lógica para pré-carregar o formulário 'home' foi removida daqui
+            // para garantir que ele sempre comece em branco.
         };
 
         window.clearForm = (entity) => {
             document.getElementById(`form-${entity}`).reset();
-            document.getElementById(`${entity}-id`).value = '';
+            const idField = document.getElementById(`${entity}-id`);
+            if (idField) {
+                idField.value = '';
+            }
         };
 
         window.editDoc = (entity, id) => {
@@ -293,10 +304,7 @@
         };
 
         window.deleteDoc = async (entity, id) => {
-            // Usando um modal customizado para confirmação, pois window.confirm() pode ser bloqueado.
-            // Para simplificar, vamos assumir que o usuário sempre confirma por agora.
-            // O ideal seria implementar um modal de confirmação na UI.
-            if (true) { // Substitua 'true' por uma lógica de modal customizado
+            if (confirm('Tem certeza que deseja excluir este item?')) {
                 try {
                     await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
                     showNotification("Item excluído com sucesso!");
@@ -310,27 +318,22 @@
         // --- LÓGICA DE INICIALIZAÇÃO ---
 
         function attachFormSubmitListeners() {
+            // Adiciona o listener para o novo botão de carregar dados da home
+            document.getElementById('load-home-data').addEventListener('click', loadHomeData);
+
             // Formulário da Home
             document.getElementById('form-home').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const tituloInput = document.getElementById('home-titulo');
-                const subtituloInput = document.getElementById('home-subtitulo');
-                const botaoInput = document.getElementById('home-botao');
-                
                 const data = {
-                    titulo: tituloInput.value,
-                    subtitulo: subtituloInput.value,
-                    botao: botaoInput.value
+                    titulo: document.getElementById('home-titulo').value,
+                    subtitulo: document.getElementById('home-subtitulo').value,
+                    botao: document.getElementById('home-botao').value
                 };
                 const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
                 try {
                     await setDoc(homeDocRef, data, { merge: true });
                     showNotification('Página inicial atualizada com sucesso!');
-                    
-                    // Limpa os campos manualmente
-                    tituloInput.value = '';
-                    subtituloInput.value = '';
-                    botaoInput.value = '';
+                    window.clearForm('home');
                 } catch (error) {
                     console.error("Erro ao salvar dados da Home: ", error);
                     showNotification("Erro ao salvar dados da Home.", true);
@@ -350,11 +353,9 @@
                         'lojas': ['nome', 'preco', 'imagem']
                     };
                     
-                    const inputElements = [];
                     fields[entity].forEach(field => {
                         const input = document.getElementById(`${entity}-${field}`);
                         data[field] = input.value;
-                        inputElements.push(input);
                     });
 
                     try {
@@ -366,11 +367,7 @@
                             await addDoc(collectionRef, data);
                             showNotification('Item adicionado com sucesso!');
                         }
-                        
-                        // Limpa os campos manualmente
-                        inputElements.forEach(input => input.value = '');
-                        idField.value = '';
-
+                        window.clearForm(entity);
                     } catch (error) {
                         console.error(`Erro ao salvar ${entity}:`, error);
                         showNotification(`Erro ao salvar item.`, true);
