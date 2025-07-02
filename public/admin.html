@@ -63,10 +63,10 @@
                 <div class="bg-white p-4 rounded-lg shadow-md">
                     <h2 class="text-lg font-bold mb-4 border-b pb-2">Gerenciar Conteúdo</h2>
                     <nav class="space-y-2">
-                        <button onclick="showForm('home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
-                        <button onclick="showForm('noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
-                        <button onclick="showForm('acervos')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Acervos</button>
-                        <button onclick="showForm('lojas')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-store fa-fw"></i> Loja</button>
+                        <button onclick="window.showForm('home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
+                        <button onclick="window.showForm('noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
+                        <button onclick="window.showForm('acervos')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Acervos</button>
+                        <button onclick="window.showForm('lojas')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-store fa-fw"></i> Loja</button>
                     </nav>
                 </div>
             </aside>
@@ -118,7 +118,7 @@
                         </div>
                         <div class="flex gap-4">
                             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Salvar Notícia</button>
-                            <button type="button" onclick="clearForm('noticias')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Cancelar Edição</button>
+                            <button type="button" onclick="window.clearForm('noticias')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Cancelar Edição</button>
                         </div>
                     </form>
                     <div class="mt-8">
@@ -146,7 +146,7 @@
                         </div>
                         <div class="flex gap-4">
                             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Salvar Acervo</button>
-                            <button type="button" onclick="clearForm('acervos')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Cancelar Edição</button>
+                            <button type="button" onclick="window.clearForm('acervos')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Cancelar Edição</button>
                         </div>
                     </form>
                     <div class="mt-8">
@@ -174,7 +174,7 @@
                         </div>
                         <div class="flex gap-4">
                             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Salvar Produto</button>
-                            <button type="button" onclick="clearForm('lojas')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Cancelar Edição</button>
+                            <button type="button" onclick="window.clearForm('lojas')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Cancelar Edição</button>
                         </div>
                     </form>
                     <div class="mt-8">
@@ -188,7 +188,7 @@
     </div>
 
     <!-- Elemento de Notificação -->
-    <div id="notification" class="hidden fixed top-5 right-5 bg-green-500 text-white py-3 px-5 rounded-lg shadow-lg transform translate-x-full transition-all duration-500">
+    <div id="notification" class="hidden fixed top-5 right-5 bg-green-500 text-white py-3 px-5 rounded-lg shadow-lg opacity-0 transform translate-x-full">
         <p>Salvo com sucesso!</p>
     </div>
 
@@ -219,164 +219,57 @@
         
         const appId = 'museu-cca6d';
 
+        // Elementos da UI
         const loader = document.getElementById('loader-container');
         const mainContent = document.getElementById('main-content');
         const userEmailElement = document.getElementById('userEmail');
         const logoutButton = document.getElementById('logout-button');
+        const notificationElement = document.getElementById('notification');
 
-        // --- FUNÇÃO PARA MOSTRAR NOTIFICAÇÃO ---
+        // --- FUNÇÕES DA UI ---
+
         function showNotification(message, isError = false) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.classList.remove('bg-green-500', 'bg-red-500', 'translate-x-full');
-            notification.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
-
+            notificationElement.textContent = message;
+            notificationElement.className = 'fixed top-5 right-5 py-3 px-5 rounded-lg shadow-lg transition-all duration-500 text-white'; // Reset classes
+            notificationElement.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+            
             // Anima a entrada
-            setTimeout(() => notification.classList.remove('opacity-0', 'translate-x-full'), 10);
+            notificationElement.classList.remove('hidden', 'opacity-0', 'translate-x-full');
 
             // Esconde depois de 3 segundos
             setTimeout(() => {
-                notification.classList.add('opacity-0', 'translate-x-full');
+                notificationElement.classList.add('opacity-0');
             }, 3000);
         }
 
-        // --- CONTROLE DE AUTENTICAÇÃO ---
-        onAuthStateChanged(auth, user => {
-            if (user && !user.isAnonymous) {
-                userEmailElement.textContent = user.email;
-                loader.style.display = 'none';
-                mainContent.classList.remove('hidden');
-                initializeAppLogic();
-            } else {
-                if (user && user.isAnonymous) {
-                    signOut(auth); 
-                }
-                window.location.href = 'login.html';
-            }
-        });
-
-        // --- LÓGICA DE LOGOUT ---
-        logoutButton.addEventListener('click', () => {
-            signOut(auth).catch((error) => console.error('Erro ao fazer logout:', error));
-        });
-
-
-        // --- FUNÇÃO PRINCIPAL QUE RODA APÓS O LOGIN ---
-        function initializeAppLogic() {
-            setupHomeManagement();
-            setupCrud('noticias');
-            setupCrud('acervos');
-            setupCrud('lojas');
-            showForm('home');
-        }
-
-        // --- LÓGICA PARA GERENCIAR A PÁGINA INICIAL ---
-        const setupHomeManagement = async () => {
-            const form = document.getElementById('form-home');
-            const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
-
-            // Carrega os dados uma vez ao entrar na seção
-            try {
-                const docSnap = await getDoc(homeDocRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('home-titulo').value = data.titulo || '';
-                    document.getElementById('home-subtitulo').value = data.subtitulo || '';
-                    document.getElementById('home-botao').value = data.botao || '';
-                }
-            } catch (error) {
-                console.error("Erro ao carregar dados da Home: ", error);
-                showNotification("Erro ao carregar dados da Home.", true);
-            }
-
-            // Salva as alterações e limpa o formulário
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const data = {
-                    titulo: document.getElementById('home-titulo').value,
-                    subtitulo: document.getElementById('home-subtitulo').value,
-                    botao: document.getElementById('home-botao').value
-                };
-                try {
-                    await setDoc(homeDocRef, data, { merge: true });
-                    showNotification('Página inicial atualizada com sucesso!');
-                    form.reset(); // Limpa o formulário após salvar
-                } catch (error) {
-                    console.error("Erro ao salvar dados da Home: ", error);
-                    showNotification("Erro ao salvar dados da Home.", true);
-                }
+        window.showForm = async (formId) => {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
             });
-        };
-
-        // --- LÓGICA PARA GERENCIAR SEÇÕES COM MÚLTIPLOS ITENS (CRUD) ---
-        const setupCrud = (entity) => {
-            const form = document.getElementById(`form-${entity}`);
-            const listContainer = document.getElementById(`${entity}-lista`);
-            const idField = document.getElementById(`${entity}-id`);
-            
-            if (!form || !listContainer || !idField) return;
-
-            const collectionRef = collection(db, `/artifacts/${appId}/public/data/${entity}`);
-
-            onSnapshot(collectionRef, (snapshot) => {
-                listContainer.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
-                    let textContent = data.titulo || data.nome;
-                    itemDiv.innerHTML = `
-                        <p class="font-semibold">${textContent}</p>
-                        <div class="flex gap-2">
-                            <button onclick="window.editDoc('${entity}', '${doc.id}')" class="px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600">Editar</button>
-                            <button onclick="window.deleteDoc('${entity}', '${doc.id}')" class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700">Excluir</button>
-                        </div>
-                    `;
-                    listContainer.appendChild(itemDiv);
-                });
-            });
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const id = idField.value;
-                const data = {};
-                const fields = {
-                    'noticias': ['titulo', 'categoria', 'descricao', 'imagem'],
-                    'acervos': ['nome', 'descricao', 'imagem'],
-                    'lojas': ['nome', 'preco', 'imagem']
-                };
-                fields[entity].forEach(field => {
-                    data[field] = document.getElementById(`${entity}-${field}`).value;
-                });
-
-                try {
-                    if (id) {
-                        await updateDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id), data);
-                        showNotification('Item atualizado com sucesso!');
-                    } else {
-                        await addDoc(collectionRef, data);
-                        showNotification('Item adicionado com sucesso!');
+            const formElement = document.getElementById(`${formId}-form`);
+            if (formElement) {
+                formElement.classList.add('active');
+                if (formId === 'home') {
+                    const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
+                    try {
+                        const docSnap = await getDoc(homeDocRef);
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            document.getElementById('home-titulo').value = data.titulo || '';
+                            document.getElementById('home-subtitulo').value = data.subtitulo || '';
+                            document.getElementById('home-botao').value = data.botao || '';
+                        }
+                    } catch (error) {
+                        console.error("Erro ao carregar dados da Home: ", error);
+                        showNotification("Erro ao carregar dados da Home.", true);
                     }
-                    form.reset();
-                    idField.value = '';
-                } catch (error) {
-                    console.error(`Erro ao salvar ${entity}:`, error);
-                    showNotification(`Erro ao salvar item.`, true);
-                }
-            });
-        };
-
-        window.deleteDoc = async (entity, id) => {
-            // Substituindo o confirm por uma abordagem mais moderna no futuro
-            if (window.confirm('Tem certeza que deseja excluir este item?')) {
-                try {
-                    await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
-                    showNotification("Item excluído com sucesso!");
-                } catch(error) {
-                    console.error(`Erro ao excluir ${entity}:`, error);
-                    showNotification("Erro ao excluir o item.", true);
                 }
             }
+        };
+
+        window.clearForm = (entity) => {
+            document.getElementById(`form-${entity}`).reset();
+            document.getElementById(`${entity}-id`).value = '';
         };
 
         window.editDoc = (entity, id) => {
@@ -399,26 +292,123 @@
             });
         };
 
-        window.clearForm = (entity) => {
-            document.getElementById(`form-${entity}`).reset();
-            document.getElementById(`${entity}-id`).value = '';
-        }
-
-        // --- LÓGICA DA INTERFACE ---
-        window.showForm = (formId) => {
-            document.querySelectorAll('.form-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            const formElement = document.getElementById(`${formId}-form`);
-            if (formElement) {
-                formElement.classList.add('active');
-                // Se for a home, recarrega os dados dela
-                if (formId === 'home') {
-                    setupHomeManagement();
+        window.deleteDoc = async (entity, id) => {
+            if (window.confirm('Tem certeza que deseja excluir este item?')) {
+                try {
+                    await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
+                    showNotification("Item excluído com sucesso!");
+                } catch(error) {
+                    console.error(`Erro ao excluir ${entity}:`, error);
+                    showNotification("Erro ao excluir o item.", true);
                 }
             }
         };
 
+        // --- LÓGICA DE INICIALIZAÇÃO ---
+
+        function attachFormSubmitListeners() {
+            // Formulário da Home
+            document.getElementById('form-home').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const form = e.target;
+                const data = {
+                    titulo: document.getElementById('home-titulo').value,
+                    subtitulo: document.getElementById('home-subtitulo').value,
+                    botao: document.getElementById('home-botao').value
+                };
+                const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
+                try {
+                    await setDoc(homeDocRef, data, { merge: true });
+                    showNotification('Página inicial atualizada com sucesso!');
+                    form.reset();
+                } catch (error) {
+                    console.error("Erro ao salvar dados da Home: ", error);
+                    showNotification("Erro ao salvar dados da Home.", true);
+                }
+            });
+
+            // Formulários de CRUD (Notícias, Acervos, Lojas)
+            ['noticias', 'acervos', 'lojas'].forEach(entity => {
+                document.getElementById(`form-${entity}`).addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const form = e.target;
+                    const idField = document.getElementById(`${entity}-id`);
+                    const id = idField.value;
+                    const data = {};
+                    const fields = {
+                        'noticias': ['titulo', 'categoria', 'descricao', 'imagem'],
+                        'acervos': ['nome', 'descricao', 'imagem'],
+                        'lojas': ['nome', 'preco', 'imagem']
+                    };
+                    fields[entity].forEach(field => {
+                        data[field] = document.getElementById(`${entity}-${field}`).value;
+                    });
+
+                    try {
+                        if (id) {
+                            await updateDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id), data);
+                            showNotification('Item atualizado com sucesso!');
+                        } else {
+                            const collectionRef = collection(db, `/artifacts/${appId}/public/data/${entity}`);
+                            await addDoc(collectionRef, data);
+                            showNotification('Item adicionado com sucesso!');
+                        }
+                        form.reset();
+                        idField.value = '';
+                    } catch (error) {
+                        console.error(`Erro ao salvar ${entity}:`, error);
+                        showNotification(`Erro ao salvar item.`, true);
+                    }
+                });
+            });
+        }
+
+        function setupListListeners() {
+            ['noticias', 'acervos', 'lojas'].forEach(entity => {
+                const listContainer = document.getElementById(`${entity}-lista`);
+                if (!listContainer) return;
+                const collectionRef = collection(db, `/artifacts/${appId}/public/data/${entity}`);
+                onSnapshot(collectionRef, (snapshot) => {
+                    listContainer.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+                        let textContent = data.titulo || data.nome;
+                        itemDiv.innerHTML = `
+                            <p class="font-semibold">${textContent}</p>
+                            <div class="flex gap-2">
+                                <button onclick="window.editDoc('${entity}', '${doc.id}')" class="px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600">Editar</button>
+                                <button onclick="window.deleteDoc('${entity}', '${doc.id}')" class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700">Excluir</button>
+                            </div>
+                        `;
+                        listContainer.appendChild(itemDiv);
+                    });
+                });
+            });
+        }
+
+        function initializeAppLogic() {
+            attachFormSubmitListeners();
+            setupListListeners();
+            showForm('home');
+        }
+
+        // --- PONTO DE ENTRADA ---
+        onAuthStateChanged(auth, user => {
+            if (user && !user.isAnonymous) {
+                userEmailElement.textContent = user.email;
+                logoutButton.addEventListener('click', () => signOut(auth).catch(err => console.error('Logout error', err)));
+                loader.style.display = 'none';
+                mainContent.classList.remove('hidden');
+                initializeAppLogic();
+            } else {
+                if (user && user.isAnonymous) {
+                    signOut(auth); 
+                }
+                window.location.href = 'login.html';
+            }
+        });
     </script>
 </body>
 </html>
