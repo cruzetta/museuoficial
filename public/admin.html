@@ -28,6 +28,10 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        /* Estilo para a notificação */
+        #notification {
+            transition: opacity 0.5s, transform 0.5s;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -183,12 +187,18 @@
         </div>
     </div>
 
+    <!-- Elemento de Notificação -->
+    <div id="notification" class="hidden fixed top-5 right-5 bg-green-500 text-white py-3 px-5 rounded-lg shadow-lg transform translate-x-full transition-all duration-500">
+        <p>Salvo com sucesso!</p>
+    </div>
+
+
     <!-- Firebase SDK -->
     <script type="module">
         // Importa as funções necessárias do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Sua chave de configuração do Firebase.
         const firebaseConfig = {
@@ -214,22 +224,33 @@
         const userEmailElement = document.getElementById('userEmail');
         const logoutButton = document.getElementById('logout-button');
 
+        // --- FUNÇÃO PARA MOSTRAR NOTIFICAÇÃO ---
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.remove('bg-green-500', 'bg-red-500', 'translate-x-full');
+            notification.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+
+            // Anima a entrada
+            setTimeout(() => notification.classList.remove('opacity-0', 'translate-x-full'), 10);
+
+            // Esconde depois de 3 segundos
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'translate-x-full');
+            }, 3000);
+        }
+
         // --- CONTROLE DE AUTENTICAÇÃO ---
         onAuthStateChanged(auth, user => {
-            // Se existe um usuário E ele NÃO é anônimo
             if (user && !user.isAnonymous) {
                 userEmailElement.textContent = user.email;
                 loader.style.display = 'none';
                 mainContent.classList.remove('hidden');
                 initializeAppLogic();
             } else {
-                // Se o usuário for anônimo, faz o logout para limpar a sessão fantasma
                 if (user && user.isAnonymous) {
-                    console.log("Sessão anônima encontrada. Fazendo logout...");
                     signOut(auth); 
                 }
-                // Se não houver usuário ou se ele era anônimo, redireciona
-                console.log("Usuário não autenticado. Redirecionando para login...");
                 window.location.href = 'login.html';
             }
         });
@@ -246,23 +267,29 @@
             setupCrud('noticias');
             setupCrud('acervos');
             setupCrud('lojas');
-            showForm('home'); // Mostra o formulário da home por padrão
+            showForm('home');
         }
 
         // --- LÓGICA PARA GERENCIAR A PÁGINA INICIAL ---
-        const setupHomeManagement = () => {
+        const setupHomeManagement = async () => {
             const form = document.getElementById('form-home');
             const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
 
-            onSnapshot(homeDocRef, (docSnap) => {
+            // Carrega os dados uma vez ao entrar na seção
+            try {
+                const docSnap = await getDoc(homeDocRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById('home-titulo').value = data.titulo || '';
                     document.getElementById('home-subtitulo').value = data.subtitulo || '';
                     document.getElementById('home-botao').value = data.botao || '';
                 }
-            });
+            } catch (error) {
+                console.error("Erro ao carregar dados da Home: ", error);
+                showNotification("Erro ao carregar dados da Home.", true);
+            }
 
+            // Salva as alterações e limpa o formulário
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const data = {
@@ -270,8 +297,14 @@
                     subtitulo: document.getElementById('home-subtitulo').value,
                     botao: document.getElementById('home-botao').value
                 };
-                await setDoc(homeDocRef, data, { merge: true });
-                alert('Página inicial atualizada com sucesso!');
+                try {
+                    await setDoc(homeDocRef, data, { merge: true });
+                    showNotification('Página inicial atualizada com sucesso!');
+                    form.reset(); // Limpa o formulário após salvar
+                } catch (error) {
+                    console.error("Erro ao salvar dados da Home: ", error);
+                    showNotification("Erro ao salvar dados da Home.", true);
+                }
             });
         };
 
@@ -315,25 +348,40 @@
                 fields[entity].forEach(field => {
                     data[field] = document.getElementById(`${entity}-${field}`).value;
                 });
-                if (id) {
-                    await updateDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id), data);
-                } else {
-                    await addDoc(collectionRef, data);
+
+                try {
+                    if (id) {
+                        await updateDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id), data);
+                        showNotification('Item atualizado com sucesso!');
+                    } else {
+                        await addDoc(collectionRef, data);
+                        showNotification('Item adicionado com sucesso!');
+                    }
+                    form.reset();
+                    idField.value = '';
+                } catch (error) {
+                    console.error(`Erro ao salvar ${entity}:`, error);
+                    showNotification(`Erro ao salvar item.`, true);
                 }
-                form.reset();
-                idField.value = '';
             });
         };
 
         window.deleteDoc = async (entity, id) => {
-            if (confirm('Tem certeza que deseja excluir este item?')) {
-                await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
+            // Substituindo o confirm por uma abordagem mais moderna no futuro
+            if (window.confirm('Tem certeza que deseja excluir este item?')) {
+                try {
+                    await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
+                    showNotification("Item excluído com sucesso!");
+                } catch(error) {
+                    console.error(`Erro ao excluir ${entity}:`, error);
+                    showNotification("Erro ao excluir o item.", true);
+                }
             }
         };
 
         window.editDoc = (entity, id) => {
             const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
-            onSnapshot(docRef, (docSnap) => {
+            getDoc(docRef).then(docSnap => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById(`${entity}-id`).value = docSnap.id;
@@ -364,6 +412,10 @@
             const formElement = document.getElementById(`${formId}-form`);
             if (formElement) {
                 formElement.classList.add('active');
+                // Se for a home, recarrega os dados dela
+                if (formId === 'home') {
+                    setupHomeManagement();
+                }
             }
         };
 
