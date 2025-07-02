@@ -35,6 +35,7 @@
     <!-- Tela de Carregamento -->
     <div id="loader-container" class="fixed inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-50">
         <div id="loader"></div>
+        <p class="text-gray-600 absolute top-1/2 mt-10">Verificando autenticação...</p>
     </div>
     
     <!-- Conteúdo principal (inicialmente oculto) -->
@@ -206,6 +207,8 @@
         const auth = getAuth(app);
         setLogLevel('debug');
         
+        console.log("Admin script started. Initializing auth check...");
+
         const appId = 'museu-cca6d';
 
         const loader = document.getElementById('loader-container');
@@ -215,15 +218,18 @@
 
         // --- CONTROLE DE AUTENTICAÇÃO ---
         onAuthStateChanged(auth, user => {
+            console.log("onAuthStateChanged callback fired.");
             if (user) {
                 // Usuário está logado.
+                console.log("User is logged in:", user.email);
                 userEmailElement.textContent = user.email;
                 loader.style.display = 'none'; // Esconde o loader
                 mainContent.classList.remove('hidden'); // Mostra o conteúdo
                 initializeAppLogic(); // Inicia a lógica principal da aplicação
             } else {
                 // Usuário não está logado. Redireciona para a página de login.
-                window.location.href = '/login.html';
+                console.log("User is not logged in. Redirecting to login.html...");
+                window.location.href = 'login.html'; // Usando caminho relativo
             }
         });
 
