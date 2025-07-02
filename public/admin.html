@@ -310,7 +310,7 @@
             // Formulário da Home
             document.getElementById('form-home').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const form = e.target;
+                const form = e.target; // Pega o elemento do formulário
                 const data = {
                     titulo: document.getElementById('home-titulo').value,
                     subtitulo: document.getElementById('home-subtitulo').value,
@@ -320,7 +320,7 @@
                 try {
                     await setDoc(homeDocRef, data, { merge: true });
                     showNotification('Página inicial atualizada com sucesso!');
-                    form.reset();
+                    form.reset(); // Limpa o formulário usando o método reset()
                 } catch (error) {
                     console.error("Erro ao salvar dados da Home: ", error);
                     showNotification("Erro ao salvar dados da Home.", true);
@@ -406,7 +406,7 @@
                 if (user && user.isAnonymous) {
                     signOut(auth); 
                 }
-                window.location.href = 'login.html';
+                window.location.assign('login.html');
             }
         });
     </script>
