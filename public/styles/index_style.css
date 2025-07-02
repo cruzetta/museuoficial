@@ -1,0 +1,111 @@
+        :root {
+            --neon-blue: #00BFFF;
+            --neon-purple: #A020F0;
+            --neon-green: #39FF14;
+            --dark-bg: #0D0D1A;
+            --metal-bg: linear-gradient(145deg, #1a1a2e, #161625);
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--dark-bg);
+            color: #E0E0E0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .nav-link {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .hud-border {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px rgba(0, 191, 255, 0.5);
+            background: rgba(13, 13, 26, 0.85);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        
+        .hud-border::before, .hud-border::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-color: var(--neon-purple);
+            border-style: solid;
+            transition: all 0.3s ease;
+        }
+        .hud-border:hover::before, .hud-border:hover::after {
+            width: 25px;
+            height: 25px;
+        }
+        .hud-border::before { top: -5px; left: -5px; border-width: 3px 0 0 3px; }
+        .hud-border::after { bottom: -5px; right: -5px; border-width: 0 3px 3px 0; }
+
+        .joystick-btn {
+            font-family: 'Orbitron', sans-serif;
+            background: var(--neon-purple);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--neon-purple);
+        }
+        .joystick-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 35px var(--neon-purple);
+        }
+
+        .room-section {
+            padding: 120px 2rem 100px;
+            border-bottom: 2px solid rgba(0, 191, 255, 0.2);
+            position: relative;
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+        }
+        .room-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(13, 13, 26, 0.90);
+        }
+        .room-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        #home { background-image: url('https://www.transparenttextures.com/patterns/holographic.png'); background-attachment: scroll; }
+        #noticias { background-image: url('https://www.transparenttextures.com/patterns/8-bit-surface.png'); }
+        #acervos { background-image: url('https://www.transparenttextures.com/patterns/checkered-pattern.png'); }
+        #games { background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); }
+        #timeline { background-image: url('https://www.transparenttextures.com/patterns/subtle-prism.png'); }
+        #quiz { background-image: url('https://www.transparenttextures.com/patterns/fancy-cushion.png'); }
+        #curiosidades { background-image: url('https://www.transparenttextures.com/patterns/inspiration-geometry.png'); }
+        #onde-estamos { background-image: url('https://www.transparenttextures.com/patterns/maps.png'); }
+        #corporativo { background-image: url('https://www.transparenttextures.com/patterns/clean-textile.png'); }
+        #loja { background-image: url('https://www.transparenttextures.com/patterns/low-poly-grid.png'); }
+
+        .holographic-text {
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-green), var(--neon-blue));
+            background-size: 200% 200%;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: holographic-shine 5s linear infinite;
+        }
+
+        @keyframes holographic-shine {
+            to { background-position: 200% center; }
+        }
+        
+        .nav-link.active {
+            color: white;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }

@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria do Acervo - Museu do Videojogo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles/gallery_style.css">
+</head>
+<body class="antialiased">
+
+    <!-- Header / HUD Fixo -->
+    <header class="fixed top-0 left-0 right-0 z-50 p-4">
+        <nav class="container mx-auto hud-border rounded-xl px-4 sm:px-6 py-3 flex justify-between items-center gap-4">
+            <a href="#" onclick="showPage('gallery')" class="text-2xl font-bold tracking-widest holographic-text">MIV</a>
+            
+            <!-- Botão de Pesquisa Inteligente com Autocomplete -->
+            <div class="flex-grow flex justify-center px-2 sm:px-4">
+                <div id="search-container" class="relative w-full max-w-lg">
+                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="w-full rounded-lg py-2 pl-4 pr-10 text-white placeholder-gray-500 transition-all">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-neon-blue">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 hud-border rounded-lg z-10 overflow-hidden hidden">
+                        <!-- As sugestões aparecerão aqui via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <a href="#" onclick="showPage('gallery')" class="nav-link text-gray-300 hover:text-white hover:drop-shadow-[0_0_5px_var(--neon-blue)] transition-all flex-shrink-0">
+                <i class="fa-solid fa-arrow-left mr-2"></i><span id="nav-back-text" class="hidden sm:inline">Voltar ao Site Principal</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="pt-32" style="background: var(--metal-bg);">
+        
+        <!-- PÁGINA DA GALERIA -->
+        <div id="gallery" class="page active">
+            <div class="container mx-auto px-4">
+                <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Galeria do Acervo</h1>
+                
+                <!-- Controles de Ordenação -->
+                <div class="flex justify-end mb-8">
+                    <div class="relative">
+                        <select id="sort-select" class="hud-border appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer">
+                            <option value="date-asc">Mais Antigos</option>
+                            <option value="date-desc">Mais Novos</option>
+                            <option value="alpha-asc">Ordem Alfabética (A-Z)</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neon-blue">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="gallery-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
+
+                    <!-- Card: Atari 2600 -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Atari+2600" alt="Imagem do Atari 2600" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Atari 2600</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Atari, Inc.</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 2ª Geração</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1977</p>
+                            </div>
+                            <button onclick="showPage('item-atari2600')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Card: NES -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=NES" alt="Imagem do NES" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Nintendo Entertainment System</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Nintendo</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 3ª Geração (8-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1983</p>
+                            </div>
+                            <button onclick="showPage('item-nes')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Master System -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Master+System" alt="Imagem do Master System" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Sega Master System</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sega</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 3ª Geração (8-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1985</p>
+                            </div>
+                            <button onclick="showPage('item-mastersystem')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Mega Drive -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Mega+Drive" alt="Imagem do Mega Drive" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Sega Mega Drive</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sega</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 4ª Geração (16-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1988</p>
+                            </div>
+                            <button onclick="showPage('item-megadrive')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Super Nintendo -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Super+Nintendo" alt="Imagem do Super Nintendo" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Super Nintendo</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Nintendo</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 4ª Geração (16-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1990</p>
+                            </div>
+                            <button onclick="showPage('item-snes')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: PlayStation -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=PlayStation" alt="Imagem do PlayStation" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Sony PlayStation</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sony</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 5ª Geração (32-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1994</p>
+                            </div>
+                            <button onclick="showPage('item-ps1')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Nintendo 64 -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Nintendo+64" alt="Imagem do Nintendo 64" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Nintendo 64</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Nintendo</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 5ª Geração (64-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1996</p>
+                            </div>
+                            <button onclick="showPage('item-n64')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Dreamcast -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Dreamcast" alt="Imagem do Dreamcast" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Sega Dreamcast</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sega</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 6ª Geração</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1998</p>
+                            </div>
+                            <button onclick="showPage('item-dreamcast')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: PlayStation 2 -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=PlayStation+2" alt="Imagem do PlayStation 2" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">PlayStation 2</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sony</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 6ª Geração</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 2000</p>
+                            </div>
+                            <button onclick="showPage('item-ps2')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Card: Xbox -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Xbox" alt="Imagem do Xbox" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Microsoft Xbox</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Microsoft</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 6ª Geração</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 2001</p>
+                            </div>
+                            <button onclick="showPage('item-xbox')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PÁGINAS DE DETALHES -->
+        
+        <!-- #region ITEM: Atari 2600 -->
+        <div id="item-atari2600" class="page">
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Atari 2600</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-atari2600" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=Atari+2600" alt="Imagem principal do Atari 2600" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('atari2600', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Joystick')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Joystick</a>
+                                <a onclick="changeImage('atari2600', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Cartucho+Pitfall')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Cartucho</a>
+                                <a onclick="changeImage('atari2600', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Console+e+Caixa')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Caixa</a>
+                                <a onclick="changeImage('atari2600', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Paddles')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Paddles</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Atari, Inc.</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 1977</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 2ª Geração</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> Cartucho</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~30 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">A Lenda que Começou Tudo</h2>
+                    <p class="text-gray-300 leading-relaxed">O Atari 2600 (originalmente Atari VCS) não foi o primeiro console, mas foi o responsável por popularizar o uso de cartuchos com jogos, uma ideia revolucionária que permitia ter uma biblioteca de jogos em casa. Com seu icônico joystick de um botão e clássicos como "Space Invaders", "Pac-Man" e "Pitfall!", ele levou a febre dos arcades para a sala de estar de milhões de famílias e criou a primeira geração de gamers.</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">O sucesso estrondoso do Atari 2600 estabeleceu o modelo de negócio de consoles e jogos vendidos separadamente. No entanto, a falta de controle de qualidade sobre os jogos de outras empresas levou a uma saturação do mercado com títulos de baixa qualidade, culminando no "crash dos videojogos de 1983", um evento que quase destruiu a indústria, mas que abriu caminho para a chegada da Nintendo.</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Morte (Pac-Man)</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Pulo (Pitfall!)</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Anúncio+Atari" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+River+Raid" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O jogo "E.T. the Extra-Terrestrial" é considerado um dos piores de todos os tempos e seu fracasso comercial foi um dos principais fatores do crash de 1983.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>Milhares de cartuchos não vendidos de "E.T." foram enterrados em um deserto no Novo México. Eles foram escavados em 2014 para um documentário.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O design com acabamento em madeira foi criado para que o console se parecesse com um móvel da sala, ajudando na aceitação pelos pais.</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Pitfall!" alt="Capa Pitfall!" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=River+Raid" alt="Capa River Raid" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Space+Invaders" alt="Capa Space Invaders" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Pac-Man" alt="Capa Pac-Man" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Adventure" alt="Capa Adventure" class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" onclick="showPage('item-nes')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Impactou:</strong> Nintendo Entertainment System</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- #region ITEM: NES -->
+        <div id="item-nes" class="page">
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Nintendo Entertainment System</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-nes" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=NES" alt="Imagem principal do NES" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('nes', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Controle')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Controle</a>
+                                <a onclick="changeImage('nes', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Cartucho')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Cartucho</a>
+                                <a onclick="changeImage('nes', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Caixa')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Caixa</a>
+                                <a onclick="changeImage('nes', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Zapper')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Zapper</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Nintendo</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 1983 (JP), 1985 (EUA)</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 3ª Geração (8-bit)</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> Cartucho (Game Pak)</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~61.91 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">A História do Herói</h2>
+                    <p class="text-gray-300 leading-relaxed">Após o "crash" dos videojogos de 1983, a indústria estava em ruínas. Foi neste cenário que a Nintendo, com o seu "cavalo de Troia", o NES, reviveu o mercado. Ele redefiniu o conceito de entretenimento caseiro, introduziu controlos de qualidade rigorosos com o "Selo de Qualidade Nintendo" e, mais importante, trouxe-nos mundos e personagens como Super Mario e Zelda, que se tornariam ícones culturais eternos.</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">O legado do NES é imensurável. Ele não só salvou a indústria de videojogos caseira, como estabeleceu o modelo de negócio que dominaria as décadas seguintes. Introduziu o D-pad (cruz direcional), que se tornou padrão em quase todos os controlos. Franquias como Super Mario Bros., The Legend of Zelda e Metroid nasceram aqui, definindo géneros e criando as fundações para o futuro dos jogos.</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Moeda (Mario)</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Segredo (Zelda)</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Anúncio+de+TV" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+Mario" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O design do robô R.O.B. foi uma estratégia para vender o console como um "brinquedo" nas lojas americanas.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O nome de código do NES durante o desenvolvimento era "Advanced Video System".</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O "Selo de Qualidade Nintendo" foi criado para garantir aos consumidores que os jogos não teriam os bugs e a baixa qualidade que causaram o crash de 1983.</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Super+Mario+Bros." alt="Capa Super Mario Bros." class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=The+Legend+of+Zelda" alt="Capa The Legend of Zelda" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Metroid" alt="Capa Metroid" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Mega+Man+2" alt="Capa Mega Man 2" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Castlevania" alt="Capa Castlevania" class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" onclick="showPage('item-snes')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Sucessor:</strong> Super Nintendo</a>
+                        <a href="#" onclick="showPage('item-mastersystem')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> Sega Master System</a>
+                        <a href="#" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Periférico:</strong> Zapper</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- #region ITEM: Master System -->
+        <div id="item-mastersystem" class="page">
+            <div class="container mx-auto px-4">
+                 <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Sega Master System</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-mastersystem" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=Master+System" alt="Imagem principal do Master System" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('mastersystem', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Controle')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Controle</a>
+                                <a onclick="changeImage('mastersystem', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Alex+Kidd')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Alex Kidd</a>
+                                <a onclick="changeImage('mastersystem', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Sega+Card')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Sega Card</a>
+                                <a onclick="changeImage('mastersystem', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Light+Phaser')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Light Phaser</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Sega</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 1985 (JP), 1986 (EUA)</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 3ª Geração (8-bit)</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> Cartucho e Sega Card</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~10-13 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">O Rival de Azul</h2>
+                    <p class="text-gray-300 leading-relaxed">O Master System foi a resposta da Sega ao domínio da Nintendo. Embora não tenha alcançado o mesmo sucesso global, o console se tornou um fenômeno em mercados como o Brasil e a Europa, graças a um design arrojado e uma biblioteca de jogos fantástica que incluía clássicos como "Alex Kidd in Miracle World" e "Phantasy Star". Ele solidificou a Sega como uma grande força na indústria e preparou o terreno para a lendária "guerra de consoles" da geração seguinte.</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">O Master System é um caso fascinante de sucesso regional. No Brasil, graças à parceria com a Tectoy, ele continuou a ser fabricado e vendido por décadas, muito depois de ter sido descontinuado no resto do mundo. Isso criou uma geração inteira de gamers brasileiros com uma forte ligação à Sega, e o console tornou-se um ícone cultural no país.</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                     <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Pausa (Alex Kidd)</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Tema (Phantasy Star)</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Comercial+BR" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+Wonder+Boy" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>Muitos modelos do Master System vinham com um jogo embutido na memória. O mais famoso deles é "Alex Kidd in Miracle World".</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>Os óculos 3D (SegaScope 3-D) foram um acessório inovador que oferecia uma experiência de jogo tridimensional em títulos compatíveis.</span></li>
+                             <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>Alex Kidd era o mascote da Sega antes da criação de Sonic the Hedgehog.</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Alex+Kidd+in+Miracle+World" alt="Capa Alex Kidd" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Phantasy+Star" alt="Capa Phantasy Star" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Wonder+Boy+III" alt="Capa Wonder Boy III" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Castle+of+Illusion" alt="Capa Castle of Illusion" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Sonic+The+Hedgehog" alt="Capa Sonic The Hedgehog" class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" onclick="showPage('item-megadrive')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Sucessor:</strong> Sega Mega Drive</a>
+                        <a href="#" onclick="showPage('item-nes')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> Nintendo Entertainment System</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- #region ITEM: Mega Drive -->
+        <div id="item-megadrive" class="page">
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Sega Mega Drive</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-megadrive" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=Mega+Drive" alt="Imagem principal do Mega Drive" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('megadrive', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Controle+6+Botões')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Controle</a>
+                                <a onclick="changeImage('megadrive', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Sonic+Cartucho')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Cartucho</a>
+                                <a onclick="changeImage('megadrive', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Sega+CD')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Sega CD</a>
+                                <a onclick="changeImage('megadrive', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=32X')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">32X</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Sega</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 1988 (JP), 1989 (EUA)</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 4ª Geração (16-bit)</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> Cartucho</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~30.75 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">A Atitude dos 16-bit</h2>
+                    <p class="text-gray-300 leading-relaxed">Com o slogan "Genesis does what Nintendon't", o Mega Drive (Genesis na América do Norte) chegou com uma atitude rebelde e marketing agressivo. Prometendo "Blast Processing" para jogos mais rápidos e uma imagem más "cool", ele deu início à famosa "guerra dos consoles" dos anos 90. Foi o lar de Sonic the Hedgehog, o mascote veloz criado para competir diretamente com Mario, e definiu uma era de rivalidade intensa e inovação.</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">O Mega Drive consolidou a Sega como uma gigante da indústria. Sua biblioteca de jogos é repleta de clássicos de ação e arcade, como a série "Streets of Rage". A estratégia de marketing focada no público adolescente e a rivalidade com a Nintendo não apenas venderam consoles, mas também ajudaram a moldar a cultura gamer como a conhecemos hoje.</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                     <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Anel (Sonic)</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> "SEGA!"</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Comercial+Genesis" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+Streets+of+Rage" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O termo "Blast Processing" era mais uma jogada de marketing do que uma tecnologia real, mas foi extremamente eficaz para criar a imagem de velocidade do console.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O Mega Drive teve dois add-ons principais, o Sega CD e o 32X, que prometiam aumentar o poder do console, mas acabaram fragmentando o mercado.</span></li>
+                             <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O controle de seis botões foi lançado posteriormente, especialmente para jogos de luta como "Street Fighter II".</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Sonic+the+Hedgehog+2" alt="Capa Sonic 2" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Streets+of+Rage+2" alt="Capa Streets of Rage 2" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Gunstar+Heroes" alt="Capa Gunstar Heroes" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Phantasy+Star+IV" alt="Capa Phantasy Star IV" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Shinobi+III" alt="Capa Shinobi III" class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" onclick="showPage('item-dreamcast')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Sucessor:</strong> Sega Dreamcast</a>
+                        <a href="#" onclick="showPage('item-snes')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> Super Nintendo</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- #region ITEM: Super Nintendo -->
+        <div id="item-snes" class="page">
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Super Nintendo</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-snes" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=Super+Nintendo" alt="Imagem principal do SNES" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('snes', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Controle+SNES')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Controle</a>
+                                <a onclick="changeImage('snes', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Cartucho+Zelda')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Cartucho</a>
+                                <a onclick="changeImage('snes', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Super+Scope')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Super Scope</a>
+                                <a onclick="changeImage('snes', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Versão+Japonesa')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Super Famicom</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Nintendo</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 1990 (JP), 1991 (EUA)</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 4ª Geração (16-bit)</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> Cartucho</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~49.1 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">O Rei dos 16-bit</h2>
+                    <p class="text-gray-300 leading-relaxed">A resposta da Nintendo à concorrência foi o Super Nintendo. Com um hardware poderoso que permitia gráficos mais coloridos e efeitos avançados como o "Mode 7" (que simulava 3D), o SNES foi o lar de alguns dos RPGs mais amados de todos os tempos, como "Chrono Trigger" e "Final Fantasy VI", além de aperfeiçoar suas próprias franquias com "Super Mario World" e "The Legend of Zelda: A Link to the Past".</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">O SNES é frequentemente lembrado como o auge dos jogos 2D. Sua paleta de cores rica e o chip de som da Sony criaram experiências audiovisuais inesquecíveis. O console também foi pioneiro no uso de chips de aprimoramento nos cartuchos, como o Super FX, que permitiu os primeiros jogos com gráficos 3D poligonais em um console Nintendo, como "Star Fox".</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                     <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Pulo (Yoshi)</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Hadouken (SFII)</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Comercial+SNES" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+Chrono+Trigger" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O design do console e dos cartuchos na América do Norte é completamente diferente do modelo japonês (Super Famicom) e europeu.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>"Donkey Kong Country" usou gráficos pré-renderizados em 3D, uma técnica revolucionária que deu a impressão de gráficos muito mais avançados do que o hardware do SNES realmente suportava.</span></li>
+                             <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O SNES quase teve um drive de CD em uma parceria com a Sony, mas o projeto foi cancelado. A Sony usou a tecnologia para criar seu próprio console: o PlayStation.</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Super+Mario+World" alt="Capa Super Mario World" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=The+Legend+of+Zelda:+A+Link+to+the+Past" alt="Capa Zelda" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Chrono+Trigger" alt="Capa Chrono Trigger" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Super+Metroid" alt="Capa Super Metroid" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Street+Fighter+II+Turbo" alt="Capa Street Fighter II" class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" onclick="showPage('item-n64')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Sucessor:</strong> Nintendo 64</a>
+                        <a href="#" onclick="showPage('item-megadrive')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> Sega Mega Drive</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- #region ITEM: PlayStation -->
+        <div id="item-ps1" class="page">
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Sony PlayStation</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-ps1" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=PlayStation" alt="Imagem principal do PlayStation" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('ps1', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=DualShock')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">DualShock</a>
+                                <a onclick="changeImage('ps1', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Memory+Card')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Memory Card</a>
+                                <a onclick="changeImage('ps1', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=CD+Preto')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">CD</a>
+                                <a onclick="changeImage('ps1', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=PSone')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">PSone</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Sony</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 1994 (JP), 1995 (EUA)</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 5ª Geração (32-bit)</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> CD-ROM</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~102.49 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">A Revolução 3D</h2>
+                    <p class="text-gray-300 leading-relaxed">Nascido de uma parceria desfeita com a Nintendo, o PlayStation da Sony entrou no mercado e mudou tudo. Ao abraçar os CDs, ele ofereceu aos desenvolvedores um espaço vasto para criar mundos 3D imersivos e cenas cinematográficas. O PlayStation não era apenas para crianças; ele atraiu um público mais velho com jogos como "Metal Gear Solid", "Resident Evil" e "Gran Turismo", solidificando os videogames como uma forma de entretenimento mainstream.</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">O PlayStation popularizou os jogos em 3D e a mídia em CD, que se tornaria o padrão da indústria. A marca PlayStation tornou-se sinônimo de videogame para uma geração inteira. A introdução do controle DualShock, com dois analógicos e vibração, também estabeleceu um novo padrão para os controles de console que perdura até hoje.</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                     <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Boot-up</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Alerta (MGS)</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Comercial+Crash" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+Final+Fantasy+VII" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>Os CDs do PlayStation eram pretos na parte de baixo, uma característica de design única para dificultar a pirataria (embora não tenha funcionado por muito tempo).</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>Os símbolos do controle (círculo, X, quadrado, triângulo) foram escolhidos por Teiyu Goto. Círculo e X representam 'sim' e 'não', triângulo simboliza um ponto de vista e quadrado representa um menu.</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Final+Fantasy+VII" alt="Capa Final Fantasy VII" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Metal+Gear+Solid" alt="Capa Metal Gear Solid" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Crash+Bandicoot" alt="Capa Crash Bandicoot" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Resident+Evil" alt="Capa Resident Evil" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Gran+Turismo" alt="Capa Gran Turismo" class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" onclick="showPage('item-ps2')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Sucessor:</strong> PlayStation 2</a>
+                        <a href="#" onclick="showPage('item-n64')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> Nintendo 64</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- #region ITEM: Nintendo 64 -->
+        <div id="item-n64" class="page">
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Nintendo 64</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-n64" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=Nintendo+64" alt="Imagem principal do Nintendo 64" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                             <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('n64', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Controle+N64')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Controle</a>
+                                <a onclick="changeImage('n64', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Cartucho+007')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Cartucho</a>
+                                <a onclick="changeImage('n64', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Rumble+Pak')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Rumble Pak</a>
+                                <a onclick="changeImage('n64', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Expansion+Pak')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Expansion Pak</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Nintendo</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 1996</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 5ª Geração (64-bit)</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> Cartucho</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~32.93 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">O Salto para o 3D Multiplayer</h2>
+                    <p class="text-gray-300 leading-relaxed">Enquanto a concorrência apostava nos CDs, a Nintendo manteve-se fiel aos cartuchos com o Nintendo 64. A decisão teve prós (sem telas de loading) e contras (menos espaço e mais caros), mas o console ficou famoso por outra inovação: o controle com stick analógico, que revolucionou a forma como controlamos personagens em espaços 3D. Jogos como "Super Mario 64" e "The Legend of Zelda: Ocarina of Time" são considerados obras-primas até hoje.</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">O maior legado do N64 foi, sem dúvida, a popularização do multiplayer local. Com quatro portas de controle de fábrica, o console tornou-se a máquina definitiva para jogar com amigos na mesma sala. Títulos como "GoldenEye 007", "Mario Kart 64" e "Super Smash Bros." criaram memórias inesquecíveis e definiram o padrão para os jogos multiplayer de sofá por anos.</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                     <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> "It's-a-me, Mario!"</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> "Hey! Listen!" (Navi)</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Comercial+N64" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+Ocarina+of+Time" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O controle em formato de "tridente" foi projetado para ser segurado de três maneiras diferentes, dependendo do jogo.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O Expansion Pak era um acessório que dobrava a RAM do console, de 4MB para 8MB, sendo necessário para rodar jogos como "Donkey Kong 64" e "Majora's Mask".</span></li>
+                             <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O nome de código do N64 era "Project Reality".</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Super+Mario+64" alt="Capa Super Mario 64" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=The+Legend+of+Zelda:+Ocarina+of+Time" alt="Capa Ocarina of Time" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=GoldenEye+007" alt="Capa GoldenEye 007" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Mario+Kart+64" alt="Capa Mario Kart 64" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Super+Smash+Bros." alt="Capa Super Smash Bros." class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Sucessor:</strong> Nintendo GameCube</a>
+                        <a href="#" onclick="showPage('item-ps1')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> Sony PlayStation</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- #region ITEM: Dreamcast -->
+        <div id="item-dreamcast" class="page">
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Sega Dreamcast</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-dreamcast" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=Dreamcast" alt="Imagem principal do Dreamcast" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('dreamcast', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Controle+DC')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Controle</a>
+                                <a onclick="changeImage('dreamcast', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=VMU')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">VMU</a>
+                                <a onclick="changeImage('dreamcast', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=GD-ROM')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">GD-ROM</a>
+                                <a onclick="changeImage('dreamcast', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Logo+Espiral')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Logo</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Sega</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 1998 (JP), 1999 (EUA)</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 6ª Geração</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> GD-ROM</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~9.13 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">À Frente do Seu Tempo</h2>
+                    <p class="text-gray-300 leading-relaxed">O Dreamcast foi a última aposta da Sega no mercado de consoles e um console amado por muitos, mas que infelizmente não teve o sucesso comercial esperado. Foi um pioneiro, o primeiro console a vir com um modem embutido para jogos online, antecipando o futuro da indústria. Com uma biblioteca de jogos criativos e inovadores como "Shenmue", "Jet Set Radio" e "Crazy Taxi", o Dreamcast deixou um legado duradouro.</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">Apesar de sua vida curta, o Dreamcast introduziu muitas ideias que se tornariam padrão, como o jogo online em consoles e o uso de "segunda tela" com o VMU (Visual Memory Unit), um memory card com tela própria. Sua descontinuação marcou a saída da Sega do mercado de hardware, um momento triste, mas que deixou uma legião de fãs e uma biblioteca de jogos cult que são celebrados até hoje.</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                     <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Boot-up</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> "Hey hey hey!" (Crazy Taxi)</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Comercial+Dreamcast" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+Shenmue" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O VMU podia ser usado como um mini-game portátil, semelhante a um Tamagotchi.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O Dreamcast usava um formato de disco proprietário chamado GD-ROM, que podia armazenar até 1GB de dados, mais do que um CD-ROM comum.</span></li>
+                             <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>"Phantasy Star Online" no Dreamcast foi o primeiro RPG online para consoles, um marco para a indústria.</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Shenmue" alt="Capa Shenmue" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Sonic+Adventure" alt="Capa Sonic Adventure" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Jet+Set+Radio" alt="Capa Jet Set Radio" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Crazy+Taxi" alt="Capa Crazy Taxi" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=SoulCalibur" alt="Capa SoulCalibur" class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" onclick="showPage('item-ps2')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> PlayStation 2</a>
+                        <a href="#" onclick="showPage('item-xbox')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> Xbox</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- #region ITEM: PlayStation 2 -->
+        <div id="item-ps2" class="page">
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">PlayStation 2</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-ps2" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=PlayStation+2" alt="Imagem principal do PlayStation 2" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('ps2', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=DualShock+2')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">DualShock 2</a>
+                                <a onclick="changeImage('ps2', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Memory+Card+8MB')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Memory Card</a>
+                                <a onclick="changeImage('ps2', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=EyeToy')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">EyeToy</a>
+                                <a onclick="changeImage('ps2', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=PS2+Slim')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">PS2 Slim</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Sony</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 2000</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 6ª Geração</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> DVD, CD-ROM</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> >155 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">O Rei dos Consoles</h2>
+                    <p class="text-gray-300 leading-relaxed">O PlayStation 2 não é apenas um console; é uma lenda. É o console de videogame mais vendido de todos os tempos, e por boas razões. Além de ter uma biblioteca de jogos gigantesca e diversificada, com títulos para todos os gostos ("God of War", "Shadow of the Colossus", "Grand Theft Auto: San Andreas"), ele também funcionava como um leitor de DVD, o que o tornou um centro de entretenimento para toda a família em uma época em que o DVD era a mídia do momento.</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">O PS2 dominou sua geração de forma avassaladora. Sua retrocompatibilidade com jogos de PS1 foi um grande atrativo inicial. A imensa popularidade e a longa vida útil do console (foi fabricado até 2013) garantiram que ele tivesse uma das maiores e mais variadas bibliotecas de jogos da história, solidificando a marca PlayStation como líder de mercado por muitos anos.</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                     <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Boot-up</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Lâminas (GoW)</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Comercial+PS9" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+Shadow+of+Colossus" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>As "torres" que aparecem na tela de boot representam os dados salvos no seu Memory Card. Quanto mais jogos salvos, mais torres aparecem.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O design do console foi inspirado em um computador da Atari, o Falcon 030 Microbox, como uma homenagem.</span></li>
+                             <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O PS2 podia ser posicionado tanto na vertical quanto na horizontal, e o logo do PlayStation no drive de disco podia ser girado para ficar na posição correta.</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Shadow+of+the+Colossus" alt="Capa Shadow of the Colossus" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=God+of+War+II" alt="Capa God of War II" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Grand+Theft+Auto:+San+Andreas" alt="Capa GTA San Andreas" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Metal+Gear+Solid+3" alt="Capa Metal Gear Solid 3" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Kingdom+Hearts" alt="Capa Kingdom Hearts" class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Sucessor:</strong> PlayStation 3</a>
+                        <a href="#" onclick="showPage('item-xbox')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> Xbox</a>
+                        <a href="#" onclick="showPage('item-dreamcast')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> Dreamcast</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- #region ITEM: Xbox -->
+        <div id="item-xbox" class="page">
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Microsoft Xbox</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-xbox" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=Xbox" alt="Imagem principal do Xbox" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('xbox', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Controle+Duke')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">'The Duke'</a>
+                                <a onclick="changeImage('xbox', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Halo')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Halo</a>
+                                <a onclick="changeImage('xbox', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Xbox+Live')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Xbox Live</a>
+                                <a onclick="changeImage('xbox', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Dashboard')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Dashboard</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Microsoft</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 2001</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 6ª Geração</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> DVD</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~24 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="hud-border rounded-lg p-8 mb-16">
+                    <h2 class="text-3xl font-bold mb-4">A Entrada de um Gigante</h2>
+                    <p class="text-gray-300 leading-relaxed">A Microsoft, gigante do software, entrou no mundo dos consoles com o Xbox. Construído com uma arquitetura semelhante à de um PC, incluindo um processador Intel e um disco rígido interno, o Xbox era uma máquina poderosa. Seu grande diferencial foi o serviço Xbox Live, que revolucionou o jogo online em consoles, tornando-o acessível, centralizado e popular.</p>
+                    <h3 class="text-2xl font-bold mt-8 mb-4">Legado</h3>
+                    <p class="text-gray-300 leading-relaxed">O maior legado do Xbox foi, sem dúvida, a criação do Xbox Live, que estabeleceu o padrão para os serviços de jogos online que vemos hoje. Além disso, o console é sinônimo de sua franquia de lançamento, "Halo: Combat Evolved", que redefiniu os jogos de tiro em primeira pessoa nos consoles e se tornou um fenômeno cultural, provando que o gênero podia ser tão bom nos consoles quanto nos PCs.</p>
+                </section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                     <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Em Ação</h2>
+                        <h3 class="text-xl font-bold mb-4">Sons Icónicos</h3>
+                        <div class="flex space-x-4 mb-8">
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Boot-up</button>
+                            <button class="sound-btn font-bold py-2 px-4 rounded-lg flex-1"><i class="fa-solid fa-play mr-2"></i> Escudo (Halo)</button>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Vídeos da Época</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Comercial+Xbox" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                            <img src="https://placehold.co/300x200/1a1a2e/E0E0E0?text=Gameplay+Halo" class="rounded-md w-full cursor-pointer hover:opacity-80">
+                        </div>
+                    </div>
+                    <div class="hud-border rounded-lg p-8">
+                        <h2 class="text-3xl font-bold mb-6">Você Sabia?</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O nome original do projeto era "DirectX Box", referindo-se à tecnologia gráfica da Microsoft, e foi abreviado para Xbox.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>O primeiro controle, apelidado de "The Duke", era tão grande e pesado que se tornou infame. Foi substituído por um modelo menor, o "Controller S", que fez mais sucesso.</span></li>
+                             <li class="flex items-start"><i class="fa-solid fa-star text-yellow-400 mr-3 mt-1"></i><span>A Microsoft tentou comprar a Nintendo antes de decidir construir seu próprio console, mas a Nintendo recusou a oferta.</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Jogos Essenciais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Halo:+Combat+Evolved" alt="Capa Halo" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Fable" alt="Capa Fable" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Ninja+Gaiden" alt="Capa Ninja Gaiden" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Star+Wars:+KOTOR" alt="Capa KOTOR" class="rounded-lg w-full transition-transform hover:scale-105">
+                        <img src="https://placehold.co/200x280/1a1a2e/E0E0E0?text=Project+Gotham+Racing" alt="Capa PGR" class="rounded-lg w-full transition-transform hover:scale-105">
+                    </div>
+                </section>
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-center mb-8">Conexões no Museu</h2>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <a href="#" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Sucessor:</strong> Xbox 360</a>
+                        <a href="#" onclick="showPage('item-ps2')" class="hud-border rounded-lg py-3 px-5 hover:bg-neon-purple transition-colors"><strong>Concorrente:</strong> PlayStation 2</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+
+    </main>
+    
+    <footer class="py-10 mt-16" style="background: var(--metal-bg)">
+        <div class="container mx-auto text-center text-gray-400">
+            <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Objeto para guardar o estado da aplicação
+        const state = {
+            currentPage: 'gallery',
+            galleryItems: []
+        };
+
+        // Função para mostrar uma página e esconder as outras
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                state.currentPage = pageId;
+                window.scrollTo(0, 0);
+            }
+
+            const backButtonText = document.getElementById('nav-back-text');
+            const searchContainer = document.getElementById('search-container');
+            if (pageId === 'gallery') {
+                searchContainer.style.visibility = 'visible';
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput.value) {
+                    searchInput.value = '';
+                    filterItems('');
+                }
+                backButtonText.innerHTML = '<i class="fa-solid fa-arrow-left mr-2"></i><span class="hidden sm:inline">Voltar ao Site Principal</span>';
+            } else {
+                searchContainer.style.visibility = 'hidden';
+                backButtonText.innerHTML = '<i class="fa-solid fa-arrow-left mr-2"></i><span class="hidden sm:inline">Voltar ao Acervo</span>';
+            }
+        }
+
+        // Função para mudar a imagem principal
+        function changeImage(consoleId, newSrc) {
+            const mainImage = document.getElementById(`main-image-${consoleId}`);
+            if (mainImage) mainImage.src = newSrc;
+        }
+
+        // Função para filtrar os itens da galeria
+        function filterItems(query) {
+            const galleryGrid = document.getElementById('gallery-grid');
+            const lowerCaseQuery = query.toLowerCase();
+            const queryRegex = new RegExp(`\\b${lowerCaseQuery}`, 'i');
+            let foundItems = 0;
+
+            state.galleryItems.forEach(item => {
+                const itemText = item.textContent.toLowerCase();
+                const card = item.closest('.item-card');
+                
+                if (queryRegex.test(itemText)) {
+                    card.style.display = 'block';
+                    foundItems++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            let noResultsMsg = document.getElementById('noResultsMessage');
+            if (foundItems === 0 && query.length > 0) {
+                if (!noResultsMsg) {
+                    noResultsMsg = document.createElement('div');
+                    noResultsMsg.id = 'noResultsMessage';
+                    noResultsMsg.className = 'text-center text-2xl text-neon-purple col-span-full';
+                    galleryGrid.appendChild(noResultsMsg);
+                }
+                noResultsMsg.textContent = `Nenhum item encontrado para "${query}"`;
+            } else {
+                noResultsMsg?.remove();
+            }
+        }
+        
+        // Função para lidar com a pesquisa e o autocomplete
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const autocompleteResults = document.getElementById('autocomplete-results');
+
+            const handleInput = () => {
+                const query = searchInput.value.toLowerCase();
+                filterItems(query); 
+
+                autocompleteResults.innerHTML = '';
+                if (query.length === 0) {
+                    autocompleteResults.classList.add('hidden');
+                    return;
+                }
+
+                const queryRegex = new RegExp(`\\b${query}`, 'i');
+                const matchedItems = state.galleryItems.filter(item => 
+                    queryRegex.test(item.querySelector('.item-title').textContent)
+                );
+
+                matchedItems.sort((a, b) => {
+                    const titleA = a.querySelector('.item-title').textContent.toLowerCase();
+                    const titleB = b.querySelector('.item-title').textContent.toLowerCase();
+                    const aStartsWith = titleA.startsWith(query);
+                    const bStartsWith = titleB.startsWith(query);
+                    if (aStartsWith && !bStartsWith) return -1;
+                    if (!aStartsWith && bStartsWith) return 1;
+                    return titleA.localeCompare(titleB);
+                });
+
+                if (matchedItems.length > 0) {
+                    matchedItems.forEach(item => {
+                        const title = item.querySelector('.item-title').textContent;
+                        const suggestionDiv = document.createElement('div');
+                        suggestionDiv.className = 'autocomplete-item';
+                        suggestionDiv.textContent = title;
+                        suggestionDiv.onclick = () => {
+                            searchInput.value = title;
+                            autocompleteResults.classList.add('hidden');
+                            filterItems(title.toLowerCase());
+                        };
+                        autocompleteResults.appendChild(suggestionDiv);
+                    });
+                    autocompleteResults.classList.remove('hidden');
+                } else {
+                    autocompleteResults.classList.add('hidden');
+                }
+            };
+
+            searchInput.addEventListener('input', handleInput);
+            searchInput.addEventListener('focus', handleInput);
+            document.addEventListener('click', (e) => {
+                if (!document.getElementById('search-container').contains(e.target)) {
+                    autocompleteResults.classList.add('hidden');
+                }
+            });
+        }
+
+        // Função para ordenar os itens da galeria
+        function sortItems(criteria) {
+            const galleryGrid = document.getElementById('gallery-grid');
+            // Usamos state.galleryItems que já contém os elementos originais
+            const itemsToSort = [...state.galleryItems];
+
+            itemsToSort.sort((a, b) => {
+                // Extrai o título para ordenação alfabética
+                const titleA = a.querySelector('.item-title').textContent.trim();
+                const titleB = b.querySelector('.item-title').textContent.trim();
+
+                // Extrai o ano de lançamento para ordenação por data
+                const yearTextA = Array.from(a.querySelectorAll('p')).find(p => p.textContent.includes('Lançamento:')).textContent;
+                const yearTextB = Array.from(b.querySelectorAll('p')).find(p => p.textContent.includes('Lançamento:')).textContent;
+                
+                // Usa regex para encontrar o ano de 4 dígitos
+                const yearA = parseInt(yearTextA.match(/\d{4}/)[0]);
+                const yearB = parseInt(yearTextB.match(/\d{4}/)[0]);
+
+                switch (criteria) {
+                    case 'date-asc':
+                        return yearA - yearB; // Mais antigo primeiro
+                    case 'date-desc':
+                        return yearB - yearA; // Mais novo primeiro
+                    case 'alpha-asc':
+                        return titleA.localeCompare(titleB); // Ordem alfabética
+                    default:
+                        return 0;
+                }
+            });
+
+            // Limpa a grade e adiciona os itens ordenados
+            galleryGrid.innerHTML = '';
+            itemsToSort.forEach(item => galleryGrid.appendChild(item));
+        }
+
+        // Inicialização quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', () => {
+            // Guarda os dados dos itens para a pesquisa e ordenação
+            state.galleryItems = Array.from(document.querySelectorAll('#gallery-grid .item-card'));
+            
+            showPage('gallery');
+            setupSearch();
+
+            // Adiciona o listener para o seletor de ordenação
+            const sortSelect = document.getElementById('sort-select');
+            sortSelect.addEventListener('change', (e) => {
+                sortItems(e.target.value);
+            });
+
+            // Aplica a ordenação inicial (Mais Antigos)
+            sortItems('date-asc');
+        });
+    </script>
+</body>
+</html>
