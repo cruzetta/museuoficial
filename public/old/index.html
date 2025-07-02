@@ -3,13 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Museu Itinerante do Videogame - Oficial</title>
+    <title>Museu Itinerante do Videojogo - Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles/index_style.css">
+
+    <style>
+        :root {
+            --neon-blue: #00BFFF;
+            --neon-purple: #A020F0;
+            --neon-green: #39FF14;
+            --dark-bg: #0D0D1A;
+            --metal-bg: linear-gradient(145deg, #1a1a2e, #161625);
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--dark-bg);
+            color: #E0E0E0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .nav-link {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .hud-border {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px rgba(0, 191, 255, 0.5);
+            background: rgba(13, 13, 26, 0.85);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        
+        .hud-border::before, .hud-border::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-color: var(--neon-purple);
+            border-style: solid;
+            transition: all 0.3s ease;
+        }
+        .hud-border:hover::before, .hud-border:hover::after {
+            width: 25px;
+            height: 25px;
+        }
+        .hud-border::before { top: -5px; left: -5px; border-width: 3px 0 0 3px; }
+        .hud-border::after { bottom: -5px; right: -5px; border-width: 0 3px 3px 0; }
+
+        .joystick-btn {
+            font-family: 'Orbitron', sans-serif;
+            background: var(--neon-purple);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--neon-purple);
+        }
+        .joystick-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 35px var(--neon-purple);
+        }
+
+        .room-section {
+            padding: 120px 2rem 100px;
+            border-bottom: 2px solid rgba(0, 191, 255, 0.2);
+            position: relative;
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+        }
+        .room-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(13, 13, 26, 0.90);
+        }
+        .room-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        #home { background-image: url('https://www.transparenttextures.com/patterns/holographic.png'); background-attachment: scroll; }
+        #noticias { background-image: url('https://www.transparenttextures.com/patterns/8-bit-surface.png'); }
+        #acervos { background-image: url('https://www.transparenttextures.com/patterns/checkered-pattern.png'); }
+        #games { background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); }
+        #timeline { background-image: url('https://www.transparenttextures.com/patterns/subtle-prism.png'); }
+        #quiz { background-image: url('https://www.transparenttextures.com/patterns/fancy-cushion.png'); }
+        #curiosidades { background-image: url('https://www.transparenttextures.com/patterns/inspiration-geometry.png'); }
+        #onde-estamos { background-image: url('https://www.transparenttextures.com/patterns/maps.png'); }
+        #corporativo { background-image: url('https://www.transparenttextures.com/patterns/clean-textile.png'); }
+        #loja { background-image: url('https://www.transparenttextures.com/patterns/low-poly-grid.png'); }
+
+        .holographic-text {
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-green), var(--neon-blue));
+            background-size: 200% 200%;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: holographic-shine 5s linear infinite;
+        }
+
+        @keyframes holographic-shine {
+            to { background-position: 200% center; }
+        }
+        
+        .nav-link.active {
+            color: white;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+    </style>
 </head>
 <body class="antialiased">
 
@@ -53,10 +166,9 @@
         <!-- Seção Home -->
         <section id="home" class="min-h-screen flex flex-col items-center justify-center text-center relative overflow-hidden pt-24">
             <div class="room-content flex-grow flex flex-col items-center justify-center p-4">
-            <img src="src/images/logo_museu.png" alt="Logo Museu do Videogame" class="mb-8 w-56 h-56 object-contain rounded-xl border border-neon-blue shadow-[0_0_30px_var(--neon-blue)] p-4">
-            <h1 id="home-titulo" class="text-5xl md:text-8xl font-black mb-4 holographic-text">Carregando...</h1>
-            <p id="home-subtitulo" class="text-lg md:text-xl max-w-3xl mx-auto mb-8">...</p>
-            <a id="home-botao" href="#noticias" class="joystick-btn">Iniciar Exploração</a>
+                <h1 id="home-titulo" class="text-5xl md:text-8xl font-black mb-4 holographic-text">Carregando...</h1>
+                <p id="home-subtitulo" class="text-lg md:text-xl max-w-3xl mx-auto mb-8">...</p>
+                <a id="home-botao" href="#noticias" class="joystick-btn">Iniciar Exploração</a>
             </div>
             
             <!-- Seção de Destaques -->
@@ -118,8 +230,8 @@
         <!-- Seção Quiz -->
         <section id="quiz" class="room-section">
             <div class="room-content container mx-auto text-center">
-            <h2 class="text-4xl font-bold mb-12">Teste seus Conhecimentos</h2>
-            <div id="quiz-container" class="max-w-2xl mx-auto hud-border p-8 rounded-lg"></div>
+                <h2 class="text-4xl font-bold mb-12">Teste seus Conhecimentos</h2>
+                <div id="quiz-container" class="max-w-2xl mx-auto hud-border p-8 rounded-lg"></div>
             </div>
         </section>
 
