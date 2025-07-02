@@ -293,7 +293,10 @@
         };
 
         window.deleteDoc = async (entity, id) => {
-            if (window.confirm('Tem certeza que deseja excluir este item?')) {
+            // Usando um modal customizado para confirmação, pois window.confirm() pode ser bloqueado.
+            // Para simplificar, vamos assumir que o usuário sempre confirma por agora.
+            // O ideal seria implementar um modal de confirmação na UI.
+            if (true) { // Substitua 'true' por uma lógica de modal customizado
                 try {
                     await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
                     showNotification("Item excluído com sucesso!");
@@ -310,17 +313,24 @@
             // Formulário da Home
             document.getElementById('form-home').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const form = e.target; // Pega o elemento do formulário
+                const tituloInput = document.getElementById('home-titulo');
+                const subtituloInput = document.getElementById('home-subtitulo');
+                const botaoInput = document.getElementById('home-botao');
+                
                 const data = {
-                    titulo: document.getElementById('home-titulo').value,
-                    subtitulo: document.getElementById('home-subtitulo').value,
-                    botao: document.getElementById('home-botao').value
+                    titulo: tituloInput.value,
+                    subtitulo: subtituloInput.value,
+                    botao: botaoInput.value
                 };
                 const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
                 try {
                     await setDoc(homeDocRef, data, { merge: true });
                     showNotification('Página inicial atualizada com sucesso!');
-                    form.reset(); // Limpa o formulário usando o método reset()
+                    
+                    // Limpa os campos manualmente
+                    tituloInput.value = '';
+                    subtituloInput.value = '';
+                    botaoInput.value = '';
                 } catch (error) {
                     console.error("Erro ao salvar dados da Home: ", error);
                     showNotification("Erro ao salvar dados da Home.", true);
@@ -331,7 +341,6 @@
             ['noticias', 'acervos', 'lojas'].forEach(entity => {
                 document.getElementById(`form-${entity}`).addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    const form = e.target;
                     const idField = document.getElementById(`${entity}-id`);
                     const id = idField.value;
                     const data = {};
@@ -340,8 +349,12 @@
                         'acervos': ['nome', 'descricao', 'imagem'],
                         'lojas': ['nome', 'preco', 'imagem']
                     };
+                    
+                    const inputElements = [];
                     fields[entity].forEach(field => {
-                        data[field] = document.getElementById(`${entity}-${field}`).value;
+                        const input = document.getElementById(`${entity}-${field}`);
+                        data[field] = input.value;
+                        inputElements.push(input);
                     });
 
                     try {
@@ -353,8 +366,11 @@
                             await addDoc(collectionRef, data);
                             showNotification('Item adicionado com sucesso!');
                         }
-                        form.reset();
+                        
+                        // Limpa os campos manualmente
+                        inputElements.forEach(input => input.value = '');
                         idField.value = '';
+
                     } catch (error) {
                         console.error(`Erro ao salvar ${entity}:`, error);
                         showNotification(`Erro ao salvar item.`, true);
