@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Museu do Video Game</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        .nav-link.active {
+            color: #3b82f6;
+            border-bottom: 2px solid #3b82f6;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-gray-800/80 backdrop-blur-sm sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <a href="#home" class="text-2xl font-bold text-white hover:text-blue-400 transition-colors duration-300" onclick="showSection('home', this)">
+                    <i class="fas fa-gamepad mr-2"></i>Museu do Video Game
+                </a>
+
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#home" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('home', this)">Home</a>
+                    <a href="#noticias" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('noticias', this)">Notícias</a>
+                    <a href="#acervos" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('acervos', this)">Acervos</a>
+                    <a href="#games" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('games', this)">Games</a>
+                    <a href="#timeline" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('timeline', this)">Timeline</a>
+                    <a href="#quiz" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('quiz', this)">Quiz</a>
+                    <a href="#curiosidades" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('curiosidades', this)">Curiosidades</a>
+                    <a href="#onde-estamos" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('onde-estamos', this)">Onde Estamos</a>
+                    <a href="#corporativo" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('corporativo', this)">Corporativo</a>
+                    <a href="#loja" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 pb-1" onclick="showSection('loja', this)">Loja</a>
+                </nav>
+
+                <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-800">
+             <a href="#home" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('home', this)">Home</a>
+            <a href="#noticias" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('noticias', this)">Notícias</a>
+            <a href="#acervos" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('acervos', this)">Acervos</a>
+            <a href="#games" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('games', this)">Games</a>
+            <a href="#timeline" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('timeline', this)">Timeline</a>
+            <a href="#quiz" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('quiz', this)">Quiz</a>
+            <a href="#curiosidades" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('curiosidades', this)">Curiosidades</a>
+            <a href="#onde-estamos" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('onde-estamos', this)">Onde Estamos</a>
+            <a href="#corporativo" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('corporativo', this)">Corporativo</a>
+            <a href="#loja" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-700" onclick="showSection('loja', this)">Loja</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+
+        <section id="home" class="content-section">
+            <div class="text-center rounded-xl bg-gray-800 p-8 md:p-16">
+                <h1 id="home-titulo" class="text-4xl md:text-6xl font-bold text-white mb-4">Bem-vindo ao Museu do Video Game</h1>
+                <p id="home-subtitulo" class="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto">Uma viagem nostálgica pela história dos jogos eletrônicos, desde os pioneiros até as gerações mais recentes.</p>
+                <a id="home-botao" href="#acervos" onclick="showSection('acervos', document.querySelector('a[href=\'#acervos\']'))" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-transform transform hover:scale-105">Explore o Acervo</a>
+            </div>
+            <div class="mt-12 grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-6 rounded-lg text-center">
+                    <i class="fas fa-newspaper text-blue-400 text-4xl mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Últimas Notícias</h3>
+                    <p class="text-gray-400">Fique por dentro dos eventos e novidades do universo gamer.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg text-center">
+                    <i class="fas fa-ghost text-yellow-400 text-4xl mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Games Clássicos</h3>
+                    <p class="text-gray-400">Relembre os jogos que marcaram gerações e definiram gêneros.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg text-center">
+                    <i class="fas fa-ticket-alt text-green-400 text-4xl mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Visite-nos</h3>
+                    <p class="text-gray-400">Confira nossa localização e planeje sua visita para uma experiência única.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="noticias" class="content-section">
+            <h2 class="text-3xl font-bold text-center mb-8">Notícias e Eventos</h2>
+            <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Conteúdo dinâmico -->
+            </div>
+        </section>
+
+        <section id="acervos" class="content-section">
+            <h2 class="text-3xl font-bold text-center mb-8">Nossos Acervos</h2>
+            <div id="acervos-container" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Conteúdo dinâmico -->
+            </div>
+        </section>
+
+        <section id="games" class="content-section">
+            <h2 class="text-3xl font-bold text-center mb-8">Games Icônicos</h2>
+            <div class="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
+                 <div class="bg-gray-800 rounded-lg p-4 text-center group">
+                    <img src="https://placehold.co/200x200/1f2937/ffff00?text=PAC-MAN" class="rounded-full w-32 h-32 mx-auto object-cover border-4 border-gray-700 group-hover:border-yellow-400 transition-all duration-300" alt="Pac-Man">
+                    <h3 class="mt-4 text-lg font-semibold">Pac-Man</h3>
+                    <p class="text-sm text-gray-400">1980</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center group">
+                    <img src="https://placehold.co/200x200/1f2937/ff0000?text=MARIO" class="rounded-full w-32 h-32 mx-auto object-cover border-4 border-gray-700 group-hover:border-red-500 transition-all duration-300" alt="Super Mario Bros.">
+                    <h3 class="mt-4 text-lg font-semibold">Super Mario Bros.</h3>
+                    <p class="text-sm text-gray-400">1985</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center group">
+                    <img src="https://placehold.co/200x200/1f2937/0000ff?text=SONIC" class="rounded-full w-32 h-32 mx-auto object-cover border-4 border-gray-700 group-hover:border-blue-500 transition-all duration-300" alt="Sonic The Hedgehog">
+                    <h3 class="mt-4 text-lg font-semibold">Sonic The Hedgehog</h3>
+                    <p class="text-sm text-gray-400">1991</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center group">
+                    <img src="https://placehold.co/200x200/1f2937/00ff00?text=ZELDA" class="rounded-full w-32 h-32 mx-auto object-cover border-4 border-gray-700 group-hover:border-green-500 transition-all duration-300" alt="The Legend of Zelda">
+                    <h3 class="mt-4 text-lg font-semibold">The Legend of Zelda</h3>
+                    <p class="text-sm text-gray-400">1986</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center group">
+                    <img src="https://placehold.co/200x200/1f2937/ffffff?text=TETRIS" class="rounded-full w-32 h-32 mx-auto object-cover border-4 border-gray-700 group-hover:border-white transition-all duration-300" alt="Tetris">
+                    <h3 class="mt-4 text-lg font-semibold">Tetris</h3>
+                    <p class="text-sm text-gray-400">1984</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="timeline" class="content-section">
+            <h2 class="text-3xl font-bold text-center mb-12">Linha do Tempo dos Games</h2>
+            <div class="relative max-w-2xl mx-auto">
+                <div class="absolute left-1/2 h-full w-1 bg-gray-700 -translate-x-1/2"></div>
+                <div class="relative mb-8">
+                    <div class="absolute left-1/2 w-6 h-6 bg-blue-500 rounded-full -translate-x-1/2 mt-1.5"></div>
+                    <div class="ml-[calc(50%+2rem)] bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg">1972: Pong</h3>
+                        <p class="text-sm text-gray-400">O primeiro sucesso comercial dos videogames, da Atari.</p>
+                    </div>
+                </div>
+                <div class="relative mb-8">
+                    <div class="absolute left-1/2 w-6 h-6 bg-blue-500 rounded-full -translate-x-1/2 mt-1.5"></div>
+                    <div class="mr-[calc(50%+2rem)] text-right bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg">1985: Nintendo Entertainment System</h3>
+                        <p class="text-sm text-gray-400">O NES revive a indústria de games após o crash de 1983.</p>
+                    </div>
+                </div>
+                <div class="relative mb-8">
+                    <div class="absolute left-1/2 w-6 h-6 bg-blue-500 rounded-full -translate-x-1/2 mt-1.5"></div>
+                    <div class="ml-[calc(50%+2rem)] bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg">1994: Sony PlayStation</h3>
+                        <p class="text-sm text-gray-400">A Sony entra no mercado e populariza os jogos em CD-ROM.</p>
+                    </div>
+                </div>
+                <div class="relative mb-8">
+                    <div class="absolute left-1/2 w-6 h-6 bg-blue-500 rounded-full -translate-x-1/2 mt-1.5"></div>
+                    <div class="mr-[calc(50%+2rem)] text-right bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg">2001: Microsoft Xbox</h3>
+                        <p class="text-sm text-gray-400">A Microsoft lança seu primeiro console com o icônico Halo.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="content-section">
+            <h2 class="text-3xl font-bold text-center mb-8">Teste seus Conhecimentos</h2>
+            <div class="max-w-2xl mx-auto bg-gray-800 p-8 rounded-lg">
+                <div id="quiz-container">
+                    <h3 id="question" class="text-2xl font-semibold mb-6">Qual foi o primeiro console a usar CDs?</h3>
+                    <div id="answers" class="space-y-4">
+                        <button class="w-full text-left p-4 bg-gray-700 rounded-lg hover:bg-blue-600 transition-colors">A) Sega CD</button>
+                        <button class="w-full text-left p-4 bg-gray-700 rounded-lg hover:bg-blue-600 transition-colors">B) PlayStation</button>
+                        <button class="w-full text-left p-4 bg-gray-700 rounded-lg hover:bg-blue-600 transition-colors">C) 3DO</button>
+                        <button class="w-full text-left p-4 bg-gray-700 rounded-lg hover:bg-blue-600 transition-colors">D) PC Engine CD-ROM²</button>
+                    </div>
+                </div>
+                <div id="result" class="text-center mt-6 hidden">
+                    <p class="text-xl">Resposta correta! O PC Engine CD-ROM² foi lançado no Japão em 1988.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="curiosidades" class="content-section">
+            <h2 class="text-3xl font-bold text-center mb-8">Você Sabia?</h2>
+            <div class="space-y-6 max-w-3xl mx-auto">
+                 <div class="bg-gray-800 p-6 rounded-lg flex items-start space-x-4">
+                    <i class="fas fa-lightbulb text-yellow-400 text-2xl mt-1"></i>
+                    <div>
+                        <h3 class="font-bold text-lg">O nome "Mario"</h3>
+                        <p class="text-gray-300">O personagem Mario foi nomeado em homenagem a Mario Segale, o proprietário do depósito da Nintendo of America nos anos 80.</p>
+                    </div>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg flex items-start space-x-4">
+                    <i class="fas fa-lightbulb text-yellow-400 text-2xl mt-1"></i>
+                    <div>
+                        <h3 class="font-bold text-lg">O primeiro "Easter Egg"</h3>
+                        <p class="text-gray-300">O primeiro easter egg conhecido em um videogame está no jogo "Adventure" (1979) para o Atari 2600, onde o programador Warren Robinett escondeu seu nome.</p>
+                    </div>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg flex items-start space-x-4">
+                    <i class="fas fa-lightbulb text-yellow-400 text-2xl mt-1"></i>
+                    <div>
+                        <h3 class="font-bold text-lg">PlayStation era da Nintendo?</h3>
+                        <p class="text-gray-300">O PlayStation começou como um projeto de parceria entre a Sony e a Nintendo para criar um periférico de CD para o Super Nintendo. Após a Nintendo desistir, a Sony continuou o projeto sozinha.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="onde-estamos" class="content-section">
+            <h2 class="text-3xl font-bold text-center mb-8">Onde Estamos</h2>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold mb-4">Nosso Endereço</h3>
+                        <p class="text-gray-300"><i class="fas fa-map-marker-alt w-6"></i> Av. dos Gamers, 1983 - Bairro Console</p>
+                        <p class="text-gray-300"><i class="fas fa-city w-6"></i> São Paulo - SP, 01234-567</p>
+                        <h3 class="text-xl font-bold mt-6 mb-4">Horário de Funcionamento</h3>
+                        <p class="text-gray-300"><i class="fas fa-clock w-6"></i> Terça a Domingo: 10h às 18h</p>
+                        <p class="text-gray-300"><i class="fas fa-door-closed w-6"></i> Fechado às Segundas</p>
+                    </div>
+                </div>
+                <div class="h-80 md:h-96 rounded-lg overflow-hidden">
+                    <div class="bg-gray-700 w-full h-full flex items-center justify-center">
+                        <p class="text-gray-400">Mapa do Google Maps aqui</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="corporativo" class="content-section">
+            <h2 class="text-3xl font-bold text-center mb-8">Sobre o Museu</h2>
+            <div class="max-w-4xl mx-auto bg-gray-800 p-8 rounded-lg">
+                <h3 class="text-2xl font-bold mb-4">Nossa Missão</h3>
+                <p class="text-gray-300 mb-6">Preservar e celebrar a rica história do videogame como uma forma de arte, tecnologia e cultura. Buscamos educar e inspirar futuras gerações de jogadores e criadores, oferecendo uma visão abrangente da evolução dos jogos eletrônicos e seu impacto na sociedade.</p>
+                <h3 class="text-2xl font-bold mb-4">Nossa Visão</h3>
+                <p class="text-gray-300">Ser a principal referência mundial na preservação da história dos videogames, reconhecidos por nosso acervo único, exposições inovadoras e programas educacionais que conectam pessoas de todas as idades através da paixão compartilhada pelos jogos.</p>
+            </div>
+        </section>
+
+        <section id="loja" class="content-section">
+            <h2 class="text-3xl font-bold text-center mb-8">Loja do Museu</h2>
+            <div id="loja-container" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Conteúdo dinâmico -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 border-t border-gray-700 mt-12">
+        <div class="container mx-auto px-4 py-8 text-center text-gray-400">
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="#" class="hover:text-white transition-colors"><i class="fab fa-facebook-f text-2xl"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i class="fab fa-twitter text-2xl"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i class="fab fa-instagram text-2xl"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i class="fab fa-youtube text-2xl"></i></a>
+            </div>
+            <p>&copy; 2024 Museu do Video Game. Todos os direitos reservados.</p>
+            <p class="text-sm mt-2">Um projeto para celebrar a história dos jogos.</p>
+        </div>
+    </footer>
+
+
+    <!-- SCRIPT ORIGINAL DA PÁGINA (NAVEGAÇÃO, ETC) -->
+    <script>
+        const sections = document.querySelectorAll('.content-section');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        function showSection(id, clickedLink) {
+            event.preventDefault();
+            sections.forEach(section => {
+                section.classList.remove('active', 'fade-in');
+            });
+            const targetSection = document.getElementById(id);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                setTimeout(() => {
+                    targetSection.classList.add('fade-in');
+                }, 10);
+                const headerOffset = 100;
+                const elementPosition = targetSection.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+            }
+            document.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelectorAll(`a[href="#${id}"]`).forEach(link => {
+                link.classList.add('active');
+            });
+            mobileMenu.classList.add('hidden');
+        }
+
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const homeSection = document.getElementById('home');
+            const homeLink = document.querySelector('a[href="#home"]');
+            if (homeSection) homeSection.classList.add('active', 'fade-in');
+            if(homeLink) homeLink.classList.add('active');
+        });
+        
+        const quizAnswers = document.querySelectorAll('#answers button');
+        const resultDiv = document.getElementById('result');
+        quizAnswers.forEach(button => {
+            button.addEventListener('click', () => {
+                quizAnswers.forEach(btn => {
+                    btn.classList.remove('bg-green-600', 'bg-red-600');
+                    btn.classList.add('bg-gray-700');
+                });
+                if(button.textContent.includes('D)')) {
+                    button.classList.remove('bg-gray-700');
+                    button.classList.add('bg-green-600');
+                    resultDiv.querySelector('p').textContent = 'Correto! O PC Engine CD-ROM² foi o primeiro, lançado no Japão em 1988.';
+                } else {
+                    button.classList.remove('bg-gray-700');
+                    button.classList.add('bg-red-600');
+                    resultDiv.querySelector('p').textContent = 'Incorreto. A resposta certa é a D.';
+                }
+                resultDiv.classList.remove('hidden');
+            });
+        });
+    </script>
+
+    <!-- ========= SCRIPT ATUALIZADO PARA CARREGAR DADOS DO FIREBASE ========= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
+            authDomain: "museu-cca6d.firebaseapp.com",
+            projectId: "museu-cca6d",
+            storageBucket: "museu-cca6d.firebasestorage.app",
+            messagingSenderId: "555107674356",
+            appId: "1:555107674356:web:f38d1703d35831f7ad16a1",
+            measurementId: "G-2SKCJ3RRN5"
+        };
+
+        // Inicialização
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        setLogLevel('debug');
+        const appId = 'museu-cca6d';
+
+        // --- FUNÇÃO PARA CARREGAR DADOS DA PÁGINA INICIAL ---
+        const loadHomeData = () => {
+            const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
+            onSnapshot(homeDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('home-titulo').textContent = data.titulo;
+                    document.getElementById('home-subtitulo').textContent = data.subtitulo;
+                    document.getElementById('home-botao').textContent = data.botao;
+                }
+            });
+        };
+
+        // --- FUNÇÃO PARA CARREGAR DADOS DE UMA COLEÇÃO E RENDERIZAR ---
+        const loadAndRender = (collectionName, containerId, renderer) => {
+            const container = document.getElementById(containerId);
+            const collectionRef = collection(db, `/artifacts/${appId}/public/data/${collectionName}`);
+
+            onSnapshot(collectionRef, (snapshot) => {
+                container.innerHTML = ''; 
+                if (snapshot.empty) {
+                    container.innerHTML = `<p class="text-gray-400 text-center col-span-full">Nenhum item encontrado. Adicione conteúdo no Painel Administrativo.</p>`;
+                } else {
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const element = renderer(data);
+                        container.innerHTML += element;
+                    });
+                }
+            }, (error) => {
+                console.error(`Erro ao carregar ${collectionName}:`, error);
+                container.innerHTML = `<p class="text-red-400 text-center col-span-full">Erro ao carregar conteúdo. Verifique o console.</p>`;
+            });
+        };
+
+        // --- FUNÇÕES DE RENDERIZAÇÃO ESPECÍFICAS PARA CADA SEÇÃO ---
+
+        const renderNoticia = (data) => `
+            <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-blue-500/20 transition-shadow duration-300">
+                <img src="${data.imagem}" alt="${data.titulo}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1f2937/ffffff?text=Imagem+Inválida';">
+                <div class="p-6">
+                    <span class="text-sm text-blue-400">${data.categoria || 'NOVIDADE'}</span>
+                    <h3 class="text-xl font-bold my-2">${data.titulo}</h3>
+                    <p class="text-gray-400">${data.descricao}</p>
+                </div>
+            </div>
+        `;
+
+        const renderAcervo = (data) => `
+            <div class="bg-gray-800 p-6 rounded-lg text-center transform hover:-translate-y-2 transition-transform duration-300">
+                <img src="${data.imagem}" alt="${data.nome}" class="mx-auto mb-4 rounded h-32 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/300x200/111827/ffffff?text=Imagem+Inválida';">
+                <h3 class="text-xl font-bold">${data.nome}</h3>
+                <p class="text-gray-400 text-sm">${data.descricao}</p>
+            </div>
+        `;
+
+        const renderProdutoLoja = (data) => `
+            <div class="bg-gray-800 rounded-lg overflow-hidden text-center group">
+                <img src="${data.imagem}" alt="${data.nome}" class="w-full h-64 object-cover group-hover:opacity-80 transition-opacity" onerror="this.onerror=null;this.src='https://placehold.co/400x400/1f2937/ffffff?text=Imagem+Inválida';">
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold">${data.nome}</h3>
+                    <p class="text-blue-400 font-bold text-xl">R$ ${data.preco}</p>
+                    <button class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">Comprar</button>
+                </div>
+            </div>
+        `;
+
+        // --- INICIAR O CARREGAMENTO DOS DADOS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHomeData(); // Carrega os dados da página inicial
+            loadAndRender('noticias', 'noticias-container', renderNoticia);
+            loadAndRender('acervos', 'acervos-container', renderAcervo);
+            loadAndRender('lojas', 'loja-container', renderProdutoLoja);
+        });
+    </script>
+</body>
+</html>

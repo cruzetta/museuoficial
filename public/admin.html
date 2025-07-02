@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Museu do Video Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Cabeçalho -->
+    <header class="bg-gray-800 text-white shadow-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold"><i class="fas fa-shield-halved mr-2"></i>Painel Administrativo</h1>
+            <p id="userId" class="text-sm font-mono"></p>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Menu Lateral -->
+        <aside class="md:col-span-1">
+            <div class="bg-white p-4 rounded-lg shadow-md">
+                <h2 class="text-lg font-bold mb-4 border-b pb-2">Gerenciar Conteúdo</h2>
+                <nav class="space-y-2">
+                    <button onclick="showForm('home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
+                    <button onclick="showForm('noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
+                    <button onclick="showForm('acervos')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Acervos</button>
+                    <button onclick="showForm('lojas')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-store fa-fw"></i> Loja</button>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="md:col-span-3">
+            <!-- Seção da Home -->
+            <div id="home-form" class="form-section bg-white p-8 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-6">Gerenciar Página Inicial</h2>
+                <form id="form-home" class="space-y-4">
+                    <div>
+                        <label for="home-titulo" class="block text-sm font-medium text-gray-700">Título Principal</label>
+                        <input type="text" id="home-titulo" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="home-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo</label>
+                        <textarea id="home-subtitulo" rows="3" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required></textarea>
+                    </div>
+                    <div>
+                        <label for="home-botao" class="block text-sm font-medium text-gray-700">Texto do Botão</label>
+                        <input type="text" id="home-botao" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Salvar Alterações da Home</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Seção de Notícias -->
+            <div id="noticias-form" class="form-section bg-white p-8 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-6">Gerenciar Notícias</h2>
+                <form id="form-noticias" class="space-y-4">
+                    <input type="hidden" id="noticias-id">
+                    <div>
+                        <label for="noticias-titulo" class="block text-sm font-medium text-gray-700">Título</label>
+                        <input type="text" id="noticias-titulo" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="noticias-categoria" class="block text-sm font-medium text-gray-700">Categoria (Ex: EVENTO, COMPETIÇÃO)</label>
+                        <input type="text" id="noticias-categoria" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="noticias-descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+                        <textarea id="noticias-descricao" rows="3" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required></textarea>
+                    </div>
+                    <div>
+                        <label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label>
+                        <input type="url" id="noticias-imagem" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Salvar Notícia</button>
+                        <button type="button" onclick="clearForm('noticias')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Cancelar Edição</button>
+                    </div>
+                </form>
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold mb-4">Notícias Cadastradas</h3>
+                    <div id="noticias-lista" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Seção de Acervos -->
+            <div id="acervos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-6">Gerenciar Acervos</h2>
+                <form id="form-acervos" class="space-y-4">
+                    <input type="hidden" id="acervos-id">
+                    <div>
+                        <label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome do Console</label>
+                        <input type="text" id="acervos-nome" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="acervos-descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+                        <input type="text" id="acervos-descricao" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="acervos-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label>
+                        <input type="url" id="acervos-imagem" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Salvar Acervo</button>
+                        <button type="button" onclick="clearForm('acervos')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Cancelar Edição</button>
+                    </div>
+                </form>
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold mb-4">Itens do Acervo</h3>
+                    <div id="acervos-lista" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Seção da Loja -->
+            <div id="lojas-form" class="form-section bg-white p-8 rounded-lg shadow-md">
+                 <h2 class="text-2xl font-bold mb-6">Gerenciar Loja</h2>
+                <form id="form-lojas" class="space-y-4">
+                    <input type="hidden" id="lojas-id">
+                    <div>
+                        <label for="lojas-nome" class="block text-sm font-medium text-gray-700">Nome do Produto</label>
+                        <input type="text" id="lojas-nome" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="lojas-preco" class="block text-sm font-medium text-gray-700">Preço (Ex: 79,90)</label>
+                        <input type="text" id="lojas-preco" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="lojas-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label>
+                        <input type="url" id="lojas-imagem" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Salvar Produto</button>
+                        <button type="button" onclick="clearForm('lojas')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Cancelar Edição</button>
+                    </div>
+                </form>
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold mb-4">Produtos da Loja</h3>
+                    <div id="lojas-lista" class="space-y-4"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Importa as funções necessárias do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Sua chave de configuração do Firebase. É o que conecta este site ao seu projeto.
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
+            authDomain: "museu-cca6d.firebaseapp.com",
+            projectId: "museu-cca6d",
+            storageBucket: "museu-cca6d.firebasestorage.app",
+            messagingSenderId: "555107674356",
+            appId: "1:555107674356:web:f38d1703d35831f7ad16a1",
+            measurementId: "G-2SKCJ3RRN5"
+        };
+
+        // Inicializa o Firebase e seus serviços
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app); // Conexão com o banco de dados Firestore
+        const auth = getAuth(app);    // Conexão com o sistema de autenticação
+        setLogLevel('debug');         // Mostra mais detalhes no console para ajudar a depurar
+        
+        const appId = 'museu-cca6d'; // ID do projeto, para montar o caminho do banco de dados
+        let userId; // Variável para guardar o ID do usuário anônimo
+
+        // --- LÓGICA PARA GERENCIAR A PÁGINA INICIAL ---
+        const setupHomeManagement = () => {
+            const form = document.getElementById('form-home');
+            // Define um caminho fixo para o documento da página inicial
+            const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
+
+            // Carrega os dados existentes no formulário
+            onSnapshot(homeDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('home-titulo').value = data.titulo || '';
+                    document.getElementById('home-subtitulo').value = data.subtitulo || '';
+                    document.getElementById('home-botao').value = data.botao || '';
+                } else {
+                    console.log("Documento da home ainda não existe. Será criado ao salvar.");
+                }
+            });
+
+            // Salva as alterações no documento da página inicial
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const data = {
+                    titulo: document.getElementById('home-titulo').value,
+                    subtitulo: document.getElementById('home-subtitulo').value,
+                    botao: document.getElementById('home-botao').value
+                };
+                // setDoc com merge:true cria o documento se não existir, ou atualiza se já existir
+                await setDoc(homeDocRef, data, { merge: true });
+                alert('Página inicial atualizada com sucesso!');
+            });
+        };
+
+
+        // --- LÓGICA PARA GERENCIAR SEÇÕES COM MÚLTIPLOS ITENS ---
+        const setupCrud = (entity) => {
+            const form = document.getElementById(`form-${entity}`);
+            const listContainer = document.getElementById(`${entity}-lista`);
+            const idField = document.getElementById(`${entity}-id`);
+            
+            if (!form || !listContainer || !idField) {
+                console.error(`Elementos para a entidade '${entity}' não foram encontrados.`);
+                return;
+            }
+
+            const collectionRef = collection(db, `/artifacts/${appId}/public/data/${entity}`);
+
+            onSnapshot(collectionRef, (snapshot) => {
+                listContainer.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+                    let textContent = data.titulo || data.nome;
+                    itemDiv.innerHTML = `
+                        <p class="font-semibold">${textContent}</p>
+                        <div class="flex gap-2">
+                            <button onclick="window.editDoc('${entity}', '${doc.id}')" class="px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600">Editar</button>
+                            <button onclick="window.deleteDoc('${entity}', '${doc.id}')" class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700">Excluir</button>
+                        </div>
+                    `;
+                    listContainer.appendChild(itemDiv);
+                });
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = idField.value;
+                const data = {};
+                const fields = {
+                    'noticias': ['titulo', 'categoria', 'descricao', 'imagem'],
+                    'acervos': ['nome', 'descricao', 'imagem'],
+                    'lojas': ['nome', 'preco', 'imagem']
+                };
+                fields[entity].forEach(field => {
+                    data[field] = document.getElementById(`${entity}-${field}`).value;
+                });
+                if (id) {
+                    await updateDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id), data);
+                } else {
+                    await addDoc(collectionRef, data);
+                }
+                form.reset();
+                idField.value = '';
+            });
+        };
+
+        window.deleteDoc = async (entity, id) => {
+            if (confirm('Tem certeza que deseja excluir este item?')) {
+                await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
+            }
+        };
+
+        window.editDoc = (entity, id) => {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById(`${entity}-id`).value = docSnap.id;
+                    const fields = {
+                        'noticias': ['titulo', 'categoria', 'descricao', 'imagem'],
+                        'acervos': ['nome', 'descricao', 'imagem'],
+                        'lojas': ['nome', 'preco', 'imagem']
+                    };
+                    fields[entity].forEach(field => {
+                        document.getElementById(`${entity}-${field}`).value = data[field];
+                    });
+                    showForm(entity);
+                    window.scrollTo(0, 0);
+                }
+            });
+        };
+
+        window.clearForm = (entity) => {
+            document.getElementById(`form-${entity}`).reset();
+            document.getElementById(`${entity}-id`).value = '';
+        }
+
+        // --- LÓGICA DA INTERFACE ---
+        window.showForm = (formId) => {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            const formElement = document.getElementById(`${formId}-form`);
+            if (formElement) {
+                formElement.classList.add('active');
+            }
+        };
+        
+        function loadAllData() {
+            setupHomeManagement();
+            setupCrud('noticias');
+            setupCrud('acervos');
+            setupCrud('lojas');
+            showForm('home'); // Mostra o formulário da home por padrão
+        }
+        
+        // --- AUTENTICAÇÃO ---
+        function initialAuth() {
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    userId = user.uid;
+                    const userIdElement = document.getElementById('userId');
+                    if (userIdElement) {
+                        userIdElement.textContent = `ID do Usuário: ${userId}`;
+                    }
+                    loadAllData();
+                } else {
+                    signInAnonymously(auth).catch(error => {
+                        console.error("Erro no login anônimo:", error);
+                    });
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initialAuth();
+        });
+
+    </script>
+</body>
+</html>
