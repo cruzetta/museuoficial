@@ -207,8 +207,6 @@
         const auth = getAuth(app);
         setLogLevel('debug');
         
-        console.log("Admin script started. Initializing auth check...");
-
         const appId = 'museu-cca6d';
 
         const loader = document.getElementById('loader-container');
@@ -218,29 +216,27 @@
 
         // --- CONTROLE DE AUTENTICAÇÃO ---
         onAuthStateChanged(auth, user => {
-            console.log("onAuthStateChanged callback fired.");
-            if (user) {
-                // Usuário está logado.
-                console.log("User is logged in:", user.email);
+            // Se existe um usuário E ele NÃO é anônimo
+            if (user && !user.isAnonymous) {
                 userEmailElement.textContent = user.email;
-                loader.style.display = 'none'; // Esconde o loader
-                mainContent.classList.remove('hidden'); // Mostra o conteúdo
-                initializeAppLogic(); // Inicia a lógica principal da aplicação
+                loader.style.display = 'none';
+                mainContent.classList.remove('hidden');
+                initializeAppLogic();
             } else {
-                // Usuário não está logado. Redireciona para a página de login.
-                console.log("User is not logged in. Redirecting to login.html...");
-                window.location.href = 'login.html'; // Usando caminho relativo
+                // Se o usuário for anônimo, faz o logout para limpar a sessão fantasma
+                if (user && user.isAnonymous) {
+                    console.log("Sessão anônima encontrada. Fazendo logout...");
+                    signOut(auth); 
+                }
+                // Se não houver usuário ou se ele era anônimo, redireciona
+                console.log("Usuário não autenticado. Redirecionando para login...");
+                window.location.href = 'login.html';
             }
         });
 
         // --- LÓGICA DE LOGOUT ---
         logoutButton.addEventListener('click', () => {
-            signOut(auth).then(() => {
-                // O onAuthStateChanged vai detectar a mudança e redirecionar.
-                console.log('Logout bem-sucedido.');
-            }).catch((error) => {
-                console.error('Erro ao fazer logout:', error);
-            });
+            signOut(auth).catch((error) => console.error('Erro ao fazer logout:', error));
         });
 
 
