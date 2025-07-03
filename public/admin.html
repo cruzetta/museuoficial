@@ -26,6 +26,16 @@
         #notification {
             transition: opacity 0.5s, transform 0.5s;
         }
+        /* Estilizando inputs e botões para consistência */
+        input[type="text"], input[type="url"], input[type="number"], textarea {
+            @apply mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
+        }
+        button[type="submit"] {
+            @apply w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors;
+        }
+        button[type="button"] {
+             @apply w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -34,7 +44,7 @@
     <div id="loader-container" class="fixed inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-50">
         <div class="text-center">
             <div id="loader" class="mx-auto"></div>
-            <p class="text-gray-600 mt-4">Verificando autenticação...</p>
+            <p class="text-gray-600 mt-4">A verificar autenticação...</p>
         </div>
     </div>
     
@@ -57,7 +67,7 @@
             <!-- Menu Lateral -->
             <aside class="md:col-span-1">
                 <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h2 class="text-lg font-bold mb-4 border-b pb-2">Gerenciar Conteúdo</h2>
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2">Gerir Conteúdo</h2>
                     <nav class="space-y-2">
                         <button onclick="window.showForm('home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
                         <button onclick="window.showForm('noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
@@ -77,144 +87,144 @@
             <main class="md:col-span-3">
                 <!-- Seção da Home -->
                 <div id="home-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar Página Inicial</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir Página Inicial</h2>
                     <form id="form-home" class="space-y-4">
                         <input type="hidden" id="home-id" value="main_content">
                         <div>
                             <label for="home-titulo" class="block text-sm font-medium text-gray-700">Título Principal</label>
-                            <input type="text" id="home-titulo" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                            <input type="text" id="home-titulo" required>
                         </div>
                         <div>
                             <label for="home-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo</label>
-                            <textarea id="home-subtitulo" rows="3" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required></textarea>
+                            <textarea id="home-subtitulo" rows="3" required></textarea>
                         </div>
                         <div>
                             <label for="home-botao" class="block text-sm font-medium text-gray-700">Texto do Botão</label>
-                            <input type="text" id="home-botao" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                            <input type="text" id="home-botao" required>
                         </div>
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Salvar Alterações da Home</button>
-                            <button type="button" onclick="window.loadSingleDoc('home')" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors">Carregar Dados Atuais</button>
+                            <button type="submit">Guardar Alterações da Home</button>
+                            <button type="button" onclick="window.loadSingleDoc('home')">Carregar Dados Atuais</button>
                         </div>
                     </form>
                 </div>
 
                 <!-- Seção de Notícias (CRUD) -->
                 <div id="noticias-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar Notícias</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir Notícias</h2>
                     <form id="form-noticias" class="space-y-4">
                         <input type="hidden" id="noticias-id">
-                        <div><label for="noticias-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="noticias-titulo" class="mt-1 block w-full" required></div>
-                        <div><label for="noticias-categoria" class="block text-sm font-medium text-gray-700">Categoria</label><input type="text" id="noticias-categoria" class="mt-1 block w-full" required></div>
-                        <div><label for="noticias-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="noticias-descricao" rows="3" class="mt-1 block w-full" required></textarea></div>
-                        <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="noticias-imagem" class="mt-1 block w-full" required></div>
-                        <div class="flex gap-4"><button type="submit" class="w-full bg-blue-600">Salvar Notícia</button><button type="button" onclick="window.clearForm('noticias')" class="w-full bg-gray-300">Cancelar</button></div>
+                        <div><label for="noticias-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="noticias-titulo" required></div>
+                        <div><label for="noticias-categoria" class="block text-sm font-medium text-gray-700">Categoria</label><input type="text" id="noticias-categoria" required></div>
+                        <div><label for="noticias-descricao" class="block text-sm font-medium text-gray-700">Descrição (use \n para nova linha)</label><textarea id="noticias-descricao" rows="5" required></textarea></div>
+                        <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="noticias-imagem" required></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Notícia</button><button type="button" onclick="window.clearForm('noticias')">Cancelar</button></div>
                     </form>
-                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Notícias Cadastradas</h3><div id="noticias-lista" class="space-y-4"></div></div>
+                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Notícias Registadas</h3><div id="noticias-lista" class="space-y-4"></div></div>
                 </div>
 
                 <!-- Seção de Acervos (CRUD) -->
                 <div id="acervos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar Acervos</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir Acervos</h2>
                     <form id="form-acervos" class="space-y-4">
                         <input type="hidden" id="acervos-id">
-                        <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome do Console</label><input type="text" id="acervos-nome" class="mt-1 block w-full" required></div>
-                        <div><label for="acervos-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><input type="text" id="acervos-descricao" class="mt-1 block w-full" required></div>
-                        <div><label for="acervos-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="acervos-imagem" class="mt-1 block w-full" required></div>
-                        <div class="flex gap-4"><button type="submit" class="w-full bg-blue-600">Salvar Acervo</button><button type="button" onclick="window.clearForm('acervos')" class="w-full bg-gray-300">Cancelar</button></div>
+                        <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome da Consola</label><input type="text" id="acervos-nome" required></div>
+                        <div><label for="acervos-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><input type="text" id="acervos-descricao" required></div>
+                        <div><label for="acervos-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="acervos-imagem" required></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Acervo</button><button type="button" onclick="window.clearForm('acervos')">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Itens do Acervo</h3><div id="acervos-lista" class="space-y-4"></div></div>
                 </div>
 
                 <!-- Seção de Games (CRUD) -->
                 <div id="games-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar Games Icônicos</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir Games Icónicos</h2>
                     <form id="form-games" class="space-y-4">
                         <input type="hidden" id="games-id">
-                        <div><label for="games-nome" class="block text-sm font-medium text-gray-700">Nome do Jogo</label><input type="text" id="games-nome" class="mt-1 block w-full" required></div>
-                        <div><label for="games-ano" class="block text-sm font-medium text-gray-700">Ano</label><input type="text" id="games-ano" class="mt-1 block w-full" required></div>
-                        <div><label for="games-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="games-imagem" class="mt-1 block w-full" required></div>
-                        <div class="flex gap-4"><button type="submit" class="w-full bg-blue-600">Salvar Game</button><button type="button" onclick="window.clearForm('games')" class="w-full bg-gray-300">Cancelar</button></div>
+                        <div><label for="games-nome" class="block text-sm font-medium text-gray-700">Nome do Jogo</label><input type="text" id="games-nome" required></div>
+                        <div><label for="games-ano" class="block text-sm font-medium text-gray-700">Ano</label><input type="text" id="games-ano" required></div>
+                        <div><label for="games-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="games-imagem" required></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Jogo</button><button type="button" onclick="window.clearForm('games')">Cancelar</button></div>
                     </form>
-                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Games Cadastrados</h3><div id="games-lista" class="space-y-4"></div></div>
+                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Jogos Registados</h3><div id="games-lista" class="space-y-4"></div></div>
                 </div>
 
                 <!-- Seção de Timeline (CRUD) -->
                 <div id="timeline-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar Timeline</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir Timeline</h2>
                     <form id="form-timeline" class="space-y-4">
                         <input type="hidden" id="timeline-id">
-                        <div><label for="timeline-titulo" class="block text-sm font-medium text-gray-700">Título (Ex: 1972: Pong)</label><input type="text" id="timeline-titulo" class="mt-1 block w-full" required></div>
-                        <div><label for="timeline-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="timeline-descricao" rows="2" class="mt-1 block w-full" required></textarea></div>
-                        <div class="flex gap-4"><button type="submit" class="w-full bg-blue-600">Salvar Evento</button><button type="button" onclick="window.clearForm('timeline')" class="w-full bg-gray-300">Cancelar</button></div>
+                        <div><label for="timeline-titulo" class="block text-sm font-medium text-gray-700">Título (Ex: 1972: Pong)</label><input type="text" id="timeline-titulo" required></div>
+                        <div><label for="timeline-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="timeline-descricao" rows="2" required></textarea></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Evento</button><button type="button" onclick="window.clearForm('timeline')">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Eventos da Timeline</h3><div id="timeline-lista" class="space-y-4"></div></div>
                 </div>
 
                 <!-- Seção de Quiz (CRUD) -->
                 <div id="quiz-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar Quiz</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir Quiz</h2>
                     <form id="form-quiz" class="space-y-4">
                         <input type="hidden" id="quiz-id">
-                        <div><label for="quiz-pergunta" class="block text-sm font-medium text-gray-700">Pergunta</label><input type="text" id="quiz-pergunta" class="mt-1 block w-full" required></div>
-                        <div><label for="quiz-opcoes" class="block text-sm font-medium text-gray-700">Opções (separadas por vírgula)</label><input type="text" id="quiz-opcoes" class="mt-1 block w-full" placeholder="Opção A,Opção B,Opção C,Opção D" required></div>
-                        <div><label for="quiz-correta" class="block text-sm font-medium text-gray-700">Índice da Resposta Correta (0, 1, 2 ou 3)</label><input type="number" id="quiz-correta" min="0" max="3" class="mt-1 block w-full" required></div>
-                        <div class="flex gap-4"><button type="submit" class="w-full bg-blue-600">Salvar Pergunta</button><button type="button" onclick="window.clearForm('quiz')" class="w-full bg-gray-300">Cancelar</button></div>
+                        <div><label for="quiz-pergunta" class="block text-sm font-medium text-gray-700">Pergunta</label><input type="text" id="quiz-pergunta" required></div>
+                        <div><label for="quiz-opcoes" class="block text-sm font-medium text-gray-700">Opções (separadas por vírgula)</label><input type="text" id="quiz-opcoes" placeholder="Opção A,Opção B,Opção C,Opção D" required></div>
+                        <div><label for="quiz-correta" class="block text-sm font-medium text-gray-700">Índice da Resposta Correta (0, 1, 2 ou 3)</label><input type="number" id="quiz-correta" min="0" max="3" required></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Pergunta</button><button type="button" onclick="window.clearForm('quiz')">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Perguntas do Quiz</h3><div id="quiz-lista" class="space-y-4"></div></div>
                 </div>
 
                 <!-- Seção de Curiosidades (CRUD) -->
                 <div id="curiosidades-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar Curiosidades</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir Curiosidades</h2>
                     <form id="form-curiosidades" class="space-y-4">
                         <input type="hidden" id="curiosidades-id">
-                        <div><label for="curiosidades-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="curiosidades-titulo" class="mt-1 block w-full" required></div>
-                        <div><label for="curiosidades-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="curiosidades-descricao" rows="3" class="mt-1 block w-full" required></textarea></div>
-                        <div class="flex gap-4"><button type="submit" class="w-full bg-blue-600">Salvar Curiosidade</button><button type="button" onclick="window.clearForm('curiosidades')" class="w-full bg-gray-300">Cancelar</button></div>
+                        <div><label for="curiosidades-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="curiosidades-titulo" required></div>
+                        <div><label for="curiosidades-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="curiosidades-descricao" rows="3" required></textarea></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Curiosidade</button><button type="button" onclick="window.clearForm('curiosidades')">Cancelar</button></div>
                     </form>
-                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Curiosidades Cadastradas</h3><div id="curiosidades-lista" class="space-y-4"></div></div>
+                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Curiosidades Registadas</h3><div id="curiosidades-lista" class="space-y-4"></div></div>
                 </div>
 
                 <!-- Seção Onde Estamos -->
                 <div id="onde-estamos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar "Onde Estamos"</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir "Onde Estamos"</h2>
                     <form id="form-onde-estamos" class="space-y-4">
                         <input type="hidden" id="onde-estamos-id" value="info">
-                        <div><label for="onde-estamos-endereco" class="block text-sm font-medium text-gray-700">Endereço</label><input type="text" id="onde-estamos-endereco" class="mt-1 block w-full" required></div>
-                        <div><label for="onde-estamos-cidade" class="block text-sm font-medium text-gray-700">Cidade/Estado</label><input type="text" id="onde-estamos-cidade" class="mt-1 block w-full" required></div>
-                        <div><label for="onde-estamos-horario" class="block text-sm font-medium text-gray-700">Horário</label><input type="text" id="onde-estamos-horario" class="mt-1 block w-full" required></div>
-                        <div><label for="onde-estamos-fechado" class="block text-sm font-medium text-gray-700">Dia de Fechamento</label><input type="text" id="onde-estamos-fechado" class="mt-1 block w-full" required></div>
+                        <div><label for="onde-estamos-endereco" class="block text-sm font-medium text-gray-700">Endereço</label><input type="text" id="onde-estamos-endereco" required></div>
+                        <div><label for="onde-estamos-cidade" class="block text-sm font-medium text-gray-700">Cidade/Estado</label><input type="text" id="onde-estamos-cidade" required></div>
+                        <div><label for="onde-estamos-horario" class="block text-sm font-medium text-gray-700">Horário</label><input type="text" id="onde-estamos-horario" required></div>
+                        <div><label for="onde-estamos-fechado" class="block text-sm font-medium text-gray-700">Dia de Encerramento</label><input type="text" id="onde-estamos-fechado" required></div>
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <button type="submit" class="w-full bg-blue-600">Salvar Informações</button>
-                            <button type="button" onclick="window.loadSingleDoc('onde-estamos')" class="w-full bg-gray-300">Carregar Dados Atuais</button>
+                            <button type="submit">Guardar Informações</button>
+                            <button type="button" onclick="window.loadSingleDoc('onde-estamos')">Carregar Dados Atuais</button>
                         </div>
                     </form>
                 </div>
 
                 <!-- Seção Corporativo -->
                 <div id="corporativo-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar "Corporativo"</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir "Corporativo"</h2>
                     <form id="form-corporativo" class="space-y-4">
                         <input type="hidden" id="corporativo-id" value="info">
-                        <div><label for="corporativo-missao" class="block text-sm font-medium text-gray-700">Missão</label><textarea id="corporativo-missao" rows="4" class="mt-1 block w-full" required></textarea></div>
-                        <div><label for="corporativo-visao" class="block text-sm font-medium text-gray-700">Visão</label><textarea id="corporativo-visao" rows="4" class="mt-1 block w-full" required></textarea></div>
+                        <div><label for="corporativo-missao" class="block text-sm font-medium text-gray-700">Missão</label><textarea id="corporativo-missao" rows="4" required></textarea></div>
+                        <div><label for="corporativo-visao" class="block text-sm font-medium text-gray-700">Visão</label><textarea id="corporativo-visao" rows="4" required></textarea></div>
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <button type="submit" class="w-full bg-blue-600">Salvar Textos</button>
-                            <button type="button" onclick="window.loadSingleDoc('corporativo')" class="w-full bg-gray-300">Carregar Dados Atuais</button>
+                            <button type="submit">Guardar Textos</button>
+                            <button type="button" onclick="window.loadSingleDoc('corporativo')">Carregar Dados Atuais</button>
                         </div>
                     </form>
                 </div>
 
                 <!-- Seção da Loja (CRUD) -->
                 <div id="lojas-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerenciar Loja</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir Loja</h2>
                     <form id="form-lojas" class="space-y-4">
                         <input type="hidden" id="lojas-id">
-                        <div><label for="lojas-nome" class="block text-sm font-medium text-gray-700">Nome do Produto</label><input type="text" id="lojas-nome" class="mt-1 block w-full" required></div>
-                        <div><label for="lojas-preco" class="block text-sm font-medium text-gray-700">Preço</label><input type="text" id="lojas-preco" class="mt-1 block w-full" required></div>
-                        <div><label for="lojas-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="lojas-imagem" class="mt-1 block w-full" required></div>
-                        <div class="flex gap-4"><button type="submit" class="w-full bg-blue-600">Salvar Produto</button><button type="button" onclick="window.clearForm('lojas')" class="w-full bg-gray-300">Cancelar</button></div>
+                        <div><label for="lojas-nome" class="block text-sm font-medium text-gray-700">Nome do Produto</label><input type="text" id="lojas-nome" required></div>
+                        <div><label for="lojas-preco" class="block text-sm font-medium text-gray-700">Preço</label><input type="text" id="lojas-preco" required></div>
+                        <div><label for="lojas-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="lojas-imagem" required></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Produto</button><button type="button" onclick="window.clearForm('lojas')">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Produtos da Loja</h3><div id="lojas-lista" class="space-y-4"></div></div>
                 </div>
@@ -231,7 +241,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, setLogLevel, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
@@ -291,7 +301,7 @@
                     });
                     showNotification("Dados atuais carregados.");
                 } else {
-                    showNotification("Nenhum dado salvo encontrado.", true);
+                    showNotification("Nenhum dado guardado encontrado.", true);
                 }
             } catch (error) {
                 showNotification("Erro ao carregar dados.", true);
@@ -326,12 +336,12 @@
         };
 
         window.deleteDoc = async (entity, id) => {
-            if (confirm('Tem certeza que deseja excluir este item?')) {
+            if (confirm('Tem a certeza que deseja eliminar este item?')) {
                 try {
                     await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
-                    showNotification("Item excluído com sucesso!");
+                    showNotification("Item eliminado com sucesso!");
                 } catch(error) {
-                    showNotification("Erro ao excluir o item.", true);
+                    showNotification("Erro ao eliminar o item.", true);
                 }
             }
         };
@@ -349,10 +359,10 @@
                     });
                     try {
                         await setDoc(doc(db, `/artifacts/${appId}/public/data/${entity}/${docId}`), data, { merge: true });
-                        showNotification('Informações salvas com sucesso!');
+                        showNotification('Informações guardadas com sucesso!');
                         window.clearForm(entity);
                     } catch (error) {
-                        showNotification('Erro ao salvar informações.', true);
+                        showNotification('Erro ao guardar informações.', true);
                     }
                 });
             });
@@ -369,6 +379,11 @@
                         data[field] = document.getElementById(`${entity}-${field}`).value;
                     });
 
+                    // Adiciona o timestamp para as notícias
+                    if (entity === 'noticias') {
+                        data.timestamp = serverTimestamp();
+                    }
+
                     try {
                         if (id) {
                             await updateDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id), data);
@@ -379,7 +394,7 @@
                         }
                         window.clearForm(entity);
                     } catch (error) {
-                        showNotification(`Erro ao salvar item.`, true);
+                        showNotification(`Erro ao guardar item.`, true);
                     }
                 });
             });
@@ -401,7 +416,7 @@
                             <p class="font-semibold text-sm">${textContent}</p>
                             <div class="flex gap-2">
                                 <button onclick="window.editDoc('${entity}', '${doc.id}')" class="px-2 py-1 bg-yellow-500 text-white rounded text-xs">Editar</button>
-                                <button onclick="window.deleteDoc('${entity}', '${doc.id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Excluir</button>
+                                <button onclick="window.deleteDoc('${entity}', '${doc.id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Eliminar</button>
                             </div>
                         `;
                         listContainer.appendChild(itemDiv);

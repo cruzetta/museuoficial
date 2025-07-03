@@ -166,7 +166,7 @@
         <!-- Seção Home -->
         <section id="home" class="min-h-screen flex flex-col items-center justify-center text-center relative overflow-hidden pt-24">
             <div class="room-content flex-grow flex flex-col items-center justify-center p-4">
-                <h1 id="home-titulo" class="text-5xl md:text-8xl font-black mb-4 holographic-text">Carregando...</h1>
+                <h1 id="home-titulo" class="text-5xl md:text-8xl font-black mb-4 holographic-text">A carregar...</h1>
                 <p id="home-subtitulo" class="text-lg md:text-xl max-w-3xl mx-auto mb-8">...</p>
                 <a id="home-botao" href="#noticias" class="joystick-btn">Iniciar Exploração</a>
             </div>
@@ -182,12 +182,12 @@
                     <div class="hud-border rounded-lg p-6 text-center transition-transform hover:scale-105">
                         <i class="fas fa-ghost text-yellow-400 text-4xl mb-4"></i>
                         <h3 class="text-xl font-bold mb-2">Games Clássicos</h3>
-                        <p class="text-gray-400">Relembre os jogos que marcaram gerações e definiram gêneros.</p>
+                        <p class="text-gray-400">Relembre os jogos que marcaram gerações e definiram géneros.</p>
                     </div>
                     <div class="hud-border rounded-lg p-6 text-center transition-transform hover:scale-105">
                         <i class="fas fa-ticket-alt text-neon-green text-4xl mb-4"></i>
                         <h3 class="text-xl font-bold mb-2">Visite-nos</h3>
-                        <p class="text-gray-400">Confira nossa localização e planeje sua visita para uma experiência única.</p>
+                        <p class="text-gray-400">Confira a nossa localização e planeie a sua visita para uma experiência única.</p>
                     </div>
                 </div>
             </div>
@@ -198,13 +198,16 @@
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Notícias e Eventos</h2>
                 <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left"></div>
+                <div class="mt-12">
+                    <a href="noticias.html" class="joystick-btn">Ver todas as notícias</a>
+                </div>
             </div>
         </section>
 
         <!-- Seção Acervos -->
         <section id="acervos" class="room-section">
             <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Nossos Acervos</h2>
+                <h2 class="text-4xl font-bold mb-12">Os Nossos Acervos</h2>
                 <div id="acervos-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
             </div>
         </section>
@@ -212,7 +215,7 @@
         <!-- Seção Games -->
         <section id="games" class="room-section">
             <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Games Icônicos</h2>
+                <h2 class="text-4xl font-bold mb-12">Games Icónicos</h2>
                 <div id="games-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
             </div>
         </section>
@@ -230,7 +233,7 @@
         <!-- Seção Quiz -->
         <section id="quiz" class="room-section">
             <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Teste seus Conhecimentos</h2>
+                <h2 class="text-4xl font-bold mb-12">Teste os seus Conhecimentos</h2>
                 <div id="quiz-container" class="max-w-2xl mx-auto hud-border p-8 rounded-lg"></div>
             </div>
         </section>
@@ -238,7 +241,7 @@
         <!-- Seção Curiosidades -->
         <section id="curiosidades" class="room-section">
             <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Você Sabia?</h2>
+                <h2 class="text-4xl font-bold mb-12">Sabia que?</h2>
                 <div id="curiosidades-container" class="space-y-6 max-w-3xl mx-auto"></div>
             </div>
         </section>
@@ -249,8 +252,8 @@
                 <h2 class="text-4xl font-bold mb-12">Onde Estamos</h2>
                 <div class="grid md:grid-cols-2 gap-8 items-center">
                     <div class="hud-border p-6 rounded-lg text-left">
-                        <h3 class="text-2xl font-bold mb-4">Nosso Endereço</h3>
-                        <p id="onde-estamos-endereco" class="mb-2"><i class="fas fa-map-marker-alt w-6 text-neon-blue"></i> Carregando...</p>
+                        <h3 class="text-2xl font-bold mb-4">O Nosso Endereço</h3>
+                        <p id="onde-estamos-endereco" class="mb-2"><i class="fas fa-map-marker-alt w-6 text-neon-blue"></i> A carregar...</p>
                         <p id="onde-estamos-cidade" class="mb-6"><i class="fas fa-city w-6 text-neon-blue"></i> ...</p>
                         <h3 class="text-2xl font-bold mt-6 mb-4">Horário</h3>
                         <p id="onde-estamos-horario" class="mb-2"><i class="fas fa-clock w-6 text-neon-blue"></i> ...</p>
@@ -268,10 +271,10 @@
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Sobre o Museu</h2>
                 <div class="max-w-4xl mx-auto hud-border p-8 rounded-lg text-left">
-                    <h3 class="text-2xl font-bold mb-4">Nossa Missão</h3>
-                    <p id="corporativo-missao" class="text-gray-300 mb-6">Carregando...</p>
-                    <h3 class="text-2xl font-bold mb-4">Nossa Visão</h3>
-                    <p id="corporativo-visao" class="text-gray-300">Carregando...</p>
+                    <h3 class="text-2xl font-bold mb-4">A Nossa Missão</h3>
+                    <p id="corporativo-missao" class="text-gray-300 mb-6">A carregar...</p>
+                    <h3 class="text-2xl font-bold mb-4">A Nossa Visão</h3>
+                    <p id="corporativo-visao" class="text-gray-300">A carregar...</p>
                 </div>
             </div>
         </section>
@@ -299,7 +302,7 @@
     <!-- Firebase e Lógica do Site -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
@@ -307,8 +310,7 @@
             projectId: "museu-cca6d",
             storageBucket: "museu-cca6d.firebasestorage.app",
             messagingSenderId: "555107674356",
-            appId: "1:555107674356:web:f38d1703d35831f7ad16a1",
-            measurementId: "G-2SKCJ3RRN5"
+            appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -355,26 +357,29 @@
         sections.forEach(section => observer.observe(section));
 
         // --- RENDERERS ---
-        const renderNoticia = (data) => `
-            <div class="hud-border rounded-lg overflow-hidden text-left transition-transform hover:scale-105">
+        const renderNoticia = (doc) => {
+            const data = doc.data();
+            return `
+            <a href="noticia.html?id=${doc.id}" class="hud-border rounded-lg overflow-hidden text-left transition-transform hover:scale-105 block">
                 <img src="${data.imagem || 'https://placehold.co/600x400/1a1a2e/E0E0E0?text=Notícia'}" alt="${data.titulo}" class="w-full h-48 object-cover">
                 <div class="p-6">
                     <span class="text-sm font-bold text-neon-blue">${data.categoria || 'NOVIDADE'}</span>
                     <h3 class="text-xl font-bold my-2">${data.titulo}</h3>
-                    <p class="text-gray-400 text-sm">${data.descricao}</p>
+                    <p class="text-gray-400 text-sm">${data.descricao.substring(0, 100)}...</p>
                 </div>
-            </div>`;
+            </a>`;
+        }
 
         const renderAcervo = (data) => `
             <div class="hud-border rounded-lg p-4 text-center transform hover:-translate-y-2 transition-transform duration-300">
-                <img src="${data.imagem || 'https://placehold.co/300x200/1a1a2e/E0E0E0?text=Console'}" alt="${data.nome}" class="mx-auto mb-4 rounded h-32 object-contain">
+                <img src="${data.imagem || 'https://placehold.co/300x200/1a1a2e/E0E0E0?text=Consola'}" alt="${data.nome}" class="mx-auto mb-4 rounded h-32 object-contain">
                 <h3 class="text-lg font-bold">${data.nome}</h3>
                 <p class="text-gray-400 text-xs">${data.descricao}</p>
             </div>`;
             
         const renderGame = (data) => `
              <div class="hud-border rounded-lg p-4 text-center transform hover:-translate-y-2 transition-transform duration-300">
-                <img src="${data.imagem || 'https://placehold.co/200x200/1a1a2e/E0E0E0?text=Game'}" alt="${data.nome}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-2 border-neon-purple">
+                <img src="${data.imagem || 'https://placehold.co/200x200/1a1a2e/E0E0E0?text=Jogo'}" alt="${data.nome}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-2 border-neon-purple">
                 <h3 class="text-md font-bold">${data.nome}</h3>
                 <p class="text-gray-400 text-xs">${data.ano}</p>
             </div>`;
@@ -421,15 +426,16 @@
             </div>`;
 
         // --- DATA LOADERS ---
-        const loadCollection = (name, containerId, renderer) => {
+        const loadCollection = (name, containerId, renderer, q) => {
             const container = document.getElementById(containerId);
             if (!container) return;
-            onSnapshot(collection(db, `/artifacts/${appId}/public/data/${name}`), (snapshot) => {
+            const collectionRef = q || collection(db, `/artifacts/${appId}/public/data/${name}`);
+            onSnapshot(collectionRef, (snapshot) => {
                 let content = '';
                 if (snapshot.empty) {
                     content = `<p class="text-gray-400 text-center col-span-full">Nenhum item encontrado.</p>`;
                 } else {
-                    snapshot.docs.forEach((doc, index) => content += renderer(doc.data(), index));
+                    snapshot.docs.forEach((doc, index) => content += renderer(doc, index));
                 }
                 container.innerHTML = content;
                 if (name === 'quiz') attachQuizListeners();
@@ -458,7 +464,7 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById('home-titulo').textContent = data.titulo || 'Museu Itinerante';
-                    document.getElementById('home-subtitulo').textContent = data.subtitulo || 'Sua jornada começa aqui.';
+                    document.getElementById('home-subtitulo').textContent = data.subtitulo || 'A sua jornada começa aqui.';
                     document.getElementById('home-botao').textContent = data.botao || 'Explorar';
                 }
              });
@@ -493,13 +499,18 @@
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
             loadHomeData();
-            loadCollection('noticias', 'noticias-container', renderNoticia);
-            loadCollection('acervos', 'acervos-container', renderAcervo);
-            loadCollection('games', 'games-container', renderGame);
-            loadCollection('timeline', 'timeline-container', renderTimeline);
-            loadCollection('curiosidades', 'curiosidades-container', renderCuriosidade);
-            loadCollection('quiz', 'quiz-container', renderQuiz);
-            loadCollection('loja', 'loja-container', renderProdutoLoja);
+            
+            // Query para buscar apenas as 3 notícias mais recentes
+            const noticiasQuery = query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("timestamp", "desc"), limit(3));
+            loadCollection('noticias', 'noticias-container', renderNoticia, noticiasQuery);
+
+            loadCollection('acervos', 'acervos-container', (d, i) => renderAcervo(d.data(), i));
+            loadCollection('games', 'games-container', (d, i) => renderGame(d.data(), i));
+            loadCollection('timeline', 'timeline-container', (d, i) => renderTimeline(d.data(), i));
+            loadCollection('curiosidades', 'curiosidades-container', (d, i) => renderCuriosidade(d.data(), i));
+            loadCollection('quiz', 'quiz-container', (d, i) => renderQuiz(d.data(), i));
+            loadCollection('loja', 'loja-container', (d, i) => renderProdutoLoja(d.data(), i));
+            
             loadSingleDoc('corporativo', { 'corporativo-missao': 'missao', 'corporativo-visao': 'visao' });
             loadSingleDoc('onde-estamos', { 'onde-estamos-endereco': 'endereco', 'onde-estamos-cidade': 'cidade', 'onde-estamos-horario': 'horario', 'onde-estamos-fechado': 'fechado' });
         });
