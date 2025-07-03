@@ -319,13 +319,35 @@
         }
 
         window.showForm = (formId) => {
-             document.querySelectorAll('.form-section').forEach(section => {
+            document.querySelectorAll('.form-section').forEach(section => {
                 section.classList.toggle('active', section.id === `${formId}-form`);
             });
             document.querySelectorAll('#admin-menu button').forEach(button => {
                 button.classList.toggle('bg-blue-500', button.getAttribute('onclick') === `window.showForm('${formId}')`);
                 button.classList.toggle('text-white', button.getAttribute('onclick') === `window.showForm('${formId}')`);
             });
+
+            // **CORREÇÃO APLICADA AQUI**
+            // Inicializa o TinyMCE apenas quando a aba de notícias é mostrada pela primeira vez.
+            if (formId === 'noticias' && !tinymce.get('noticias-descricao')) {
+                tinymce.init({
+                    selector: '#noticias-descricao',
+                    height: 500,
+                    plugins: [
+                      'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+                      'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+                    ],
+                    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                    tinycomments_mode: 'embedded',
+                    tinycomments_author: 'Author name',
+                    mergetags_list: [
+                      { value: 'First.Name', title: 'First Name' },
+                      { value: 'Email', title: 'Email' },
+                    ],
+                    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+                    content_style: 'body { font-family:Inter,sans-serif; font-size:16px }'
+                });
+            }
         };
 
         window.clearForm = (entity) => {
@@ -571,26 +593,7 @@
                 document.getElementById('userEmail').textContent = user.email;
                 document.getElementById('logout-button').addEventListener('click', () => signOut(auth));
                 
-                // NOVA INICIALIZAÇÃO DO TINYMCE
-                if (!tinymce.get('noticias-descricao')) {
-                    tinymce.init({
-                        selector: '#noticias-descricao',
-                        height: 500,
-                        plugins: [
-                          'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-                          'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
-                        ],
-                        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-                        tinycomments_mode: 'embedded',
-                        tinycomments_author: 'Author name',
-                        mergetags_list: [
-                          { value: 'First.Name', title: 'First Name' },
-                          { value: 'Email', title: 'Email' },
-                        ],
-                        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
-                        content_style: 'body { font-family:Inter,sans-serif; font-size:16px }'
-                    });
-                }
+                // A inicialização do TinyMCE foi MOVIDA para a função showForm para garantir que o elemento está visível.
 
                 // Anexar listeners de formulário e carregar dados
                 Object.keys(entities).forEach(entity => {
