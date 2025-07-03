@@ -28,14 +28,14 @@
         #notification {
             transition: opacity 0.5s, transform 0.5s;
         }
-        input[type="text"], input[type="url"], input[type="number"], select, textarea:not(.tox-tinymce-aux) {
+        input[type="text"], input[type="url"], input[type="number"], input[type="email"], input[type="password"], select, textarea:not(.tox-tinymce-aux) {
             @apply mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
         }
         button[type="submit"] {
             @apply w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors;
         }
         button[type="button"] {
-             @apply w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors;
+             @apply bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors;
         }
         .tox-tinymce {
             border-radius: 0.375rem;
@@ -72,7 +72,7 @@
             <aside class="md:col-span-1">
                 <div class="bg-white p-4 rounded-lg shadow-md">
                     <h2 class="text-lg font-bold mb-4 border-b pb-2">Gerir Conteúdo</h2>
-                    <nav class="space-y-2">
+                    <nav id="admin-menu" class="space-y-2">
                         <button onclick="window.showForm('home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
                         <button onclick="window.showForm('noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
                         <button onclick="window.showForm('acervos')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Acervos</button>
@@ -142,7 +142,7 @@
                             <label for="noticias-descricao" class="block text-sm font-medium text-gray-700 mb-2">Conteúdo da Notícia</label>
                             <textarea id="noticias-descricao"></textarea>
                         </div>
-                        <div class="flex gap-4"><button type="submit">Guardar Notícia</button><button type="button" onclick="window.clearForm('noticias')">Cancelar</button></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Notícia</button><button type="button" onclick="window.clearForm('noticias')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Notícias Registadas</h3><div id="noticias-lista" class="space-y-4"></div></div>
                 </div>
@@ -155,7 +155,7 @@
                         <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome da Consola</label><input type="text" id="acervos-nome" required></div>
                         <div><label for="acervos-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><input type="text" id="acervos-descricao" required></div>
                         <div><label for="acervos-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="acervos-imagem" required></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Acervo</button><button type="button" onclick="window.clearForm('acervos')">Cancelar</button></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Acervo</button><button type="button" onclick="window.clearForm('acervos')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Itens do Acervo</h3><div id="acervos-lista" class="space-y-4"></div></div>
                 </div>
@@ -168,7 +168,7 @@
                         <div><label for="games-nome" class="block text-sm font-medium text-gray-700">Nome do Jogo</label><input type="text" id="games-nome" required></div>
                         <div><label for="games-ano" class="block text-sm font-medium text-gray-700">Ano</label><input type="text" id="games-ano" required></div>
                         <div><label for="games-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="games-imagem" required></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Jogo</button><button type="button" onclick="window.clearForm('games')">Cancelar</button></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Jogo</button><button type="button" onclick="window.clearForm('games')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Jogos Registados</h3><div id="games-lista" class="space-y-4"></div></div>
                 </div>
@@ -180,7 +180,7 @@
                         <input type="hidden" id="timeline-id">
                         <div><label for="timeline-titulo" class="block text-sm font-medium text-gray-700">Título (Ex: 1972: Pong)</label><input type="text" id="timeline-titulo" required></div>
                         <div><label for="timeline-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="timeline-descricao" rows="2" required></textarea></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Evento</button><button type="button" onclick="window.clearForm('timeline')">Cancelar</button></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Evento</button><button type="button" onclick="window.clearForm('timeline')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Eventos da Timeline</h3><div id="timeline-lista" class="space-y-4"></div></div>
                 </div>
@@ -193,7 +193,7 @@
                         <div><label for="quiz-pergunta" class="block text-sm font-medium text-gray-700">Pergunta</label><input type="text" id="quiz-pergunta" required></div>
                         <div><label for="quiz-opcoes" class="block text-sm font-medium text-gray-700">Opções (separadas por vírgula)</label><input type="text" id="quiz-opcoes" placeholder="Opção A,Opção B,Opção C,Opção D" required></div>
                         <div><label for="quiz-correta" class="block text-sm font-medium text-gray-700">Índice da Resposta Correta (0, 1, 2 ou 3)</label><input type="number" id="quiz-correta" min="0" max="3" required></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Pergunta</button><button type="button" onclick="window.clearForm('quiz')">Cancelar</button></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Pergunta</button><button type="button" onclick="window.clearForm('quiz')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Perguntas do Quiz</h3><div id="quiz-lista" class="space-y-4"></div></div>
                 </div>
@@ -205,7 +205,7 @@
                         <input type="hidden" id="curiosidades-id">
                         <div><label for="curiosidades-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="curiosidades-titulo" required></div>
                         <div><label for="curiosidades-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="curiosidades-descricao" rows="3" required></textarea></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Curiosidade</button><button type="button" onclick="window.clearForm('curiosidades')">Cancelar</button></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Curiosidade</button><button type="button" onclick="window.clearForm('curiosidades')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Curiosidades Registadas</h3><div id="curiosidades-lista" class="space-y-4"></div></div>
                 </div>
@@ -248,7 +248,7 @@
                         <div><label for="lojas-nome" class="block text-sm font-medium text-gray-700">Nome do Produto</label><input type="text" id="lojas-nome" required></div>
                         <div><label for="lojas-preco" class="block text-sm font-medium text-gray-700">Preço</label><input type="text" id="lojas-preco" required></div>
                         <div><label for="lojas-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="lojas-imagem" required></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Produto</button><button type="button" onclick="window.clearForm('lojas')">Cancelar</button></div>
+                        <div class="flex gap-4"><button type="submit">Guardar Produto</button><button type="button" onclick="window.clearForm('lojas')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Produtos da Loja</h3><div id="lojas-lista" class="space-y-4"></div></div>
                 </div>
@@ -279,18 +279,43 @@
         const auth = getAuth(app);
         const appId = 'museu-cca6d';
 
-        // Funções da UI
+        // --- DEFINIÇÃO DAS ENTIDADES GERENCIÁVEIS ---
+        const entities = {
+            'home': { isSingleDoc: true, fields: ['titulo', 'subtitulo', 'botao'] },
+            'noticias': { 
+                isSingleDoc: false, 
+                fields: ['titulo', 'subtitulo', 'categoria', 'imagem', 'descricao'],
+                listDisplayField: 'titulo' 
+            },
+            'acervos': { isSingleDoc: false, fields: ['nome', 'descricao', 'imagem'], listDisplayField: 'nome' },
+            'games': { isSingleDoc: false, fields: ['nome', 'ano', 'imagem'], listDisplayField: 'nome' },
+            'timeline': { isSingleDoc: false, fields: ['titulo', 'descricao'], listDisplayField: 'titulo' },
+            'quiz': { isSingleDoc: false, fields: ['pergunta', 'opcoes', 'correta'], listDisplayField: 'pergunta' },
+            'curiosidades': { isSingleDoc: false, fields: ['titulo', 'descricao'], listDisplayField: 'titulo' },
+            'onde-estamos': { isSingleDoc: true, fields: ['endereco', 'cidade', 'horario', 'fechado'] },
+            'corporativo': { isSingleDoc: true, fields: ['missao', 'visao'] },
+            'lojas': { isSingleDoc: false, fields: ['nome', 'preco', 'imagem'], listDisplayField: 'nome' }
+        };
+
+        // --- FUNÇÕES GLOBAIS DA UI ---
         function showNotification(message, isError = false) {
              const el = document.getElementById('notification');
              el.textContent = message;
              el.className = `fixed top-5 right-5 py-3 px-5 rounded-lg shadow-lg transition-all duration-500 text-white ${isError ? 'bg-red-500' : 'bg-green-500'}`;
              el.classList.remove('hidden', 'opacity-0', 'translate-x-full');
-             setTimeout(() => { el.classList.add('opacity-0'); }, 3000);
+             setTimeout(() => { 
+                el.classList.add('opacity-0', 'translate-x-full');
+                setTimeout(() => el.classList.add('hidden'), 500);
+             }, 3000);
         }
 
         window.showForm = (formId) => {
              document.querySelectorAll('.form-section').forEach(section => {
                 section.classList.toggle('active', section.id === `${formId}-form`);
+            });
+            document.querySelectorAll('#admin-menu button').forEach(button => {
+                button.classList.toggle('bg-blue-500', button.getAttribute('onclick') === `window.showForm('${formId}')`);
+                button.classList.toggle('text-white', button.getAttribute('onclick') === `window.showForm('${formId}')`);
             });
         };
 
@@ -304,62 +329,184 @@
             }
         };
 
-        // Gestão de Categorias
-        const categoriasCollection = collection(db, `/artifacts/${appId}/public/data/categorias`);
+        // --- FUNÇÕES DE DADOS GENÉRICAS ---
+        async function saveData(entity) {
+            const config = entities[entity];
+            if (!config) return;
 
-        onSnapshot(categoriasCollection, (snapshot) => {
-            const categoriaSelect = document.getElementById('noticias-categoria');
-            const categoriaLista = document.getElementById('categorias-lista');
-            const currentCategoryValue = categoriaSelect.value;
-            
-            categoriaSelect.innerHTML = '<option value="">Selecione uma categoria</option>';
-            categoriaLista.innerHTML = '';
+            const form = document.getElementById(`form-${entity}`);
+            const id = document.getElementById(`${entity}-id`)?.value;
+            const data = {};
 
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const id = doc.id;
-
-                // Popula o dropdown
-                const option = document.createElement('option');
-                option.value = data.nome;
-                option.textContent = data.nome;
-                categoriaSelect.appendChild(option);
-
-                // Popula a lista de gestão
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'flex items-center justify-between bg-gray-50 p-2 rounded-md border';
-                itemDiv.innerHTML = `
-                    <p class="text-sm">${data.nome}</p>
-                    <button onclick="window.deleteDoc('categorias', '${id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Eliminar</button>
-                `;
-                categoriaLista.appendChild(itemDiv);
+            config.fields.forEach(field => {
+                if (field === 'descricao' && entity === 'noticias') {
+                    data[field] = tinymce.get('noticias-descricao').getContent();
+                } else {
+                    data[field] = document.getElementById(`${entity}-${field}`).value;
+                }
             });
-            // Mantém a categoria selecionada após recarregar
-            if(currentCategoryValue) {
-                categoriaSelect.value = currentCategoryValue;
-            }
-        });
 
-        document.getElementById('form-categorias').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nomeInput = document.getElementById('categorias-nome');
-            const nome = nomeInput.value.trim();
-            if (nome) {
+            if (entity === 'noticias') {
+                 data.timestamp = serverTimestamp();
+            }
+
+            try {
+                if (config.isSingleDoc) {
+                    const docId = id || 'info'; // 'info' or 'main_content' as default for single docs
+                    await setDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, docId), data);
+                    showNotification('Informações guardadas com sucesso!');
+                } else {
+                    if (id) {
+                        await updateDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id), data);
+                        showNotification('Item atualizado com sucesso!');
+                    } else {
+                        await addDoc(collection(db, `/artifacts/${appId}/public/data/${entity}`), data);
+                        showNotification('Item adicionado com sucesso!');
+                    }
+                }
+                window.clearForm(entity);
+            } catch (error) {
+                console.error(`Erro ao guardar ${entity}:`, error);
+                showNotification(`Erro ao guardar item.`, true);
+            }
+        }
+
+        window.deleteDoc = async (entity, id) => {
+            if (confirm('Tem a certeza que deseja eliminar este item?')) {
                 try {
-                    await addDoc(categoriasCollection, { nome: nome });
-                    showNotification('Categoria adicionada!');
-                    nomeInput.value = '';
-                } catch (error) {
-                    showNotification('Erro ao adicionar categoria.', true);
+                    await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
+                    showNotification("Item eliminado com sucesso!");
+                } catch(error) {
+                    console.error(`Erro ao eliminar ${entity}:`, error);
+                    showNotification("Erro ao eliminar o item.", true);
                 }
             }
-        });
+        };
 
-        document.getElementById('toggle-category-manager').addEventListener('click', () => {
-            document.getElementById('category-manager-panel').classList.toggle('hidden');
-        });
-        
-        // Lógica de Autenticação e Inicialização
+        window.editDoc = async (entity, id) => {
+            const config = entities[entity];
+            if (!config || config.isSingleDoc) return;
+            
+            try {
+                const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById(`${entity}-id`).value = docSnap.id;
+                    config.fields.forEach(field => {
+                         if (field === 'descricao' && entity === 'noticias') {
+                            tinymce.get('noticias-descricao').setContent(data[field] || '');
+                        } else {
+                            document.getElementById(`${entity}-${field}`).value = data[field] || '';
+                        }
+                    });
+                    showForm(entity);
+                    window.scrollTo(0, 0);
+                }
+            } catch (error) {
+                console.error(`Erro ao carregar ${entity} para edição:`, error);
+                showNotification('Erro ao carregar dados para edição.', true);
+            }
+        };
+
+        window.loadSingleDoc = async (entity) => {
+            const config = entities[entity];
+            if (!config || !config.isSingleDoc) return;
+            const docId = document.getElementById(`${entity}-id`).value || 'info';
+             try {
+                const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, docId);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                     config.fields.forEach(field => {
+                        document.getElementById(`${entity}-${field}`).value = data[field] || '';
+                    });
+                    showNotification('Dados carregados!');
+                }
+             } catch(error) {
+                console.error(`Erro ao carregar doc single ${entity}:`, error);
+                showNotification('Erro ao carregar dados atuais.', true);
+             }
+        }
+
+        function listenToCollection(entity) {
+            const config = entities[entity];
+            if (!config || config.isSingleDoc) return;
+
+            const listContainer = document.getElementById(`${entity}-lista`);
+            const q = collection(db, `/artifacts/${appId}/public/data/${entity}`);
+            
+            onSnapshot(q, (snapshot) => {
+                listContainer.innerHTML = '';
+                if (snapshot.empty) {
+                    listContainer.innerHTML = '<p class="text-sm text-gray-500">Nenhum item registado.</p>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+                    itemDiv.innerHTML = `
+                        <p class="font-semibold text-sm truncate pr-4">${data[config.listDisplayField] || 'Item sem título'}</p>
+                        <div class="flex-shrink-0 flex gap-2">
+                            <button onclick="window.editDoc('${entity}', '${doc.id}')" class="px-2 py-1 bg-yellow-500 text-white rounded text-xs">Editar</button>
+                            <button onclick="window.deleteDoc('${entity}', '${doc.id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Eliminar</button>
+                        </div>
+                    `;
+                    listContainer.appendChild(itemDiv);
+                });
+            });
+        }
+
+        // --- GESTÃO DE CATEGORIAS (ESPECÍFICO PARA NOTÍCIAS) ---
+        function setupCategoryManager() {
+            const categoriasCollection = collection(db, `/artifacts/${appId}/public/data/categorias`);
+
+            onSnapshot(categoriasCollection, (snapshot) => {
+                const categoriaSelect = document.getElementById('noticias-categoria');
+                const categoriaLista = document.getElementById('categorias-lista');
+                const currentCategoryValue = categoriaSelect.value;
+                
+                categoriaSelect.innerHTML = '<option value="">Selecione uma categoria</option>';
+                categoriaLista.innerHTML = '';
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const option = `<option value="${data.nome}">${data.nome}</option>`;
+                    categoriaSelect.innerHTML += option;
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'flex items-center justify-between bg-white p-2 rounded-md border';
+                    itemDiv.innerHTML = `
+                        <p class="text-sm">${data.nome}</p>
+                        <button type="button" onclick="window.deleteDoc('categorias', '${doc.id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Eliminar</button>
+                    `;
+                    categoriaLista.appendChild(itemDiv);
+                });
+                if(currentCategoryValue) categoriaSelect.value = currentCategoryValue;
+            });
+
+            document.getElementById('form-categorias').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const nomeInput = document.getElementById('categorias-nome');
+                const nome = nomeInput.value.trim();
+                if (nome) {
+                    try {
+                        await addDoc(categoriasCollection, { nome: nome });
+                        showNotification('Categoria adicionada!');
+                        nomeInput.value = '';
+                    } catch (error) {
+                        showNotification('Erro ao adicionar categoria.', true);
+                    }
+                }
+            });
+
+            document.getElementById('toggle-category-manager').addEventListener('click', () => {
+                document.getElementById('category-manager-panel').classList.toggle('hidden');
+            });
+        }
+
+        // --- INICIALIZAÇÃO E AUTENTICAÇÃO ---
         onAuthStateChanged(auth, user => {
             const loader = document.getElementById('loader-container');
             const mainContent = document.getElementById('main-content');
@@ -367,7 +514,6 @@
                 document.getElementById('userEmail').textContent = user.email;
                 document.getElementById('logout-button').addEventListener('click', () => signOut(auth));
                 
-                // Inicializa o editor de texto APÓS o login e a exibição do conteúdo
                 if (!tinymce.get('noticias-descricao')) {
                     tinymce.init({
                         selector: '#noticias-descricao',
@@ -379,94 +525,27 @@
                     });
                 }
 
+                // Anexar listeners de formulário e carregar dados
+                Object.keys(entities).forEach(entity => {
+                    const form = document.getElementById(`form-${entity}`);
+                    if (form) {
+                        form.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            saveData(entity);
+                        });
+                    }
+                    listenToCollection(entity);
+                });
+                
+                setupCategoryManager();
+
                 loader.style.display = 'none';
                 mainContent.style.display = 'block';
-                showForm('noticias'); // Inicia na aba de notícias
+                showForm('home'); // Inicia na aba home
             } else {
                 window.location.assign('login.html');
             }
         });
-
-        // Listener para o formulário de notícias
-         document.getElementById('form-noticias').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('noticias-id').value;
-            const data = {
-                titulo: document.getElementById('noticias-titulo').value,
-                subtitulo: document.getElementById('noticias-subtitulo').value,
-                categoria: document.getElementById('noticias-categoria').value,
-                imagem: document.getElementById('noticias-imagem').value,
-                descricao: tinymce.get('noticias-descricao').getContent(),
-                timestamp: serverTimestamp()
-            };
-
-            if (!data.categoria) {
-                showNotification('Por favor, selecione uma categoria.', true);
-                return;
-            }
-
-            try {
-                if (id) {
-                    await updateDoc(doc(db, `/artifacts/${appId}/public/data/noticias`, id), data);
-                    showNotification('Notícia atualizada com sucesso!');
-                } else {
-                    await addDoc(collection(db, `/artifacts/${appId}/public/data/noticias`), data);
-                    showNotification('Notícia adicionada com sucesso!');
-                }
-                window.clearForm('noticias');
-            } catch (error) {
-                showNotification(`Erro ao guardar notícia.`, true);
-            }
-        });
-
-        // Listener para a lista de notícias publicadas
-        const noticiasListContainer = document.getElementById('noticias-lista');
-        onSnapshot(collection(db, `/artifacts/${appId}/public/data/noticias`), (snapshot) => {
-            noticiasListContainer.innerHTML = '';
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
-                itemDiv.innerHTML = `
-                    <p class="font-semibold text-sm">${data.titulo}</p>
-                    <button onclick="window.editDoc('noticias', '${doc.id}')" class="px-2 py-1 bg-yellow-500 text-white rounded text-xs">Editar</button>
-                `;
-                noticiasListContainer.appendChild(itemDiv);
-            });
-        });
-
-        window.deleteDoc = async (entity, id) => {
-            if (confirm('Tem a certeza que deseja eliminar este item?')) {
-                try {
-                    await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
-                    showNotification("Item eliminado com sucesso!");
-                } catch(error) {
-                    showNotification("Erro ao eliminar o item.", true);
-                }
-            }
-        };
-
-        window.editDoc = (entity, id) => {
-            if (entity !== 'noticias') return; // Esta função é agora só para notícias
-            const docRef = doc(db, `/artifacts/${appId}/public/data/noticias`, id);
-            getDoc(docRef).then(docSnap => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('noticias-id').value = docSnap.id;
-                    document.getElementById('noticias-titulo').value = data.titulo || '';
-                    document.getElementById('noticias-subtitulo').value = data.subtitulo || '';
-                    document.getElementById('noticias-categoria').value = data.categoria || '';
-                    document.getElementById('noticias-imagem').value = data.imagem || '';
-                    tinymce.get('noticias-descricao').setContent(data.descricao || '');
-                    showForm('noticias');
-                    window.scrollTo(0, 0);
-                }
-            });
-        };
-
-        // A lógica para as outras seções (home, acervos, etc.) precisa ser adicionada aqui
-        // para que elas funcionem corretamente.
-
     </script>
 </body>
 </html>
