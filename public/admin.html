@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Script do Editor de Texto Rico (TinyMCE) -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .form-section { display: none; }
@@ -26,8 +28,7 @@
         #notification {
             transition: opacity 0.5s, transform 0.5s;
         }
-        /* Estilizando inputs e botões para consistência */
-        input[type="text"], input[type="url"], input[type="number"], textarea {
+        input[type="text"], input[type="url"], input[type="number"], select, textarea:not(.tox-tinymce-aux) {
             @apply mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
         }
         button[type="submit"] {
@@ -35,6 +36,9 @@
         }
         button[type="button"] {
              @apply w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors;
+        }
+        .tox-tinymce {
+            border-radius: 0.375rem;
         }
     </style>
 </head>
@@ -90,18 +94,9 @@
                     <h2 class="text-2xl font-bold mb-6">Gerir Página Inicial</h2>
                     <form id="form-home" class="space-y-4">
                         <input type="hidden" id="home-id" value="main_content">
-                        <div>
-                            <label for="home-titulo" class="block text-sm font-medium text-gray-700">Título Principal</label>
-                            <input type="text" id="home-titulo" required>
-                        </div>
-                        <div>
-                            <label for="home-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo</label>
-                            <textarea id="home-subtitulo" rows="3" required></textarea>
-                        </div>
-                        <div>
-                            <label for="home-botao" class="block text-sm font-medium text-gray-700">Texto do Botão</label>
-                            <input type="text" id="home-botao" required>
-                        </div>
+                        <div><label for="home-titulo" class="block text-sm font-medium text-gray-700">Título Principal</label><input type="text" id="home-titulo" required></div>
+                        <div><label for="home-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo</label><textarea id="home-subtitulo" rows="3" required></textarea></div>
+                        <div><label for="home-botao" class="block text-sm font-medium text-gray-700">Texto do Botão</label><input type="text" id="home-botao" required></div>
                         <div class="flex flex-col sm:flex-row gap-4">
                             <button type="submit">Guardar Alterações da Home</button>
                             <button type="button" onclick="window.loadSingleDoc('home')">Carregar Dados Atuais</button>
@@ -109,15 +104,44 @@
                     </form>
                 </div>
 
-                <!-- Seção de Notícias (CRUD) -->
+                <!-- Seção de Notícias (CRUD) com Editor de Texto Rico -->
                 <div id="noticias-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerir Notícias</h2>
-                    <form id="form-noticias" class="space-y-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Gerir Notícias</h2>
+                        <button type="button" id="toggle-category-manager" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-bold py-2 px-4 rounded-md">
+                            <i class="fas fa-tags mr-2"></i>Gerir Categorias
+                        </button>
+                    </div>
+
+                    <!-- Painel de Gestão de Categorias (Oculto por padrão) -->
+                    <div id="category-manager-panel" class="hidden mb-8 p-6 bg-gray-50 rounded-lg border transition-all duration-300">
+                        <h3 class="text-xl font-bold mb-4">Gestão de Categorias</h3>
+                        <form id="form-categorias" class="space-y-4">
+                            <div>
+                                <label for="categorias-nome" class="block text-sm font-medium text-gray-700">Nova Categoria</label>
+                                <input type="text" id="categorias-nome" placeholder="Ex: Retrô, Indústria..." required>
+                            </div>
+                            <button type="submit">Adicionar Categoria</button>
+                        </form>
+                        <div class="mt-6">
+                            <h4 class="font-bold mb-2">Categorias Existentes</h4>
+                            <div id="categorias-lista" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <form id="form-noticias" class="space-y-4 border-t pt-8">
                         <input type="hidden" id="noticias-id">
                         <div><label for="noticias-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="noticias-titulo" required></div>
-                        <div><label for="noticias-categoria" class="block text-sm font-medium text-gray-700">Categoria</label><input type="text" id="noticias-categoria" required></div>
-                        <div><label for="noticias-descricao" class="block text-sm font-medium text-gray-700">Descrição (use \n para nova linha)</label><textarea id="noticias-descricao" rows="5" required></textarea></div>
-                        <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="noticias-imagem" required></div>
+                        <div><label for="noticias-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo (resumo da notícia)</label><input type="text" id="noticias-subtitulo" required></div>
+                        <div>
+                            <label for="noticias-categoria" class="block text-sm font-medium text-gray-700">Categoria</label>
+                            <select id="noticias-categoria" required></select>
+                        </div>
+                        <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem de Destaque</label><input type="url" id="noticias-imagem" required></div>
+                        <div>
+                            <label for="noticias-descricao" class="block text-sm font-medium text-gray-700 mb-2">Conteúdo da Notícia</label>
+                            <textarea id="noticias-descricao"></textarea>
+                        </div>
                         <div class="flex gap-4"><button type="submit">Guardar Notícia</button><button type="button" onclick="window.clearForm('noticias')">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Notícias Registadas</h3><div id="noticias-lista" class="space-y-4"></div></div>
@@ -236,12 +260,11 @@
     <!-- Elemento de Notificação -->
     <div id="notification" class="hidden fixed top-5 right-5 bg-green-500 text-white py-3 px-5 rounded-lg shadow-lg opacity-0 transform translate-x-full"></div>
 
-
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, setLogLevel, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
@@ -249,91 +272,168 @@
             projectId: "museu-cca6d",
             storageBucket: "museu-cca6d.firebasestorage.app",
             messagingSenderId: "555107674356",
-            appId: "1:555107674356:web:f38d1703d35831f7ad16a1",
-            measurementId: "G-2SKCJ3RRN5"
+            appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        setLogLevel('debug');
         const appId = 'museu-cca6d';
 
-        const loader = document.getElementById('loader-container');
-        const mainContent = document.getElementById('main-content');
-        const userEmailElement = document.getElementById('userEmail');
-        const logoutButton = document.getElementById('logout-button');
-        const notificationElement = document.getElementById('notification');
-
+        // Funções da UI
         function showNotification(message, isError = false) {
-            notificationElement.textContent = message;
-            notificationElement.className = 'fixed top-5 right-5 py-3 px-5 rounded-lg shadow-lg transition-all duration-500 text-white';
-            notificationElement.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
-            notificationElement.classList.remove('hidden', 'opacity-0', 'translate-x-full');
-            setTimeout(() => { notificationElement.classList.add('opacity-0'); }, 3000);
+             const el = document.getElementById('notification');
+             el.textContent = message;
+             el.className = `fixed top-5 right-5 py-3 px-5 rounded-lg shadow-lg transition-all duration-500 text-white ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+             el.classList.remove('hidden', 'opacity-0', 'translate-x-full');
+             setTimeout(() => { el.classList.add('opacity-0'); }, 3000);
         }
 
-        const singleDocEntities = {
-            'home': ['titulo', 'subtitulo', 'botao'],
-            'onde-estamos': ['endereco', 'cidade', 'horario', 'fechado'],
-            'corporativo': ['missao', 'visao']
-        };
-
-        const crudEntities = {
-            'noticias': ['titulo', 'categoria', 'descricao', 'imagem'],
-            'acervos': ['nome', 'descricao', 'imagem'],
-            'games': ['nome', 'ano', 'imagem'],
-            'timeline': ['titulo', 'descricao'],
-            'quiz': ['pergunta', 'opcoes', 'correta'],
-            'curiosidades': ['titulo', 'descricao'],
-            'lojas': ['nome', 'preco', 'imagem']
-        };
-
-        window.loadSingleDoc = async (entity) => {
-            const docId = document.getElementById(`${entity}-id`).value;
-            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}/${docId}`);
-            try {
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    singleDocEntities[entity].forEach(field => {
-                        document.getElementById(`${entity}-${field}`).value = data[field] || '';
-                    });
-                    showNotification("Dados atuais carregados.");
-                } else {
-                    showNotification("Nenhum dado guardado encontrado.", true);
-                }
-            } catch (error) {
-                showNotification("Erro ao carregar dados.", true);
-                console.error(`Error loading ${entity}:`, error);
-            }
-        };
-        
         window.showForm = (formId) => {
-            document.querySelectorAll('.form-section').forEach(section => section.classList.remove('active'));
-            document.getElementById(`${formId}-form`).classList.add('active');
+             document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.toggle('active', section.id === `${formId}-form`);
+            });
         };
 
         window.clearForm = (entity) => {
-            document.getElementById(`form-${entity}`).reset();
+            const form = document.getElementById(`form-${entity}`);
+            if(form) form.reset();
             const idField = document.getElementById(`${entity}-id`);
             if (idField) idField.value = '';
+            if (entity === 'noticias' && tinymce.get('noticias-descricao')) {
+                tinymce.get('noticias-descricao').setContent('');
+            }
         };
 
-        window.editDoc = (entity, id) => {
-            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
-            getDoc(docRef).then(docSnap => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById(`${entity}-id`).value = docSnap.id;
-                    crudEntities[entity].forEach(field => {
-                        document.getElementById(`${entity}-${field}`).value = data[field];
-                    });
-                    showForm(entity);
-                    window.scrollTo(0, 0);
-                }
+        // Gestão de Categorias
+        const categoriasCollection = collection(db, `/artifacts/${appId}/public/data/categorias`);
+
+        onSnapshot(categoriasCollection, (snapshot) => {
+            const categoriaSelect = document.getElementById('noticias-categoria');
+            const categoriaLista = document.getElementById('categorias-lista');
+            const currentCategoryValue = categoriaSelect.value;
+            
+            categoriaSelect.innerHTML = '<option value="">Selecione uma categoria</option>';
+            categoriaLista.innerHTML = '';
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const id = doc.id;
+
+                // Popula o dropdown
+                const option = document.createElement('option');
+                option.value = data.nome;
+                option.textContent = data.nome;
+                categoriaSelect.appendChild(option);
+
+                // Popula a lista de gestão
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-center justify-between bg-gray-50 p-2 rounded-md border';
+                itemDiv.innerHTML = `
+                    <p class="text-sm">${data.nome}</p>
+                    <button onclick="window.deleteDoc('categorias', '${id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Eliminar</button>
+                `;
+                categoriaLista.appendChild(itemDiv);
             });
-        };
+            // Mantém a categoria selecionada após recarregar
+            if(currentCategoryValue) {
+                categoriaSelect.value = currentCategoryValue;
+            }
+        });
+
+        document.getElementById('form-categorias').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nomeInput = document.getElementById('categorias-nome');
+            const nome = nomeInput.value.trim();
+            if (nome) {
+                try {
+                    await addDoc(categoriasCollection, { nome: nome });
+                    showNotification('Categoria adicionada!');
+                    nomeInput.value = '';
+                } catch (error) {
+                    showNotification('Erro ao adicionar categoria.', true);
+                }
+            }
+        });
+
+        document.getElementById('toggle-category-manager').addEventListener('click', () => {
+            document.getElementById('category-manager-panel').classList.toggle('hidden');
+        });
+        
+        // Lógica de Autenticação e Inicialização
+        onAuthStateChanged(auth, user => {
+            const loader = document.getElementById('loader-container');
+            const mainContent = document.getElementById('main-content');
+            if (user && !user.isAnonymous) {
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('logout-button').addEventListener('click', () => signOut(auth));
+                
+                // Inicializa o editor de texto APÓS o login e a exibição do conteúdo
+                if (!tinymce.get('noticias-descricao')) {
+                    tinymce.init({
+                        selector: '#noticias-descricao',
+                        plugins: 'lists link image table code help wordcount',
+                        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
+                        height: 400,
+                        menubar: false,
+                        content_style: 'body { font-family:Inter,sans-serif; font-size:16px }'
+                    });
+                }
+
+                loader.style.display = 'none';
+                mainContent.style.display = 'block';
+                showForm('noticias'); // Inicia na aba de notícias
+            } else {
+                window.location.assign('login.html');
+            }
+        });
+
+        // Listener para o formulário de notícias
+         document.getElementById('form-noticias').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('noticias-id').value;
+            const data = {
+                titulo: document.getElementById('noticias-titulo').value,
+                subtitulo: document.getElementById('noticias-subtitulo').value,
+                categoria: document.getElementById('noticias-categoria').value,
+                imagem: document.getElementById('noticias-imagem').value,
+                descricao: tinymce.get('noticias-descricao').getContent(),
+                timestamp: serverTimestamp()
+            };
+
+            if (!data.categoria) {
+                showNotification('Por favor, selecione uma categoria.', true);
+                return;
+            }
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, `/artifacts/${appId}/public/data/noticias`, id), data);
+                    showNotification('Notícia atualizada com sucesso!');
+                } else {
+                    await addDoc(collection(db, `/artifacts/${appId}/public/data/noticias`), data);
+                    showNotification('Notícia adicionada com sucesso!');
+                }
+                window.clearForm('noticias');
+            } catch (error) {
+                showNotification(`Erro ao guardar notícia.`, true);
+            }
+        });
+
+        // Listener para a lista de notícias publicadas
+        const noticiasListContainer = document.getElementById('noticias-lista');
+        onSnapshot(collection(db, `/artifacts/${appId}/public/data/noticias`), (snapshot) => {
+            noticiasListContainer.innerHTML = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+                itemDiv.innerHTML = `
+                    <p class="font-semibold text-sm">${data.titulo}</p>
+                    <button onclick="window.editDoc('noticias', '${doc.id}')" class="px-2 py-1 bg-yellow-500 text-white rounded text-xs">Editar</button>
+                `;
+                noticiasListContainer.appendChild(itemDiv);
+            });
+        });
 
         window.deleteDoc = async (entity, id) => {
             if (confirm('Tem a certeza que deseja eliminar este item?')) {
@@ -346,99 +446,27 @@
             }
         };
 
-        function attachFormSubmitListeners() {
-            // Handlers for single-document sections
-            Object.keys(singleDocEntities).forEach(entity => {
-                const form = document.getElementById(`form-${entity}`);
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const docId = document.getElementById(`${entity}-id`).value;
-                    const data = {};
-                    singleDocEntities[entity].forEach(field => {
-                        data[field] = document.getElementById(`${entity}-${field}`).value;
-                    });
-                    try {
-                        await setDoc(doc(db, `/artifacts/${appId}/public/data/${entity}/${docId}`), data, { merge: true });
-                        showNotification('Informações guardadas com sucesso!');
-                        window.clearForm(entity);
-                    } catch (error) {
-                        showNotification('Erro ao guardar informações.', true);
-                    }
-                });
+        window.editDoc = (entity, id) => {
+            if (entity !== 'noticias') return; // Esta função é agora só para notícias
+            const docRef = doc(db, `/artifacts/${appId}/public/data/noticias`, id);
+            getDoc(docRef).then(docSnap => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('noticias-id').value = docSnap.id;
+                    document.getElementById('noticias-titulo').value = data.titulo || '';
+                    document.getElementById('noticias-subtitulo').value = data.subtitulo || '';
+                    document.getElementById('noticias-categoria').value = data.categoria || '';
+                    document.getElementById('noticias-imagem').value = data.imagem || '';
+                    tinymce.get('noticias-descricao').setContent(data.descricao || '');
+                    showForm('noticias');
+                    window.scrollTo(0, 0);
+                }
             });
+        };
 
-            // Handlers for CRUD sections
-            Object.keys(crudEntities).forEach(entity => {
-                const form = document.getElementById(`form-${entity}`);
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const idField = document.getElementById(`${entity}-id`);
-                    const id = idField.value;
-                    const data = {};
-                    crudEntities[entity].forEach(field => {
-                        data[field] = document.getElementById(`${entity}-${field}`).value;
-                    });
+        // A lógica para as outras seções (home, acervos, etc.) precisa ser adicionada aqui
+        // para que elas funcionem corretamente.
 
-                    // Adiciona o timestamp para as notícias
-                    if (entity === 'noticias') {
-                        data.timestamp = serverTimestamp();
-                    }
-
-                    try {
-                        if (id) {
-                            await updateDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id), data);
-                            showNotification('Item atualizado com sucesso!');
-                        } else {
-                            await addDoc(collection(db, `/artifacts/${appId}/public/data/${entity}`), data);
-                            showNotification('Item adicionado com sucesso!');
-                        }
-                        window.clearForm(entity);
-                    } catch (error) {
-                        showNotification(`Erro ao guardar item.`, true);
-                    }
-                });
-            });
-        }
-
-        function setupListListeners() {
-            Object.keys(crudEntities).forEach(entity => {
-                const listContainer = document.getElementById(`${entity}-lista`);
-                if (!listContainer) return;
-
-                onSnapshot(collection(db, `/artifacts/${appId}/public/data/${entity}`), (snapshot) => {
-                    listContainer.innerHTML = '';
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const itemDiv = document.createElement('div');
-                        itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
-                        let textContent = data.titulo || data.nome || data.pergunta;
-                        itemDiv.innerHTML = `
-                            <p class="font-semibold text-sm">${textContent}</p>
-                            <div class="flex gap-2">
-                                <button onclick="window.editDoc('${entity}', '${doc.id}')" class="px-2 py-1 bg-yellow-500 text-white rounded text-xs">Editar</button>
-                                <button onclick="window.deleteDoc('${entity}', '${doc.id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Eliminar</button>
-                            </div>
-                        `;
-                        listContainer.appendChild(itemDiv);
-                    });
-                });
-            });
-        }
-
-        onAuthStateChanged(auth, user => {
-            if (user && !user.isAnonymous) {
-                userEmailElement.textContent = user.email;
-                logoutButton.addEventListener('click', () => signOut(auth));
-                loader.style.display = 'none';
-                mainContent.classList.remove('hidden');
-                
-                attachFormSubmitListeners();
-                setupListListeners();
-                showForm('home');
-            } else {
-                window.location.assign('login.html');
-            }
-        });
     </script>
 </body>
 </html>
