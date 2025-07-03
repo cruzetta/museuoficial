@@ -7,8 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Script do Editor de Texto Rico (TinyMCE) -->
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- Script do Editor de Texto Rico (TinyMCE) ATUALIZADO -->
+    <script src="https://cdn.tiny.cloud/1/ax9ytuzxdow0jnp2ckoxtjqodetjbi02tebpk5doji7mav6b/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .form-section { display: none; }
@@ -39,6 +39,10 @@
         }
         .tox-tinymce {
             border-radius: 0.375rem;
+        }
+        /* Estilos para o Modal de Confirmação */
+        #confirm-modal-overlay {
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
@@ -140,14 +144,14 @@
                         <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem de Destaque</label><input type="url" id="noticias-imagem" required></div>
                         <div>
                             <label for="noticias-descricao" class="block text-sm font-medium text-gray-700 mb-2">Conteúdo da Notícia</label>
-                            <textarea id="noticias-descricao"></textarea>
+                            <textarea id="noticias-descricao">Bem-vindo ao novo editor!</textarea>
                         </div>
                         <div class="flex gap-4"><button type="submit">Guardar Notícia</button><button type="button" onclick="window.clearForm('noticias')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Notícias Registadas</h3><div id="noticias-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Seção de Acervos (CRUD) -->
+                <!-- Outras seções (Acervos, Games, etc.) permanecem iguais -->
                 <div id="acervos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Acervos</h2>
                     <form id="form-acervos" class="space-y-4">
@@ -160,7 +164,6 @@
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Itens do Acervo</h3><div id="acervos-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Seção de Games (CRUD) -->
                 <div id="games-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Games Icónicos</h2>
                     <form id="form-games" class="space-y-4">
@@ -173,7 +176,6 @@
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Jogos Registados</h3><div id="games-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Seção de Timeline (CRUD) -->
                 <div id="timeline-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Timeline</h2>
                     <form id="form-timeline" class="space-y-4">
@@ -185,7 +187,6 @@
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Eventos da Timeline</h3><div id="timeline-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Seção de Quiz (CRUD) -->
                 <div id="quiz-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Quiz</h2>
                     <form id="form-quiz" class="space-y-4">
@@ -198,7 +199,6 @@
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Perguntas do Quiz</h3><div id="quiz-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Seção de Curiosidades (CRUD) -->
                 <div id="curiosidades-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Curiosidades</h2>
                     <form id="form-curiosidades" class="space-y-4">
@@ -210,7 +210,6 @@
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Curiosidades Registadas</h3><div id="curiosidades-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Seção Onde Estamos -->
                 <div id="onde-estamos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir "Onde Estamos"</h2>
                     <form id="form-onde-estamos" class="space-y-4">
@@ -226,7 +225,6 @@
                     </form>
                 </div>
 
-                <!-- Seção Corporativo -->
                 <div id="corporativo-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir "Corporativo"</h2>
                     <form id="form-corporativo" class="space-y-4">
@@ -240,7 +238,6 @@
                     </form>
                 </div>
 
-                <!-- Seção da Loja (CRUD) -->
                 <div id="lojas-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Loja</h2>
                     <form id="form-lojas" class="space-y-4">
@@ -252,13 +249,25 @@
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Produtos da Loja</h3><div id="lojas-lista" class="space-y-4"></div></div>
                 </div>
-
             </main>
         </div>
     </div>
 
     <!-- Elemento de Notificação -->
     <div id="notification" class="hidden fixed top-5 right-5 bg-green-500 text-white py-3 px-5 rounded-lg shadow-lg opacity-0 transform translate-x-full"></div>
+    
+    <!-- Modal de Confirmação de Eliminação -->
+    <div id="confirm-modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 opacity-0">
+        <div id="confirm-modal" class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-sm transform scale-95 transition-transform duration-300">
+            <h3 class="text-lg font-bold text-gray-900">Confirmar Eliminação</h3>
+            <p class="text-gray-600 mt-2">Tem a certeza que deseja eliminar este item? Esta ação não pode ser desfeita.</p>
+            <div class="mt-6 flex justify-end gap-4">
+                <button id="cancel-delete-btn" type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button>
+                <button id="confirm-delete-btn" type="button" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -352,7 +361,7 @@
 
             try {
                 if (config.isSingleDoc) {
-                    const docId = id || 'info'; // 'info' or 'main_content' as default for single docs
+                    const docId = id || 'info'; 
                     await setDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, docId), data);
                     showNotification('Informações guardadas com sucesso!');
                 } else {
@@ -371,10 +380,58 @@
             }
         }
 
+        // --- LÓGICA DO MODAL DE CONFIRMAÇÃO ---
+        const confirmModalOverlay = document.getElementById('confirm-modal-overlay');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        let deleteResolver = null;
+
+        function showConfirmModal() {
+            confirmModalOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                confirmModalOverlay.classList.remove('opacity-0');
+                confirmModal.classList.remove('scale-95');
+            }, 10);
+            return new Promise(resolve => {
+                deleteResolver = resolve;
+            });
+        }
+
+        function hideConfirmModal() {
+            confirmModalOverlay.classList.add('opacity-0');
+            confirmModal.classList.add('scale-95');
+            setTimeout(() => {
+                confirmModalOverlay.classList.add('hidden');
+                if (deleteResolver) {
+                    deleteResolver(false);
+                    deleteResolver = null;
+                }
+            }, 300);
+        }
+
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (deleteResolver) {
+                deleteResolver(true);
+                deleteResolver = null;
+            }
+            hideConfirmModal();
+        });
+
+        cancelDeleteBtn.addEventListener('click', () => {
+             hideConfirmModal();
+        });
+
         window.deleteDoc = async (entity, id) => {
-            if (confirm('Tem a certeza que deseja eliminar este item?')) {
+            const confirmed = await showConfirmModal();
+            if (confirmed) {
                 try {
-                    await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
+                    // Adiciona uma verificação extra para categorias
+                    if (entity === 'categorias') {
+                         await deleteDoc(doc(db, `/artifacts/${appId}/public/data/categorias`, id));
+                    } else {
+                         await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
+                    }
                     showNotification("Item eliminado com sucesso!");
                 } catch(error) {
                     console.error(`Erro ao eliminar ${entity}:`, error);
@@ -514,13 +571,23 @@
                 document.getElementById('userEmail').textContent = user.email;
                 document.getElementById('logout-button').addEventListener('click', () => signOut(auth));
                 
+                // NOVA INICIALIZAÇÃO DO TINYMCE
                 if (!tinymce.get('noticias-descricao')) {
                     tinymce.init({
                         selector: '#noticias-descricao',
-                        plugins: 'lists link image table code help wordcount',
-                        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
-                        height: 400,
-                        menubar: false,
+                        height: 500,
+                        plugins: [
+                          'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+                          'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+                        ],
+                        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                        tinycomments_mode: 'embedded',
+                        tinycomments_author: 'Author name',
+                        mergetags_list: [
+                          { value: 'First.Name', title: 'First Name' },
+                          { value: 'Email', title: 'Email' },
+                        ],
+                        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
                         content_style: 'body { font-family:Inter,sans-serif; font-size:16px }'
                     });
                 }
@@ -534,7 +601,9 @@
                             saveData(entity);
                         });
                     }
-                    listenToCollection(entity);
+                    if (!entities[entity].isSingleDoc) {
+                        listenToCollection(entity);
+                    }
                 });
                 
                 setupCategoryManager();
