@@ -437,11 +437,12 @@
             </a>`;
         }
 
+        // --- CORREÇÃO APLICADA AQUI ---
         const renderAcervo = (data) => `
             <div class="hud-border rounded-lg p-4 text-center transform hover:-translate-y-2 transition-transform duration-300">
-                <img src="${data.imagem || 'https://placehold.co/300x200/1a1a2e/E0E0E0?text=Consola'}" alt="${data.nome}" class="mx-auto mb-4 rounded h-32 object-contain">
+                <img src="${data.imagem_principal || 'https://placehold.co/300x200/1a1a2e/E0E0E0?text=Consola'}" alt="${data.nome}" class="mx-auto mb-4 rounded h-32 object-contain">
                 <h3 class="text-lg font-bold">${data.nome}</h3>
-                <p class="text-gray-400 text-xs">${data.descricao}</p>
+                <p class="text-gray-400 text-xs">${data.fabricante || ''}</p>
             </div>`;
             
         const renderGame = (data) => `
