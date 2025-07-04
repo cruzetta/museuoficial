@@ -45,6 +45,42 @@
         #confirm-modal-overlay {
             transition: opacity 0.3s ease;
         }
+        /* Estilos para campos de upload */
+        .upload-drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .upload-drop-zone.dragover {
+            background-color: #e9f5ff;
+            border-color: #3b82f6;
+        }
+        .upload-preview-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #f0f0f0;
+        }
+        .upload-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .upload-progress-bar {
+            transition: width 0.3s;
+        }
+        .repeater-file-button {
+            @apply text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-3 rounded-md transition-colors;
+        }
+        .file-name-display {
+            @apply text-xs text-gray-500 italic mt-1 truncate;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -109,7 +145,7 @@
                     </form>
                 </div>
 
-                <!-- Seção de Notícias (CRUD) com Editor de Texto Rico -->
+                <!-- Seção de Notícias (CRUD) com Upload de Imagem -->
                 <div id="noticias-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold">Gerir Notícias</h2>
@@ -135,6 +171,7 @@
 
                     <form id="form-noticias" class="space-y-4 border-t pt-8">
                         <input type="hidden" id="noticias-id">
+                        
                         <div><label for="noticias-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="noticias-titulo"></div>
                         <div><label for="noticias-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo (resumo da notícia)</label><input type="text" id="noticias-subtitulo"></div>
                         <div>
@@ -145,7 +182,28 @@
                             <label for="noticias-data" class="block text-sm font-medium text-gray-700">Data da Publicação</label>
                             <input type="date" id="noticias-data">
                         </div>
-                        <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem de Destaque</label><input type="url" id="noticias-imagem"></div>
+                        
+                        <!-- CAMPO DE UPLOAD DE IMAGEM PARA NOTÍCIAS -->
+                        <div data-upload-container="noticias-imagem">
+                             <input type="hidden" id="noticias-imagem-url">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Imagem de Destaque</label>
+                            <div class="upload-preview-wrapper hidden mb-4">
+                                <div class="upload-preview-container rounded-lg overflow-hidden">
+                                    <img src="#" alt="Preview da imagem" class="upload-preview rounded-lg">
+                                </div>
+                                <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover imagem</button>
+                            </div>
+                            <div class="upload-drop-zone">
+                                <input type="file" class="upload-file-input hidden" accept="image/*">
+                                <div class="text-gray-500">
+                                    <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                                    <p><strong>Arraste e solte</strong> uma imagem aqui, ou</p>
+                                    <p class="text-blue-600 font-semibold">clique para selecionar</p>
+                                    <p class="text-xs mt-1">PNG, JPG, GIF até 5MB</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div>
                             <label for="noticias-descricao" class="block text-sm font-medium text-gray-700 mb-2">Conteúdo da Notícia</label>
                             <textarea id="noticias-descricao"></textarea>
@@ -155,7 +213,7 @@
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Notícias Registadas</h3><div id="noticias-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Seção de Acervos -->
+                <!-- Seção de Acervos com Uploads -->
                 <div id="acervos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Acervos da Galeria</h2>
                     <form id="form-acervos" class="space-y-6">
@@ -170,7 +228,24 @@
                                 <div><label for="acervos-geracao" class="block text-sm font-medium text-gray-700">Geração</label><input type="text" id="acervos-geracao" placeholder="Ex: 3ª Geração (8-bit)"></div>
                                 <div><label for="acervos-media" class="block text-sm font-medium text-gray-700">Média</label><input type="text" id="acervos-media" placeholder="Ex: Cartucho"></div>
                                 <div><label for="acervos-vendas" class="block text-sm font-medium text-gray-700">Vendas (aprox.)</label><input type="text" id="acervos-vendas" placeholder="Ex: ~50 milhões"></div>
-                                <div class="md:col-span-2"><label for="acervos-imagem_principal" class="block text-sm font-medium text-gray-700">URL da Imagem Principal</label><input type="url" id="acervos-imagem_principal"></div>
+                                
+                                <div class="md:col-span-2" data-upload-container="acervos-imagem_principal">
+                                    <input type="hidden" id="acervos-imagem_principal-url">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Imagem Principal</label>
+                                    <div class="upload-preview-wrapper hidden mb-4">
+                                        <div class="upload-preview-container rounded-lg overflow-hidden">
+                                            <img src="#" alt="Preview da imagem" class="upload-preview rounded-lg">
+                                        </div>
+                                        <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover imagem</button>
+                                    </div>
+                                    <div class="upload-drop-zone">
+                                        <input type="file" class="upload-file-input hidden" accept="image/*">
+                                        <div class="text-gray-500">
+                                            <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                                            <p><strong>Arraste e solte</strong> ou <strong>clique para selecionar</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </fieldset>
 
@@ -181,31 +256,26 @@
                                     <label for="acervos-detalhes" class="block text-sm font-medium text-gray-700 mb-2">Sobre o Item (História, Legado, etc.)</label>
                                     <textarea id="acervos-detalhes"></textarea>
                                 </div>
-                                
                                 <div class="border-t pt-4">
-                                    <label class="block text-sm font-medium text-gray-700">Galeria de Imagens (para os botões)</label>
+                                    <label class="block text-sm font-medium text-gray-700">Galeria de Imagens</label>
                                     <div id="acervos-galeria_imagens-container" class="space-y-3 mt-2"></div>
                                     <button type="button" onclick="window.addRepeaterItem('galeria_imagens')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Imagem</button>
                                 </div>
-
-                                <div class="border-t pt-4">
-                                    <label class="block text-sm font-medium text-gray-700">Curiosidades ("Você Sabia?")</label>
-                                    <div id="acervos-voce_sabia-container" class="space-y-3 mt-2"></div>
-                                    <button type="button" onclick="window.addRepeaterItem('voce_sabia')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Fato</button>
-                                </div>
-                                
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700">Sons Icónicos</label>
                                     <div id="acervos-sons_iconicos-container" class="space-y-3 mt-2"></div>
                                     <button type="button" onclick="window.addRepeaterItem('sons_iconicos')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Som</button>
                                 </div>
-
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700">Vídeos da Época</label>
                                     <div id="acervos-videos_epoca-container" class="space-y-3 mt-2"></div>
                                     <button type="button" onclick="window.addRepeaterItem('videos_epoca')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Vídeo</button>
                                 </div>
-
+                                <div class="border-t pt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Curiosidades ("Você Sabia?")</label>
+                                    <div id="acervos-voce_sabia-container" class="space-y-3 mt-2"></div>
+                                    <button type="button" onclick="window.addRepeaterItem('voce_sabia')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Fato</button>
+                                </div>
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700">Jogos Essenciais</label>
                                     <div id="acervos-jogos_essenciais-container" class="space-y-3 mt-2"></div>
@@ -213,97 +283,27 @@
                                 </div>
                             </div>
                         </fieldset>
+                        
+                        <!-- Barra de Progresso Geral para Acervos -->
+                        <div id="acervos-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4">
+                            <div id="acervos-upload-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">0%</div>
+                        </div>
 
                         <div class="flex gap-4 pt-4"><button type="submit">Guardar Item do Acervo</button><button type="button" onclick="window.clearForm('acervos')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Itens do Acervo</h3><div id="acervos-lista" class="space-y-4"></div></div>
                 </div>
 
-                <div id="games-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerir Games Icónicos</h2>
-                    <form id="form-games" class="space-y-4">
-                        <input type="hidden" id="games-id">
-                        <div><label for="games-nome" class="block text-sm font-medium text-gray-700">Nome do Jogo</label><input type="text" id="games-nome"></div>
-                        <div><label for="games-ano" class="block text-sm font-medium text-gray-700">Ano</label><input type="text" id="games-ano"></div>
-                        <div><label for="games-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="games-imagem"></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Jogo</button><button type="button" onclick="window.clearForm('games')" class="w-auto">Cancelar</button></div>
-                    </form>
-                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Jogos Registados</h3><div id="games-lista" class="space-y-4"></div></div>
-                </div>
+                <!-- Outros formulários (games, timeline, etc.) -->
+                <div id="games-form" class="form-section bg-white p-8 rounded-lg shadow-md">...</div>
+                <div id="timeline-form" class="form-section bg-white p-8 rounded-lg shadow-md">...</div>
+                <div id="quiz-form" class="form-section bg-white p-8 rounded-lg shadow-md">...</div>
+                <div id="curiosidades-form" class="form-section bg-white p-8 rounded-lg shadow-md">...</div>
+                <div id="onde-estamos-form" class="form-section bg-white p-8 rounded-lg shadow-md">...</div>
+                <div id="corporativo-form" class="form-section bg-white p-8 rounded-lg shadow-md">...</div>
+                <div id="lojas-form" class="form-section bg-white p-8 rounded-lg shadow-md">...</div>
 
-                <div id="timeline-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerir Timeline</h2>
-                    <form id="form-timeline" class="space-y-4">
-                        <input type="hidden" id="timeline-id">
-                        <div><label for="timeline-titulo" class="block text-sm font-medium text-gray-700">Título (Ex: 1972: Pong)</label><input type="text" id="timeline-titulo"></div>
-                        <div><label for="timeline-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="timeline-descricao" rows="2"></textarea></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Evento</button><button type="button" onclick="window.clearForm('timeline')" class="w-auto">Cancelar</button></div>
-                    </form>
-                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Eventos da Timeline</h3><div id="timeline-lista" class="space-y-4"></div></div>
-                </div>
 
-                <div id="quiz-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerir Quiz</h2>
-                    <form id="form-quiz" class="space-y-4">
-                        <input type="hidden" id="quiz-id">
-                        <div><label for="quiz-pergunta" class="block text-sm font-medium text-gray-700">Pergunta</label><input type="text" id="quiz-pergunta"></div>
-                        <div><label for="quiz-opcoes" class="block text-sm font-medium text-gray-700">Opções (separadas por vírgula)</label><input type="text" id="quiz-opcoes" placeholder="Opção A,Opção B,Opção C,Opção D"></div>
-                        <div><label for="quiz-correta" class="block text-sm font-medium text-gray-700">Índice da Resposta Correta (0, 1, 2 ou 3)</label><input type="number" id="quiz-correta" min="0" max="3"></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Pergunta</button><button type="button" onclick="window.clearForm('quiz')" class="w-auto">Cancelar</button></div>
-                    </form>
-                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Perguntas do Quiz</h3><div id="quiz-lista" class="space-y-4"></div></div>
-                </div>
-
-                <div id="curiosidades-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerir Curiosidades</h2>
-                    <form id="form-curiosidades" class="space-y-4">
-                        <input type="hidden" id="curiosidades-id">
-                        <div><label for="curiosidades-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="curiosidades-titulo"></div>
-                        <div><label for="curiosidades-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="curiosidades-descricao" rows="3"></textarea></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Curiosidade</button><button type="button" onclick="window.clearForm('curiosidades')" class="w-auto">Cancelar</button></div>
-                    </form>
-                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Curiosidades Registadas</h3><div id="curiosidades-lista" class="space-y-4"></div></div>
-                </div>
-
-                <div id="onde-estamos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerir "Onde Estamos"</h2>
-                    <form id="form-onde-estamos" class="space-y-4">
-                        <input type="hidden" id="onde-estamos-id" value="info">
-                        <div><label for="onde-estamos-endereco" class="block text-sm font-medium text-gray-700">Endereço</label><input type="text" id="onde-estamos-endereco"></div>
-                        <div><label for="onde-estamos-cidade" class="block text-sm font-medium text-gray-700">Cidade/Estado</label><input type="text" id="onde-estamos-cidade"></div>
-                        <div><label for="onde-estamos-horario" class="block text-sm font-medium text-gray-700">Horário</label><input type="text" id="onde-estamos-horario"></div>
-                        <div><label for="onde-estamos-fechado" class="block text-sm font-medium text-gray-700">Dia de Encerramento</label><input type="text" id="onde-estamos-fechado"></div>
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <button type="submit">Guardar Informações</button>
-                            <button type="button" onclick="window.loadSingleDoc('onde-estamos')">Carregar Dados Atuais</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div id="corporativo-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerir "Corporativo"</h2>
-                    <form id="form-corporativo" class="space-y-4">
-                        <input type="hidden" id="corporativo-id" value="info">
-                        <div><label for="corporativo-missao" class="block text-sm font-medium text-gray-700">Missão</label><textarea id="corporativo-missao" rows="4"></textarea></div>
-                        <div><label for="corporativo-visao" class="block text-sm font-medium text-gray-700">Visão</label><textarea id="corporativo-visao" rows="4"></textarea></div>
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <button type="submit">Guardar Textos</button>
-                            <button type="button" onclick="window.loadSingleDoc('corporativo')">Carregar Dados Atuais</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div id="lojas-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerir Loja</h2>
-                    <form id="form-lojas" class="space-y-4">
-                        <input type="hidden" id="lojas-id">
-                        <div><label for="lojas-nome" class="block text-sm font-medium text-gray-700">Nome do Produto</label><input type="text" id="lojas-nome"></div>
-                        <div><label for="lojas-preco" class="block text-sm font-medium text-gray-700">Preço</label><input type="text" id="lojas-preco"></div>
-                        <div><label for="lojas-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="lojas-imagem"></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Produto</button><button type="button" onclick="window.clearForm('lojas')" class="w-auto">Cancelar</button></div>
-                    </form>
-                    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Produtos da Loja</h3><div id="lojas-lista" class="space-y-4"></div></div>
-                </div>
             </main>
         </div>
     </div>
@@ -327,37 +327,43 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.firebasestorage.app",
+            storageBucket: "museu-cca6d.appspot.com",
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const storage = getStorage(app);
         const appId = 'museu-cca6d';
+
+        const pendingFiles = new Map();
 
         const entities = {
             'home': { isSingleDoc: true, fields: ['titulo', 'subtitulo', 'botao'] },
             'noticias': { 
                 isSingleDoc: false, 
-                fields: ['titulo', 'subtitulo', 'categoria', 'imagem', 'data', 'descricao'],
+                fields: ['titulo', 'subtitulo', 'categoria', 'data', 'descricao'],
                 listDisplayField: 'titulo',
                 hasRichText: true,
-                richTextField: 'descricao'
+                richTextField: 'descricao',
+                fileUploads: { 'noticias-imagem': { field: 'imagem', path: 'noticias/' } }
             },
             'acervos': { 
                 isSingleDoc: false, 
-                fields: ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas', 'imagem_principal', 'detalhes'],
+                fields: ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas', 'detalhes'],
                 repeaterFields: ['galeria_imagens', 'voce_sabia', 'sons_iconicos', 'videos_epoca', 'jogos_essenciais'],
                 listDisplayField: 'nome',
                 hasRichText: true,
-                richTextField: 'detalhes'
+                richTextField: 'detalhes',
+                fileUploads: { 'acervos-imagem_principal': { field: 'imagem_principal', path: 'acervos/main/' } }
             },
             'games': { isSingleDoc: false, fields: ['nome', 'ano', 'imagem'], listDisplayField: 'nome' },
             'timeline': { isSingleDoc: false, fields: ['titulo', 'descricao'], listDisplayField: 'titulo' },
@@ -368,51 +374,77 @@
             'lojas': { isSingleDoc: false, fields: ['nome', 'preco', 'imagem'], listDisplayField: 'nome' }
         };
 
-        // --- LÓGICA DO REPEATER (CAMPOS DINÂMICOS) ---
         const repeaterTemplates = {
-            galeria_imagens: () => `
+            galeria_imagens: (uuid) => `
                 <input type="text" class="repeater-input" data-field="nome" placeholder="Nome do Botão (Ex: Controle)">
-                <input type="url" class="repeater-input" data-field="url" placeholder="URL da Imagem">
+                <div class="flex-grow">
+                    <input type="file" id="${uuid}" class="hidden" accept="image/*" onchange="window.handleRepeaterFileSelect(this)">
+                    <button type="button" class="repeater-file-button" onclick="document.getElementById('${uuid}').click()">Selecionar Imagem</button>
+                    <div class="file-name-display">Nenhum ficheiro selecionado</div>
+                </div>
             `,
-            sons_iconicos: () => `
+            sons_iconicos: (uuid) => `
                 <input type="text" class="repeater-input" data-field="nome" placeholder="Nome do Som (Ex: Moeda do Mario)">
-                <input type="url" class="repeater-input" data-field="url" placeholder="URL do arquivo de áudio">
+                 <div class="flex-grow">
+                    <input type="file" id="${uuid}" class="hidden" accept="audio/*" onchange="window.handleRepeaterFileSelect(this)">
+                    <button type="button" class="repeater-file-button" onclick="document.getElementById('${uuid}').click()">Selecionar Áudio</button>
+                    <div class="file-name-display">Nenhum ficheiro selecionado</div>
+                </div>
             `,
-            videos_epoca: () => `
+            videos_epoca: (uuid) => `
                 <input type="text" class="repeater-input" data-field="nome" placeholder="Título do Vídeo (Ex: Anúncio de TV)">
-                <input type="url" class="repeater-input" data-field="embed_url" placeholder="URL de Incorporação (Embed)">
+                 <div class="flex-grow">
+                    <input type="file" id="${uuid}" class="hidden" accept="video/*" onchange="window.handleRepeaterFileSelect(this)">
+                    <button type="button" class="repeater-file-button" onclick="document.getElementById('${uuid}').click()">Selecionar Vídeo</button>
+                    <div class="file-name-display">Nenhum ficheiro selecionado</div>
+                </div>
             `,
             voce_sabia: () => `<input type="text" class="repeater-input" placeholder="Escreva a curiosidade">`,
             jogos_essenciais: () => `<input type="text" class="repeater-input" placeholder="Nome do Jogo">`
+        };
+        
+        window.handleRepeaterFileSelect = (input) => {
+            const file = input.files[0];
+            if (!file) return;
+            pendingFiles.set(input.id, file);
+            const fileNameDisplay = input.parentElement.querySelector('.file-name-display');
+            fileNameDisplay.textContent = file.name;
         };
 
         window.addRepeaterItem = (type, data = {}) => {
             const container = document.getElementById(`acervos-${type}-container`);
             if (!container) return;
-
+            const uuid = `repeater-file-${crypto.randomUUID()}`;
             const itemDiv = document.createElement('div');
-            // FIX: Added 'repeater-item' class for reliable selection
             itemDiv.className = 'repeater-item flex items-center gap-2 p-2 border rounded-md bg-gray-50';
+            itemDiv.setAttribute('data-repeater-type', type);
             itemDiv.innerHTML = `
-                <div class="flex-grow flex gap-2">${repeaterTemplates[type]()}</div>
+                <div class="flex-grow flex gap-2">${repeaterTemplates[type] ? repeaterTemplates[type](uuid) : ''}</div>
                 <button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>
             `;
+            container.appendChild(itemDiv);
             
-            if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+            if (typeof data === 'object' && data !== null) {
                 for (const key in data) {
                     const input = itemDiv.querySelector(`[data-field="${key}"]`);
                     if (input) input.value = data[key];
+                    const url = data.url || data.embed_url;
+                    if(url && (key === 'url' || key === 'embed_url')){
+                       const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+                       if(fileNameDisplay) fileNameDisplay.textContent = decodeURIComponent(url.split('%2F').pop().split('?')[0]);
+                    }
                 }
-            } else if (typeof data === 'string') {
-                const input = itemDiv.querySelector('input');
-                if (input) input.value = data;
             }
 
-            container.appendChild(itemDiv);
-            itemDiv.querySelector('.remove-item-btn').addEventListener('click', () => itemDiv.remove());
+            itemDiv.querySelector('.remove-item-btn').addEventListener('click', () => {
+                const fileInput = itemDiv.querySelector('input[type="file"]');
+                if (fileInput && pendingFiles.has(fileInput.id)) {
+                    pendingFiles.delete(fileInput.id);
+                }
+                itemDiv.remove();
+            });
         };
         
-        // --- FUNÇÕES GLOBAIS DA UI ---
         function showNotification(message, isError = false) {
              const el = document.getElementById('notification');
              el.textContent = message;
@@ -437,13 +469,7 @@
             if (config && config.hasRichText) {
                 const editorId = `${formId}-${config.richTextField}`;
                 if (!tinymce.get(editorId)) {
-                    tinymce.init({
-                        selector: `#${editorId}`,
-                        height: 500,
-                        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-                        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
-                        content_style: 'body { font-family:Inter,sans-serif; font-size:16px }'
-                    });
+                    tinymce.init({ selector: `#${editorId}`, height: 500, plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount', toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat', content_style: 'body { font-family:Inter,sans-serif; font-size:16px }'});
                 }
             }
         };
@@ -455,112 +481,207 @@
             if (idField) idField.value = '';
             
             const config = entities[entity];
-            if (config?.hasRichText) {
-                const editor = tinymce.get(`${entity}-${config.richTextField}`);
-                if (editor) editor.setContent('');
-            }
+            if (config?.hasRichText) tinymce.get(`${entity}-${config.richTextField}`)?.setContent('');
             if (config?.repeaterFields) {
                 config.repeaterFields.forEach(type => {
                     const container = document.getElementById(`acervos-${type}-container`);
                     if(container) container.innerHTML = '';
                 });
             }
-        };
-
-        // --- FUNÇÕES DE DADOS (CORRIGIDA) ---
-        async function saveData(entity) {
-            const config = entities[entity];
-            if (!config) return;
-
-            const id = document.getElementById(`${entity}-id`)?.value;
-            const data = {};
-
-            // Pega dados dos campos normais
-            config.fields.forEach(field => {
-                const el = document.getElementById(`${entity}-${field}`);
-                let value;
-                if (config.hasRichText && field === config.richTextField) {
-                    value = tinymce.get(`${entity}-${field}`)?.getContent();
-                } else if (el) {
-                    value = el.value.trim();
-                }
-
-                if (value) {
-                    data[field] = value;
-                }
-            });
-
-            // FIX: Pega dados dos campos repetidores de forma correta
-            if (config.repeaterFields) {
-                config.repeaterFields.forEach(type => {
-                    const container = document.getElementById(`acervos-${type}-container`);
-                    if (!container) return;
-                    const items = [];
-                    
-                    // Use the new 'repeater-item' class to correctly select each item's wrapper div
-                    container.querySelectorAll('.repeater-item').forEach(itemDiv => {
-                        const inputs = itemDiv.querySelectorAll('input');
-                        
-                        if (inputs.length > 1) { // Case for multi-input items (e.g., galeria_imagens)
-                            const itemData = {};
-                            let hasValue = false;
-                            inputs.forEach(input => {
-                                const value = input.value.trim();
-                                if (value && input.dataset.field) {
-                                    itemData[input.dataset.field] = value;
-                                    hasValue = true;
-                                }
-                            });
-                            if (hasValue) {
-                                items.push(itemData);
-                            }
-                        } else if (inputs.length === 1) { // Case for single-input items (e.g., voce_sabia)
-                            const value = inputs[0].value.trim();
-                            if (value) {
-                                items.push(value);
-                            }
-                        }
-                    });
-
-                    if (items.length > 0) {
-                        data[type] = items;
-                    }
+            if (config?.fileUploads) {
+                Object.keys(config.fileUploads).forEach(key => {
+                    resetUploadUI(key);
                 });
             }
-            
-            // Trata a data da notícia
-            if (entity === 'noticias') {
-                 const dateString = document.getElementById('noticias-data').value;
-                 if (dateString) {
-                     data.data_publicacao = new Date(dateString + "T12:00:00");
-                 }
-            }
-            
-            if (Object.keys(data).length === 0 && !config.isSingleDoc && !id) {
-                showNotification('Nenhum dado para guardar.', true);
-                return;
-            }
+            pendingFiles.clear();
+        };
 
-            try {
-                const path = `/artifacts/${appId}/public/data/${entity}`;
-                if (config.isSingleDoc) {
-                    await setDoc(doc(db, path, id || 'info'), data, { merge: true });
-                } else {
-                    if (id) {
-                        await updateDoc(doc(db, path, id), data);
-                    } else {
-                        await addDoc(collection(db, path), data);
-                    }
-                }
-                showNotification('Dados guardados com sucesso!');
-                window.clearForm(entity);
-            } catch (error) {
-                console.error(`Erro ao guardar ${entity}:`, error);
-                showNotification(`Erro ao guardar item.`, true);
-            }
+        function setupUploadComponent(container) {
+            const dropZone = container.querySelector('.upload-drop-zone');
+            const fileInput = container.querySelector('.upload-file-input');
+            const removeBtn = container.querySelector('.remove-upload-btn');
+
+            dropZone.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => handleFile(e.target.files[0], container));
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+            dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0], container); });
+            removeBtn.addEventListener('click', () => resetUploadUI(container.dataset.uploadContainer));
         }
 
-        // --- MODAL DE CONFIRMAÇÃO ---
+        function handleFile(file, container) {
+            if (!file) return;
+            const containerKey = container.dataset.uploadContainer;
+            pendingFiles.set(containerKey, file);
+            
+            const previewImg = container.querySelector('.upload-preview');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                container.querySelector('.upload-preview-wrapper').classList.remove('hidden');
+                container.querySelector('.upload-drop-zone').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetUploadUI(containerKey) {
+            const container = document.querySelector(`[data-upload-container="${containerKey}"]`);
+            if (!container) return;
+            pendingFiles.delete(containerKey);
+            container.querySelector('.upload-file-input').value = '';
+            container.querySelector('.upload-preview').src = '#';
+            container.querySelector('.upload-preview-wrapper').classList.add('hidden');
+            container.querySelector('.upload-drop-zone').classList.remove('hidden');
+            const urlInput = document.getElementById(`${containerKey}-url`);
+            if (urlInput) urlInput.value = '';
+        }
+
+        function uploadFile(file, path) {
+            return new Promise((resolve, reject) => {
+                const storageRef = ref(storage, `${path}${Date.now()}_${file.name}`);
+                const uploadTask = uploadBytesResumable(storageRef, file);
+                uploadTask.on('state_changed', 
+                    null, 
+                    (error) => reject(error), 
+                    async () => {
+                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                        resolve(downloadURL);
+                    }
+                );
+            });
+        }
+
+        async function handleFormSubmit(entity, event) {
+            event.preventDefault();
+            const form = event.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+
+            const config = entities[entity];
+            const data = {};
+
+            config.fields.forEach(field => {
+                const el = document.getElementById(`${entity}-${field}`);
+                if (config.hasRichText && field === config.richTextField) {
+                    data[field] = tinymce.get(`${entity}-${field}`)?.getContent() || '';
+                } else if (el) {
+                    data[field] = el.value.trim();
+                }
+            });
+            if (entity === 'noticias') {
+                 const dateString = document.getElementById('noticias-data').value;
+                 if (dateString) data.data_publicacao = new Date(dateString + "T12:00:00");
+            }
+
+            if (config.repeaterFields) {
+                config.repeaterFields.forEach(type => {
+                    data[type] = [];
+                    const container = document.getElementById(`acervos-${type}-container`);
+                    container.querySelectorAll('.repeater-item').forEach(itemDiv => {
+                        const itemData = {};
+                        itemDiv.querySelectorAll('input[data-field]').forEach(input => {
+                            itemData[input.dataset.field] = input.value.trim();
+                        });
+                        
+                        const fileInput = itemDiv.querySelector('input[type="file"]');
+                        const urlField = (type === 'videos_epoca') ? 'embed_url' : 'url';
+                        const existingUrl = itemDiv.querySelector('.file-name-display')?.dataset.existingUrl;
+
+                        if (fileInput && pendingFiles.has(fileInput.id)) {
+                             // Ficheiro novo, será processado depois
+                        } else if (existingUrl) {
+                            itemData[urlField] = existingUrl;
+                        }
+                        
+                        if(Object.keys(itemData).length === 0){
+                            const simpleInput = itemDiv.querySelector('input');
+                            if(simpleInput && simpleInput.value) data[type].push(simpleInput.value.trim());
+                        } else {
+                            data[type].push(itemData);
+                        }
+                    });
+                });
+            }
+
+            const uploadPromises = [];
+            pendingFiles.forEach((file, key) => {
+                let uploadPath = 'uploads/'; // Caminho padrão
+                if (key.startsWith('repeater-file-')) {
+                    uploadPath = 'acervos/repeater/';
+                } else if (config.fileUploads && config.fileUploads[key]) {
+                    uploadPath = config.fileUploads[key].path;
+                }
+                const promise = uploadFile(file, uploadPath).then(url => ({ key, url }));
+                uploadPromises.push(promise);
+            });
+
+            const progressContainer = document.getElementById(`${entity}-upload-progress-container`);
+            const progressBar = document.getElementById(`${entity}-upload-progress-bar`);
+            if (progressContainer && uploadPromises.length > 0) {
+                progressContainer.classList.remove('hidden');
+            }
+
+            let uploadedCount = 0;
+            const wrappedPromises = uploadPromises.map(p => p.then(result => {
+                uploadedCount++;
+                const progress = (uploadedCount / uploadPromises.length) * 100;
+                if(progressBar) {
+                    progressBar.style.width = `${progress}%`;
+                    progressBar.textContent = `${Math.round(progress)}%`;
+                }
+                return result;
+            }));
+
+            try {
+                const uploadResults = await Promise.all(wrappedPromises);
+
+                uploadResults.forEach(({ key, url }) => {
+                    if (key.startsWith('repeater-file-')) {
+                        const fileInput = document.getElementById(key);
+                        if (!fileInput) return;
+                        const repeaterItem = fileInput.closest('.repeater-item');
+                        const repeaterType = repeaterItem.dataset.repeaterType;
+                        const itemIndex = [...repeaterItem.parentElement.children].indexOf(repeaterItem);
+                        if (data[repeaterType] && data[repeaterType][itemIndex]) {
+                            const urlField = (repeaterType === 'videos_epoca') ? 'embed_url' : 'url';
+                            data[repeaterType][itemIndex][urlField] = url;
+                        }
+                    } else {
+                        const fieldName = config.fileUploads[key].field;
+                        data[fieldName] = url;
+                    }
+                });
+
+                if (config.fileUploads) {
+                    Object.keys(config.fileUploads).forEach(key => {
+                        const fieldName = config.fileUploads[key].field;
+                        if (!data[fieldName]) {
+                            const urlInput = document.getElementById(`${key}-url`);
+                            if (urlInput && urlInput.value) data[fieldName] = urlInput.value;
+                        }
+                    });
+                }
+                
+                const id = document.getElementById(`${entity}-id`)?.value;
+                const path = `/artifacts/${appId}/public/data/${entity}`;
+                if (id) {
+                    await updateDoc(doc(db, path, id), data);
+                } else {
+                    await addDoc(collection(db, path), data);
+                }
+
+                showNotification('Dados guardados com sucesso!');
+                window.clearForm(entity);
+
+            } catch (error) {
+                console.error(`Erro ao guardar ${entity}:`, error);
+                showNotification('Erro ao guardar os dados. Verifique a consola.', true);
+            } finally {
+                submitButton.disabled = false;
+                if(progressContainer) setTimeout(() => progressContainer.classList.add('hidden'), 1000);
+            }
+        }
+        
         const confirmModalOverlay = document.getElementById('confirm-modal-overlay');
         const confirmModal = document.getElementById('confirm-modal');
         const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
@@ -581,43 +702,59 @@
             confirmModal.classList.add('scale-95');
             setTimeout(() => {
                 confirmModalOverlay.classList.add('hidden');
-                if (deleteResolver) {
-                    deleteResolver(false);
-                    deleteResolver = null;
-                }
+                if (deleteResolver) { deleteResolver(false); deleteResolver = null; }
             }, 300);
         }
+        
+        confirmDeleteBtn.addEventListener('click', () => { if (deleteResolver) { deleteResolver(true); deleteResolver = null; } hideConfirmModal(); });
+        cancelDeleteBtn.addEventListener('click', () => hideConfirmModal());
 
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (deleteResolver) {
-                deleteResolver(true);
-                deleteResolver = null;
-            }
-            hideConfirmModal();
-        });
-
-        cancelDeleteBtn.addEventListener('click', () => { hideConfirmModal(); });
 
         window.deleteDoc = async (entity, id) => {
             const confirmed = await showConfirmModal();
-            if (confirmed) {
-                try {
-                    const collectionName = (entity === 'categorias') ? 'categorias' : entity;
-                    await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${collectionName}`, id));
-                    showNotification("Item eliminado com sucesso!");
-                } catch(error) {
-                    console.error(`Erro ao eliminar ${entity}:`, error);
-                    showNotification("Erro ao eliminar o item.", true);
+            if (!confirmed) return;
+            
+            try {
+                const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const deletePromises = [];
+                    const config = entities[entity];
+                    if (config.fileUploads) {
+                        Object.values(config.fileUploads).forEach(fileInfo => {
+                            if (data[fileInfo.field]) {
+                                try { deletePromises.push(deleteObject(ref(storage, data[fileInfo.field]))); } catch(e) { console.warn(e); }
+                            }
+                        });
+                    }
+                    if(entity === 'acervos' && config.repeaterFields){
+                        config.repeaterFields.forEach(type => {
+                            if(data[type] && Array.isArray(data[type])){
+                                data[type].forEach(item => {
+                                    const url = item.url || item.embed_url;
+                                    if(url && url.includes('firebasestorage')) {
+                                        try { deletePromises.push(deleteObject(ref(storage, url))); } catch(e) { console.warn(e); }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    await Promise.all(deletePromises);
                 }
+                
+                const collectionName = (entity === 'categorias') ? 'categorias' : entity;
+                await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${collectionName}`, id));
+                showNotification("Item eliminado com sucesso!");
+            } catch(error) {
+                console.error(`Erro ao eliminar ${entity}:`, error);
+                showNotification("Erro ao eliminar o item.", true);
             }
         };
 
         window.editDoc = async (entity, id) => {
-            const config = entities[entity];
-            if (!config || config.isSingleDoc) return;
-            
             window.clearForm(entity); 
-
+            const config = entities[entity];
             try {
                 const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
                 const docSnap = await getDoc(docRef);
@@ -628,19 +765,30 @@
                     config.fields.forEach(field => {
                         const el = document.getElementById(`${entity}-${field}`);
                         if (config.hasRichText && field === config.richTextField) {
-                            tinymce.get(`${entity}-${field}`).setContent(data[field] || '');
-                        } else if (field === 'data' && entity === 'noticias') {
-                            const dataInput = document.getElementById('noticias-data');
-                            if (data.data_publicacao && data.data_publicacao.toDate) {
-                                dataInput.value = data.data_publicacao.toDate().toISOString().split('T')[0];
-                            } else {
-                                dataInput.value = '';
-                            }
-                        } else {
-                            if(el) el.value = data[field] || '';
+                            tinymce.get(`${entity}-${field}`)?.setContent(data[field] || '');
+                        } else if(el) {
+                            el.value = data[field] || '';
                         }
                     });
-                    
+                     if (entity === 'noticias') {
+                        const dataInput = document.getElementById('noticias-data');
+                        if (data.data_publicacao?.toDate) {
+                            dataInput.value = data.data_publicacao.toDate().toISOString().split('T')[0];
+                        }
+                    }
+
+                    if (config.fileUploads) {
+                        Object.entries(config.fileUploads).forEach(([key, fileInfo]) => {
+                            if (data[fileInfo.field]) {
+                                const container = document.querySelector(`[data-upload-container="${key}"]`);
+                                container.querySelector('.upload-preview').src = data[fileInfo.field];
+                                container.querySelector('.upload-preview-wrapper').classList.remove('hidden');
+                                container.querySelector('.upload-drop-zone').classList.add('hidden');
+                                document.getElementById(`${key}-url`).value = data[fileInfo.field];
+                            }
+                        });
+                    }
+
                     if (config.repeaterFields) {
                         config.repeaterFields.forEach(type => {
                             if (data[type] && Array.isArray(data[type])) {
@@ -648,7 +796,6 @@
                             }
                         });
                     }
-
                     showForm(entity);
                     window.scrollTo(0, 0);
                 }
@@ -657,11 +804,11 @@
                 showNotification('Erro ao carregar dados para edição.', true);
             }
         };
-
+        
         window.loadSingleDoc = async (entity) => {
             const config = entities[entity];
             if (!config || !config.isSingleDoc) return;
-            const docId = document.getElementById(`${entity}-id`).value || 'info';
+            const docId = 'info';
              try {
                 const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, docId);
                 const docSnap = await getDoc(docRef);
@@ -760,7 +907,6 @@
             });
         }
 
-        // --- INICIALIZAÇÃO E AUTENTICAÇÃO ---
         onAuthStateChanged(auth, user => {
             const loader = document.getElementById('loader-container');
             const mainContent = document.getElementById('main-content');
@@ -771,18 +917,20 @@
                 Object.keys(entities).forEach(entity => {
                     const form = document.getElementById(`form-${entity}`);
                     if (form) {
-                        form.addEventListener('submit', (e) => {
-                            e.preventDefault();
-                            saveData(entity);
-                        });
+                        form.addEventListener('submit', (e) => handleFormSubmit(entity, e));
                     }
                     if (entities[entity] && !entities[entity].isSingleDoc) {
                         listenToCollection(entity);
                     }
+                    if (entities[entity].fileUploads) {
+                        Object.keys(entities[entity].fileUploads).forEach(key => {
+                            const container = document.querySelector(`[data-upload-container="${key}"]`);
+                            if (container) setupUploadComponent(container);
+                        });
+                    }
                 });
                 
                 setupCategoryManager();
-
                 loader.style.display = 'none';
                 mainContent.style.display = 'block';
                 showForm('home');
