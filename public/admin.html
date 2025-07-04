@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Script do Editor de Texto Rico (TinyMCE) ATUALIZADO -->
     <script src="https://cdn.tiny.cloud/1/ax9ytuzxdow0jnp2ckoxtjqodetjbi02tebpk5doji7mav6b/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -40,7 +39,6 @@
         .tox-tinymce {
             border-radius: 0.375rem;
         }
-        /* Estilos para o Modal de Confirmação */
         #confirm-modal-overlay {
             transition: opacity 0.3s ease;
         }
@@ -117,7 +115,6 @@
                         </button>
                     </div>
 
-                    <!-- Painel de Gestão de Categorias (Oculto por padrão) -->
                     <div id="category-manager-panel" class="hidden mb-8 p-6 bg-gray-50 rounded-lg border transition-all duration-300">
                         <h3 class="text-xl font-bold mb-4">Gestão de Categorias</h3>
                         <form id="form-categorias" class="space-y-4">
@@ -148,22 +145,36 @@
                         <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem de Destaque</label><input type="url" id="noticias-imagem" required></div>
                         <div>
                             <label for="noticias-descricao" class="block text-sm font-medium text-gray-700 mb-2">Conteúdo da Notícia</label>
-                            <textarea id="noticias-descricao">Bem-vindo ao novo editor!</textarea>
+                            <textarea id="noticias-descricao"></textarea>
                         </div>
                         <div class="flex gap-4"><button type="submit">Guardar Notícia</button><button type="button" onclick="window.clearForm('noticias')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Notícias Registadas</h3><div id="noticias-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Outras seções (Acervos, Games, etc.) permanecem iguais -->
+                <!-- Seção de Acervos (ATUALIZADA) -->
                 <div id="acervos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-6">Gerir Acervos</h2>
+                    <h2 class="text-2xl font-bold mb-6">Gerir Acervos da Galeria</h2>
                     <form id="form-acervos" class="space-y-4">
                         <input type="hidden" id="acervos-id">
-                        <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome da Consola</label><input type="text" id="acervos-nome" required></div>
-                        <div><label for="acervos-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><input type="text" id="acervos-descricao" required></div>
-                        <div><label for="acervos-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="acervos-imagem" required></div>
-                        <div class="flex gap-4"><button type="submit">Guardar Acervo</button><button type="button" onclick="window.clearForm('acervos')" class="w-auto">Cancelar</button></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome do Item</label><input type="text" id="acervos-nome" required></div>
+                            <div><label for="acervos-fabricante" class="block text-sm font-medium text-gray-700">Fabricante</label><input type="text" id="acervos-fabricante" required></div>
+                            <div><label for="acervos-lancamento" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label><input type="number" id="acervos-lancamento" placeholder="Ex: 1983" required></div>
+                            <div><label for="acervos-geracao" class="block text-sm font-medium text-gray-700">Geração</label><input type="text" id="acervos-geracao" placeholder="Ex: 3ª Geração (8-bit)" required></div>
+                            <div><label for="acervos-media" class="block text-sm font-medium text-gray-700">Média</label><input type="text" id="acervos-media" placeholder="Ex: Cartucho"></div>
+                            <div><label for="acervos-vendas" class="block text-sm font-medium text-gray-700">Vendas (aprox.)</label><input type="text" id="acervos-vendas" placeholder="Ex: ~50 milhões"></div>
+                        </div>
+                        <div><label for="acervos-imagem_principal" class="block text-sm font-medium text-gray-700">URL da Imagem Principal</label><input type="url" id="acervos-imagem_principal" required></div>
+                        <div>
+                            <label for="acervos-galeria_imagens" class="block text-sm font-medium text-gray-700">URLs de Imagens da Galeria (separadas por vírgula)</label>
+                            <textarea id="acervos-galeria_imagens" rows="3" placeholder="https://url/imagem1.jpg, https://url/imagem2.jpg"></textarea>
+                        </div>
+                        <div>
+                            <label for="acervos-detalhes" class="block text-sm font-medium text-gray-700 mb-2">Detalhes (Conteúdo Principal)</label>
+                            <textarea id="acervos-detalhes"></textarea>
+                        </div>
+                        <div class="flex gap-4"><button type="submit">Guardar Item do Acervo</button><button type="button" onclick="window.clearForm('acervos')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Itens do Acervo</h3><div id="acervos-lista" class="space-y-4"></div></div>
                 </div>
@@ -292,15 +303,23 @@
         const auth = getAuth(app);
         const appId = 'museu-cca6d';
 
-        // --- DEFINIÇÃO DAS ENTIDADES GERENCIÁVEIS ---
+        // --- DEFINIÇÃO DAS ENTIDADES (COM ACERVOS ATUALIZADO) ---
         const entities = {
             'home': { isSingleDoc: true, fields: ['titulo', 'subtitulo', 'botao'] },
             'noticias': { 
                 isSingleDoc: false, 
                 fields: ['titulo', 'subtitulo', 'categoria', 'imagem', 'data', 'descricao'],
-                listDisplayField: 'titulo' 
+                listDisplayField: 'titulo',
+                hasRichText: true,
+                richTextField: 'descricao'
             },
-            'acervos': { isSingleDoc: false, fields: ['nome', 'descricao', 'imagem'], listDisplayField: 'nome' },
+            'acervos': { 
+                isSingleDoc: false, 
+                fields: ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas', 'imagem_principal', 'galeria_imagens', 'detalhes'], 
+                listDisplayField: 'nome',
+                hasRichText: true,
+                richTextField: 'detalhes'
+            },
             'games': { isSingleDoc: false, fields: ['nome', 'ano', 'imagem'], listDisplayField: 'nome' },
             'timeline': { isSingleDoc: false, fields: ['titulo', 'descricao'], listDisplayField: 'titulo' },
             'quiz': { isSingleDoc: false, fields: ['pergunta', 'opcoes', 'correta'], listDisplayField: 'pergunta' },
@@ -331,21 +350,18 @@
                 button.classList.toggle('text-white', button.getAttribute('onclick') === `window.showForm('${formId}')`);
             });
 
-            if (formId === 'noticias' && !tinymce.get('noticias-descricao')) {
-                tinymce.init({
-                    selector: '#noticias-descricao',
-                    height: 500,
-                    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange formatpainter pageembed a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss markdown importword exportword exportpdf',
-                    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-                    tinycomments_mode: 'embedded',
-                    tinycomments_author: 'Author name',
-                    mergetags_list: [
-                      { value: 'First.Name', title: 'First Name' },
-                      { value: 'Email', title: 'Email' },
-                    ],
-                    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
-                    content_style: 'body { font-family:Inter,sans-serif; font-size:16px }'
-                });
+            const config = entities[formId];
+            if (config && config.hasRichText) {
+                const editorId = `${formId}-${config.richTextField}`;
+                if (!tinymce.get(editorId)) {
+                    tinymce.init({
+                        selector: `#${editorId}`,
+                        height: 500,
+                        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+                        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+                        content_style: 'body { font-family:Inter,sans-serif; font-size:16px }'
+                    });
+                }
             }
         };
 
@@ -354,8 +370,13 @@
             if(form) form.reset();
             const idField = document.getElementById(`${entity}-id`);
             if (idField) idField.value = '';
-            if (entity === 'noticias' && tinymce.get('noticias-descricao')) {
-                tinymce.get('noticias-descricao').setContent('');
+            
+            const config = entities[entity];
+            if (config && config.hasRichText) {
+                const editor = tinymce.get(`${entity}-${config.richTextField}`);
+                if (editor) {
+                    editor.setContent('');
+                }
             }
         };
 
@@ -368,39 +389,37 @@
             const data = {};
 
             config.fields.forEach(field => {
-                if (field === 'descricao' && entity === 'noticias') {
-                    data[field] = tinymce.get('noticias-descricao').getContent();
-                } else if (field !== 'data') { // Ignora o campo 'data' por enquanto
-                    const el = document.getElementById(`${entity}-${field}`);
+                const el = document.getElementById(`${entity}-${field}`);
+                if (config.hasRichText && field === config.richTextField) {
+                    data[field] = tinymce.get(`${entity}-${field}`).getContent();
+                } else if (field === 'galeria_imagens') {
+                    data[field] = el.value.split(',').map(url => url.trim()).filter(url => url);
+                } else if (field !== 'data') {
                     if (el) data[field] = el.value;
                 }
             });
 
-            // Tratamento especial para data da notícia
             if (entity === 'noticias') {
                  const dateString = document.getElementById('noticias-data').value;
                  if (dateString) {
-                     // Adiciona o horário para evitar problemas de fuso horário que podem mudar o dia
                      data.data_publicacao = new Date(dateString + "T12:00:00");
                  } else {
-                     data.data_publicacao = serverTimestamp(); // Fallback
+                     data.data_publicacao = serverTimestamp();
                  }
             }
 
             try {
+                const path = `/artifacts/${appId}/public/data/${entity}`;
                 if (config.isSingleDoc) {
-                    const docId = id || 'info'; 
-                    await setDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, docId), data);
-                    showNotification('Informações guardadas com sucesso!');
+                    await setDoc(doc(db, path, id || 'info'), data);
                 } else {
                     if (id) {
-                        await updateDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id), data);
-                        showNotification('Item atualizado com sucesso!');
+                        await updateDoc(doc(db, path, id), data);
                     } else {
-                        await addDoc(collection(db, `/artifacts/${appId}/public/data/${entity}`), data);
-                        showNotification('Item adicionado com sucesso!');
+                        await addDoc(collection(db, path), data);
                     }
                 }
+                showNotification('Dados guardados com sucesso!');
                 window.clearForm(entity);
             } catch (error) {
                 console.error(`Erro ao guardar ${entity}:`, error);
@@ -421,9 +440,7 @@
                 confirmModalOverlay.classList.remove('opacity-0');
                 confirmModal.classList.remove('scale-95');
             }, 10);
-            return new Promise(resolve => {
-                deleteResolver = resolve;
-            });
+            return new Promise(resolve => { deleteResolver = resolve; });
         }
 
         function hideConfirmModal() {
@@ -446,9 +463,7 @@
             hideConfirmModal();
         });
 
-        cancelDeleteBtn.addEventListener('click', () => {
-             hideConfirmModal();
-        });
+        cancelDeleteBtn.addEventListener('click', () => { hideConfirmModal(); });
 
         window.deleteDoc = async (entity, id) => {
             const confirmed = await showConfirmModal();
@@ -476,18 +491,21 @@
                     document.getElementById(`${entity}-id`).value = docSnap.id;
                     
                     config.fields.forEach(field => {
-                         if (field === 'descricao' && entity === 'noticias') {
-                            tinymce.get('noticias-descricao').setContent(data[field] || '');
+                        const el = document.getElementById(`${entity}-${field}`);
+                        if (config.hasRichText && field === config.richTextField) {
+                            tinymce.get(`${entity}-${field}`).setContent(data[field] || '');
+                        } else if (field === 'galeria_imagens') {
+                            if (el && Array.isArray(data[field])) {
+                                el.value = data[field].join(', ');
+                            }
                         } else if (field === 'data' && entity === 'noticias') {
                             const dataInput = document.getElementById('noticias-data');
                             if (data.data_publicacao && data.data_publicacao.toDate) {
-                                // Formata a data para YYYY-MM-DD para o input type="date"
                                 dataInput.value = data.data_publicacao.toDate().toISOString().split('T')[0];
                             } else {
                                 dataInput.value = '';
                             }
                         } else {
-                            const el = document.getElementById(`${entity}-${field}`);
                             if(el) el.value = data[field] || '';
                         }
                     });
@@ -535,7 +553,6 @@
                 }
                 const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                // Ordena as notícias pela data de publicação, se for a lista de notícias
                 if (entity === 'noticias') {
                     docs.sort((a, b) => (b.data_publicacao?.toDate() || 0) - (a.data_publicacao?.toDate() || 0));
                 }
