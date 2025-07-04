@@ -63,7 +63,7 @@
         
         <div id="todas-noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
             <!-- Estado de carregamento inicial -->
-            <div class="col-span-full text-center py-20">
+            <div id="loader" class="col-span-full text-center py-20">
                 <i class="fas fa-sync fa-spin text-5xl text-neon-blue"></i>
                 <p class="mt-4 text-2xl holographic-text">A carregar notícias...</p>
            </div>
@@ -79,7 +79,7 @@
     <!-- Firebase e Lógica da Página -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
@@ -94,16 +94,15 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // --- CORREÇÃO APLICADA AQUI ---
-        // A função renderNoticia agora recebe o documento inteiro (doc)
-        // e usa o doc.id para construir o link corretamente.
+        // Função que renderiza o HTML de uma notícia
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = '';
+            // Formata a data de publicação, se existir
             if (data.data_publicacao && data.data_publicacao.toDate) {
                 dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
             }
-            // O href agora usa o ID do documento para criar o link dinâmico
+            // CORREÇÃO: O href agora usa o ID do documento para criar o link dinâmico
             return `
                 <a href="noticia.html?id=${doc.id}" class="hud-border rounded-lg overflow-hidden text-left transition-transform hover:scale-105 block">
                     <img src="${data.imagem || 'https://placehold.co/600x400/1a1a2e/E0E0E0?text=Notícia'}" alt="${data.titulo}" class="w-full h-48 object-cover">
@@ -118,28 +117,42 @@
                 </a>`;
         };
 
-        async function carregarTodasAsNoticias() {
+        // Função para carregar todas as notícias do Firestore
+        function carregarTodasAsNoticias() {
             const container = document.getElementById('todas-noticias-container');
+            const loader = document.getElementById('loader');
 
             try {
                 const noticiasRef = collection(db, `/artifacts/${appId}/public/data/noticias`);
+                // Cria uma query para ordenar as notícias pela data de publicação, da mais recente para a mais antiga
                 const q = query(noticiasRef, orderBy("data_publicacao", "desc"));
-                const querySnapshot = await getDocs(q);
+                
+                // Usa onSnapshot para ouvir atualizações em tempo real
+                onSnapshot(q, (querySnapshot) => {
+                    if (loader) {
+                        loader.style.display = 'none'; // Esconde o loader
+                    }
 
-                if (querySnapshot.empty) {
-                    container.innerHTML = '<p class="text-center col-span-full">Nenhuma notícia encontrada.</p>';
-                    return;
-                }
+                    if (querySnapshot.empty) {
+                        container.innerHTML = '<p class="text-center col-span-full">Nenhuma notícia encontrada.</p>';
+                        return;
+                    }
 
-                let content = '';
-                // Passa o documento inteiro para a função de renderização
-                querySnapshot.forEach(doc => {
-                    content += renderNoticia(doc);
+                    let content = '';
+                    // Itera sobre os documentos e passa o documento inteiro para a função de renderização
+                    querySnapshot.forEach(doc => {
+                        content += renderNoticia(doc);
+                    });
+                    container.innerHTML = content;
+
+                }, (error) => {
+                    console.error("Erro ao ouvir notícias:", error);
+                    container.innerHTML = '<p class="text-center col-span-full text-red-500">Ocorreu um erro ao carregar as notícias.</p>';
                 });
-                container.innerHTML = content;
 
             } catch (error) {
-                console.error("Erro ao carregar notícias:", error);
+                console.error("Erro ao configurar o listener de notícias:", error);
+                if (loader) loader.style.display = 'none';
                 container.innerHTML = '<p class="text-center col-span-full text-red-500">Ocorreu um erro ao carregar as notícias.</p>';
             }
         }

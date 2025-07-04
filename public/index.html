@@ -188,12 +188,12 @@
                 <a id="home-botao" href="#noticias" class="joystick-btn">Iniciar Exploração</a>
             </div>
             
-            <!-- Seção de Destaques ATUALIZADA -->
+            <!-- Seção de Destaques -->
             <div class="room-content w-full max-w-6xl mx-auto p-4 md:pb-8">
                  <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Coluna da Notícia em Destaque (mais larga e alta) -->
+                    <!-- Coluna da Notícia em Destaque -->
                     <div id="destaque-noticia-container" class="md:col-span-2 hud-border rounded-lg p-4 text-left transition-transform hover:scale-105 flex flex-col min-h-[450px]">
-                        <!-- Conteúdo da notícia em destaque será carregado aqui pelo JS -->
+                        <!-- Conteúdo da notícia em destaque será carregado aqui -->
                         <div class="flex-grow flex items-center justify-center text-center p-8">
                             <div>
                                 <i class="fas fa-sync fa-spin text-3xl text-neon-blue"></i>
@@ -202,21 +202,21 @@
                         </div>
                     </div>
 
-                    <!-- Coluna dos outros destaques (empilhados) -->
+                    <!-- Coluna dos outros destaques -->
                     <div class="space-y-8 flex flex-col">
-                        <!-- Card de Games Clássicos com Canvas do Pong (agora clicável) -->
+                        <!-- Card de Games Clássicos com Canvas do Pong -->
                         <div id="pong-container" onclick="window.location.href='#games'" class="cursor-pointer relative hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center overflow-hidden min-h-[200px]">
                             <canvas id="pong-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
                             <div class="relative z-10 pointer-events-none">
                                 <h3 class="text-xl font-bold mb-2">Games Clássicos</h3>
-                                <p class="text-gray-400">Relembre os jogos que marcaram gerações e definiram géneros.</p>
+                                <p class="text-gray-400">Relembre os jogos que marcaram gerações.</p>
                             </div>
                         </div>
-                        <!-- Card "Visite-nos" (agora clicável) -->
+                        <!-- Card "Visite-nos" -->
                         <a href="#onde-estamos" class="block hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center">
                             <i class="fas fa-ticket-alt text-neon-green text-4xl mb-4"></i>
                             <h3 class="text-xl font-bold mb-2">Visite-nos</h3>
-                            <p class="text-gray-400">Confira a nossa localização e planeie a sua visita para uma experiência única.</p>
+                            <p class="text-gray-400">Confira a nossa localização e planeie a sua visita.</p>
                         </a>
                     </div>
                 </div>
@@ -236,15 +236,17 @@
             </div>
         </section>
 
-        <!-- Seção Acervos -->
+        <!-- Outras seções (Acervos, Games, etc.) -->
         <section id="acervos" class="room-section">
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Os Nossos Acervos</h2>
                 <div id="acervos-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+                 <div class="mt-12">
+                    <a href="galeria.html" class="joystick-btn">Explorar Galeria Completa</a>
+                </div>
             </div>
         </section>
 
-        <!-- Seção Games -->
         <section id="games" class="room-section">
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Games Icónicos</h2>
@@ -252,7 +254,6 @@
             </div>
         </section>
 
-        <!-- Seção Timeline -->
         <section id="timeline" class="room-section">
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Linha do Tempo dos Games</h2>
@@ -262,7 +263,6 @@
             </div>
         </section>
 
-        <!-- Seção Quiz -->
         <section id="quiz" class="room-section">
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Teste os seus Conhecimentos</h2>
@@ -270,7 +270,6 @@
             </div>
         </section>
 
-        <!-- Seção Curiosidades -->
         <section id="curiosidades" class="room-section">
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Sabia que?</h2>
@@ -278,7 +277,6 @@
             </div>
         </section>
 
-        <!-- Seção Onde Estamos -->
         <section id="onde-estamos" class="room-section">
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Onde Estamos</h2>
@@ -298,7 +296,6 @@
             </div>
         </section>
 
-        <!-- Seção Corporativo -->
         <section id="corporativo" class="room-section">
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Sobre o Museu</h2>
@@ -311,7 +308,6 @@
             </div>
         </section>
 
-        <!-- Seção Loja -->
         <section id="loja" class="room-section">
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Loja do Museu</h2>
@@ -358,22 +354,23 @@
 
         internalNavLinks.forEach(link => {
             link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    const headerHeight = document.querySelector('header').offsetHeight;
-                    const elementPosition = targetElement.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20; /* 20px extra space */
-                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                }
-                if (!mobileMenu.classList.contains('hidden')) {
-                    mobileMenu.classList.add('hidden');
+                if (link.getAttribute('href').startsWith('#')) {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const headerHeight = document.querySelector('header').offsetHeight;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20;
+                        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                    }
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
                 }
             });
         });
 
-        // --- LÓGICA PARA ATUALIZAR LINK ATIVO NO SCROLL ---
         const sections = document.querySelectorAll('section');
         const navLinksForObserver = document.querySelectorAll('#desktop-nav a, #mobile-menu a');
         const observer = new IntersectionObserver((entries) => {
@@ -381,9 +378,10 @@
                 if (entry.isIntersecting) {
                     const id = entry.target.id;
                     navLinksForObserver.forEach(link => {
-                        if (link.getAttribute('href') === `#${id}`) {
+                        const href = link.getAttribute('href');
+                        if (href === `#${id}`) {
                            link.classList.add('active');
-                        } else if (link.getAttribute('href').startsWith('#')) {
+                        } else if (href && href.startsWith('#')) {
                            link.classList.remove('active');
                         }
                     });
@@ -399,6 +397,7 @@
             if (data.data_publicacao && data.data_publicacao.toDate) {
                 dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
             }
+            // CORREÇÃO: Link para noticia.html com o ID correto
             return `
                 <img src="${data.imagem || 'https://placehold.co/800x400/1a1a2e/E0E0E0?text=Notícia'}" alt="${data.titulo}" class="w-full h-64 object-cover rounded-lg mb-4">
                 <div class="flex-grow flex flex-col p-2">
@@ -419,16 +418,17 @@
             if (data.data_publicacao && data.data_publicacao.toDate) {
                 dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
             }
+            // CORREÇÃO: Link para noticia.html com o ID correto
             return `
-            <a href="noticia.html?id=${doc.id}" class="hud-border rounded-lg overflow-hidden text-left transition-transform hover:scale-105 block">
+            <a href="noticia.html?id=${doc.id}" class="hud-border rounded-lg overflow-hidden text-left transition-transform hover:scale-105 block h-full flex flex-col">
                 <img src="${data.imagem || 'https://placehold.co/600x400/1a1a2e/E0E0E0?text=Notícia'}" alt="${data.titulo}" class="w-full h-48 object-cover">
-                <div class="p-6">
+                <div class="p-6 flex flex-col flex-grow">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm font-bold text-neon-blue">${data.categoria || 'NOVIDADE'}</span>
                         <span class="text-xs text-gray-400">${dataFormatada}</span>
                     </div>
                     <h3 class="text-xl font-bold my-2">${data.titulo}</h3>
-                    <p class="text-gray-400 text-sm">${data.subtitulo || ''}</p>
+                    <p class="text-gray-400 text-sm flex-grow">${data.subtitulo || ''}</p>
                 </div>
             </a>`;
         }
@@ -501,8 +501,8 @@
                 if (snapshot.empty) {
                     content = `<p class="text-gray-400 text-center col-span-full">Nenhum item encontrado.</p>`;
                 } else {
-                    const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    docs.forEach((data, index) => content += renderer({ id: data.id, data: () => data }, index));
+                    const docs = snapshot.docs;
+                    docs.forEach((doc, index) => content += renderer(doc, index));
                 }
                 container.innerHTML = content;
                 if (name === 'quiz') attachQuizListeners();
@@ -603,13 +603,13 @@
             loadHomeData();
             loadNoticiasHomepage();
             
-            loadCollection('acervos', 'acervos-container', (doc, i) => renderAcervo(doc, i));
+            loadCollection('acervos', 'acervos-container', (doc) => renderAcervo(doc));
             
-            loadCollection('games', 'games-container', (d, i) => renderGame(d.data(), i));
-            loadCollection('timeline', 'timeline-container', (d, i) => renderTimeline(d.data(), i));
-            loadCollection('curiosidades', 'curiosidades-container', (d, i) => renderCuriosidade(d.data(), i));
-            loadCollection('quiz', 'quiz-container', (d, i) => renderQuiz(d.data(), i));
-            loadCollection('loja', 'loja-container', (d, i) => renderProdutoLoja(d.data(), i));
+            loadCollection('games', 'games-container', (doc) => renderGame(doc.data()));
+            loadCollection('timeline', 'timeline-container', (doc, i) => renderTimeline(doc.data(), i));
+            loadCollection('curiosidades', 'curiosidades-container', (doc) => renderCuriosidade(doc.data()));
+            loadCollection('quiz', 'quiz-container', (doc) => renderQuiz(doc.data()));
+            loadCollection('loja', 'loja-container', (doc) => renderProdutoLoja(doc.data()));
             
             loadSingleDoc('corporativo', { 'corporativo-missao': 'missao', 'corporativo-visao': 'visao' });
             loadSingleDoc('onde-estamos', { 'onde-estamos-endereco': 'endereco', 'onde-estamos-cidade': 'cidade', 'onde-estamos-horario': 'horario', 'onde-estamos-fechado': 'fechado' });
@@ -629,10 +629,11 @@
             const ballSize = 8; 
 
             function resizeCanvas() {
+                if (!container.clientWidth || !container.clientHeight) return;
                 canvas.width = container.clientWidth;
                 canvas.height = container.clientHeight;
                 
-                const paddleHeight = canvas.height * 0.08; 
+                const paddleHeight = canvas.height * 0.25; 
                 const paddleWidth = 6;
 
                 paddle1 = { x: 10, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, speed: 2.8 };
@@ -642,11 +643,12 @@
             }
 
             function resetBall() {
+                if (!canvas.width || !canvas.height) return;
                 ball = { x: canvas.width / 2, y: canvas.height / 2, width: ballSize, height: ballSize, dx: (Math.random() > 0.5 ? 1 : -1) * 3.5, dy: (Math.random() - 0.5) * 4 };
             }
 
             function draw() {
-                ctx.fillStyle = 'black';
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = 'white';
                 ctx.fillRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
@@ -681,7 +683,7 @@
                     let speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
                     ball.dx = direction * speed * Math.cos(angleRad);
                     ball.dy = speed * Math.sin(angleRad);
-                    ball.dx *= 1.02;
+                    ball.dx *= 1.02; // Aumenta a velocidade a cada colisão
                     ball.dy *= 1.02;
                 }
 
@@ -689,10 +691,11 @@
                     resetBall();
                 }
 
-                if (ball.dx > 0) {
+                // Lógica de IA para as raquetes
+                if (ball.dx > 0) { // Bola a mover-se para a raquete 2 (direita)
                     let targetY = ball.y;
                     paddle2.y += (targetY - (paddle2.y + paddle2.height / 2)) * 0.1;
-                } else {
+                } else { // Bola a mover-se para a raquete 1 (esquerda)
                     let targetY = ball.y;
                     paddle1.y += (targetY - (paddle1.y + paddle1.height / 2)) * 0.1;
                 }
@@ -714,7 +717,9 @@
             const resizeObserver = new ResizeObserver(() => {
                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
                 resizeCanvas();
-                gameLoop();
+                if (container.clientWidth > 0 && container.clientHeight > 0) {
+                    gameLoop();
+                }
             });
 
             resizeObserver.observe(container);
