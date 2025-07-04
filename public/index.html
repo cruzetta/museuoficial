@@ -122,8 +122,6 @@
             color: white;
             text-shadow: 0 0 10px var(--neon-blue);
         }
-
-        /* Estilos para o Dropdown removidos, agora controlados pelo Tailwind */
     </style>
 </head>
 <body class="antialiased">
@@ -140,7 +138,8 @@
             <nav id="desktop-nav" class="hidden md:flex items-center space-x-2 lg:space-x-4 text-sm">
                 <a href="#home" class="nav-link px-2 py-2">Home</a>
                 <a href="#noticias" class="nav-link px-2 py-2">Notícias</a>
-                <a href="#acervos" class="nav-link px-2 py-2">Acervos</a>
+                <!-- MODIFICADO: Link para a nova página da galeria -->
+                <a href="galeria.html" class="nav-link px-2 py-2">Acervos</a>
                 <a href="#onde-estamos" class="nav-link px-2 py-2 whitespace-nowrap">Onde Estamos</a>
                 <a href="#loja" class="nav-link px-2 py-2">Loja</a>
                 
@@ -170,7 +169,8 @@
     <div id="mobile-menu" class="hidden fixed top-28 left-4 right-4 z-40 hud-border rounded-lg p-4">
         <a href="#home" class="block text-center py-3 text-lg nav-link">Home</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
-        <a href="#acervos" class="block text-center py-3 text-lg nav-link">Acervos</a>
+        <!-- MODIFICADO: Link para a nova página da galeria no menu mobile -->
+        <a href="galeria.html" class="block text-center py-3 text-lg nav-link">Acervos</a>
         <a href="#onde-estamos" class="block text-center py-3 text-lg nav-link">Onde Estamos</a>
         <a href="#loja" class="block text-center py-3 text-lg nav-link">Loja</a>
         <hr class="border-neon-blue/30 my-2">
@@ -354,11 +354,12 @@
         // --- LÓGICA DE NAVEGAÇÃO ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
-        const allNavLinks = document.querySelectorAll('a[href^="#"]');
+        // Seleciona apenas os links de navegação interna (que começam com #)
+        const internalNavLinks = document.querySelectorAll('a[href^="#"]');
 
         mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
 
-        allNavLinks.forEach(link => {
+        internalNavLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const targetId = link.getAttribute('href');
@@ -383,7 +384,12 @@
                 if (entry.isIntersecting) {
                     const id = entry.target.id;
                     navLinksForObserver.forEach(link => {
-                        link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+                        // Apenas atualiza o 'active' para links de navegação interna
+                        if (link.getAttribute('href') === `#${id}`) {
+                           link.classList.add('active');
+                        } else if (link.getAttribute('href').startsWith('#')) {
+                           link.classList.remove('active');
+                        }
                     });
                 }
             });

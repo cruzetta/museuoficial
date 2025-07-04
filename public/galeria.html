@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria do Acervo - Museu do Videojogo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Link para o novo arquivo de estilo -->
+    <link rel="stylesheet" href="styles/gallery_style.css">
+</head>
+<body class="antialiased">
+
+    <!-- Header / HUD Fixo -->
+    <header class="fixed top-0 left-0 right-0 z-50 p-4">
+        <nav class="container mx-auto hud-border rounded-xl px-4 sm:px-6 py-3 flex justify-between items-center gap-4">
+            <!-- O logo ainda pode ser usado para voltar à galeria principal a partir de uma página de item -->
+            <a href="#" onclick="showPage('gallery')" class="text-2xl font-bold tracking-widest holographic-text">MIV</a>
+            
+            <!-- Botão de Pesquisa Inteligente com Autocomplete -->
+            <div class="flex-grow flex justify-center px-2 sm:px-4">
+                <div id="search-container" class="relative w-full max-w-lg">
+                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="w-full rounded-lg py-2 pl-4 pr-10 text-white placeholder-gray-500 transition-all">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-neon-blue">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 hud-border rounded-lg z-10 overflow-hidden hidden">
+                        <!-- As sugestões aparecerão aqui via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão "Voltar" modificado para apontar para a página inicial -->
+            <a href="index.html" class="nav-link text-gray-300 hover:text-white hover:drop-shadow-[0_0_5px_var(--neon-blue)] transition-all flex-shrink-0">
+                <i class="fa-solid fa-arrow-left mr-2"></i><span id="nav-back-text" class="hidden sm:inline">Voltar ao Site Principal</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="pt-32" style="background: var(--metal-bg);">
+        
+        <!-- PÁGINA DA GALERIA -->
+        <div id="gallery" class="page active">
+            <div class="container mx-auto px-4">
+                <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Galeria do Acervo</h1>
+                
+                <!-- Controles de Ordenação -->
+                <div class="flex justify-end mb-8">
+                    <div class="relative">
+                        <select id="sort-select" class="hud-border appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer">
+                            <option value="date-asc">Mais Antigos</option>
+                            <option value="date-desc">Mais Novos</option>
+                            <option value="alpha-asc">Ordem Alfabética (A-Z)</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neon-blue">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="gallery-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
+
+                    <!-- Card: Atari 2600 -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Atari+2600" alt="Imagem do Atari 2600" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Atari 2600</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Atari, Inc.</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 2ª Geração</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1977</p>
+                            </div>
+                            <button onclick="showPage('item-atari2600')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Card: NES -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=NES" alt="Imagem do NES" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Nintendo Entertainment System</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Nintendo</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 3ª Geração (8-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1983</p>
+                            </div>
+                            <button onclick="showPage('item-nes')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- ... O restante dos cards da galeria continua aqui ... -->
+                    
+                    <!-- Card: Master System -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Master+System" alt="Imagem do Master System" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Sega Master System</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sega</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 3ª Geração (8-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1985</p>
+                            </div>
+                            <button onclick="showPage('item-mastersystem')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Mega Drive -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Mega+Drive" alt="Imagem do Mega Drive" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Sega Mega Drive</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sega</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 4ª Geração (16-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1988</p>
+                            </div>
+                            <button onclick="showPage('item-megadrive')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Super Nintendo -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Super+Nintendo" alt="Imagem do Super Nintendo" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Super Nintendo</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Nintendo</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 4ª Geração (16-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1990</p>
+                            </div>
+                            <button onclick="showPage('item-snes')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: PlayStation -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=PlayStation" alt="Imagem do PlayStation" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Sony PlayStation</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sony</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 5ª Geração (32-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1994</p>
+                            </div>
+                            <button onclick="showPage('item-ps1')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Nintendo 64 -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Nintendo+64" alt="Imagem do Nintendo 64" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Nintendo 64</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Nintendo</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 5ª Geração (64-bit)</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1996</p>
+                            </div>
+                            <button onclick="showPage('item-n64')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Dreamcast -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Dreamcast" alt="Imagem do Dreamcast" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Sega Dreamcast</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sega</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 6ª Geração</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 1998</p>
+                            </div>
+                            <button onclick="showPage('item-dreamcast')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Card: PlayStation 2 -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=PlayStation+2" alt="Imagem do PlayStation 2" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">PlayStation 2</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Sony</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 6ª Geração</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 2000</p>
+                            </div>
+                            <button onclick="showPage('item-ps2')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Card: Xbox -->
+                    <div class="item-card">
+                        <div class="hud-border rounded-lg p-4 flex flex-col h-full">
+                            <img src="https://placehold.co/600x400/1a1a2e/E0E0E0?text=Xbox" alt="Imagem do Xbox" class="w-full h-48 rounded-md object-cover mb-4">
+                            <h3 class="item-title text-2xl font-bold mb-3">Microsoft Xbox</h3>
+                            <div class="text-sm space-y-2 mb-4 flex-grow">
+                                <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> Microsoft</p>
+                                <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> 6ª Geração</p>
+                                <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> 2001</p>
+                            </div>
+                            <button onclick="showPage('item-xbox')" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PÁGINAS DE DETALHES -->
+        
+        <!-- #region ITEM: Atari 2600 -->
+        <div id="item-atari2600" class="page">
+            <!-- O conteúdo detalhado de cada item permanece o mesmo -->
+            <div class="container mx-auto px-4">
+                <section class="mb-16">
+                    <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Atari 2600</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3">
+                            <div class="hud-border rounded-lg p-2">
+                                <img id="main-image-atari2600" src="https://placehold.co/800x600/1a1a2e/E0E0E0?text=Atari+2600" alt="Imagem principal do Atari 2600" class="w-full h-auto rounded-md object-cover">
+                            </div>
+                            <div class="flex space-x-2 mt-2">
+                                <a onclick="changeImage('atari2600', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Joystick')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Joystick</a>
+                                <a onclick="changeImage('atari2600', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Cartucho+Pitfall')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Cartucho</a>
+                                <a onclick="changeImage('atari2600', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Console+e+Caixa')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Caixa</a>
+                                <a onclick="changeImage('atari2600', 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Paddles')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-16">Paddles</a>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 hud-border rounded-lg p-6">
+                            <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                            <ul class="space-y-3 text-lg">
+                                <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> Atari, Inc.</li>
+                                <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> 1977</li>
+                                <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> 2ª Geração</li>
+                                <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> Cartucho</li>
+                                <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ~30 milhões</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <!-- O restante do conteúdo detalhado do Atari 2600 -->
+            </div>
+        </div>
+        <!-- #endregion -->
+        
+        <!-- ... todas as outras páginas de detalhes (item-nes, item-mastersystem, etc.) ... -->
+
+    </main>
+    
+    <footer class="py-10 mt-16" style="background: var(--metal-bg)">
+        <div class="container mx-auto text-center text-gray-400">
+            <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Objeto para guardar o estado da aplicação
+        const state = {
+            currentPage: 'gallery',
+            galleryItems: []
+        };
+
+        // Função para mostrar uma página e esconder as outras
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                state.currentPage = pageId;
+                window.scrollTo(0, 0);
+            }
+
+            const backButtonText = document.getElementById('nav-back-text');
+            const searchContainer = document.getElementById('search-container');
+            if (pageId === 'gallery') {
+                searchContainer.style.visibility = 'visible';
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput.value) {
+                    searchInput.value = '';
+                    filterItems('');
+                }
+                // O texto do botão "Voltar" é alterado, mas o link agora aponta sempre para index.html
+                backButtonText.innerHTML = '<i class="fa-solid fa-arrow-left mr-2"></i><span class="hidden sm:inline">Voltar ao Site Principal</span>';
+            } else {
+                searchContainer.style.visibility = 'hidden';
+                // Quando em uma página de item, o texto muda para "Voltar ao Acervo"
+                // O usuário pode clicar no logo "MIV" para voltar à galeria.
+                backButtonText.innerHTML = '<i class="fa-solid fa-arrow-left mr-2"></i><span class="hidden sm:inline">Voltar ao Acervo</span>';
+            }
+        }
+
+        // Função para mudar a imagem principal
+        function changeImage(consoleId, newSrc) {
+            const mainImage = document.getElementById(`main-image-${consoleId}`);
+            if (mainImage) mainImage.src = newSrc;
+        }
+
+        // Função para filtrar os itens da galeria
+        function filterItems(query) {
+            const galleryGrid = document.getElementById('gallery-grid');
+            const lowerCaseQuery = query.toLowerCase();
+            const queryRegex = new RegExp(`\\b${lowerCaseQuery}`, 'i');
+            let foundItems = 0;
+
+            state.galleryItems.forEach(item => {
+                const itemText = item.textContent.toLowerCase();
+                const card = item.closest('.item-card');
+                
+                if (queryRegex.test(itemText)) {
+                    card.style.display = 'block';
+                    foundItems++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            let noResultsMsg = document.getElementById('noResultsMessage');
+            if (foundItems === 0 && query.length > 0) {
+                if (!noResultsMsg) {
+                    noResultsMsg = document.createElement('div');
+                    noResultsMsg.id = 'noResultsMessage';
+                    noResultsMsg.className = 'text-center text-2xl text-neon-purple col-span-full';
+                    galleryGrid.appendChild(noResultsMsg);
+                }
+                noResultsMsg.textContent = `Nenhum item encontrado para "${query}"`;
+            } else {
+                noResultsMsg?.remove();
+            }
+        }
+        
+        // Função para lidar com a pesquisa e o autocomplete
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const autocompleteResults = document.getElementById('autocomplete-results');
+
+            const handleInput = () => {
+                const query = searchInput.value.toLowerCase();
+                filterItems(query); 
+
+                autocompleteResults.innerHTML = '';
+                if (query.length === 0) {
+                    autocompleteResults.classList.add('hidden');
+                    return;
+                }
+
+                const queryRegex = new RegExp(`\\b${query}`, 'i');
+                const matchedItems = state.galleryItems.filter(item => 
+                    queryRegex.test(item.querySelector('.item-title').textContent)
+                );
+
+                matchedItems.sort((a, b) => {
+                    const titleA = a.querySelector('.item-title').textContent.toLowerCase();
+                    const titleB = b.querySelector('.item-title').textContent.toLowerCase();
+                    const aStartsWith = titleA.startsWith(query);
+                    const bStartsWith = titleB.startsWith(query);
+                    if (aStartsWith && !bStartsWith) return -1;
+                    if (!aStartsWith && bStartsWith) return 1;
+                    return titleA.localeCompare(titleB);
+                });
+
+                if (matchedItems.length > 0) {
+                    matchedItems.forEach(item => {
+                        const title = item.querySelector('.item-title').textContent;
+                        const suggestionDiv = document.createElement('div');
+                        suggestionDiv.className = 'autocomplete-item';
+                        suggestionDiv.textContent = title;
+                        suggestionDiv.onclick = () => {
+                            searchInput.value = title;
+                            autocompleteResults.classList.add('hidden');
+                            filterItems(title.toLowerCase());
+                        };
+                        autocompleteResults.appendChild(suggestionDiv);
+                    });
+                    autocompleteResults.classList.remove('hidden');
+                } else {
+                    autocompleteResults.classList.add('hidden');
+                }
+            };
+
+            searchInput.addEventListener('input', handleInput);
+            searchInput.addEventListener('focus', handleInput);
+            document.addEventListener('click', (e) => {
+                if (!document.getElementById('search-container').contains(e.target)) {
+                    autocompleteResults.classList.add('hidden');
+                }
+            });
+        }
+
+        // Função para ordenar os itens da galeria
+        function sortItems(criteria) {
+            const galleryGrid = document.getElementById('gallery-grid');
+            const itemsToSort = [...state.galleryItems];
+
+            itemsToSort.sort((a, b) => {
+                const titleA = a.querySelector('.item-title').textContent.trim();
+                const titleB = b.querySelector('.item-title').textContent.trim();
+
+                const yearTextA = Array.from(a.querySelectorAll('p')).find(p => p.textContent.includes('Lançamento:')).textContent;
+                const yearTextB = Array.from(b.querySelectorAll('p')).find(p => p.textContent.includes('Lançamento:')).textContent;
+                
+                const yearA = parseInt(yearTextA.match(/\d{4}/)[0]);
+                const yearB = parseInt(yearTextB.match(/\d{4}/)[0]);
+
+                switch (criteria) {
+                    case 'date-asc':
+                        return yearA - yearB;
+                    case 'date-desc':
+                        return yearB - yearA;
+                    case 'alpha-asc':
+                        return titleA.localeCompare(titleB);
+                    default:
+                        return 0;
+                }
+            });
+
+            galleryGrid.innerHTML = '';
+            itemsToSort.forEach(item => galleryGrid.appendChild(item));
+        }
+
+        // Inicialização quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', () => {
+            state.galleryItems = Array.from(document.querySelectorAll('#gallery-grid .item-card'));
+            
+            showPage('gallery');
+            setupSearch();
+
+            const sortSelect = document.getElementById('sort-select');
+            sortSelect.addEventListener('change', (e) => {
+                sortItems(e.target.value);
+            });
+
+            sortItems('date-asc');
+        });
+    </script>
+</body>
+</html>
