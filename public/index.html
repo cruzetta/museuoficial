@@ -204,19 +204,20 @@
 
                     <!-- Coluna dos outros destaques (empilhados) -->
                     <div class="space-y-8 flex flex-col">
-                        <!-- Card de Games Clássicos com Canvas do Pong -->
-                        <div id="pong-container" class="relative hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center overflow-hidden min-h-[200px]">
+                        <!-- Card de Games Clássicos com Canvas do Pong (agora clicável) -->
+                        <div id="pong-container" onclick="window.location.href='#games'" class="cursor-pointer relative hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center overflow-hidden min-h-[200px]">
                             <canvas id="pong-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
                             <div class="relative z-10 pointer-events-none">
                                 <h3 class="text-xl font-bold mb-2">Games Clássicos</h3>
                                 <p class="text-gray-400">Relembre os jogos que marcaram gerações e definiram géneros.</p>
                             </div>
                         </div>
-                        <div class="hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center">
+                        <!-- Card "Visite-nos" (agora clicável) -->
+                        <a href="#onde-estamos" class="block hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center">
                             <i class="fas fa-ticket-alt text-neon-green text-4xl mb-4"></i>
                             <h3 class="text-xl font-bold mb-2">Visite-nos</h3>
                             <p class="text-gray-400">Confira a nossa localização e planeie a sua visita para uma experiência única.</p>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -432,8 +433,6 @@
             </a>`;
         }
 
-        // --- CORREÇÃO APLICADA AQUI ---
-        // A função agora cria um link (<a>) para cada item do acervo.
         const renderAcervo = (doc) => {
             const data = doc.data();
             return `
@@ -604,8 +603,6 @@
             loadHomeData();
             loadNoticiasHomepage();
             
-            // --- CORREÇÃO APLICADA AQUI ---
-            // A chamada para loadCollection agora passa o documento inteiro para o renderer.
             loadCollection('acervos', 'acervos-container', (doc, i) => renderAcervo(doc, i));
             
             loadCollection('games', 'games-container', (d, i) => renderGame(d.data(), i));

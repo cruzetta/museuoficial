@@ -47,55 +47,105 @@
         #noticia-descricao p { margin-bottom: 1rem; }
         #noticia-descricao a { color: var(--neon-blue); text-decoration: underline; }
         #noticia-descricao h1, #noticia-descricao h2, #noticia-descricao h3 { font-family: 'Orbitron', sans-serif; margin-top: 1.5rem; margin-bottom: 1rem; }
+        
+        /* Estilos do Loader */
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(13, 13, 26, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
     </style>
 </head>
 <body class="antialiased">
 
     <header class="sticky top-0 z-50 p-4">
-        <!-- ... (código do header) ... -->
+        <div class="container mx-auto hud-border rounded-xl px-4 py-3 flex justify-between items-center">
+            <a href="/index.html" class="text-2xl font-bold tracking-widest holographic-text">MIV</a>
+            <a href="/noticias.html" class="text-sm font-bold text-neon-blue hover:text-white transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Voltar para Notícias
+            </a>
+        </div>
     </header>
 
+    <!-- Loader Overlay -->
+    <div id="loader-overlay">
+        <div class="text-center">
+            <i class="fas fa-sync fa-spin text-5xl text-neon-blue"></i>
+            <p class="mt-4 text-2xl holographic-text">A carregar notícia...</p>
+        </div>
+    </div>
+
     <main class="container mx-auto px-4 py-16">
-        <article id="noticia-content" class="max-w-4xl mx-auto hud-border p-8 rounded-lg">
-            <h1 id="noticia-titulo" class="text-4xl md:text-5xl font-bold mb-4 text-center holographic-text">A carregar...</h1>
+        <!-- O conteúdo fica oculto até ser carregado -->
+        <article id="noticia-content" class="max-w-4xl mx-auto hud-border p-8 rounded-lg hidden">
+            <h1 id="noticia-titulo" class="text-4xl md:text-5xl font-bold mb-4 text-center holographic-text"></h1>
             <div id="noticia-meta" class="text-center text-gray-400 mb-8 text-lg"></div>
-
-            <!-- Container da Imagem de Destaque com Posição Ajustável -->
-            <div id="noticia-imagem" class="w-full h-96 bg-cover bg-no-repeat rounded-lg mb-8 hud-border p-1 bg-gray-800">
-                <!-- A imagem de fundo será definida via JS -->
-            </div>
-
-            <div id="noticia-descricao" class="text-lg leading-relaxed space-y-4">
-                <p>Por favor, aguarde...</p>
-            </div>
+            <div id="noticia-imagem" class="w-full h-96 bg-cover bg-center bg-no-repeat rounded-lg mb-8 hud-border p-1 bg-gray-800"></div>
+            <div id="noticia-descricao" class="text-lg leading-relaxed space-y-4 text-left"></div>
         </article>
     </main>
 
     <footer class="py-10 mt-16">
-        <!-- ... (código do footer) ... -->
+        <div class="container mx-auto text-center text-gray-400">
+            <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
+        </div>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { /* ... */ };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
+            authDomain: "museu-cca6d.firebaseapp.com",
+            projectId: "museu-cca6d",
+            storageBucket: "museu-cca6d.firebasestorage.app",
+            messagingSenderId: "555107674356",
+            appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        async function carregarNoticia() {
-            const params = new URLSearchParams(window.location.search);
-            const noticiaId = params.get('id');
-
+        // Função para mostrar erros de forma controlada
+        function displayError(message) {
+            const contentEl = document.getElementById('noticia-content');
             const tituloEl = document.getElementById('noticia-titulo');
-            const metaEl = document.getElementById('noticia-meta');
-            const imagemEl = document.getElementById('noticia-imagem');
             const descricaoEl = document.getElementById('noticia-descricao');
+            
+            tituloEl.textContent = "Erro";
+            descricaoEl.innerHTML = `<p class='text-red-500 text-center'>${message}</p>`;
+            
+            // Oculta elementos que não são necessários no erro
+            document.getElementById('noticia-meta').style.display = 'none';
+            document.getElementById('noticia-imagem').style.display = 'none';
 
-            if (!noticiaId) { /* ... */ return; }
+            // Mostra o container do conteúdo com a mensagem de erro
+            contentEl.classList.remove('hidden');
+        }
+
+        async function carregarNoticia() {
+            const contentEl = document.getElementById('noticia-content');
+            const loaderOverlay = document.getElementById('loader-overlay');
 
             try {
+                const params = new URLSearchParams(window.location.search);
+                const noticiaId = params.get('id');
+
+                if (!noticiaId) {
+                    displayError("ID da notícia não encontrado na URL.");
+                    return;
+                }
+
                 const docRef = doc(db, `/artifacts/${appId}/public/data/noticias`, noticiaId);
                 const docSnap = await getDoc(docRef);
 
@@ -103,25 +153,33 @@
                     const data = docSnap.data();
                     
                     document.title = `${data.titulo} - MIV`;
-                    tituloEl.textContent = data.titulo;
+                    
+                    document.getElementById('noticia-titulo').textContent = data.titulo;
                     
                     let metaHTML = `<span class="text-neon-blue font-bold">${data.categoria || 'Novidade'}</span>`;
                     if (data.data_publicacao && data.data_publicacao.toDate) {
                         const dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                         metaHTML += `<span class="mx-2">•</span><span>${dataFormatada}</span>`;
                     }
-                    metaEl.innerHTML = metaHTML;
+                    document.getElementById('noticia-meta').innerHTML = metaHTML;
 
-                    // Aplica a imagem e sua posição
-                    imagemEl.style.backgroundImage = `url('${data.imagem}')`;
-                    imagemEl.style.backgroundPosition = `center ${data.imagemPosicaoY || '50%'}`;
+                    document.getElementById('noticia-imagem').style.backgroundImage = `url('${data.imagem}')`;
                     
-                    descricaoEl.innerHTML = data.descricao;
+                    document.getElementById('noticia-descricao').innerHTML = data.descricao;
+
+                    contentEl.classList.remove('hidden');
                 } else {
-                    // ... (tratamento de erro)
+                    displayError("A notícia que procura não existe na nossa base de dados.");
                 }
             } catch (error) {
-                // ... (tratamento de erro)
+                console.error("Ocorreu um erro geral ao carregar a notícia:", error);
+                displayError("Ocorreu um erro ao tentar carregar a notícia. Por favor, tente novamente mais tarde.");
+            } finally {
+                // Esconde o loader no final, quer tenha sucesso ou erro
+                loaderOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loaderOverlay.style.display = 'none';
+                }, 500); // Duração igual à transição do CSS
             }
         }
 

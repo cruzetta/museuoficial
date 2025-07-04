@@ -62,8 +62,11 @@
         <h1 class="text-4xl md:text-5xl font-bold mb-12 text-center holographic-text">Todas as Notícias</h1>
         
         <div id="todas-noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-            <!-- As notícias serão carregadas aqui pelo JavaScript -->
-            <p class="text-center col-span-full">A carregar notícias...</p>
+            <!-- Estado de carregamento inicial -->
+            <div class="col-span-full text-center py-20">
+                <i class="fas fa-sync fa-spin text-5xl text-neon-blue"></i>
+                <p class="mt-4 text-2xl holographic-text">A carregar notícias...</p>
+           </div>
         </div>
     </main>
 
@@ -91,13 +94,16 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // Função para criar o card de uma notícia
+        // --- CORREÇÃO APLICADA AQUI ---
+        // A função renderNoticia agora recebe o documento inteiro (doc)
+        // e usa o doc.id para construir o link corretamente.
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = '';
             if (data.data_publicacao && data.data_publicacao.toDate) {
                 dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
             }
+            // O href agora usa o ID do documento para criar o link dinâmico
             return `
                 <a href="noticia.html?id=${doc.id}" class="hud-border rounded-lg overflow-hidden text-left transition-transform hover:scale-105 block">
                     <img src="${data.imagem || 'https://placehold.co/600x400/1a1a2e/E0E0E0?text=Notícia'}" alt="${data.titulo}" class="w-full h-48 object-cover">
@@ -114,11 +120,9 @@
 
         async function carregarTodasAsNoticias() {
             const container = document.getElementById('todas-noticias-container');
-            container.innerHTML = '<p class="text-center col-span-full">A carregar notícias...</p>';
 
             try {
                 const noticiasRef = collection(db, `/artifacts/${appId}/public/data/noticias`);
-                // Ordena as notícias pela data de publicação para mostrar as mais recentes primeiro
                 const q = query(noticiasRef, orderBy("data_publicacao", "desc"));
                 const querySnapshot = await getDocs(q);
 
@@ -128,6 +132,7 @@
                 }
 
                 let content = '';
+                // Passa o documento inteiro para a função de renderização
                 querySnapshot.forEach(doc => {
                     content += renderNoticia(doc);
                 });
