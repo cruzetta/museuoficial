@@ -122,49 +122,68 @@
             color: white;
             text-shadow: 0 0 10px var(--neon-blue);
         }
+
+        /* Estilos para o Dropdown removidos, agora controlados pelo Tailwind */
     </style>
 </head>
 <body class="antialiased">
 
     <!-- Header / HUD -->
-    <header class="fixed top-0 left-0 right-0 z-50 p-4">
-        <nav id="desktop-nav" class="container mx-auto hud-border rounded-xl px-4 py-3 flex justify-between items-center">
-            <a href="#home" class="text-2xl font-bold tracking-widest holographic-text">MIV</a>
-            <div class="hidden md:flex items-center space-x-4 text-sm">
-                <a href="#home" class="nav-link">Home</a>
-                <a href="#noticias" class="nav-link">Notícias</a>
-                <a href="#acervos" class="nav-link">Acervos</a>
-                <a href="#games" class="nav-link">Games</a>
-                <a href="#timeline" class="nav-link">Timeline</a>
-                <a href="#quiz" class="nav-link">Quiz</a>
-                <a href="#curiosidades" class="nav-link">Curiosidades</a>
-                <a href="#onde-estamos" class="nav-link whitespace-nowrap">Onde Estamos</a>
-                <a href="#corporativo" class="nav-link">Corporativo</a>
-                <a href="#loja" class="nav-link">Loja</a>
-            </div>
+    <header class="fixed top-0 left-0 right-0 z-50 p-4 bg-dark-bg/80 backdrop-blur-sm">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#home" class="flex-shrink-0">
+                 <img src="LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).jpg" alt="Logo Museu do Videogame" class="h-20 w-auto">
+            </a>
+            
+            <!-- Navigation Bar -->
+            <nav id="desktop-nav" class="hidden md:flex items-center space-x-2 lg:space-x-4 text-sm">
+                <a href="#home" class="nav-link px-2 py-2">Home</a>
+                <a href="#noticias" class="nav-link px-2 py-2">Notícias</a>
+                <a href="#acervos" class="nav-link px-2 py-2">Acervos</a>
+                <a href="#onde-estamos" class="nav-link px-2 py-2 whitespace-nowrap">Onde Estamos</a>
+                <a href="#loja" class="nav-link px-2 py-2">Loja</a>
+                
+                <!-- Dropdown Menu -->
+                <div class="relative group">
+                    <button class="nav-link px-2 py-2 flex items-center">
+                        Explorar <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                    </button>
+                    <div class="absolute right-0 top-full mt-2 w-48 hud-border rounded-lg p-2 opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-200 ease-in-out">
+                        <a href="#games" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Games</a>
+                        <a href="#timeline" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Timeline</a>
+                        <a href="#quiz" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Quiz</a>
+                        <a href="#curiosidades" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Curiosidades</a>
+                        <a href="#corporativo" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Corporativo</a>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Mobile Menu Button -->
             <button id="mobile-menu-button" class="text-2xl text-white md:hidden">
                 <i class="fa-solid fa-bars"></i>
             </button>
-        </nav>
+        </div>
     </header>
     
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden fixed top-24 left-4 right-4 z-40 hud-border rounded-lg p-4">
+    <div id="mobile-menu" class="hidden fixed top-28 left-4 right-4 z-40 hud-border rounded-lg p-4">
         <a href="#home" class="block text-center py-3 text-lg nav-link">Home</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
         <a href="#acervos" class="block text-center py-3 text-lg nav-link">Acervos</a>
+        <a href="#onde-estamos" class="block text-center py-3 text-lg nav-link">Onde Estamos</a>
+        <a href="#loja" class="block text-center py-3 text-lg nav-link">Loja</a>
+        <hr class="border-neon-blue/30 my-2">
         <a href="#games" class="block text-center py-3 text-lg nav-link">Games</a>
         <a href="#timeline" class="block text-center py-3 text-lg nav-link">Timeline</a>
         <a href="#quiz" class="block text-center py-3 text-lg nav-link">Quiz</a>
         <a href="#curiosidades" class="block text-center py-3 text-lg nav-link">Curiosidades</a>
-        <a href="#onde-estamos" class="block text-center py-3 text-lg nav-link">Onde Estamos</a>
         <a href="#corporativo" class="block text-center py-3 text-lg nav-link">Corporativo</a>
-        <a href="#loja" class="block text-center py-3 text-lg nav-link">Loja</a>
     </div>
 
     <main>
         <!-- Seção Home -->
-        <section id="home" class="min-h-screen flex flex-col items-center justify-center text-center relative overflow-hidden pt-24">
+        <section id="home" class="min-h-screen flex flex-col items-center justify-center text-center relative overflow-hidden pt-32">
             <div class="room-content flex-grow flex flex-col items-center justify-center p-4">
                 <h1 id="home-titulo" class="text-5xl md:text-8xl font-black mb-4 holographic-text">A carregar...</h1>
                 <p id="home-subtitulo" class="text-lg md:text-xl max-w-3xl mx-auto mb-8">...</p>
@@ -345,9 +364,9 @@
                 const targetId = link.getAttribute('href');
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
-                    const headerOffset = document.querySelector('header nav').offsetHeight + 32;
+                    const headerHeight = document.querySelector('header').offsetHeight;
                     const elementPosition = targetElement.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20; /* 20px extra space */
                     window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                 }
                 if (!mobileMenu.classList.contains('hidden')) {
