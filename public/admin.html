@@ -28,7 +28,7 @@
         #notification {
             transition: opacity 0.5s, transform 0.5s;
         }
-        input[type="text"], input[type="url"], input[type="number"], input[type="email"], input[type="password"], select, textarea:not(.tox-tinymce-aux) {
+        input[type="text"], input[type="url"], input[type="number"], input[type="email"], input[type="password"], input[type="date"], select, textarea:not(.tox-tinymce-aux) {
             @apply mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
         }
         button[type="submit"] {
@@ -140,6 +140,10 @@
                         <div>
                             <label for="noticias-categoria" class="block text-sm font-medium text-gray-700">Categoria</label>
                             <select id="noticias-categoria" required></select>
+                        </div>
+                        <div>
+                            <label for="noticias-data" class="block text-sm font-medium text-gray-700">Data da Publicação</label>
+                            <input type="date" id="noticias-data" required>
                         </div>
                         <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem de Destaque</label><input type="url" id="noticias-imagem" required></div>
                         <div>
@@ -293,7 +297,7 @@
             'home': { isSingleDoc: true, fields: ['titulo', 'subtitulo', 'botao'] },
             'noticias': { 
                 isSingleDoc: false, 
-                fields: ['titulo', 'subtitulo', 'categoria', 'imagem', 'descricao'],
+                fields: ['titulo', 'subtitulo', 'categoria', 'imagem', 'data', 'descricao'],
                 listDisplayField: 'titulo' 
             },
             'acervos': { isSingleDoc: false, fields: ['nome', 'descricao', 'imagem'], listDisplayField: 'nome' },
@@ -327,16 +331,11 @@
                 button.classList.toggle('text-white', button.getAttribute('onclick') === `window.showForm('${formId}')`);
             });
 
-            // **CORREÇÃO APLICADA AQUI**
-            // Inicializa o TinyMCE apenas quando a aba de notícias é mostrada pela primeira vez.
             if (formId === 'noticias' && !tinymce.get('noticias-descricao')) {
                 tinymce.init({
                     selector: '#noticias-descricao',
                     height: 500,
-                    plugins: [
-                      'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-                      'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
-                    ],
+                    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange formatpainter pageembed a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss markdown importword exportword exportpdf',
                     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
                     tinycomments_mode: 'embedded',
                     tinycomments_author: 'Author name',
@@ -365,20 +364,27 @@
             const config = entities[entity];
             if (!config) return;
 
-            const form = document.getElementById(`form-${entity}`);
             const id = document.getElementById(`${entity}-id`)?.value;
             const data = {};
 
             config.fields.forEach(field => {
                 if (field === 'descricao' && entity === 'noticias') {
                     data[field] = tinymce.get('noticias-descricao').getContent();
-                } else {
-                    data[field] = document.getElementById(`${entity}-${field}`).value;
+                } else if (field !== 'data') { // Ignora o campo 'data' por enquanto
+                    const el = document.getElementById(`${entity}-${field}`);
+                    if (el) data[field] = el.value;
                 }
             });
 
+            // Tratamento especial para data da notícia
             if (entity === 'noticias') {
-                 data.timestamp = serverTimestamp();
+                 const dateString = document.getElementById('noticias-data').value;
+                 if (dateString) {
+                     // Adiciona o horário para evitar problemas de fuso horário que podem mudar o dia
+                     data.data_publicacao = new Date(dateString + "T12:00:00");
+                 } else {
+                     data.data_publicacao = serverTimestamp(); // Fallback
+                 }
             }
 
             try {
@@ -448,12 +454,8 @@
             const confirmed = await showConfirmModal();
             if (confirmed) {
                 try {
-                    // Adiciona uma verificação extra para categorias
-                    if (entity === 'categorias') {
-                         await deleteDoc(doc(db, `/artifacts/${appId}/public/data/categorias`, id));
-                    } else {
-                         await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
-                    }
+                    const collectionName = (entity === 'categorias') ? 'categorias' : entity;
+                    await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${collectionName}`, id));
                     showNotification("Item eliminado com sucesso!");
                 } catch(error) {
                     console.error(`Erro ao eliminar ${entity}:`, error);
@@ -472,11 +474,21 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById(`${entity}-id`).value = docSnap.id;
+                    
                     config.fields.forEach(field => {
                          if (field === 'descricao' && entity === 'noticias') {
                             tinymce.get('noticias-descricao').setContent(data[field] || '');
+                        } else if (field === 'data' && entity === 'noticias') {
+                            const dataInput = document.getElementById('noticias-data');
+                            if (data.data_publicacao && data.data_publicacao.toDate) {
+                                // Formata a data para YYYY-MM-DD para o input type="date"
+                                dataInput.value = data.data_publicacao.toDate().toISOString().split('T')[0];
+                            } else {
+                                dataInput.value = '';
+                            }
                         } else {
-                            document.getElementById(`${entity}-${field}`).value = data[field] || '';
+                            const el = document.getElementById(`${entity}-${field}`);
+                            if(el) el.value = data[field] || '';
                         }
                     });
                     showForm(entity);
@@ -521,15 +533,21 @@
                     listContainer.innerHTML = '<p class="text-sm text-gray-500">Nenhum item registado.</p>';
                     return;
                 }
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Ordena as notícias pela data de publicação, se for a lista de notícias
+                if (entity === 'noticias') {
+                    docs.sort((a, b) => (b.data_publicacao?.toDate() || 0) - (a.data_publicacao?.toDate() || 0));
+                }
+
+                docs.forEach(data => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
                     itemDiv.innerHTML = `
                         <p class="font-semibold text-sm truncate pr-4">${data[config.listDisplayField] || 'Item sem título'}</p>
                         <div class="flex-shrink-0 flex gap-2">
-                            <button onclick="window.editDoc('${entity}', '${doc.id}')" class="px-2 py-1 bg-yellow-500 text-white rounded text-xs">Editar</button>
-                            <button onclick="window.deleteDoc('${entity}', '${doc.id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Eliminar</button>
+                            <button onclick="window.editDoc('${entity}', '${data.id}')" class="px-2 py-1 bg-yellow-500 text-white rounded text-xs">Editar</button>
+                            <button onclick="window.deleteDoc('${entity}', '${data.id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Eliminar</button>
                         </div>
                     `;
                     listContainer.appendChild(itemDiv);
@@ -593,9 +611,6 @@
                 document.getElementById('userEmail').textContent = user.email;
                 document.getElementById('logout-button').addEventListener('click', () => signOut(auth));
                 
-                // A inicialização do TinyMCE foi MOVIDA para a função showForm para garantir que o elemento está visível.
-
-                // Anexar listeners de formulário e carregar dados
                 Object.keys(entities).forEach(entity => {
                     const form = document.getElementById(`form-${entity}`);
                     if (form) {
@@ -613,7 +628,7 @@
 
                 loader.style.display = 'none';
                 mainContent.style.display = 'block';
-                showForm('home'); // Inicia na aba home
+                showForm('home');
             } else {
                 window.location.assign('login.html');
             }
