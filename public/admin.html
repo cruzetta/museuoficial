@@ -371,19 +371,19 @@
         // --- LÓGICA DO REPEATER (CAMPOS DINÂMICOS) ---
         const repeaterTemplates = {
             galeria_imagens: () => `
-                <input type="text" class="repeater-input flex-grow" data-field="nome" placeholder="Nome do Botão (Ex: Controle)">
-                <input type="url" class="repeater-input flex-grow" data-field="url" placeholder="URL da Imagem">
+                <input type="text" class="repeater-input" data-field="nome" placeholder="Nome do Botão (Ex: Controle)">
+                <input type="url" class="repeater-input" data-field="url" placeholder="URL da Imagem">
             `,
             sons_iconicos: () => `
-                <input type="text" class="repeater-input flex-grow" data-field="nome" placeholder="Nome do Som (Ex: Moeda do Mario)">
-                <input type="url" class="repeater-input flex-grow" data-field="url" placeholder="URL do arquivo de áudio">
+                <input type="text" class="repeater-input" data-field="nome" placeholder="Nome do Som (Ex: Moeda do Mario)">
+                <input type="url" class="repeater-input" data-field="url" placeholder="URL do arquivo de áudio">
             `,
             videos_epoca: () => `
-                <input type="text" class="repeater-input flex-grow" data-field="nome" placeholder="Título do Vídeo (Ex: Anúncio de TV)">
-                <input type="url" class="repeater-input flex-grow" data-field="embed_url" placeholder="URL de Incorporação (Embed)">
+                <input type="text" class="repeater-input" data-field="nome" placeholder="Título do Vídeo (Ex: Anúncio de TV)">
+                <input type="url" class="repeater-input" data-field="embed_url" placeholder="URL de Incorporação (Embed)">
             `,
-            voce_sabia: () => `<input type="text" class="repeater-input flex-grow" placeholder="Escreva a curiosidade">`,
-            jogos_essenciais: () => `<input type="text" class="repeater-input flex-grow" placeholder="Nome do Jogo">`
+            voce_sabia: () => `<input type="text" class="repeater-input" placeholder="Escreva a curiosidade">`,
+            jogos_essenciais: () => `<input type="text" class="repeater-input" placeholder="Nome do Jogo">`
         };
 
         window.addRepeaterItem = (type, data = {}) => {
@@ -391,19 +391,21 @@
             if (!container) return;
 
             const itemDiv = document.createElement('div');
-            itemDiv.className = 'flex items-center gap-2 p-2 border rounded-md bg-gray-50';
+            // FIX: Added 'repeater-item' class for reliable selection
+            itemDiv.className = 'repeater-item flex items-center gap-2 p-2 border rounded-md bg-gray-50';
             itemDiv.innerHTML = `
                 <div class="flex-grow flex gap-2">${repeaterTemplates[type]()}</div>
                 <button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>
             `;
             
-            if (typeof data === 'object' && data !== null) {
+            if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
                 for (const key in data) {
                     const input = itemDiv.querySelector(`[data-field="${key}"]`);
                     if (input) input.value = data[key];
                 }
             } else if (typeof data === 'string') {
-                itemDiv.querySelector('input').value = data;
+                const input = itemDiv.querySelector('input');
+                if (input) input.value = data;
             }
 
             container.appendChild(itemDiv);
@@ -465,7 +467,7 @@
             }
         };
 
-        // --- FUNÇÕES DE DADOS (ATUALIZADA) ---
+        // --- FUNÇÕES DE DADOS (CORRIGIDA) ---
         async function saveData(entity) {
             const config = entities[entity];
             if (!config) return;
@@ -473,34 +475,38 @@
             const id = document.getElementById(`${entity}-id`)?.value;
             const data = {};
 
-            // Pega dados dos campos normais, apenas se tiverem valor
+            // Pega dados dos campos normais
             config.fields.forEach(field => {
                 const el = document.getElementById(`${entity}-${field}`);
                 let value;
                 if (config.hasRichText && field === config.richTextField) {
-                    value = tinymce.get(`${entity}-${field}`).getContent();
+                    value = tinymce.get(`${entity}-${field}`)?.getContent();
                 } else if (el) {
                     value = el.value.trim();
                 }
 
-                if (value) { // SÓ ADICIONA O CAMPO SE TIVER VALOR
+                if (value) {
                     data[field] = value;
                 }
             });
 
-            // Pega dados dos campos repetidores (acervos), apenas se tiverem valor
+            // FIX: Pega dados dos campos repetidores de forma correta
             if (config.repeaterFields) {
                 config.repeaterFields.forEach(type => {
                     const container = document.getElementById(`acervos-${type}-container`);
+                    if (!container) return;
                     const items = [];
-                    container.querySelectorAll('.flex-grow').forEach(itemContainer => {
-                        const inputs = itemContainer.querySelectorAll('input');
-                        if (inputs.length > 1) {
+                    
+                    // Use the new 'repeater-item' class to correctly select each item's wrapper div
+                    container.querySelectorAll('.repeater-item').forEach(itemDiv => {
+                        const inputs = itemDiv.querySelectorAll('input');
+                        
+                        if (inputs.length > 1) { // Case for multi-input items (e.g., galeria_imagens)
                             const itemData = {};
                             let hasValue = false;
                             inputs.forEach(input => {
                                 const value = input.value.trim();
-                                if (value) {
+                                if (value && input.dataset.field) {
                                     itemData[input.dataset.field] = value;
                                     hasValue = true;
                                 }
@@ -508,11 +514,14 @@
                             if (hasValue) {
                                 items.push(itemData);
                             }
-                        } else {
+                        } else if (inputs.length === 1) { // Case for single-input items (e.g., voce_sabia)
                             const value = inputs[0].value.trim();
-                            if (value) items.push(value);
+                            if (value) {
+                                items.push(value);
+                            }
                         }
                     });
+
                     if (items.length > 0) {
                         data[type] = items;
                     }
@@ -527,7 +536,6 @@
                  }
             }
             
-            // Não guarda um documento vazio (a menos que seja um doc único que está a ser limpo)
             if (Object.keys(data).length === 0 && !config.isSingleDoc && !id) {
                 showNotification('Nenhum dado para guardar.', true);
                 return;
@@ -536,7 +544,7 @@
             try {
                 const path = `/artifacts/${appId}/public/data/${entity}`;
                 if (config.isSingleDoc) {
-                    await setDoc(doc(db, path, id || 'info'), data);
+                    await setDoc(doc(db, path, id || 'info'), data, { merge: true });
                 } else {
                     if (id) {
                         await updateDoc(doc(db, path, id), data);
@@ -660,7 +668,8 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                      config.fields.forEach(field => {
-                        document.getElementById(`${entity}-${field}`).value = data[field] || '';
+                        const el = document.getElementById(`${entity}-${field}`);
+                        if(el) el.value = data[field] || '';
                     });
                     showNotification('Dados carregados!');
                 }
@@ -685,7 +694,7 @@
                 }
                 const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                if (entity === 'noticias') {
+                if (entity === 'noticias' && docs.every(d => d.data_publicacao)) {
                     docs.sort((a, b) => (b.data_publicacao?.toDate() || 0) - (a.data_publicacao?.toDate() || 0));
                 }
 
