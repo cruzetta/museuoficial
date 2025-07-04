@@ -30,6 +30,9 @@
         input[type="text"], input[type="url"], input[type="number"], input[type="email"], input[type="password"], input[type="date"], select, textarea:not(.tox-tinymce-aux) {
             @apply mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
         }
+        .repeater-input {
+             @apply block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm text-sm;
+        }
         button[type="submit"] {
             @apply w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors;
         }
@@ -41,9 +44,6 @@
         }
         #confirm-modal-overlay {
             transition: opacity 0.3s ease;
-        }
-        .json-example {
-            @apply text-xs text-gray-500 mt-1 bg-gray-50 p-2 rounded;
         }
     </style>
 </head>
@@ -155,7 +155,7 @@
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Notícias Registadas</h3><div id="noticias-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Seção de Acervos (ATUALIZADA) -->
+                <!-- Seção de Acervos (SUPER SIMPLIFICADA) -->
                 <div id="acervos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Acervos da Galeria</h2>
                     <form id="form-acervos" class="space-y-6">
@@ -181,28 +181,40 @@
                                     <label for="acervos-detalhes" class="block text-sm font-medium text-gray-700 mb-2">Sobre o Item (História, Legado, etc.)</label>
                                     <textarea id="acervos-detalhes"></textarea>
                                 </div>
-                                <div>
-                                    <label for="acervos-galeria_imagens" class="block text-sm font-medium text-gray-700">Galeria de Imagens (formato JSON)</label>
-                                    <textarea id="acervos-galeria_imagens" rows="4" placeholder='[{"nome": "Controle", "url": "https://..."}, {"nome": "Caixa", "url": "https://..."}]'></textarea>
-                                    <pre class="json-example">[{"nome": "Nome do Botão", "url": "URL da Imagem"}]</pre>
+                                
+                                <!-- Galeria de Imagens Dinâmica -->
+                                <div class="border-t pt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Galeria de Imagens (para os botões)</label>
+                                    <div id="acervos-galeria_imagens-container" class="space-y-3 mt-2"></div>
+                                    <button type="button" onclick="window.addRepeaterItem('galeria_imagens')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Imagem</button>
                                 </div>
-                                <div>
-                                    <label for="acervos-voce_sabia" class="block text-sm font-medium text-gray-700">Você Sabia? (um fato por linha)</label>
-                                    <textarea id="acervos-voce_sabia" rows="4" placeholder="Fato 1...&#10;Fato 2..."></textarea>
+
+                                <!-- Você Sabia Dinâmico -->
+                                <div class="border-t pt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Curiosidades ("Você Sabia?")</label>
+                                    <div id="acervos-voce_sabia-container" class="space-y-3 mt-2"></div>
+                                    <button type="button" onclick="window.addRepeaterItem('voce_sabia')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Fato</button>
                                 </div>
-                                <div>
-                                    <label for="acervos-sons_iconicos" class="block text-sm font-medium text-gray-700">Sons Icónicos (formato JSON)</label>
-                                    <textarea id="acervos-sons_iconicos" rows="4" placeholder='[{"nome": "Som de Moeda", "url": "https://..."}, {"nome": "Segredo Zelda", "url": "https://..."}]'></textarea>
-                                     <pre class="json-example">[{"nome": "Nome do Som", "url": "URL do Áudio"}]</pre>
+                                
+                                <!-- Sons Icônicos Dinâmico -->
+                                <div class="border-t pt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Sons Icónicos</label>
+                                    <div id="acervos-sons_iconicos-container" class="space-y-3 mt-2"></div>
+                                    <button type="button" onclick="window.addRepeaterItem('sons_iconicos')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Som</button>
                                 </div>
-                                <div>
-                                    <label for="acervos-videos_epoca" class="block text-sm font-medium text-gray-700">Vídeos da Época (formato JSON com URL de embed)</label>
-                                    <textarea id="acervos-videos_epoca" rows="4" placeholder='[{"nome": "Anúncio de TV", "embed_url": "https://youtube.com/embed/..."}, {"nome": "Gameplay", "embed_url": "https://..."}]'></textarea>
-                                     <pre class="json-example">[{"nome": "Título do Vídeo", "embed_url": "URL de Incorporação"}]</pre>
+
+                                <!-- Vídeos da Época Dinâmico -->
+                                <div class="border-t pt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Vídeos da Época</label>
+                                    <div id="acervos-videos_epoca-container" class="space-y-3 mt-2"></div>
+                                    <button type="button" onclick="window.addRepeaterItem('videos_epoca')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Vídeo</button>
                                 </div>
-                                <div>
-                                    <label for="acervos-jogos_essenciais" class="block text-sm font-medium text-gray-700">Jogos Essenciais (nomes separados por vírgula)</label>
-                                    <textarea id="acervos-jogos_essenciais" rows="2" placeholder="Super Mario Bros., The Legend of Zelda, Metroid..."></textarea>
+
+                                <!-- Jogos Essenciais Dinâmico -->
+                                <div class="border-t pt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Jogos Essenciais</label>
+                                    <div id="acervos-jogos_essenciais-container" class="space-y-3 mt-2"></div>
+                                    <button type="button" onclick="window.addRepeaterItem('jogos_essenciais')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Jogo</button>
                                 </div>
                             </div>
                         </fieldset>
@@ -316,7 +328,6 @@
         </div>
     </div>
 
-
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -336,7 +347,6 @@
         const auth = getAuth(app);
         const appId = 'museu-cca6d';
 
-        // --- DEFINIÇÃO DAS ENTIDADES (COM ACERVOS ATUALIZADO) ---
         const entities = {
             'home': { isSingleDoc: true, fields: ['titulo', 'subtitulo', 'botao'] },
             'noticias': { 
@@ -348,7 +358,8 @@
             },
             'acervos': { 
                 isSingleDoc: false, 
-                fields: ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas', 'imagem_principal', 'galeria_imagens', 'detalhes', 'voce_sabia', 'sons_iconicos', 'videos_epoca', 'jogos_essenciais'], 
+                fields: ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas', 'imagem_principal', 'detalhes'],
+                repeaterFields: ['galeria_imagens', 'voce_sabia', 'sons_iconicos', 'videos_epoca', 'jogos_essenciais'],
                 listDisplayField: 'nome',
                 hasRichText: true,
                 richTextField: 'detalhes'
@@ -362,6 +373,49 @@
             'lojas': { isSingleDoc: false, fields: ['nome', 'preco', 'imagem'], listDisplayField: 'nome' }
         };
 
+        // --- LÓGICA DO REPEATER (CAMPOS DINÂMICOS) ---
+        const repeaterTemplates = {
+            galeria_imagens: () => `
+                <input type="text" class="repeater-input flex-grow" data-field="nome" placeholder="Nome do Botão (Ex: Controle)">
+                <input type="url" class="repeater-input flex-grow" data-field="url" placeholder="URL da Imagem">
+            `,
+            sons_iconicos: () => `
+                <input type="text" class="repeater-input flex-grow" data-field="nome" placeholder="Nome do Som (Ex: Moeda do Mario)">
+                <input type="url" class="repeater-input flex-grow" data-field="url" placeholder="URL do arquivo de áudio">
+            `,
+            videos_epoca: () => `
+                <input type="text" class="repeater-input flex-grow" data-field="nome" placeholder="Título do Vídeo (Ex: Anúncio de TV)">
+                <input type="url" class="repeater-input flex-grow" data-field="embed_url" placeholder="URL de Incorporação (Embed)">
+            `,
+            voce_sabia: () => `<input type="text" class="repeater-input flex-grow" placeholder="Escreva a curiosidade">`,
+            jogos_essenciais: () => `<input type="text" class="repeater-input flex-grow" placeholder="Nome do Jogo">`
+        };
+
+        window.addRepeaterItem = (type, data = {}) => {
+            const container = document.getElementById(`acervos-${type}-container`);
+            if (!container) return;
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center gap-2 p-2 border rounded-md bg-gray-50';
+            itemDiv.innerHTML = `
+                <div class="flex-grow flex gap-2">${repeaterTemplates[type]()}</div>
+                <button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>
+            `;
+            
+            // Preenche os campos se os dados forem fornecidos (modo de edição)
+            if (typeof data === 'object' && data !== null) {
+                for (const key in data) {
+                    const input = itemDiv.querySelector(`[data-field="${key}"]`);
+                    if (input) input.value = data[key];
+                }
+            } else if (typeof data === 'string') {
+                itemDiv.querySelector('input').value = data;
+            }
+
+            container.appendChild(itemDiv);
+            itemDiv.querySelector('.remove-item-btn').addEventListener('click', () => itemDiv.remove());
+        };
+        
         // --- FUNÇÕES GLOBAIS DA UI ---
         function showNotification(message, isError = false) {
              const el = document.getElementById('notification');
@@ -397,7 +451,7 @@
                 }
             }
         };
-
+        
         window.clearForm = (entity) => {
             const form = document.getElementById(`form-${entity}`);
             if(form) form.reset();
@@ -405,11 +459,16 @@
             if (idField) idField.value = '';
             
             const config = entities[entity];
-            if (config && config.hasRichText) {
+            if (config?.hasRichText) {
                 const editor = tinymce.get(`${entity}-${config.richTextField}`);
-                if (editor) {
-                    editor.setContent('');
-                }
+                if (editor) editor.setContent('');
+            }
+            // Limpa os campos repetidores
+            if (config?.repeaterFields) {
+                config.repeaterFields.forEach(type => {
+                    const container = document.getElementById(`acervos-${type}-container`);
+                    if(container) container.innerHTML = '';
+                });
             }
         };
 
@@ -419,39 +478,42 @@
             if (!config) return;
 
             const id = document.getElementById(`${entity}-id`)?.value;
-            let data = {};
-            let hasError = false;
+            const data = {};
 
+            // Pega dados dos campos normais
             config.fields.forEach(field => {
-                if (hasError) return;
                 const el = document.getElementById(`${entity}-${field}`);
-                if (!el) return;
-
                 if (config.hasRichText && field === config.richTextField) {
                     data[field] = tinymce.get(`${entity}-${field}`).getContent();
-                } else if (entity === 'acervos' && ['galeria_imagens', 'sons_iconicos', 'videos_epoca'].includes(field)) {
-                    try {
-                        if (el.value.trim()) {
-                           data[field] = JSON.parse(el.value);
-                        } else {
-                           data[field] = [];
-                        }
-                    } catch(e) {
-                        showNotification(`Erro: O formato JSON no campo '${field}' é inválido.`, true);
-                        console.error(`JSON Parse Error in ${field}:`, e);
-                        hasError = true;
-                    }
-                } else if (entity === 'acervos' && field === 'voce_sabia') {
-                    data[field] = el.value.split('\n').map(s => s.trim()).filter(Boolean);
-                } else if (entity === 'acervos' && field === 'jogos_essenciais') {
-                     data[field] = el.value.split(',').map(s => s.trim()).filter(Boolean);
-                } else if (field !== 'data') {
+                } else if (el) {
                     data[field] = el.value;
                 }
             });
 
-            if (hasError) return;
-
+            // Pega dados dos campos repetidores (acervos)
+            if (config.repeaterFields) {
+                config.repeaterFields.forEach(type => {
+                    const container = document.getElementById(`acervos-${type}-container`);
+                    const items = [];
+                    container.querySelectorAll('.flex-grow').forEach(itemContainer => {
+                        const inputs = itemContainer.querySelectorAll('input');
+                        if (inputs.length > 1) { // É um objeto {nome, url, etc}
+                            const itemData = {};
+                            inputs.forEach(input => {
+                                itemData[input.dataset.field] = input.value;
+                            });
+                            if (Object.values(itemData).some(val => val && val.trim() !== '')) {
+                                items.push(itemData);
+                            }
+                        } else { // É uma string simples
+                            const value = inputs[0].value.trim();
+                            if (value) items.push(value);
+                        }
+                    });
+                    data[type] = items;
+                });
+            }
+            
             if (entity === 'noticias') {
                  const dateString = document.getElementById('noticias-data').value;
                  if (dateString) {
@@ -480,7 +542,7 @@
             }
         }
 
-        // --- LÓGICA DO MODAL DE CONFIRMAÇÃO ---
+        // --- MODAL DE CONFIRMAÇÃO ---
         const confirmModalOverlay = document.getElementById('confirm-modal-overlay');
         const confirmModal = document.getElementById('confirm-modal');
         const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
@@ -536,6 +598,8 @@
             const config = entities[entity];
             if (!config || config.isSingleDoc) return;
             
+            window.clearForm(entity); 
+
             try {
                 const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
                 const docSnap = await getDoc(docRef);
@@ -545,24 +609,8 @@
                     
                     config.fields.forEach(field => {
                         const el = document.getElementById(`${entity}-${field}`);
-                        if (!el) return;
-
                         if (config.hasRichText && field === config.richTextField) {
                             tinymce.get(`${entity}-${field}`).setContent(data[field] || '');
-                        } else if (entity === 'acervos' && ['galeria_imagens', 'sons_iconicos', 'videos_epoca'].includes(field)) {
-                            if (data[field] && Array.isArray(data[field])) {
-                               el.value = JSON.stringify(data[field], null, 2);
-                            } else {
-                               el.value = '[]';
-                            }
-                        } else if (entity === 'acervos' && field === 'voce_sabia') {
-                            if (data[field] && Array.isArray(data[field])) {
-                                el.value = data[field].join('\n');
-                            }
-                        } else if (entity === 'acervos' && field === 'jogos_essenciais') {
-                             if (data[field] && Array.isArray(data[field])) {
-                                el.value = data[field].join(', ');
-                            }
                         } else if (field === 'data' && entity === 'noticias') {
                             const dataInput = document.getElementById('noticias-data');
                             if (data.data_publicacao && data.data_publicacao.toDate) {
@@ -574,6 +622,15 @@
                             if(el) el.value = data[field] || '';
                         }
                     });
+                    
+                    if (config.repeaterFields) {
+                        config.repeaterFields.forEach(type => {
+                            if (data[type] && Array.isArray(data[type])) {
+                                data[type].forEach(itemData => window.addRepeaterItem(type, itemData));
+                            }
+                        });
+                    }
+
                     showForm(entity);
                     window.scrollTo(0, 0);
                 }
@@ -637,7 +694,6 @@
             });
         }
 
-        // --- GESTÃO DE CATEGORIAS (ESPECÍFICO PARA NOTÍCIAS) ---
         function setupCategoryManager() {
             const categoriasCollection = collection(db, `/artifacts/${appId}/public/data/categorias`);
 
@@ -701,7 +757,7 @@
                             saveData(entity);
                         });
                     }
-                    if (!entities[entity].isSingleDoc) {
+                    if (entities[entity] && !entities[entity].isSingleDoc) {
                         listenToCollection(entity);
                     }
                 });
