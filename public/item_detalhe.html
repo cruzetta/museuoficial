@@ -128,23 +128,36 @@
                         }
                     }
 
+                    // ### INÍCIO DA ALTERAÇÃO ###
+                    // A lógica para renderizar os vídeos foi alterada para usar a tag <video>.
                     let videosHTML = '';
                     if (item.videos_epoca && item.videos_epoca.length > 0) {
-                        const videoPlaceholders = item.videos_epoca
+                        const videoEmbeds = item.videos_epoca
                             .filter(video => video.nome && video.embed_url)
-                            .map(video => `<a href="${video.embed_url}" target="_blank" class="video-placeholder"><i class="fas fa-video"></i><span>${video.nome}</span></a>`)
+                            .map(video => `
+                                <div class="mb-4">
+                                    <h4 class="font-semibold text-white mb-2">${video.nome}</h4>
+                                    <div class="hud-border rounded-lg p-1">
+                                        <video controls class="w-full rounded-md aspect-video bg-black">
+                                            <source src="${video.embed_url}" type="video/mp4">
+                                            O seu navegador não suporta a tag de vídeo.
+                                        </video>
+                                    </div>
+                                </div>
+                            `)
                             .join('');
-                        if (videoPlaceholders) {
-                            videosHTML = `<div><h3 class="section-subtitle">Vídeos da Época</h3><div class="flex flex-wrap gap-4 mt-2">${videoPlaceholders}</div></div>`;
+                        if (videoEmbeds) {
+                            videosHTML = `<div><h3 class="section-subtitle">Vídeos da Época</h3><div class="flex flex-col gap-4 mt-2">${videoEmbeds}</div></div>`;
                         }
                     }
+                    // ### FIM DA ALTERAÇÃO ###
                     
                     const emAcaoHTML = (sonsHTML || videosHTML) ? `
                         <section class="mt-12">
                             <h2 class="section-title">Em Ação</h2>
                             <div class="hud-border rounded-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                ${sonsHTML}
-                                ${videosHTML}
+                                ${sonsHTML || ''}
+                                ${videosHTML || ''}
                             </div>
                         </section>` : '';
 
