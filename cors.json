@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://museu-cca6d.web.app"],
+    "method": ["GET", "POST", "PUT"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]
