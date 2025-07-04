@@ -42,6 +42,9 @@
         #confirm-modal-overlay {
             transition: opacity 0.3s ease;
         }
+        .json-example {
+            @apply text-xs text-gray-500 mt-1 bg-gray-50 p-2 rounded;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -155,26 +158,56 @@
                 <!-- Seção de Acervos (ATUALIZADA) -->
                 <div id="acervos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Acervos da Galeria</h2>
-                    <form id="form-acervos" class="space-y-4">
+                    <form id="form-acervos" class="space-y-6">
                         <input type="hidden" id="acervos-id">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome do Item</label><input type="text" id="acervos-nome" required></div>
-                            <div><label for="acervos-fabricante" class="block text-sm font-medium text-gray-700">Fabricante</label><input type="text" id="acervos-fabricante" required></div>
-                            <div><label for="acervos-lancamento" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label><input type="number" id="acervos-lancamento" placeholder="Ex: 1983" required></div>
-                            <div><label for="acervos-geracao" class="block text-sm font-medium text-gray-700">Geração</label><input type="text" id="acervos-geracao" placeholder="Ex: 3ª Geração (8-bit)" required></div>
-                            <div><label for="acervos-media" class="block text-sm font-medium text-gray-700">Média</label><input type="text" id="acervos-media" placeholder="Ex: Cartucho"></div>
-                            <div><label for="acervos-vendas" class="block text-sm font-medium text-gray-700">Vendas (aprox.)</label><input type="text" id="acervos-vendas" placeholder="Ex: ~50 milhões"></div>
-                        </div>
-                        <div><label for="acervos-imagem_principal" class="block text-sm font-medium text-gray-700">URL da Imagem Principal</label><input type="url" id="acervos-imagem_principal" required></div>
-                        <div>
-                            <label for="acervos-galeria_imagens" class="block text-sm font-medium text-gray-700">URLs de Imagens da Galeria (separadas por vírgula)</label>
-                            <textarea id="acervos-galeria_imagens" rows="3" placeholder="https://url/imagem1.jpg, https://url/imagem2.jpg"></textarea>
-                        </div>
-                        <div>
-                            <label for="acervos-detalhes" class="block text-sm font-medium text-gray-700 mb-2">Detalhes (Conteúdo Principal)</label>
-                            <textarea id="acervos-detalhes"></textarea>
-                        </div>
-                        <div class="flex gap-4"><button type="submit">Guardar Item do Acervo</button><button type="button" onclick="window.clearForm('acervos')" class="w-auto">Cancelar</button></div>
+                        
+                        <fieldset class="border p-4 rounded-md">
+                            <legend class="text-lg font-semibold px-2">Informações Principais</legend>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome do Item</label><input type="text" id="acervos-nome" required></div>
+                                <div><label for="acervos-fabricante" class="block text-sm font-medium text-gray-700">Fabricante</label><input type="text" id="acervos-fabricante" required></div>
+                                <div><label for="acervos-lancamento" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label><input type="number" id="acervos-lancamento" placeholder="Ex: 1983" required></div>
+                                <div><label for="acervos-geracao" class="block text-sm font-medium text-gray-700">Geração</label><input type="text" id="acervos-geracao" placeholder="Ex: 3ª Geração (8-bit)" required></div>
+                                <div><label for="acervos-media" class="block text-sm font-medium text-gray-700">Média</label><input type="text" id="acervos-media" placeholder="Ex: Cartucho"></div>
+                                <div><label for="acervos-vendas" class="block text-sm font-medium text-gray-700">Vendas (aprox.)</label><input type="text" id="acervos-vendas" placeholder="Ex: ~50 milhões"></div>
+                                <div class="md:col-span-2"><label for="acervos-imagem_principal" class="block text-sm font-medium text-gray-700">URL da Imagem Principal</label><input type="url" id="acervos-imagem_principal" required></div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="border p-4 rounded-md">
+                            <legend class="text-lg font-semibold px-2">Conteúdo Detalhado</legend>
+                            <div class="space-y-4 pt-2">
+                                <div>
+                                    <label for="acervos-detalhes" class="block text-sm font-medium text-gray-700 mb-2">Sobre o Item (História, Legado, etc.)</label>
+                                    <textarea id="acervos-detalhes"></textarea>
+                                </div>
+                                <div>
+                                    <label for="acervos-galeria_imagens" class="block text-sm font-medium text-gray-700">Galeria de Imagens (formato JSON)</label>
+                                    <textarea id="acervos-galeria_imagens" rows="4" placeholder='[{"nome": "Controle", "url": "https://..."}, {"nome": "Caixa", "url": "https://..."}]'></textarea>
+                                    <pre class="json-example">[{"nome": "Nome do Botão", "url": "URL da Imagem"}]</pre>
+                                </div>
+                                <div>
+                                    <label for="acervos-voce_sabia" class="block text-sm font-medium text-gray-700">Você Sabia? (um fato por linha)</label>
+                                    <textarea id="acervos-voce_sabia" rows="4" placeholder="Fato 1...&#10;Fato 2..."></textarea>
+                                </div>
+                                <div>
+                                    <label for="acervos-sons_iconicos" class="block text-sm font-medium text-gray-700">Sons Icónicos (formato JSON)</label>
+                                    <textarea id="acervos-sons_iconicos" rows="4" placeholder='[{"nome": "Som de Moeda", "url": "https://..."}, {"nome": "Segredo Zelda", "url": "https://..."}]'></textarea>
+                                     <pre class="json-example">[{"nome": "Nome do Som", "url": "URL do Áudio"}]</pre>
+                                </div>
+                                <div>
+                                    <label for="acervos-videos_epoca" class="block text-sm font-medium text-gray-700">Vídeos da Época (formato JSON com URL de embed)</label>
+                                    <textarea id="acervos-videos_epoca" rows="4" placeholder='[{"nome": "Anúncio de TV", "embed_url": "https://youtube.com/embed/..."}, {"nome": "Gameplay", "embed_url": "https://..."}]'></textarea>
+                                     <pre class="json-example">[{"nome": "Título do Vídeo", "embed_url": "URL de Incorporação"}]</pre>
+                                </div>
+                                <div>
+                                    <label for="acervos-jogos_essenciais" class="block text-sm font-medium text-gray-700">Jogos Essenciais (nomes separados por vírgula)</label>
+                                    <textarea id="acervos-jogos_essenciais" rows="2" placeholder="Super Mario Bros., The Legend of Zelda, Metroid..."></textarea>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="flex gap-4 pt-4"><button type="submit">Guardar Item do Acervo</button><button type="button" onclick="window.clearForm('acervos')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Itens do Acervo</h3><div id="acervos-lista" class="space-y-4"></div></div>
                 </div>
@@ -315,7 +348,7 @@
             },
             'acervos': { 
                 isSingleDoc: false, 
-                fields: ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas', 'imagem_principal', 'galeria_imagens', 'detalhes'], 
+                fields: ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas', 'imagem_principal', 'galeria_imagens', 'detalhes', 'voce_sabia', 'sons_iconicos', 'videos_epoca', 'jogos_essenciais'], 
                 listDisplayField: 'nome',
                 hasRichText: true,
                 richTextField: 'detalhes'
@@ -386,18 +419,38 @@
             if (!config) return;
 
             const id = document.getElementById(`${entity}-id`)?.value;
-            const data = {};
+            let data = {};
+            let hasError = false;
 
             config.fields.forEach(field => {
+                if (hasError) return;
                 const el = document.getElementById(`${entity}-${field}`);
+                if (!el) return;
+
                 if (config.hasRichText && field === config.richTextField) {
                     data[field] = tinymce.get(`${entity}-${field}`).getContent();
-                } else if (field === 'galeria_imagens') {
-                    data[field] = el.value.split(',').map(url => url.trim()).filter(url => url);
+                } else if (entity === 'acervos' && ['galeria_imagens', 'sons_iconicos', 'videos_epoca'].includes(field)) {
+                    try {
+                        if (el.value.trim()) {
+                           data[field] = JSON.parse(el.value);
+                        } else {
+                           data[field] = [];
+                        }
+                    } catch(e) {
+                        showNotification(`Erro: O formato JSON no campo '${field}' é inválido.`, true);
+                        console.error(`JSON Parse Error in ${field}:`, e);
+                        hasError = true;
+                    }
+                } else if (entity === 'acervos' && field === 'voce_sabia') {
+                    data[field] = el.value.split('\n').map(s => s.trim()).filter(Boolean);
+                } else if (entity === 'acervos' && field === 'jogos_essenciais') {
+                     data[field] = el.value.split(',').map(s => s.trim()).filter(Boolean);
                 } else if (field !== 'data') {
-                    if (el) data[field] = el.value;
+                    data[field] = el.value;
                 }
             });
+
+            if (hasError) return;
 
             if (entity === 'noticias') {
                  const dateString = document.getElementById('noticias-data').value;
@@ -492,10 +545,22 @@
                     
                     config.fields.forEach(field => {
                         const el = document.getElementById(`${entity}-${field}`);
+                        if (!el) return;
+
                         if (config.hasRichText && field === config.richTextField) {
                             tinymce.get(`${entity}-${field}`).setContent(data[field] || '');
-                        } else if (field === 'galeria_imagens') {
-                            if (el && Array.isArray(data[field])) {
+                        } else if (entity === 'acervos' && ['galeria_imagens', 'sons_iconicos', 'videos_epoca'].includes(field)) {
+                            if (data[field] && Array.isArray(data[field])) {
+                               el.value = JSON.stringify(data[field], null, 2);
+                            } else {
+                               el.value = '[]';
+                            }
+                        } else if (entity === 'acervos' && field === 'voce_sabia') {
+                            if (data[field] && Array.isArray(data[field])) {
+                                el.value = data[field].join('\n');
+                            }
+                        } else if (entity === 'acervos' && field === 'jogos_essenciais') {
+                             if (data[field] && Array.isArray(data[field])) {
                                 el.value = data[field].join(', ');
                             }
                         } else if (field === 'data' && entity === 'noticias') {

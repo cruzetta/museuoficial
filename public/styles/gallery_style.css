@@ -1,6 +1,7 @@
 :root {
     --neon-blue: #00BFFF;
     --neon-purple: #A020F0;
+    --neon-green: #39FF14;
     --dark-bg: #0D0D1A;
     --metal-bg: linear-gradient(145deg, #1a1a2e, #161625);
 }
@@ -37,20 +38,7 @@ h1, h2, h3, .nav-link {
     to { background-position: 200% center; }
 }
 
-.page {
-    display: none;
-    padding-bottom: 4rem;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-.page.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+/* --- ESTILOS DA PÁGINA DE GALERIA --- */
 
 #searchInput {
     background: rgba(13, 13, 26, 0.8);
@@ -79,16 +67,6 @@ h1, h2, h3, .nav-link {
     box-shadow: 0 0 25px var(--neon-purple);
 }
 
-.sound-btn {
-    background-color: rgba(0, 191, 255, 0.2);
-    border: 1px solid var(--neon-blue);
-    transition: background-color 0.3s, color 0.3s;
-}
-.sound-btn:hover {
-    background-color: var(--neon-blue);
-    color: var(--dark-bg);
-}
-
 .autocomplete-item {
     padding: 12px 16px;
     cursor: pointer;
@@ -97,4 +75,89 @@ h1, h2, h3, .nav-link {
 }
 .autocomplete-item:hover {
     background-color: var(--neon-purple);
+}
+
+
+/* --- NOVOS ESTILOS PARA A PÁGINA DE DETALHES (item_detalhe.html) --- */
+
+.section-title {
+    @apply text-3xl font-bold text-center mb-6 holographic-text;
+}
+
+.section-subtitle {
+    @apply text-xl font-bold text-neon-blue;
+}
+
+/* Botões da galeria de imagens */
+.gallery-thumb-btn {
+    @apply hud-border rounded-lg px-4 py-2 text-white font-semibold uppercase tracking-wider transition-all duration-200;
+}
+.gallery-thumb-btn:hover {
+    background-color: var(--neon-purple);
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 15px var(--neon-purple);
+    transform: translateY(-2px);
+}
+
+/* Estilos para o conteúdo de texto vindo do editor */
+.prose-custom {
+    @apply text-lg leading-relaxed space-y-4;
+}
+.prose-custom h1, .prose-custom h2, .prose-custom h3 {
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    @apply holographic-text my-6;
+}
+.prose-custom a {
+    color: var(--neon-blue);
+    text-decoration: underline;
+}
+.prose-custom p {
+    @apply mb-4;
+}
+
+/* Seção "Em Ação" */
+.sound-play-btn {
+    @apply flex items-center gap-3 px-4 py-2 rounded-lg font-bold text-white transition-all duration-200;
+    background-color: rgba(57, 255, 20, 0.2);
+    border: 2px solid var(--neon-green);
+}
+.sound-play-btn:hover {
+    background-color: var(--neon-green);
+    color: var(--dark-bg);
+    box-shadow: 0 0 15px var(--neon-green);
+    transform: scale(1.05);
+}
+
+.video-placeholder {
+    @apply hud-border rounded-lg p-4 w-48 h-24 flex flex-col items-center justify-center text-center text-white font-bold transition-all duration-200;
+}
+.video-placeholder i {
+    @apply text-3xl mb-2 text-neon-blue;
+}
+.video-placeholder:hover {
+    border-color: var(--neon-purple);
+    transform: scale(1.05);
+}
+.video-placeholder:hover i {
+    color: var(--neon-purple);
+}
+
+/* Seção "Você Sabia?" */
+.did-you-know-item {
+    @apply flex items-start gap-4 text-lg;
+}
+.did-you-know-item i {
+    @apply mt-1;
+}
+
+/* Seção "Jogos Essenciais" */
+.essential-game-card {
+    @apply hud-border rounded-lg p-4 text-center font-bold text-lg w-48 h-24 flex items-center justify-center;
+    transition: all 0.2s ease-in-out;
+}
+.essential-game-card:hover {
+    border-color: var(--neon-purple);
+    color: var(--neon-purple);
+    transform: translateY(-4px);
 }

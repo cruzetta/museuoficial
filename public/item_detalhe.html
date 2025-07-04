@@ -23,7 +23,7 @@
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-16 pt-32">
+    <main class="container mx-auto px-4 pt-12 pb-16">
         <!-- Conteúdo do Item Carregado Dinamicamente -->
         <article id="item-container" class="opacity-0 transition-opacity duration-500">
             <!-- O conteúdo será preenchido pelo JavaScript -->
@@ -35,6 +35,9 @@
             <p class="mt-4 text-2xl holographic-text">A carregar detalhes do item...</p>
         </div>
     </main>
+    
+    <!-- Elemento de Áudio para os sons -->
+    <audio id="audio-player"></audio>
 
     <footer class="py-10 mt-16" style="background: var(--metal-bg)">
         <div class="container mx-auto text-center text-gray-400">
@@ -62,6 +65,7 @@
 
         const itemContainer = document.getElementById('item-container');
         const loader = document.getElementById('loader');
+        const audioPlayer = document.getElementById('audio-player');
 
         // Função para mudar a imagem principal na galeria de detalhes
         window.changeImage = (newSrc) => {
@@ -73,7 +77,15 @@
                     mainImage.style.opacity = 1;
                 }, 300);
             }
-        }
+        };
+
+        // Função para tocar um som
+        window.playSound = (soundUrl) => {
+            if (audioPlayer) {
+                audioPlayer.src = soundUrl;
+                audioPlayer.play();
+            }
+        };
 
         async function carregarItem() {
             const params = new URLSearchParams(window.location.search);
@@ -92,46 +104,114 @@
                     const item = docSnap.data();
                     document.title = `${item.nome} - Museu do Videojogo`;
 
-                    // Gera a galeria de imagens secundárias, se existir
-                    let thumbnailsHTML = '';
+                    // --- GERAÇÃO DOS COMPONENTES HTML ---
+
+                    // Galeria de Imagens (Botões)
+                    let galleryButtonsHTML = '';
                     if (item.galeria_imagens && item.galeria_imagens.length > 0) {
-                        // Adiciona a imagem principal como a primeira miniatura
-                        thumbnailsHTML += `<a onclick="changeImage('${item.imagem_principal}')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-20 bg-cover bg-center" style="background-image: url('${item.imagem_principal}')"></a>`;
-                        
-                        item.galeria_imagens.forEach(imgUrl => {
-                            thumbnailsHTML += `<a onclick="changeImage('${imgUrl}')" class="hud-border p-1 rounded-md w-1/4 hover:border-neon-purple cursor-pointer flex items-center justify-center text-center font-bold text-sm h-20 bg-cover bg-center" style="background-image: url('${imgUrl}')"></a>`;
+                        item.galeria_imagens.forEach(img => {
+                            galleryButtonsHTML += `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome}</button>`;
                         });
                     }
 
+                    // Seção "Sobre o Item"
+                    const sobreHTML = item.detalhes ? `
+                        <section class="hud-border rounded-lg p-8 mt-12">
+                            <div class="prose-custom">${item.detalhes}</div>
+                        </section>` : '';
+
+                    // Seção "Em Ação"
+                    let sonsHTML = '';
+                    if (item.sons_iconicos && item.sons_iconicos.length > 0) {
+                        const soundButtons = item.sons_iconicos.map(som => 
+                            `<button onclick="playSound('${som.url}')" class="sound-play-btn">
+                                <i class="fas fa-play mr-2"></i> ${som.nome}
+                            </button>`
+                        ).join('');
+                        sonsHTML = `<div><h3 class="section-subtitle">Sons Icónicos</h3><div class="flex flex-wrap gap-4 mt-2">${soundButtons}</div></div>`;
+                    }
+
+                    let videosHTML = '';
+                    if (item.videos_epoca && item.videos_epoca.length > 0) {
+                        const videoPlaceholders = item.videos_epoca.map(video => 
+                            `<a href="${video.embed_url}" target="_blank" class="video-placeholder">
+                                <i class="fas fa-video"></i>
+                                <span>${video.nome}</span>
+                            </a>`
+                        ).join('');
+                        videosHTML = `<div><h3 class="section-subtitle">Vídeos da Época</h3><div class="flex flex-wrap gap-4 mt-2">${videoPlaceholders}</div></div>`;
+                    }
+                    
+                    const emAcaoHTML = (sonsHTML || videosHTML) ? `
+                        <section class="mt-12">
+                            <h2 class="section-title">Em Ação</h2>
+                            <div class="hud-border rounded-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                ${sonsHTML}
+                                ${videosHTML}
+                            </div>
+                        </section>` : '';
+
+                    // Seção "Você Sabia?"
+                    let voceSabiaHTML = '';
+                    if (item.voce_sabia && item.voce_sabia.length > 0) {
+                        const fatos = item.voce_sabia.map(fato => 
+                            `<li class="did-you-know-item">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span>${fato}</span>
+                            </li>`
+                        ).join('');
+                        voceSabiaHTML = `
+                        <section class="mt-12">
+                            <h2 class="section-title">Você Sabia?</h2>
+                            <div class="hud-border rounded-lg p-8">
+                                <ul class="space-y-4">${fatos}</ul>
+                            </div>
+                        </section>`;
+                    }
+
+                    // Seção "Jogos Essenciais"
+                    let jogosEssenciaisHTML = '';
+                    if (item.jogos_essenciais && item.jogos_essenciais.length > 0) {
+                        const jogos = item.jogos_essenciais.map(jogo => `<div class="essential-game-card">${jogo}</div>`).join('');
+                        jogosEssenciaisHTML = `
+                        <section class="mt-12">
+                            <h2 class="section-title">Jogos Essenciais</h2>
+                            <div class="flex flex-wrap gap-4 justify-center">${jogos}</div>
+                        </section>`;
+                    }
+
+                    // --- MONTAGEM FINAL DO HTML ---
                     const contentHTML = `
-                        <section class="mb-16">
-                            <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">${item.nome}</h1>
-                            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                                <div class="lg:col-span-3">
-                                    <div class="hud-border rounded-lg p-2">
-                                        <img id="main-item-image" src="${item.imagem_principal}" alt="Imagem principal de ${item.nome}" class="w-full h-auto rounded-md object-cover transition-opacity duration-300">
-                                    </div>
-                                    <div class="flex space-x-2 mt-2">
-                                        ${thumbnailsHTML}
-                                    </div>
+                        <h1 class="text-5xl md:text-7xl font-black text-center mb-12 holographic-text">${item.nome}</h1>
+                        
+                        <section class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                            <!-- Coluna da Imagem e Galeria -->
+                            <div class="lg:col-span-3">
+                                <div class="hud-border rounded-lg p-2 mb-4">
+                                    <img id="main-item-image" src="${item.imagem_principal || 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Item'}" alt="Imagem principal de ${item.nome}" class="w-full h-auto rounded-md object-cover transition-opacity duration-300 aspect-video">
                                 </div>
-                                <div class="lg:col-span-2 hud-border rounded-lg p-6 self-start">
-                                    <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
-                                    <ul class="space-y-3 text-lg">
-                                        <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> ${item.fabricante || 'N/A'}</li>
-                                        <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> ${item.lancamento || 'N/A'}</li>
-                                        <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> ${item.geracao || 'N/A'}</li>
-                                        <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> ${item.media || 'Cartucho'}</li>
-                                        <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ${item.vendas || 'N/A'}</li>
-                                    </ul>
+                                <div class="flex flex-wrap gap-2">
+                                    ${galleryButtonsHTML}
                                 </div>
+                            </div>
+
+                            <!-- Coluna da Ficha Técnica -->
+                            <div class="lg:col-span-2 hud-border rounded-lg p-6 self-start">
+                                <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                                <ul class="space-y-3 text-lg">
+                                    <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> ${item.fabricante || 'N/A'}</li>
+                                    <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> ${item.lancamento || 'N/A'}</li>
+                                    <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> ${item.geracao || 'N/A'}</li>
+                                    <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> ${item.media || 'N/A'}</li>
+                                    <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ${item.vendas || 'N/A'}</li>
+                                </ul>
                             </div>
                         </section>
 
-                        <section class="hud-border rounded-lg p-8">
-                            <h2 class="text-3xl font-bold mb-6 holographic-text">Sobre o Item</h2>
-                            <div class="text-lg leading-relaxed space-y-4">${item.detalhes || '<p>Descrição não disponível.</p>'}</div>
-                        </section>
+                        ${sobreHTML}
+                        ${emAcaoHTML}
+                        ${voceSabiaHTML}
+                        ${jogosEssenciaisHTML}
                     `;
                     
                     itemContainer.innerHTML = contentHTML;

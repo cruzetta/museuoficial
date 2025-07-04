@@ -43,10 +43,22 @@
         @keyframes holographic-shine {
             to { background-position: 200% center; }
         }
-        /* Estilos para o conteúdo da notícia */
-        #noticia-descricao p { margin-bottom: 1rem; }
+        /* Estilos para o conteúdo da notícia (gerado pelo TinyMCE) */
+        #noticia-descricao p { margin-bottom: 1rem; line-height: 1.75; }
         #noticia-descricao a { color: var(--neon-blue); text-decoration: underline; }
-        #noticia-descricao h1, #noticia-descricao h2, #noticia-descricao h3 { font-family: 'Orbitron', sans-serif; margin-top: 1.5rem; margin-bottom: 1rem; }
+        #noticia-descricao h1, #noticia-descricao h2, #noticia-descricao h3, #noticia-descricao h4 { 
+            font-family: 'Orbitron', sans-serif; 
+            margin-top: 2rem; 
+            margin-bottom: 1rem; 
+            font-weight: bold;
+        }
+        #noticia-descricao h1 { font-size: 2.25rem; }
+        #noticia-descricao h2 { font-size: 1.875rem; }
+        #noticia-descricao h3 { font-size: 1.5rem; }
+        #noticia-descricao h4 { font-size: 1.25rem; }
+        #noticia-descricao ul, #noticia-descricao ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        #noticia-descricao ul { list-style-type: disc; }
+        #noticia-descricao ol { list-style-type: decimal; }
         
         /* Estilos do Loader */
         #loader-overlay {
@@ -85,10 +97,12 @@
 
     <main class="container mx-auto px-4 py-16">
         <!-- O conteúdo fica oculto até ser carregado -->
-        <article id="noticia-content" class="max-w-4xl mx-auto hud-border p-8 rounded-lg hidden">
+        <article id="noticia-content" class="max-w-4xl mx-auto hud-border p-6 md:p-8 rounded-lg hidden">
             <h1 id="noticia-titulo" class="text-4xl md:text-5xl font-bold mb-4 text-center holographic-text"></h1>
             <div id="noticia-meta" class="text-center text-gray-400 mb-8 text-lg"></div>
-            <div id="noticia-imagem" class="w-full h-96 bg-cover bg-center bg-no-repeat rounded-lg mb-8 hud-border p-1 bg-gray-800"></div>
+            <div id="noticia-imagem-container" class="w-full h-auto max-h-[500px] bg-cover bg-center bg-no-repeat rounded-lg mb-8 hud-border p-1 bg-gray-800 overflow-hidden">
+                <img id="noticia-imagem" src="" alt="Imagem de Destaque da Notícia" class="w-full h-full object-cover">
+            </div>
             <div id="noticia-descricao" class="text-lg leading-relaxed space-y-4 text-left"></div>
         </article>
     </main>
@@ -116,7 +130,7 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // Função para mostrar erros de forma controlada
+        // Função para mostrar erros de forma controlada na UI
         function displayError(message) {
             const contentEl = document.getElementById('noticia-content');
             const tituloEl = document.getElementById('noticia-titulo');
@@ -125,24 +139,27 @@
             tituloEl.textContent = "Erro";
             descricaoEl.innerHTML = `<p class='text-red-500 text-center'>${message}</p>`;
             
-            // Oculta elementos que não são necessários no erro
+            // Oculta elementos que não são necessários na mensagem de erro
             document.getElementById('noticia-meta').style.display = 'none';
-            document.getElementById('noticia-imagem').style.display = 'none';
+            document.getElementById('noticia-imagem-container').style.display = 'none';
 
             // Mostra o container do conteúdo com a mensagem de erro
             contentEl.classList.remove('hidden');
         }
 
+        // Função principal para carregar os dados da notícia
         async function carregarNoticia() {
             const contentEl = document.getElementById('noticia-content');
             const loaderOverlay = document.getElementById('loader-overlay');
 
             try {
+                // Pega o ID da notícia a partir dos parâmetros da URL
                 const params = new URLSearchParams(window.location.search);
                 const noticiaId = params.get('id');
 
+                // Se não houver ID, exibe um erro
                 if (!noticiaId) {
-                    displayError("ID da notícia não encontrado na URL.");
+                    displayError("ID da notícia não encontrado na URL. O link pode estar quebrado.");
                     return;
                 }
 
@@ -152,8 +169,10 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
+                    // Atualiza o título da página
                     document.title = `${data.titulo} - MIV`;
                     
+                    // Preenche os elementos HTML com os dados da notícia
                     document.getElementById('noticia-titulo').textContent = data.titulo;
                     
                     let metaHTML = `<span class="text-neon-blue font-bold">${data.categoria || 'Novidade'}</span>`;
@@ -163,19 +182,22 @@
                     }
                     document.getElementById('noticia-meta').innerHTML = metaHTML;
 
-                    document.getElementById('noticia-imagem').style.backgroundImage = `url('${data.imagem}')`;
+                    const imgElement = document.getElementById('noticia-imagem');
+                    imgElement.src = data.imagem;
+                    imgElement.alt = `Imagem de destaque para: ${data.titulo}`;
                     
                     document.getElementById('noticia-descricao').innerHTML = data.descricao;
 
+                    // Mostra o conteúdo da notícia
                     contentEl.classList.remove('hidden');
                 } else {
-                    displayError("A notícia que procura não existe na nossa base de dados.");
+                    displayError("A notícia que procura não existe ou foi removida.");
                 }
             } catch (error) {
                 console.error("Ocorreu um erro geral ao carregar a notícia:", error);
                 displayError("Ocorreu um erro ao tentar carregar a notícia. Por favor, tente novamente mais tarde.");
             } finally {
-                // Esconde o loader no final, quer tenha sucesso ou erro
+                // Esconde o loader no final, independentemente do resultado
                 loaderOverlay.style.opacity = '0';
                 setTimeout(() => {
                     loaderOverlay.style.display = 'none';
