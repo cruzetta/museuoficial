@@ -1,0 +1,100 @@
+:root {
+    --neon-blue: #00BFFF;
+    --neon-purple: #A020F0;
+    --dark-bg: #0D0D1A;
+    --metal-bg: linear-gradient(145deg, #1a1a2e, #161625);
+}
+
+body {
+    font-family: 'Roboto Mono', monospace;
+    background-color: var(--dark-bg);
+    color: #E0E0E0;
+}
+
+h1, h2, h3, .nav-link {
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+}
+
+.hud-border {
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px rgba(0, 191, 255, 0.5);
+    background: rgba(13, 13, 26, 0.85);
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+.holographic-text {
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-blue));
+    background-size: 200% 200%;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: holographic-shine 5s linear infinite;
+}
+
+@keyframes holographic-shine {
+    to { background-position: 200% center; }
+}
+
+.page {
+    display: none;
+    padding-bottom: 4rem;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#searchInput {
+    background: rgba(13, 13, 26, 0.8);
+    border: 1px solid var(--neon-blue);
+    box-shadow: 0 0 8px var(--neon-blue);
+}
+#searchInput:focus {
+    outline: none;
+    box-shadow: 0 0 15px var(--neon-purple);
+    border-color: var(--neon-purple);
+}
+
+#sort-select {
+    background: rgba(13, 13, 26, 0.8);
+    border: 1px solid var(--neon-blue);
+}
+
+.explore-btn {
+    background: var(--neon-purple);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px var(--neon-purple);
+}
+.explore-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px var(--neon-purple);
+}
+
+.sound-btn {
+    background-color: rgba(0, 191, 255, 0.2);
+    border: 1px solid var(--neon-blue);
+    transition: background-color 0.3s, color 0.3s;
+}
+.sound-btn:hover {
+    background-color: var(--neon-blue);
+    color: var(--dark-bg);
+}
+
+.autocomplete-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.2s;
+}
+.autocomplete-item:hover {
+    background-color: var(--neon-purple);
+}
