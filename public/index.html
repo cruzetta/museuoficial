@@ -171,23 +171,32 @@
                 <a id="home-botao" href="#noticias" class="joystick-btn">Iniciar Exploração</a>
             </div>
             
-            <!-- Seção de Destaques -->
+            <!-- Seção de Destaques ATUALIZADA -->
             <div class="room-content w-full max-w-6xl mx-auto p-4 md:pb-8">
                  <div class="grid md:grid-cols-3 gap-8">
-                    <div class="hud-border rounded-lg p-6 text-center transition-transform hover:scale-105">
-                        <i class="fas fa-newspaper text-neon-blue text-4xl mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">Últimas Notícias</h3>
-                        <p class="text-gray-400">Fique por dentro dos eventos e novidades do universo gamer.</p>
+                    <!-- Coluna da Notícia em Destaque (mais larga e alta) -->
+                    <div id="destaque-noticia-container" class="md:col-span-2 hud-border rounded-lg p-4 text-left transition-transform hover:scale-105 flex flex-col min-h-[450px]">
+                        <!-- Conteúdo da notícia em destaque será carregado aqui pelo JS -->
+                        <div class="flex-grow flex items-center justify-center text-center p-8">
+                            <div>
+                                <i class="fas fa-sync fa-spin text-3xl text-neon-blue"></i>
+                                <p class="mt-4 text-gray-400">A carregar última notícia...</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="hud-border rounded-lg p-6 text-center transition-transform hover:scale-105">
-                        <i class="fas fa-ghost text-yellow-400 text-4xl mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">Games Clássicos</h3>
-                        <p class="text-gray-400">Relembre os jogos que marcaram gerações e definiram géneros.</p>
-                    </div>
-                    <div class="hud-border rounded-lg p-6 text-center transition-transform hover:scale-105">
-                        <i class="fas fa-ticket-alt text-neon-green text-4xl mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">Visite-nos</h3>
-                        <p class="text-gray-400">Confira a nossa localização e planeie a sua visita para uma experiência única.</p>
+
+                    <!-- Coluna dos outros destaques (empilhados) -->
+                    <div class="space-y-8 flex flex-col">
+                        <div class="hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center">
+                            <i class="fas fa-ghost text-yellow-400 text-4xl mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2">Games Clássicos</h3>
+                            <p class="text-gray-400">Relembre os jogos que marcaram gerações e definiram géneros.</p>
+                        </div>
+                        <div class="hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center">
+                            <i class="fas fa-ticket-alt text-neon-green text-4xl mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2">Visite-nos</h3>
+                            <p class="text-gray-400">Confira a nossa localização e planeie a sua visita para uma experiência única.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -196,8 +205,10 @@
         <!-- Seção Notícias -->
         <section id="noticias" class="room-section">
             <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Notícias e Eventos</h2>
-                <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left"></div>
+                <h2 class="text-4xl font-bold mb-12">Mais Notícias e Eventos</h2>
+                <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+                    <!-- As outras notícias serão carregadas aqui -->
+                </div>
                 <div class="mt-12">
                     <a href="noticias.html" class="joystick-btn">Ver todas as notícias</a>
                 </div>
@@ -357,6 +368,26 @@
         sections.forEach(section => observer.observe(section));
 
         // --- RENDERERS ---
+        const renderNoticiaDestaque = (doc) => {
+            const data = doc.data();
+            let dataFormatada = '';
+            if (data.data_publicacao && data.data_publicacao.toDate) {
+                dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            }
+            return `
+                <img src="${data.imagem || 'https://placehold.co/800x400/1a1a2e/E0E0E0?text=Notícia'}" alt="${data.titulo}" class="w-full h-64 object-cover rounded-lg mb-4">
+                <div class="flex-grow flex flex-col p-2">
+                    <div>
+                        <span class="text-sm font-bold text-neon-blue">${data.categoria || 'NOVIDADE'}</span>
+                        <span class="text-xs text-gray-400 float-right">${dataFormatada}</span>
+                    </div>
+                    <h3 class="text-2xl font-bold my-2 flex-grow">${data.titulo}</h3>
+                    <p class="text-gray-400 text-sm mb-4">${data.subtitulo || ''}</p>
+                    <a href="noticia.html?id=${doc.id}" class="joystick-btn mt-auto text-center">Ler Mais</a>
+                </div>
+            `;
+        }
+        
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = '';
@@ -443,9 +474,6 @@
                     content = `<p class="text-gray-400 text-center col-span-full">Nenhum item encontrado.</p>`;
                 } else {
                     const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    if (name === 'noticias') {
-                        docs.sort((a, b) => (b.data_publicacao?.toDate() || 0) - (a.data_publicacao?.toDate() || 0));
-                    }
                     docs.forEach((data, index) => content += renderer({ id: data.id, data: () => data }, index));
                 }
                 container.innerHTML = content;
@@ -480,6 +508,44 @@
                 }
              });
         }
+        
+        // NOVA FUNÇÃO para carregar notícias da Home
+        const loadNoticiasHomepage = () => {
+            const destaqueContainer = document.getElementById('destaque-noticia-container');
+            const noticiasContainer = document.getElementById('noticias-container');
+
+            const noticiasQuery = query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(4));
+
+            onSnapshot(noticiasQuery, (snapshot) => {
+                if (snapshot.empty) {
+                    if(destaqueContainer) destaqueContainer.innerHTML = '<p class="flex-grow flex items-center justify-center text-center p-8 text-gray-400">Nenhuma notícia encontrada.</p>';
+                    if(noticiasContainer) noticiasContainer.innerHTML = '<p class="text-center col-span-full text-gray-400">Nenhuma notícia para exibir.</p>';
+                    return;
+                }
+
+                const docs = snapshot.docs;
+
+                // Renderiza a notícia em destaque
+                if (destaqueContainer && docs.length > 0) {
+                    destaqueContainer.innerHTML = renderNoticiaDestaque(docs[0]);
+                }
+
+                // Renderiza as outras notícias
+                if (noticiasContainer) {
+                    const outrasNoticiasDocs = docs.slice(1);
+                    if (outrasNoticiasDocs.length > 0) {
+                        let content = '';
+                        outrasNoticiasDocs.forEach(doc => {
+                            content += renderNoticia(doc);
+                        });
+                        noticiasContainer.innerHTML = content;
+                    } else {
+                        noticiasContainer.innerHTML = '<p class="text-center col-span-full text-gray-400">Não há mais notícias para exibir.</p>';
+                    }
+                }
+            });
+        };
+
 
         function attachQuizListeners() {
             document.getElementById('quiz-container').addEventListener('click', (e) => {
@@ -510,11 +576,8 @@
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
             loadHomeData();
+            loadNoticiasHomepage(); // Carrega a notícia em destaque e as outras
             
-            // Query para buscar as 3 notícias mais recentes pela data de publicação
-            const noticiasQuery = query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3));
-            loadCollection('noticias', 'noticias-container', renderNoticia, noticiasQuery);
-
             loadCollection('acervos', 'acervos-container', (d, i) => renderAcervo(d.data(), i));
             loadCollection('games', 'games-container', (d, i) => renderGame(d.data(), i));
             loadCollection('timeline', 'timeline-container', (d, i) => renderTimeline(d.data(), i));
