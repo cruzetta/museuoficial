@@ -102,7 +102,7 @@
                     const item = docSnap.data();
                     document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
 
-                    // --- GERAÇÃO DOS COMPONENTES HTML (ATUALIZADO) ---
+                    // --- GERAÇÃO DOS COMPONENTES HTML ---
 
                     let galleryButtonsHTML = '';
                     if (item.galeria_imagens && item.galeria_imagens.length > 0) {
@@ -124,21 +124,27 @@
                             .map(som => `<button onclick="playSound('${som.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${som.nome}</button>`)
                             .join('');
                         if (soundButtons) {
-                            sonsHTML = `<div><h3 class="section-subtitle">Sons Icónicos</h3><div class="flex flex-wrap gap-4 mt-2">${soundButtons}</div></div>`;
+                            sonsHTML = `
+                            <section class="mt-12">
+                                <h2 class="section-title">Sons Icónicos</h2>
+                                <div class="hud-border rounded-lg p-8 flex flex-wrap gap-4 justify-center">
+                                    ${soundButtons}
+                                </div>
+                            </section>`;
                         }
                     }
-
-                    // ### INÍCIO DA ALTERAÇÃO ###
-                    // A lógica para renderizar os vídeos foi alterada para usar a tag <video>.
+                    
                     let videosHTML = '';
                     if (item.videos_epoca && item.videos_epoca.length > 0) {
                         const videoEmbeds = item.videos_epoca
                             .filter(video => video.nome && video.embed_url)
                             .map(video => `
-                                <div class="mb-4">
-                                    <h4 class="font-semibold text-white mb-2">${video.nome}</h4>
-                                    <div class="hud-border rounded-lg p-1">
-                                        <video controls class="w-full rounded-md aspect-video bg-black">
+                                <div class="hud-border rounded-lg p-4 flex flex-col">
+                                    <h4 class="font-semibold text-white mb-3 text-lg">${video.nome}</h4>
+                                    <!-- ### CORREÇÃO APLICADA AQUI ### -->
+                                    <!-- Removida a classe "aspect-video" do container e ajustada a classe do vídeo -->
+                                    <div class="bg-black rounded-md overflow-hidden">
+                                        <video controls class="w-full h-auto">
                                             <source src="${video.embed_url}" type="video/mp4">
                                             O seu navegador não suporta a tag de vídeo.
                                         </video>
@@ -147,20 +153,16 @@
                             `)
                             .join('');
                         if (videoEmbeds) {
-                            videosHTML = `<div><h3 class="section-subtitle">Vídeos da Época</h3><div class="flex flex-col gap-4 mt-2">${videoEmbeds}</div></div>`;
+                            videosHTML = `
+                            <section class="mt-12">
+                                <h2 class="section-title">Vídeos da Época</h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    ${videoEmbeds}
+                                </div>
+                            </section>`;
                         }
                     }
-                    // ### FIM DA ALTERAÇÃO ###
                     
-                    const emAcaoHTML = (sonsHTML || videosHTML) ? `
-                        <section class="mt-12">
-                            <h2 class="section-title">Em Ação</h2>
-                            <div class="hud-border rounded-lg p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                ${sonsHTML || ''}
-                                ${videosHTML || ''}
-                            </div>
-                        </section>` : '';
-
                     let voceSabiaHTML = '';
                     if (item.voce_sabia && item.voce_sabia.length > 0) {
                         const fatos = item.voce_sabia
@@ -226,7 +228,8 @@
                         </section>
 
                         ${sobreHTML}
-                        ${emAcaoHTML}
+                        ${sonsHTML}
+                        ${videosHTML}
                         ${voceSabiaHTML}
                         ${jogosEssenciaisHTML}
                     `;
