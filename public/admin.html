@@ -531,18 +531,34 @@
             container.querySelector('.upload-file-input').value = '';
             container.querySelector('.upload-preview').src = '#';
             container.querySelector('.upload-preview-wrapper').classList.add('hidden');
-            container.querySelector('.upload-drop-zone').classList.remove('hidden');
             const urlInput = document.getElementById(`${containerKey}-url`);
             if (urlInput) urlInput.value = '';
         }
 
-        function uploadFile(file, path) {
+        /**
+         * Uploads a file to Firebase Storage and reports progress.
+         * @param {File} file The file to upload.
+         * @param {string} path The path in Storage to upload to.
+         * @param {function(number):void} [progressCallback] Optional callback to report progress (0.0 to 1.0).
+         * @returns {Promise<string>} A promise that resolves with the download URL.
+         */
+        function uploadFile(file, path, progressCallback) {
             return new Promise((resolve, reject) => {
                 const storageRef = ref(storage, `${path}${Date.now()}_${file.name}`);
                 const uploadTask = uploadBytesResumable(storageRef, file);
+                
                 uploadTask.on('state_changed', 
-                    null, 
-                    (error) => reject(error), 
+                    (snapshot) => {
+                        // Report progress
+                        const progress = snapshot.totalBytes > 0 ? (snapshot.bytesTransferred / snapshot.totalBytes) : 0;
+                        if (progressCallback) {
+                            progressCallback(progress);
+                        }
+                    }, 
+                    (error) => {
+                        console.error("Upload failed:", error);
+                        reject(error);
+                    }, 
                     async () => {
                         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                         resolve(downloadURL);
@@ -588,7 +604,7 @@
                         const existingUrl = itemDiv.querySelector('.file-name-display')?.dataset.existingUrl;
 
                         if (fileInput && pendingFiles.has(fileInput.id)) {
-                             // Ficheiro novo, será processado depois
+                             // New file, will be processed during upload.
                         } else if (existingUrl) {
                             itemData[urlField] = existingUrl;
                         }
@@ -603,37 +619,52 @@
                 });
             }
 
-            const uploadPromises = [];
-            pendingFiles.forEach((file, key) => {
-                let uploadPath = 'uploads/'; // Caminho padrão
+            const filesToUpload = Array.from(pendingFiles.entries());
+            const progressContainer = document.getElementById(`${entity}-upload-progress-container`);
+            const progressBar = document.getElementById(`${entity}-upload-progress-bar`);
+            
+            // Setup for progress tracking
+            const fileProgress = {};
+            let totalSize = 0;
+            filesToUpload.forEach(([key, file]) => {
+                fileProgress[key] = { loaded: 0, total: file.size };
+                totalSize += file.size;
+            });
+
+            if (progressContainer && filesToUpload.length > 0) {
+                progressContainer.classList.remove('hidden');
+                progressBar.style.width = '0%';
+                progressBar.textContent = '0%';
+            }
+
+            const uploadPromises = filesToUpload.map(([key, file]) => {
+                let uploadPath = 'uploads/';
                 if (key.startsWith('repeater-file-')) {
                     uploadPath = 'acervos/repeater/';
                 } else if (config.fileUploads && config.fileUploads[key]) {
                     uploadPath = config.fileUploads[key].path;
                 }
-                const promise = uploadFile(file, uploadPath).then(url => ({ key, url }));
-                uploadPromises.push(promise);
+                
+                const progressCallback = (progress) => {
+                    fileProgress[key].loaded = progress * fileProgress[key].total;
+                    
+                    let totalBytesLoaded = 0;
+                    Object.values(fileProgress).forEach(p => {
+                        totalBytesLoaded += p.loaded;
+                    });
+
+                    const overallProgress = totalSize > 0 ? (totalBytesLoaded / totalSize) * 100 : 0;
+                    if (progressBar) {
+                        progressBar.style.width = `${overallProgress}%`;
+                        progressBar.textContent = `${Math.round(overallProgress)}%`;
+                    }
+                };
+
+                return uploadFile(file, uploadPath, progressCallback).then(url => ({ key, url }));
             });
 
-            const progressContainer = document.getElementById(`${entity}-upload-progress-container`);
-            const progressBar = document.getElementById(`${entity}-upload-progress-bar`);
-            if (progressContainer && uploadPromises.length > 0) {
-                progressContainer.classList.remove('hidden');
-            }
-
-            let uploadedCount = 0;
-            const wrappedPromises = uploadPromises.map(p => p.then(result => {
-                uploadedCount++;
-                const progress = (uploadedCount / uploadPromises.length) * 100;
-                if(progressBar) {
-                    progressBar.style.width = `${progress}%`;
-                    progressBar.textContent = `${Math.round(progress)}%`;
-                }
-                return result;
-            }));
-
             try {
-                const uploadResults = await Promise.all(wrappedPromises);
+                const uploadResults = await Promise.all(uploadPromises);
 
                 uploadResults.forEach(({ key, url }) => {
                     if (key.startsWith('repeater-file-')) {
