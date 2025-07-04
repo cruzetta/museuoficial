@@ -67,7 +67,6 @@
         const loader = document.getElementById('loader');
         const audioPlayer = document.getElementById('audio-player');
 
-        // Função para mudar a imagem principal na galeria de detalhes
         window.changeImage = (newSrc) => {
             const mainImage = document.getElementById('main-item-image');
             if (mainImage) {
@@ -79,7 +78,6 @@
             }
         };
 
-        // Função para tocar um som
         window.playSound = (soundUrl) => {
             if (audioPlayer) {
                 audioPlayer.src = soundUrl;
@@ -102,44 +100,43 @@
 
                 if (docSnap.exists()) {
                     const item = docSnap.data();
-                    document.title = `${item.nome} - Museu do Videojogo`;
+                    document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
 
-                    // --- GERAÇÃO DOS COMPONENTES HTML ---
+                    // --- GERAÇÃO DOS COMPONENTES HTML (ATUALIZADO) ---
 
-                    // Galeria de Imagens (Botões)
                     let galleryButtonsHTML = '';
                     if (item.galeria_imagens && item.galeria_imagens.length > 0) {
-                        item.galeria_imagens.forEach(img => {
-                            galleryButtonsHTML += `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome}</button>`;
-                        });
+                        galleryButtonsHTML = item.galeria_imagens
+                            .filter(img => img.nome && img.url)
+                            .map(img => `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome}</button>`)
+                            .join('');
                     }
 
-                    // Seção "Sobre o Item"
                     const sobreHTML = item.detalhes ? `
                         <section class="hud-border rounded-lg p-8 mt-12">
                             <div class="prose-custom">${item.detalhes}</div>
                         </section>` : '';
 
-                    // Seção "Em Ação"
                     let sonsHTML = '';
                     if (item.sons_iconicos && item.sons_iconicos.length > 0) {
-                        const soundButtons = item.sons_iconicos.map(som => 
-                            `<button onclick="playSound('${som.url}')" class="sound-play-btn">
-                                <i class="fas fa-play mr-2"></i> ${som.nome}
-                            </button>`
-                        ).join('');
-                        sonsHTML = `<div><h3 class="section-subtitle">Sons Icónicos</h3><div class="flex flex-wrap gap-4 mt-2">${soundButtons}</div></div>`;
+                        const soundButtons = item.sons_iconicos
+                            .filter(som => som.nome && som.url)
+                            .map(som => `<button onclick="playSound('${som.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${som.nome}</button>`)
+                            .join('');
+                        if (soundButtons) {
+                            sonsHTML = `<div><h3 class="section-subtitle">Sons Icónicos</h3><div class="flex flex-wrap gap-4 mt-2">${soundButtons}</div></div>`;
+                        }
                     }
 
                     let videosHTML = '';
                     if (item.videos_epoca && item.videos_epoca.length > 0) {
-                        const videoPlaceholders = item.videos_epoca.map(video => 
-                            `<a href="${video.embed_url}" target="_blank" class="video-placeholder">
-                                <i class="fas fa-video"></i>
-                                <span>${video.nome}</span>
-                            </a>`
-                        ).join('');
-                        videosHTML = `<div><h3 class="section-subtitle">Vídeos da Época</h3><div class="flex flex-wrap gap-4 mt-2">${videoPlaceholders}</div></div>`;
+                        const videoPlaceholders = item.videos_epoca
+                            .filter(video => video.nome && video.embed_url)
+                            .map(video => `<a href="${video.embed_url}" target="_blank" class="video-placeholder"><i class="fas fa-video"></i><span>${video.nome}</span></a>`)
+                            .join('');
+                        if (videoPlaceholders) {
+                            videosHTML = `<div><h3 class="section-subtitle">Vídeos da Época</h3><div class="flex flex-wrap gap-4 mt-2">${videoPlaceholders}</div></div>`;
+                        }
                     }
                     
                     const emAcaoHTML = (sonsHTML || videosHTML) ? `
@@ -151,61 +148,68 @@
                             </div>
                         </section>` : '';
 
-                    // Seção "Você Sabia?"
                     let voceSabiaHTML = '';
                     if (item.voce_sabia && item.voce_sabia.length > 0) {
-                        const fatos = item.voce_sabia.map(fato => 
-                            `<li class="did-you-know-item">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <span>${fato}</span>
-                            </li>`
-                        ).join('');
-                        voceSabiaHTML = `
-                        <section class="mt-12">
-                            <h2 class="section-title">Você Sabia?</h2>
-                            <div class="hud-border rounded-lg p-8">
-                                <ul class="space-y-4">${fatos}</ul>
-                            </div>
-                        </section>`;
+                        const fatos = item.voce_sabia
+                            .filter(fato => fato)
+                            .map(fato => `<li class="did-you-know-item"><i class="fas fa-star text-yellow-400"></i><span>${fato}</span></li>`)
+                            .join('');
+                        if (fatos) {
+                            voceSabiaHTML = `
+                            <section class="mt-12">
+                                <h2 class="section-title">Você Sabia?</h2>
+                                <div class="hud-border rounded-lg p-8">
+                                    <ul class="space-y-4">${fatos}</ul>
+                                </div>
+                            </section>`;
+                        }
                     }
 
-                    // Seção "Jogos Essenciais"
                     let jogosEssenciaisHTML = '';
                     if (item.jogos_essenciais && item.jogos_essenciais.length > 0) {
-                        const jogos = item.jogos_essenciais.map(jogo => `<div class="essential-game-card">${jogo}</div>`).join('');
-                        jogosEssenciaisHTML = `
-                        <section class="mt-12">
-                            <h2 class="section-title">Jogos Essenciais</h2>
-                            <div class="flex flex-wrap gap-4 justify-center">${jogos}</div>
-                        </section>`;
+                        const jogos = item.jogos_essenciais.filter(jogo => jogo).map(jogo => `<div class="essential-game-card">${jogo}</div>`).join('');
+                        if (jogos) {
+                            jogosEssenciaisHTML = `
+                            <section class="mt-12">
+                                <h2 class="section-title">Jogos Essenciais</h2>
+                                <div class="flex flex-wrap gap-4 justify-center">${jogos}</div>
+                            </section>`;
+                        }
                     }
+
+                    const fichaTecnicaFields = [
+                        { icon: 'fa-microchip', label: 'Fabricante', value: item.fabricante },
+                        { icon: 'fa-calendar-days', label: 'Lançamento', value: item.lancamento },
+                        { icon: 'fa-gamepad', label: 'Geração', value: item.geracao },
+                        { icon: 'fa-sd-card', label: 'Média', value: item.media },
+                        { icon: 'fa-chart-line', label: 'Vendas', value: item.vendas }
+                    ];
+
+                    const fichaTecnicaHTML = fichaTecnicaFields
+                        .filter(field => field.value)
+                        .map(field => `<li><strong><i class="fa-solid ${field.icon} w-6 text-neon-blue"></i> ${field.label}:</strong> ${field.value}</li>`)
+                        .join('');
 
                     // --- MONTAGEM FINAL DO HTML ---
                     const contentHTML = `
-                        <h1 class="text-5xl md:text-7xl font-black text-center mb-12 holographic-text">${item.nome}</h1>
+                        ${item.nome ? `<h1 class="text-5xl md:text-7xl font-black text-center mb-12 holographic-text">${item.nome}</h1>` : ''}
                         
                         <section class="grid grid-cols-1 lg:grid-cols-5 gap-8">
                             <!-- Coluna da Imagem e Galeria -->
                             <div class="lg:col-span-3">
+                                ${item.imagem_principal ? `
                                 <div class="hud-border rounded-lg p-2 mb-4">
-                                    <img id="main-item-image" src="${item.imagem_principal || 'https://placehold.co/800x600/1a1a2e/E0E0E0?text=Item'}" alt="Imagem principal de ${item.nome}" class="w-full h-auto rounded-md object-cover transition-opacity duration-300 aspect-video">
-                                </div>
-                                <div class="flex flex-wrap gap-2">
-                                    ${galleryButtonsHTML}
-                                </div>
+                                    <img id="main-item-image" src="${item.imagem_principal}" alt="Imagem principal de ${item.nome || 'Item'}" class="w-full h-auto rounded-md object-cover transition-opacity duration-300 aspect-video">
+                                </div>` : ''}
+                                ${galleryButtonsHTML ? `<div class="flex flex-wrap gap-2">${galleryButtonsHTML}</div>` : ''}
                             </div>
 
                             <!-- Coluna da Ficha Técnica -->
+                            ${fichaTecnicaHTML ? `
                             <div class="lg:col-span-2 hud-border rounded-lg p-6 self-start">
                                 <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
-                                <ul class="space-y-3 text-lg">
-                                    <li><strong><i class="fa-solid fa-microchip w-6 text-neon-blue"></i> Fabricante:</strong> ${item.fabricante || 'N/A'}</li>
-                                    <li><strong><i class="fa-solid fa-calendar-days w-6 text-neon-blue"></i> Lançamento:</strong> ${item.lancamento || 'N/A'}</li>
-                                    <li><strong><i class="fa-solid fa-gamepad w-6 text-neon-blue"></i> Geração:</strong> ${item.geracao || 'N/A'}</li>
-                                    <li><strong><i class="fa-solid fa-sd-card w-6 text-neon-blue"></i> Média:</strong> ${item.media || 'N/A'}</li>
-                                    <li><strong><i class="fa-solid fa-chart-line w-6 text-neon-blue"></i> Vendas:</strong> ${item.vendas || 'N/A'}</li>
-                                </ul>
-                            </div>
+                                <ul class="space-y-3 text-lg">${fichaTecnicaHTML}</ul>
+                            </div>` : ''}
                         </section>
 
                         ${sobreHTML}

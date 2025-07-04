@@ -74,8 +74,6 @@
 
     <!-- Firebase e Lógica da Galeria -->
     <script type="module">
-        // --- CORREÇÃO APLICADA AQUI ---
-        // Adicionado 'onSnapshot' para carregamento de dados em tempo real.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -105,7 +103,7 @@
         const sortSelect = document.getElementById('sort-select');
         const autocompleteResults = document.getElementById('autocomplete-results');
 
-        // --- RENDER FUNCTION ---
+        // --- RENDER FUNCTION (ATUALIZADA) ---
         function renderGallery() {
             galleryGrid.innerHTML = '';
             if (state.filteredItems.length === 0 && galleryLoader.style.display === 'none') {
@@ -118,12 +116,12 @@
                 card.className = 'item-card';
                 card.innerHTML = `
                     <div class="hud-border rounded-lg p-4 flex flex-col h-full transition-transform hover:scale-105">
-                        <img src="${item.imagem_principal || 'https://placehold.co/600x400/1a1a2e/E0E0E0?text=Item'}" alt="Imagem de ${item.nome}" class="w-full h-48 rounded-md object-cover mb-4">
-                        <h3 class="item-title text-2xl font-bold mb-3">${item.nome}</h3>
+                        ${item.imagem_principal ? `<img src="${item.imagem_principal}" alt="Imagem de ${item.nome || 'Item'}" class="w-full h-48 rounded-md object-cover mb-4">` : ''}
+                        ${item.nome ? `<h3 class="item-title text-2xl font-bold mb-3">${item.nome}</h3>` : ''}
                         <div class="text-sm space-y-2 mb-4 flex-grow">
-                            <p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> ${item.fabricante}</p>
-                            <p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> ${item.geracao}</p>
-                            <p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> ${item.lancamento}</p>
+                            ${item.fabricante ? `<p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> ${item.fabricante}</p>` : ''}
+                            ${item.geracao ? `<p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> ${item.geracao}</p>` : ''}
+                            ${item.lancamento ? `<p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> ${item.lancamento}</p>` : ''}
                         </div>
                         <a href="item_detalhe.html?id=${item.id}" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</a>
                     </div>
@@ -140,8 +138,8 @@
             let tempItems = state.items;
             if (searchTerm) {
                 tempItems = state.items.filter(item => 
-                    item.nome.toLowerCase().includes(searchTerm) ||
-                    item.fabricante.toLowerCase().includes(searchTerm)
+                    (item.nome && item.nome.toLowerCase().includes(searchTerm)) ||
+                    (item.fabricante && item.fabricante.toLowerCase().includes(searchTerm))
                 );
             }
 
@@ -149,9 +147,13 @@
                 const [field, direction] = sortValue.split('-');
                 const valA = a[field];
                 const valB = b[field];
+
+                if (!valA) return 1; // Move items without the sort field to the end
+                if (!valB) return -1;
+
                 if (field === 'nome') {
                     return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                } else {
+                } else { // Assumes numeric sort for 'lancamento'
                     return direction === 'asc' ? valA - valB : valB - valA;
                 }
             });
@@ -167,7 +169,7 @@
                  autocompleteResults.classList.add('hidden');
                  return;
              }
-             const matchedItems = state.items.filter(item => item.nome.toLowerCase().includes(query)).slice(0, 5);
+             const matchedItems = state.items.filter(item => item.nome && item.nome.toLowerCase().includes(query)).slice(0, 5);
              if (matchedItems.length > 0) {
                  matchedItems.forEach(item => {
                      const suggestionDiv = document.createElement('div');
@@ -185,10 +187,7 @@
                  autocompleteResults.classList.add('hidden');
              }
         }
-
-        // --- CORREÇÃO APLICADA AQUI ---
-        // A função agora usa 'onSnapshot' para ouvir mudanças em tempo real,
-        // garantindo que a galeria esteja sempre atualizada.
+        
         function carregarAcervo() {
             try {
                 const acervosRef = collection(db, `/artifacts/${appId}/public/data/acervos`);
@@ -201,7 +200,7 @@
                         galleryLoader.style.display = 'none';
                     }
                     
-                    applyFiltersAndSort(); // Renderiza a galeria com os dados recebidos
+                    applyFiltersAndSort(); 
                 }, (error) => {
                     console.error("Erro ao carregar o acervo:", error);
                     galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar o acervo. Tente novamente mais tarde.</p>`;

@@ -283,11 +283,11 @@
                 <div class="grid md:grid-cols-2 gap-8 items-center">
                     <div class="hud-border p-6 rounded-lg text-left">
                         <h3 class="text-2xl font-bold mb-4">O Nosso Endereço</h3>
-                        <p id="onde-estamos-endereco" class="mb-2"><i class="fas fa-map-marker-alt w-6 text-neon-blue"></i> A carregar...</p>
-                        <p id="onde-estamos-cidade" class="mb-6"><i class="fas fa-city w-6 text-neon-blue"></i> ...</p>
-                        <h3 class="text-2xl font-bold mt-6 mb-4">Horário</h3>
-                        <p id="onde-estamos-horario" class="mb-2"><i class="fas fa-clock w-6 text-neon-blue"></i> ...</p>
-                        <p id="onde-estamos-fechado"><i class="fas fa-door-closed w-6 text-neon-blue"></i> ...</p>
+                        <p id="onde-estamos-endereco" class="mb-2 hidden"><i class="fas fa-map-marker-alt w-6 text-neon-blue"></i></p>
+                        <p id="onde-estamos-cidade" class="mb-6 hidden"><i class="fas fa-city w-6 text-neon-blue"></i></p>
+                        <h3 id="onde-estamos-horario-titulo" class="text-2xl font-bold mt-6 mb-4 hidden">Horário</h3>
+                        <p id="onde-estamos-horario" class="mb-2 hidden"><i class="fas fa-clock w-6 text-neon-blue"></i></p>
+                        <p id="onde-estamos-fechado" class="hidden"><i class="fas fa-door-closed w-6 text-neon-blue"></i></p>
                     </div>
                     <div class="h-96 rounded-lg overflow-hidden hud-border">
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.188330542973!2d-43.17930938451152!3d-22.90641318501239!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997f58a6a00001%3A0x7d1d9c4f8dfc1a63!2sMuseu%20do%20Amanh%C3%A3!5e0!3m2!1spt-BR!2sbr!4v1672857335917!5m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -300,10 +300,14 @@
             <div class="room-content container mx-auto text-center">
                 <h2 class="text-4xl font-bold mb-12">Sobre o Museu</h2>
                 <div class="max-w-4xl mx-auto hud-border p-8 rounded-lg text-left">
-                    <h3 class="text-2xl font-bold mb-4">A Nossa Missão</h3>
-                    <p id="corporativo-missao" class="text-gray-300 mb-6">A carregar...</p>
-                    <h3 class="text-2xl font-bold mb-4">A Nossa Visão</h3>
-                    <p id="corporativo-visao" class="text-gray-300">A carregar...</p>
+                    <div id="corporativo-missao-container">
+                        <h3 class="text-2xl font-bold mb-4">A Nossa Missão</h3>
+                        <p id="corporativo-missao" class="text-gray-300 mb-6"></p>
+                    </div>
+                    <div id="corporativo-visao-container">
+                        <h3 class="text-2xl font-bold mb-4">A Nossa Visão</h3>
+                        <p id="corporativo-visao" class="text-gray-300"></p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -390,23 +394,22 @@
         }, { rootMargin: "-50% 0px -50% 0px" });
         sections.forEach(section => observer.observe(section));
 
-        // --- RENDERERS ---
+        // --- RENDERERS (ATUALIZADOS) ---
         const renderNoticiaDestaque = (doc) => {
             const data = doc.data();
             let dataFormatada = '';
             if (data.data_publicacao && data.data_publicacao.toDate) {
                 dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
             }
-            // CORREÇÃO: Link para noticia.html com o ID correto
             return `
-                <img src="${data.imagem || 'https://placehold.co/800x400/1a1a2e/E0E0E0?text=Notícia'}" alt="${data.titulo}" class="w-full h-64 object-cover rounded-lg mb-4">
+                ${data.imagem ? `<img src="${data.imagem}" alt="${data.titulo || 'Notícia'}" class="w-full h-64 object-cover rounded-lg mb-4">` : ''}
                 <div class="flex-grow flex flex-col p-2">
-                    <div>
-                        <span class="text-sm font-bold text-neon-blue">${data.categoria || 'NOVIDADE'}</span>
-                        <span class="text-xs text-gray-400 float-right">${dataFormatada}</span>
+                    <div class="flex justify-between items-center">
+                        ${data.categoria ? `<span class="text-sm font-bold text-neon-blue">${data.categoria}</span>` : ''}
+                        ${dataFormatada ? `<span class="text-xs text-gray-400">${dataFormatada}</span>` : ''}
                     </div>
-                    <h3 class="text-2xl font-bold my-2 flex-grow">${data.titulo}</h3>
-                    <p class="text-gray-400 text-sm mb-4">${data.subtitulo || ''}</p>
+                    ${data.titulo ? `<h3 class="text-2xl font-bold my-2 flex-grow">${data.titulo}</h3>` : '<div class="flex-grow"></div>'}
+                    ${data.subtitulo ? `<p class="text-gray-400 text-sm mb-4">${data.subtitulo}</p>` : ''}
                     <a href="noticia.html?id=${doc.id}" class="joystick-btn mt-auto text-center">Ler Mais</a>
                 </div>
             `;
@@ -418,17 +421,16 @@
             if (data.data_publicacao && data.data_publicacao.toDate) {
                 dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
             }
-            // CORREÇÃO: Link para noticia.html com o ID correto
             return `
             <a href="noticia.html?id=${doc.id}" class="hud-border rounded-lg overflow-hidden text-left transition-transform hover:scale-105 block h-full flex flex-col">
-                <img src="${data.imagem || 'https://placehold.co/600x400/1a1a2e/E0E0E0?text=Notícia'}" alt="${data.titulo}" class="w-full h-48 object-cover">
+                ${data.imagem ? `<img src="${data.imagem}" alt="${data.titulo || 'Notícia'}" class="w-full h-48 object-cover">` : ''}
                 <div class="p-6 flex flex-col flex-grow">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-bold text-neon-blue">${data.categoria || 'NOVIDADE'}</span>
-                        <span class="text-xs text-gray-400">${dataFormatada}</span>
+                        ${data.categoria ? `<span class="text-sm font-bold text-neon-blue">${data.categoria}</span>` : ''}
+                        ${dataFormatada ? `<span class="text-xs text-gray-400">${dataFormatada}</span>` : ''}
                     </div>
-                    <h3 class="text-xl font-bold my-2">${data.titulo}</h3>
-                    <p class="text-gray-400 text-sm flex-grow">${data.subtitulo || ''}</p>
+                    ${data.titulo ? `<h3 class="text-xl font-bold my-2">${data.titulo}</h3>` : ''}
+                    ${data.subtitulo ? `<p class="text-gray-400 text-sm flex-grow">${data.subtitulo}</p>` : '<div class="flex-grow"></div>'}
                 </div>
             </a>`;
         }
@@ -437,41 +439,52 @@
             const data = doc.data();
             return `
             <a href="item_detalhe.html?id=${doc.id}" class="block hud-border rounded-lg p-4 text-center transform hover:-translate-y-2 transition-transform duration-300">
-                <img src="${data.imagem_principal || 'https://placehold.co/300x200/1a1a2e/E0E0E0?text=Consola'}" alt="${data.nome}" class="mx-auto mb-4 rounded h-32 object-contain">
-                <h3 class="text-lg font-bold">${data.nome}</h3>
-                <p class="text-gray-400 text-xs">${data.fabricante || ''}</p>
+                ${data.imagem_principal ? `<img src="${data.imagem_principal}" alt="${data.nome || 'Item do Acervo'}" class="mx-auto mb-4 rounded h-32 object-contain">` : ''}
+                ${data.nome ? `<h3 class="text-lg font-bold">${data.nome}</h3>` : ''}
+                ${data.fabricante ? `<p class="text-gray-400 text-xs">${data.fabricante}</p>` : ''}
             </a>`;
         };
             
-        const renderGame = (data) => `
+        const renderGame = (doc) => {
+            const data = doc.data();
+            return `
              <div class="hud-border rounded-lg p-4 text-center transform hover:-translate-y-2 transition-transform duration-300">
-                <img src="${data.imagem || 'https://placehold.co/200x200/1a1a2e/E0E0E0?text=Jogo'}" alt="${data.nome}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-2 border-neon-purple">
-                <h3 class="text-md font-bold">${data.nome}</h3>
-                <p class="text-gray-400 text-xs">${data.ano}</p>
+                ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Jogo'}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-2 border-neon-purple">` : ''}
+                ${data.nome ? `<h3 class="text-md font-bold">${data.nome}</h3>` : ''}
+                ${data.ano ? `<p class="text-gray-400 text-xs">${data.ano}</p>` : ''}
             </div>`;
+        }
 
-        const renderTimeline = (data, index) => {
+        const renderTimeline = (doc, index) => {
+            const data = doc.data();
+            if (!data.titulo && !data.descricao) return '';
             const alignment = index % 2 === 0 ? 'mr-[calc(50%+2rem)] text-right' : 'ml-[calc(50%+2rem)]';
             return `
                 <div class="relative mb-8">
                     <div class="absolute left-1/2 w-6 h-6 bg-neon-purple rounded-full -translate-x-1/2 mt-1.5 border-2 border-white shadow-[0_0_10px_var(--neon-purple)]"></div>
                     <div class="${alignment} hud-border p-4 rounded-lg text-left">
-                        <h3 class="font-bold text-lg">${data.titulo}</h3>
-                        <p class="text-sm text-gray-400">${data.descricao}</p>
+                        ${data.titulo ? `<h3 class="font-bold text-lg">${data.titulo}</h3>` : ''}
+                        ${data.descricao ? `<p class="text-sm text-gray-400">${data.descricao}</p>` : ''}
                     </div>
                 </div>`;
         };
 
-        const renderCuriosidade = (data) => `
+        const renderCuriosidade = (doc) => {
+            const data = doc.data();
+            if (!data.titulo && !data.descricao) return '';
+            return `
             <div class="hud-border p-6 rounded-lg flex items-start space-x-4 text-left">
                 <i class="fas fa-lightbulb text-yellow-400 text-3xl mt-1"></i>
                 <div>
-                    <h3 class="font-bold text-lg">${data.titulo}</h3>
-                    <p class="text-gray-300">${data.descricao}</p>
+                    ${data.titulo ? `<h3 class="font-bold text-lg">${data.titulo}</h3>` : ''}
+                    ${data.descricao ? `<p class="text-gray-300">${data.descricao}</p>` : ''}
                 </div>
             </div>`;
+        }
 
-        const renderQuiz = (data) => {
+        const renderQuiz = (doc) => {
+            const data = doc.data();
+            if (!data.pergunta || !data.opcoes) return '';
             const options = data.opcoes.split(',').map((opt, i) =>
                 `<button data-correct="${i == data.correta}" class="w-full text-left p-4 bg-gray-700/50 rounded-lg hover:bg-neon-blue hover:text-black transition-colors quiz-option">${String.fromCharCode(65 + i)}) ${opt.trim()}</button>`
             ).join('');
@@ -481,15 +494,18 @@
                 <p class="quiz-result text-center mt-6 hidden font-bold text-lg"></p>`;
         };
 
-        const renderProdutoLoja = (data) => `
+        const renderProdutoLoja = (doc) => {
+            const data = doc.data();
+            return `
             <div class="hud-border rounded-lg overflow-hidden text-center group">
-                <img src="${data.imagem || 'https://placehold.co/400x400/1a1a2e/E0E0E0?text=Produto'}" alt="${data.nome}" class="w-full h-64 object-cover group-hover:opacity-80 transition-opacity">
+                ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Produto'}" class="w-full h-64 object-cover group-hover:opacity-80 transition-opacity">` : ''}
                 <div class="p-4">
-                    <h3 class="text-lg font-semibold">${data.nome}</h3>
-                    <p class="text-neon-green font-bold text-xl">R$ ${data.preco}</p>
+                    ${data.nome ? `<h3 class="text-lg font-semibold">${data.nome}</h3>` : ''}
+                    ${data.preco ? `<p class="text-neon-green font-bold text-xl">R$ ${data.preco}</p>` : ''}
                     <button class="mt-4 w-full joystick-btn text-sm py-2">Comprar</button>
                 </div>
             </div>`;
+        }
 
         // --- DATA LOADERS ---
         const loadCollection = (name, containerId, renderer, q) => {
@@ -509,19 +525,31 @@
             });
         };
 
-        const loadSingleDoc = (name, fieldMap) => {
+        const loadSingleDoc = (name, fieldMap, containerIds = {}) => {
             const docRef = doc(db, `/artifacts/${appId}/public/data/${name}/info`);
             onSnapshot(docRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    Object.keys(fieldMap).forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) {
-                           const iconHTML = el.querySelector('i') ? `<i class="${el.querySelector('i').className} w-6 text-neon-blue"></i>` : '';
-                           el.innerHTML = `${iconHTML} ${data[fieldMap[id]]}`;
+                const data = docSnap.exists() ? docSnap.data() : {};
+                Object.keys(fieldMap).forEach(id => {
+                    const el = document.getElementById(id);
+                    const fieldValue = data[fieldMap[id]];
+                    if (el) {
+                        if (fieldValue) {
+                            const iconHTML = el.querySelector('i') ? el.querySelector('i').outerHTML : '';
+                            el.innerHTML = `${iconHTML} ${fieldValue}`;
+                            el.classList.remove('hidden');
+                        } else {
+                            el.classList.add('hidden');
                         }
-                    });
-                }
+                    }
+                });
+                Object.keys(containerIds).forEach(id => {
+                    const container = document.getElementById(id);
+                    const fieldValue = data[containerIds[id]];
+                    if(container) {
+                        if(fieldValue) container.classList.remove('hidden');
+                        else container.classList.add('hidden');
+                    }
+                });
             });
         };
         
@@ -603,16 +631,38 @@
             loadHomeData();
             loadNoticiasHomepage();
             
-            loadCollection('acervos', 'acervos-container', (doc) => renderAcervo(doc));
+            loadCollection('acervos', 'acervos-container', renderAcervo);
+            loadCollection('games', 'games-container', renderGame);
+            loadCollection('timeline', 'timeline-container', renderTimeline);
+            loadCollection('curiosidades', 'curiosidades-container', renderCuriosidade);
+            loadCollection('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
+            loadCollection('loja', 'loja-container', renderProdutoLoja);
             
-            loadCollection('games', 'games-container', (doc) => renderGame(doc.data()));
-            loadCollection('timeline', 'timeline-container', (doc, i) => renderTimeline(doc.data(), i));
-            loadCollection('curiosidades', 'curiosidades-container', (doc) => renderCuriosidade(doc.data()));
-            loadCollection('quiz', 'quiz-container', (doc) => renderQuiz(doc.data()));
-            loadCollection('loja', 'loja-container', (doc) => renderProdutoLoja(doc.data()));
+            loadSingleDoc('corporativo', { 
+                'corporativo-missao': 'missao', 
+                'corporativo-visao': 'visao' 
+            }, {
+                'corporativo-missao-container': 'missao',
+                'corporativo-visao-container': 'visao'
+            });
+
+            loadSingleDoc('onde-estamos', { 
+                'onde-estamos-endereco': 'endereco', 
+                'onde-estamos-cidade': 'cidade', 
+                'onde-estamos-horario': 'horario', 
+                'onde-estamos-fechado': 'fechado' 
+            });
             
-            loadSingleDoc('corporativo', { 'corporativo-missao': 'missao', 'corporativo-visao': 'visao' });
-            loadSingleDoc('onde-estamos', { 'onde-estamos-endereco': 'endereco', 'onde-estamos-cidade': 'cidade', 'onde-estamos-horario': 'horario', 'onde-estamos-fechado': 'fechado' });
+            // Logic for "Onde Estamos" Horario title
+            const horarioRef = doc(db, `/artifacts/${appId}/public/data/onde-estamos/info`);
+            onSnapshot(horarioRef, (docSnap) => {
+                const horarioTitle = document.getElementById('onde-estamos-horario-titulo');
+                if (docSnap.exists() && docSnap.data().horario) {
+                    horarioTitle.classList.remove('hidden');
+                } else {
+                    horarioTitle.classList.add('hidden');
+                }
+            });
         });
     </script>
     
@@ -683,7 +733,7 @@
                     let speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
                     ball.dx = direction * speed * Math.cos(angleRad);
                     ball.dy = speed * Math.sin(angleRad);
-                    ball.dx *= 1.02; // Aumenta a velocidade a cada colisão
+                    ball.dx *= 1.02; 
                     ball.dy *= 1.02;
                 }
 
@@ -691,11 +741,10 @@
                     resetBall();
                 }
 
-                // Lógica de IA para as raquetes
-                if (ball.dx > 0) { // Bola a mover-se para a raquete 2 (direita)
+                if (ball.dx > 0) { 
                     let targetY = ball.y;
                     paddle2.y += (targetY - (paddle2.y + paddle2.height / 2)) * 0.1;
-                } else { // Bola a mover-se para a raquete 1 (esquerda)
+                } else { 
                     let targetY = ball.y;
                     paddle1.y += (targetY - (paddle1.y + paddle1.height / 2)) * 0.1;
                 }

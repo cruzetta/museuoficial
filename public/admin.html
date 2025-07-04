@@ -99,9 +99,9 @@
                     <h2 class="text-2xl font-bold mb-6">Gerir Página Inicial</h2>
                     <form id="form-home" class="space-y-4">
                         <input type="hidden" id="home-id" value="main_content">
-                        <div><label for="home-titulo" class="block text-sm font-medium text-gray-700">Título Principal</label><input type="text" id="home-titulo" required></div>
-                        <div><label for="home-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo</label><textarea id="home-subtitulo" rows="3" required></textarea></div>
-                        <div><label for="home-botao" class="block text-sm font-medium text-gray-700">Texto do Botão</label><input type="text" id="home-botao" required></div>
+                        <div><label for="home-titulo" class="block text-sm font-medium text-gray-700">Título Principal</label><input type="text" id="home-titulo"></div>
+                        <div><label for="home-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo</label><textarea id="home-subtitulo" rows="3"></textarea></div>
+                        <div><label for="home-botao" class="block text-sm font-medium text-gray-700">Texto do Botão</label><input type="text" id="home-botao"></div>
                         <div class="flex flex-col sm:flex-row gap-4">
                             <button type="submit">Guardar Alterações da Home</button>
                             <button type="button" onclick="window.loadSingleDoc('home')">Carregar Dados Atuais</button>
@@ -123,7 +123,7 @@
                         <form id="form-categorias" class="space-y-4">
                             <div>
                                 <label for="categorias-nome" class="block text-sm font-medium text-gray-700">Nova Categoria</label>
-                                <input type="text" id="categorias-nome" placeholder="Ex: Retrô, Indústria..." required>
+                                <input type="text" id="categorias-nome" placeholder="Ex: Retrô, Indústria...">
                             </div>
                             <button type="submit">Adicionar Categoria</button>
                         </form>
@@ -135,17 +135,17 @@
 
                     <form id="form-noticias" class="space-y-4 border-t pt-8">
                         <input type="hidden" id="noticias-id">
-                        <div><label for="noticias-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="noticias-titulo" required></div>
-                        <div><label for="noticias-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo (resumo da notícia)</label><input type="text" id="noticias-subtitulo" required></div>
+                        <div><label for="noticias-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="noticias-titulo"></div>
+                        <div><label for="noticias-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo (resumo da notícia)</label><input type="text" id="noticias-subtitulo"></div>
                         <div>
                             <label for="noticias-categoria" class="block text-sm font-medium text-gray-700">Categoria</label>
-                            <select id="noticias-categoria" required></select>
+                            <select id="noticias-categoria"></select>
                         </div>
                         <div>
                             <label for="noticias-data" class="block text-sm font-medium text-gray-700">Data da Publicação</label>
-                            <input type="date" id="noticias-data" required>
+                            <input type="date" id="noticias-data">
                         </div>
-                        <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem de Destaque</label><input type="url" id="noticias-imagem" required></div>
+                        <div><label for="noticias-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem de Destaque</label><input type="url" id="noticias-imagem"></div>
                         <div>
                             <label for="noticias-descricao" class="block text-sm font-medium text-gray-700 mb-2">Conteúdo da Notícia</label>
                             <textarea id="noticias-descricao"></textarea>
@@ -155,7 +155,7 @@
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Notícias Registadas</h3><div id="noticias-lista" class="space-y-4"></div></div>
                 </div>
 
-                <!-- Seção de Acervos (SUPER SIMPLIFICADA) -->
+                <!-- Seção de Acervos -->
                 <div id="acervos-form" class="form-section bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-bold mb-6">Gerir Acervos da Galeria</h2>
                     <form id="form-acervos" class="space-y-6">
@@ -164,13 +164,13 @@
                         <fieldset class="border p-4 rounded-md">
                             <legend class="text-lg font-semibold px-2">Informações Principais</legend>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome do Item</label><input type="text" id="acervos-nome" required></div>
-                                <div><label for="acervos-fabricante" class="block text-sm font-medium text-gray-700">Fabricante</label><input type="text" id="acervos-fabricante" required></div>
-                                <div><label for="acervos-lancamento" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label><input type="number" id="acervos-lancamento" placeholder="Ex: 1983" required></div>
-                                <div><label for="acervos-geracao" class="block text-sm font-medium text-gray-700">Geração</label><input type="text" id="acervos-geracao" placeholder="Ex: 3ª Geração (8-bit)" required></div>
+                                <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome do Item</label><input type="text" id="acervos-nome"></div>
+                                <div><label for="acervos-fabricante" class="block text-sm font-medium text-gray-700">Fabricante</label><input type="text" id="acervos-fabricante"></div>
+                                <div><label for="acervos-lancamento" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label><input type="number" id="acervos-lancamento" placeholder="Ex: 1983"></div>
+                                <div><label for="acervos-geracao" class="block text-sm font-medium text-gray-700">Geração</label><input type="text" id="acervos-geracao" placeholder="Ex: 3ª Geração (8-bit)"></div>
                                 <div><label for="acervos-media" class="block text-sm font-medium text-gray-700">Média</label><input type="text" id="acervos-media" placeholder="Ex: Cartucho"></div>
                                 <div><label for="acervos-vendas" class="block text-sm font-medium text-gray-700">Vendas (aprox.)</label><input type="text" id="acervos-vendas" placeholder="Ex: ~50 milhões"></div>
-                                <div class="md:col-span-2"><label for="acervos-imagem_principal" class="block text-sm font-medium text-gray-700">URL da Imagem Principal</label><input type="url" id="acervos-imagem_principal" required></div>
+                                <div class="md:col-span-2"><label for="acervos-imagem_principal" class="block text-sm font-medium text-gray-700">URL da Imagem Principal</label><input type="url" id="acervos-imagem_principal"></div>
                             </div>
                         </fieldset>
 
@@ -182,35 +182,30 @@
                                     <textarea id="acervos-detalhes"></textarea>
                                 </div>
                                 
-                                <!-- Galeria de Imagens Dinâmica -->
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700">Galeria de Imagens (para os botões)</label>
                                     <div id="acervos-galeria_imagens-container" class="space-y-3 mt-2"></div>
                                     <button type="button" onclick="window.addRepeaterItem('galeria_imagens')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Imagem</button>
                                 </div>
 
-                                <!-- Você Sabia Dinâmico -->
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700">Curiosidades ("Você Sabia?")</label>
                                     <div id="acervos-voce_sabia-container" class="space-y-3 mt-2"></div>
                                     <button type="button" onclick="window.addRepeaterItem('voce_sabia')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Fato</button>
                                 </div>
                                 
-                                <!-- Sons Icônicos Dinâmico -->
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700">Sons Icónicos</label>
                                     <div id="acervos-sons_iconicos-container" class="space-y-3 mt-2"></div>
                                     <button type="button" onclick="window.addRepeaterItem('sons_iconicos')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Som</button>
                                 </div>
 
-                                <!-- Vídeos da Época Dinâmico -->
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700">Vídeos da Época</label>
                                     <div id="acervos-videos_epoca-container" class="space-y-3 mt-2"></div>
                                     <button type="button" onclick="window.addRepeaterItem('videos_epoca')" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Vídeo</button>
                                 </div>
 
-                                <!-- Jogos Essenciais Dinâmico -->
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700">Jogos Essenciais</label>
                                     <div id="acervos-jogos_essenciais-container" class="space-y-3 mt-2"></div>
@@ -228,9 +223,9 @@
                     <h2 class="text-2xl font-bold mb-6">Gerir Games Icónicos</h2>
                     <form id="form-games" class="space-y-4">
                         <input type="hidden" id="games-id">
-                        <div><label for="games-nome" class="block text-sm font-medium text-gray-700">Nome do Jogo</label><input type="text" id="games-nome" required></div>
-                        <div><label for="games-ano" class="block text-sm font-medium text-gray-700">Ano</label><input type="text" id="games-ano" required></div>
-                        <div><label for="games-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="games-imagem" required></div>
+                        <div><label for="games-nome" class="block text-sm font-medium text-gray-700">Nome do Jogo</label><input type="text" id="games-nome"></div>
+                        <div><label for="games-ano" class="block text-sm font-medium text-gray-700">Ano</label><input type="text" id="games-ano"></div>
+                        <div><label for="games-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="games-imagem"></div>
                         <div class="flex gap-4"><button type="submit">Guardar Jogo</button><button type="button" onclick="window.clearForm('games')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Jogos Registados</h3><div id="games-lista" class="space-y-4"></div></div>
@@ -240,8 +235,8 @@
                     <h2 class="text-2xl font-bold mb-6">Gerir Timeline</h2>
                     <form id="form-timeline" class="space-y-4">
                         <input type="hidden" id="timeline-id">
-                        <div><label for="timeline-titulo" class="block text-sm font-medium text-gray-700">Título (Ex: 1972: Pong)</label><input type="text" id="timeline-titulo" required></div>
-                        <div><label for="timeline-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="timeline-descricao" rows="2" required></textarea></div>
+                        <div><label for="timeline-titulo" class="block text-sm font-medium text-gray-700">Título (Ex: 1972: Pong)</label><input type="text" id="timeline-titulo"></div>
+                        <div><label for="timeline-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="timeline-descricao" rows="2"></textarea></div>
                         <div class="flex gap-4"><button type="submit">Guardar Evento</button><button type="button" onclick="window.clearForm('timeline')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Eventos da Timeline</h3><div id="timeline-lista" class="space-y-4"></div></div>
@@ -251,9 +246,9 @@
                     <h2 class="text-2xl font-bold mb-6">Gerir Quiz</h2>
                     <form id="form-quiz" class="space-y-4">
                         <input type="hidden" id="quiz-id">
-                        <div><label for="quiz-pergunta" class="block text-sm font-medium text-gray-700">Pergunta</label><input type="text" id="quiz-pergunta" required></div>
-                        <div><label for="quiz-opcoes" class="block text-sm font-medium text-gray-700">Opções (separadas por vírgula)</label><input type="text" id="quiz-opcoes" placeholder="Opção A,Opção B,Opção C,Opção D" required></div>
-                        <div><label for="quiz-correta" class="block text-sm font-medium text-gray-700">Índice da Resposta Correta (0, 1, 2 ou 3)</label><input type="number" id="quiz-correta" min="0" max="3" required></div>
+                        <div><label for="quiz-pergunta" class="block text-sm font-medium text-gray-700">Pergunta</label><input type="text" id="quiz-pergunta"></div>
+                        <div><label for="quiz-opcoes" class="block text-sm font-medium text-gray-700">Opções (separadas por vírgula)</label><input type="text" id="quiz-opcoes" placeholder="Opção A,Opção B,Opção C,Opção D"></div>
+                        <div><label for="quiz-correta" class="block text-sm font-medium text-gray-700">Índice da Resposta Correta (0, 1, 2 ou 3)</label><input type="number" id="quiz-correta" min="0" max="3"></div>
                         <div class="flex gap-4"><button type="submit">Guardar Pergunta</button><button type="button" onclick="window.clearForm('quiz')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Perguntas do Quiz</h3><div id="quiz-lista" class="space-y-4"></div></div>
@@ -263,8 +258,8 @@
                     <h2 class="text-2xl font-bold mb-6">Gerir Curiosidades</h2>
                     <form id="form-curiosidades" class="space-y-4">
                         <input type="hidden" id="curiosidades-id">
-                        <div><label for="curiosidades-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="curiosidades-titulo" required></div>
-                        <div><label for="curiosidades-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="curiosidades-descricao" rows="3" required></textarea></div>
+                        <div><label for="curiosidades-titulo" class="block text-sm font-medium text-gray-700">Título</label><input type="text" id="curiosidades-titulo"></div>
+                        <div><label for="curiosidades-descricao" class="block text-sm font-medium text-gray-700">Descrição</label><textarea id="curiosidades-descricao" rows="3"></textarea></div>
                         <div class="flex gap-4"><button type="submit">Guardar Curiosidade</button><button type="button" onclick="window.clearForm('curiosidades')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Curiosidades Registadas</h3><div id="curiosidades-lista" class="space-y-4"></div></div>
@@ -274,10 +269,10 @@
                     <h2 class="text-2xl font-bold mb-6">Gerir "Onde Estamos"</h2>
                     <form id="form-onde-estamos" class="space-y-4">
                         <input type="hidden" id="onde-estamos-id" value="info">
-                        <div><label for="onde-estamos-endereco" class="block text-sm font-medium text-gray-700">Endereço</label><input type="text" id="onde-estamos-endereco" required></div>
-                        <div><label for="onde-estamos-cidade" class="block text-sm font-medium text-gray-700">Cidade/Estado</label><input type="text" id="onde-estamos-cidade" required></div>
-                        <div><label for="onde-estamos-horario" class="block text-sm font-medium text-gray-700">Horário</label><input type="text" id="onde-estamos-horario" required></div>
-                        <div><label for="onde-estamos-fechado" class="block text-sm font-medium text-gray-700">Dia de Encerramento</label><input type="text" id="onde-estamos-fechado" required></div>
+                        <div><label for="onde-estamos-endereco" class="block text-sm font-medium text-gray-700">Endereço</label><input type="text" id="onde-estamos-endereco"></div>
+                        <div><label for="onde-estamos-cidade" class="block text-sm font-medium text-gray-700">Cidade/Estado</label><input type="text" id="onde-estamos-cidade"></div>
+                        <div><label for="onde-estamos-horario" class="block text-sm font-medium text-gray-700">Horário</label><input type="text" id="onde-estamos-horario"></div>
+                        <div><label for="onde-estamos-fechado" class="block text-sm font-medium text-gray-700">Dia de Encerramento</label><input type="text" id="onde-estamos-fechado"></div>
                         <div class="flex flex-col sm:flex-row gap-4">
                             <button type="submit">Guardar Informações</button>
                             <button type="button" onclick="window.loadSingleDoc('onde-estamos')">Carregar Dados Atuais</button>
@@ -289,8 +284,8 @@
                     <h2 class="text-2xl font-bold mb-6">Gerir "Corporativo"</h2>
                     <form id="form-corporativo" class="space-y-4">
                         <input type="hidden" id="corporativo-id" value="info">
-                        <div><label for="corporativo-missao" class="block text-sm font-medium text-gray-700">Missão</label><textarea id="corporativo-missao" rows="4" required></textarea></div>
-                        <div><label for="corporativo-visao" class="block text-sm font-medium text-gray-700">Visão</label><textarea id="corporativo-visao" rows="4" required></textarea></div>
+                        <div><label for="corporativo-missao" class="block text-sm font-medium text-gray-700">Missão</label><textarea id="corporativo-missao" rows="4"></textarea></div>
+                        <div><label for="corporativo-visao" class="block text-sm font-medium text-gray-700">Visão</label><textarea id="corporativo-visao" rows="4"></textarea></div>
                         <div class="flex flex-col sm:flex-row gap-4">
                             <button type="submit">Guardar Textos</button>
                             <button type="button" onclick="window.loadSingleDoc('corporativo')">Carregar Dados Atuais</button>
@@ -302,9 +297,9 @@
                     <h2 class="text-2xl font-bold mb-6">Gerir Loja</h2>
                     <form id="form-lojas" class="space-y-4">
                         <input type="hidden" id="lojas-id">
-                        <div><label for="lojas-nome" class="block text-sm font-medium text-gray-700">Nome do Produto</label><input type="text" id="lojas-nome" required></div>
-                        <div><label for="lojas-preco" class="block text-sm font-medium text-gray-700">Preço</label><input type="text" id="lojas-preco" required></div>
-                        <div><label for="lojas-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="lojas-imagem" required></div>
+                        <div><label for="lojas-nome" class="block text-sm font-medium text-gray-700">Nome do Produto</label><input type="text" id="lojas-nome"></div>
+                        <div><label for="lojas-preco" class="block text-sm font-medium text-gray-700">Preço</label><input type="text" id="lojas-preco"></div>
+                        <div><label for="lojas-imagem" class="block text-sm font-medium text-gray-700">URL da Imagem</label><input type="url" id="lojas-imagem"></div>
                         <div class="flex gap-4"><button type="submit">Guardar Produto</button><button type="button" onclick="window.clearForm('lojas')" class="w-auto">Cancelar</button></div>
                     </form>
                     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Produtos da Loja</h3><div id="lojas-lista" class="space-y-4"></div></div>
@@ -402,7 +397,6 @@
                 <button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>
             `;
             
-            // Preenche os campos se os dados forem fornecidos (modo de edição)
             if (typeof data === 'object' && data !== null) {
                 for (const key in data) {
                     const input = itemDiv.querySelector(`[data-field="${key}"]`);
@@ -463,7 +457,6 @@
                 const editor = tinymce.get(`${entity}-${config.richTextField}`);
                 if (editor) editor.setContent('');
             }
-            // Limpa os campos repetidores
             if (config?.repeaterFields) {
                 config.repeaterFields.forEach(type => {
                     const container = document.getElementById(`acervos-${type}-container`);
@@ -472,7 +465,7 @@
             }
         };
 
-        // --- FUNÇÕES DE DADOS GENÉRICAS ---
+        // --- FUNÇÕES DE DADOS (ATUALIZADA) ---
         async function saveData(entity) {
             const config = entities[entity];
             if (!config) return;
@@ -480,47 +473,64 @@
             const id = document.getElementById(`${entity}-id`)?.value;
             const data = {};
 
-            // Pega dados dos campos normais
+            // Pega dados dos campos normais, apenas se tiverem valor
             config.fields.forEach(field => {
                 const el = document.getElementById(`${entity}-${field}`);
+                let value;
                 if (config.hasRichText && field === config.richTextField) {
-                    data[field] = tinymce.get(`${entity}-${field}`).getContent();
+                    value = tinymce.get(`${entity}-${field}`).getContent();
                 } else if (el) {
-                    data[field] = el.value;
+                    value = el.value.trim();
+                }
+
+                if (value) { // SÓ ADICIONA O CAMPO SE TIVER VALOR
+                    data[field] = value;
                 }
             });
 
-            // Pega dados dos campos repetidores (acervos)
+            // Pega dados dos campos repetidores (acervos), apenas se tiverem valor
             if (config.repeaterFields) {
                 config.repeaterFields.forEach(type => {
                     const container = document.getElementById(`acervos-${type}-container`);
                     const items = [];
                     container.querySelectorAll('.flex-grow').forEach(itemContainer => {
                         const inputs = itemContainer.querySelectorAll('input');
-                        if (inputs.length > 1) { // É um objeto {nome, url, etc}
+                        if (inputs.length > 1) {
                             const itemData = {};
+                            let hasValue = false;
                             inputs.forEach(input => {
-                                itemData[input.dataset.field] = input.value;
+                                const value = input.value.trim();
+                                if (value) {
+                                    itemData[input.dataset.field] = value;
+                                    hasValue = true;
+                                }
                             });
-                            if (Object.values(itemData).some(val => val && val.trim() !== '')) {
+                            if (hasValue) {
                                 items.push(itemData);
                             }
-                        } else { // É uma string simples
+                        } else {
                             const value = inputs[0].value.trim();
                             if (value) items.push(value);
                         }
                     });
-                    data[type] = items;
+                    if (items.length > 0) {
+                        data[type] = items;
+                    }
                 });
             }
             
+            // Trata a data da notícia
             if (entity === 'noticias') {
                  const dateString = document.getElementById('noticias-data').value;
                  if (dateString) {
                      data.data_publicacao = new Date(dateString + "T12:00:00");
-                 } else {
-                     data.data_publicacao = serverTimestamp();
                  }
+            }
+            
+            // Não guarda um documento vazio (a menos que seja um doc único que está a ser limpo)
+            if (Object.keys(data).length === 0 && !config.isSingleDoc && !id) {
+                showNotification('Nenhum dado para guardar.', true);
+                return;
             }
 
             try {
