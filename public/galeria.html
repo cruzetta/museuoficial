@@ -74,8 +74,10 @@
 
     <!-- Firebase e Lógica da Galeria -->
     <script type="module">
+        // --- CORREÇÃO APLICADA AQUI ---
+        // Adicionado 'onSnapshot' para carregamento de dados em tempo real.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
@@ -92,8 +94,8 @@
 
         // --- STATE MANAGEMENT ---
         const state = {
-            items: [], // Armazena todos os itens do acervo
-            filteredItems: [] // Armazena os itens filtrados e ordenados
+            items: [],
+            filteredItems: []
         };
 
         // --- DOM ELEMENTS ---
@@ -105,9 +107,9 @@
 
         // --- RENDER FUNCTION ---
         function renderGallery() {
-            galleryGrid.innerHTML = ''; // Limpa a grid
-            if (state.filteredItems.length === 0) {
-                galleryGrid.innerHTML = `<p class="col-span-full text-center text-2xl text-neon-purple py-10">Nenhum item encontrado.</p>`;
+            galleryGrid.innerHTML = '';
+            if (state.filteredItems.length === 0 && galleryLoader.style.display === 'none') {
+                galleryGrid.innerHTML = `<p class="col-span-full text-center text-2xl text-neon-purple py-10">Nenhum item encontrado com os critérios atuais.</p>`;
                 return;
             }
 
@@ -135,7 +137,6 @@
             const searchTerm = searchInput.value.toLowerCase();
             const sortValue = sortSelect.value;
             
-            // 1. Filter
             let tempItems = state.items;
             if (searchTerm) {
                 tempItems = state.items.filter(item => 
@@ -144,15 +145,13 @@
                 );
             }
 
-            // 2. Sort
             tempItems.sort((a, b) => {
                 const [field, direction] = sortValue.split('-');
                 const valA = a[field];
                 const valB = b[field];
-
                 if (field === 'nome') {
                     return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                } else { // 'lancamento'
+                } else {
                     return direction === 'asc' ? valA - valB : valB - valA;
                 }
             });
@@ -168,11 +167,7 @@
                  autocompleteResults.classList.add('hidden');
                  return;
              }
-             
-             const matchedItems = state.items
-                .filter(item => item.nome.toLowerCase().includes(query))
-                .slice(0, 5); // Limita a 5 sugestões
-
+             const matchedItems = state.items.filter(item => item.nome.toLowerCase().includes(query)).slice(0, 5);
              if (matchedItems.length > 0) {
                  matchedItems.forEach(item => {
                      const suggestionDiv = document.createElement('div');
@@ -191,21 +186,31 @@
              }
         }
 
-        // --- INITIAL DATA LOAD ---
-        async function carregarAcervo() {
+        // --- CORREÇÃO APLICADA AQUI ---
+        // A função agora usa 'onSnapshot' para ouvir mudanças em tempo real,
+        // garantindo que a galeria esteja sempre atualizada.
+        function carregarAcervo() {
             try {
                 const acervosRef = collection(db, `/artifacts/${appId}/public/data/acervos`);
                 const q = query(acervosRef);
-                const querySnapshot = await getDocs(q);
+                
+                onSnapshot(q, (querySnapshot) => {
+                    state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    
+                    if (galleryLoader) {
+                        galleryLoader.style.display = 'none';
+                    }
+                    
+                    applyFiltersAndSort(); // Renderiza a galeria com os dados recebidos
+                }, (error) => {
+                    console.error("Erro ao carregar o acervo:", error);
+                    galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar o acervo. Tente novamente mais tarde.</p>`;
+                });
 
-                state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                galleryLoader.style.display = 'none';
-                applyFiltersAndSort(); // Renderiza a galeria inicial
-                
             } catch (error) {
-                console.error("Erro ao carregar o acervo:", error);
-                galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar o acervo. Tente novamente mais tarde.</p>`;
+                console.error("Erro ao configurar o listener do acervo:", error);
+                galleryLoader.style.display = 'none';
+                galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Ocorreu um erro inesperado. Verifique a consola para mais detalhes.</p>`;
             }
         }
 
@@ -215,7 +220,6 @@
             searchInput.addEventListener('input', applyFiltersAndSort);
             sortSelect.addEventListener('change', applyFiltersAndSort);
             
-            // Esconde o autocomplete se clicar fora
             document.addEventListener('click', (e) => {
                 if (!document.getElementById('search-container').contains(e.target)) {
                     autocompleteResults.classList.add('hidden');

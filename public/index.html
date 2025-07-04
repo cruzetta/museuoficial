@@ -138,7 +138,6 @@
             <nav id="desktop-nav" class="hidden md:flex items-center space-x-2 lg:space-x-4 text-sm">
                 <a href="#home" class="nav-link px-2 py-2">Home</a>
                 <a href="#noticias" class="nav-link px-2 py-2">Notícias</a>
-                <!-- MODIFICADO: Link para a nova página da galeria -->
                 <a href="galeria.html" class="nav-link px-2 py-2">Acervos</a>
                 <a href="#onde-estamos" class="nav-link px-2 py-2 whitespace-nowrap">Onde Estamos</a>
                 <a href="#loja" class="nav-link px-2 py-2">Loja</a>
@@ -169,7 +168,6 @@
     <div id="mobile-menu" class="hidden fixed top-28 left-4 right-4 z-40 hud-border rounded-lg p-4">
         <a href="#home" class="block text-center py-3 text-lg nav-link">Home</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
-        <!-- MODIFICADO: Link para a nova página da galeria no menu mobile -->
         <a href="galeria.html" class="block text-center py-3 text-lg nav-link">Acervos</a>
         <a href="#onde-estamos" class="block text-center py-3 text-lg nav-link">Onde Estamos</a>
         <a href="#loja" class="block text-center py-3 text-lg nav-link">Loja</a>
@@ -206,7 +204,7 @@
 
                     <!-- Coluna dos outros destaques (empilhados) -->
                     <div class="space-y-8 flex flex-col">
-                        <!-- MODIFICADO: Card de Games Clássicos com Canvas do Pong -->
+                        <!-- Card de Games Clássicos com Canvas do Pong -->
                         <div id="pong-container" class="relative hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center overflow-hidden min-h-[200px]">
                             <canvas id="pong-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
                             <div class="relative z-10 pointer-events-none">
@@ -214,7 +212,6 @@
                                 <p class="text-gray-400">Relembre os jogos que marcaram gerações e definiram géneros.</p>
                             </div>
                         </div>
-                        <!-- Fim da Modificação -->
                         <div class="hud-border rounded-lg p-6 text-center transition-transform hover:scale-105 flex-grow flex flex-col justify-center">
                             <i class="fas fa-ticket-alt text-neon-green text-4xl mb-4"></i>
                             <h3 class="text-xl font-bold mb-2">Visite-nos</h3>
@@ -354,7 +351,6 @@
         // --- LÓGICA DE NAVEGAÇÃO ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
-        // Seleciona apenas os links de navegação interna (que começam com #)
         const internalNavLinks = document.querySelectorAll('a[href^="#"]');
 
         mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
@@ -384,7 +380,6 @@
                 if (entry.isIntersecting) {
                     const id = entry.target.id;
                     navLinksForObserver.forEach(link => {
-                        // Apenas atualiza o 'active' para links de navegação interna
                         if (link.getAttribute('href') === `#${id}`) {
                            link.classList.add('active');
                         } else if (link.getAttribute('href').startsWith('#')) {
@@ -438,12 +433,16 @@
         }
 
         // --- CORREÇÃO APLICADA AQUI ---
-        const renderAcervo = (data) => `
-            <div class="hud-border rounded-lg p-4 text-center transform hover:-translate-y-2 transition-transform duration-300">
+        // A função agora cria um link (<a>) para cada item do acervo.
+        const renderAcervo = (doc) => {
+            const data = doc.data();
+            return `
+            <a href="item_detalhe.html?id=${doc.id}" class="block hud-border rounded-lg p-4 text-center transform hover:-translate-y-2 transition-transform duration-300">
                 <img src="${data.imagem_principal || 'https://placehold.co/300x200/1a1a2e/E0E0E0?text=Consola'}" alt="${data.nome}" class="mx-auto mb-4 rounded h-32 object-contain">
                 <h3 class="text-lg font-bold">${data.nome}</h3>
                 <p class="text-gray-400 text-xs">${data.fabricante || ''}</p>
-            </div>`;
+            </a>`;
+        };
             
         const renderGame = (data) => `
              <div class="hud-border rounded-lg p-4 text-center transform hover:-translate-y-2 transition-transform duration-300">
@@ -539,7 +538,6 @@
              });
         }
         
-        // NOVA FUNÇÃO para carregar notícias da Home
         const loadNoticiasHomepage = () => {
             const destaqueContainer = document.getElementById('destaque-noticia-container');
             const noticiasContainer = document.getElementById('noticias-container');
@@ -555,12 +553,10 @@
 
                 const docs = snapshot.docs;
 
-                // Renderiza a notícia em destaque
                 if (destaqueContainer && docs.length > 0) {
                     destaqueContainer.innerHTML = renderNoticiaDestaque(docs[0]);
                 }
 
-                // Renderiza as outras notícias
                 if (noticiasContainer) {
                     const outrasNoticiasDocs = docs.slice(1);
                     if (outrasNoticiasDocs.length > 0) {
@@ -606,9 +602,12 @@
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
             loadHomeData();
-            loadNoticiasHomepage(); // Carrega a notícia em destaque e as outras
+            loadNoticiasHomepage();
             
-            loadCollection('acervos', 'acervos-container', (d, i) => renderAcervo(d.data(), i));
+            // --- CORREÇÃO APLICADA AQUI ---
+            // A chamada para loadCollection agora passa o documento inteiro para o renderer.
+            loadCollection('acervos', 'acervos-container', (doc, i) => renderAcervo(doc, i));
+            
             loadCollection('games', 'games-container', (d, i) => renderGame(d.data(), i));
             loadCollection('timeline', 'timeline-container', (d, i) => renderTimeline(d.data(), i));
             loadCollection('curiosidades', 'curiosidades-container', (d, i) => renderCuriosidade(d.data(), i));
@@ -620,7 +619,7 @@
         });
     </script>
     
-    <!-- SCRIPT DO JOGO PONG (VERSÃO COM RAQUETES MENORES) -->
+    <!-- SCRIPT DO JOGO PONG -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const canvas = document.getElementById('pong-canvas');
@@ -636,57 +635,26 @@
                 canvas.width = container.clientWidth;
                 canvas.height = container.clientHeight;
                 
-                // Redefine os elementos do jogo com base no novo tamanho
                 const paddleHeight = canvas.height * 0.08; 
                 const paddleWidth = 6;
 
-                paddle1 = {
-                    x: 10,
-                    y: canvas.height / 2 - paddleHeight / 2,
-                    width: paddleWidth,
-                    height: paddleHeight,
-                    speed: 2.8 // Velocidade da IA
-                };
-
-                paddle2 = {
-                    x: canvas.width - 10 - paddleWidth,
-                    y: canvas.height / 2 - paddleHeight / 2,
-                    width: paddleWidth,
-                    height: paddleHeight,
-                    speed: 2.8 // Velocidade da IA
-                };
+                paddle1 = { x: 10, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, speed: 2.8 };
+                paddle2 = { x: canvas.width - 10 - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, speed: 2.8 };
                 
                 resetBall();
             }
 
             function resetBall() {
-                ball = {
-                    x: canvas.width / 2,
-                    y: canvas.height / 2,
-                    width: ballSize,
-                    height: ballSize,
-                    // Velocidade inicial da bola
-                    dx: (Math.random() > 0.5 ? 1 : -1) * 3.5,
-                    dy: (Math.random() - 0.5) * 4
-                };
+                ball = { x: canvas.width / 2, y: canvas.height / 2, width: ballSize, height: ballSize, dx: (Math.random() > 0.5 ? 1 : -1) * 3.5, dy: (Math.random() - 0.5) * 4 };
             }
 
             function draw() {
-                // Define o fundo do canvas como preto sólido
                 ctx.fillStyle = 'black';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Cor branca para os elementos
                 ctx.fillStyle = 'white';
-
-                // Desenha raquetes
                 ctx.fillRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
                 ctx.fillRect(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
-
-                // Desenha a bola
                 ctx.fillRect(ball.x, ball.y, ball.width, ball.height);
-
-                // Linha central tracejada
                 ctx.beginPath();
                 ctx.setLineDash([4, 8]);
                 ctx.moveTo(canvas.width / 2, 0);
@@ -698,67 +666,46 @@
             }
 
             function update() {
-                if (!ball) return; // Garante que a bola exista
-
-                // Movimento da bola
+                if (!ball) return;
                 ball.x += ball.dx;
                 ball.y += ball.dy;
 
-                // Colisão com paredes superior/inferior
                 if (ball.y + ball.height > canvas.height || ball.y < 0) {
                     ball.dy *= -1;
                 }
 
-                // Determina qual raquete está ativa (a que a bola está se aproximando)
                 let player = (ball.dx < 0) ? paddle1 : paddle2;
 
-                // Colisão com raquetes
                 if (isColliding(ball, player)) {
-                    // Calcula o ponto de intersecção na raquete (-1 a 1)
                     let collidePoint = (ball.y + (ball.height / 2)) - (player.y + (player.height / 2));
                     collidePoint = collidePoint / (player.height / 2);
-
-                    // Calcula o ângulo de rebatida (em radianos)
                     let angleRad = (Math.PI / 4) * collidePoint;
-
-                    // Calcula a nova direção da bola
                     let direction = (ball.dx < 0) ? 1 : -1;
-                    let speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy); // Mantém a velocidade
+                    let speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
                     ball.dx = direction * speed * Math.cos(angleRad);
                     ball.dy = speed * Math.sin(angleRad);
-                    
-                    // Aumenta a velocidade da bola a cada rebatida para dificultar
                     ball.dx *= 1.02;
                     ball.dy *= 1.02;
                 }
 
-
-                // Ponto marcado (bola saiu da tela)
                 if (ball.x + ball.width < 0 || ball.x > canvas.width) {
                     resetBall();
                 }
 
-                // IA das raquetes (mais "realista")
-                // A raquete só se move se a bola estiver no seu lado do campo
-                if (ball.dx > 0) { // Bola indo para a direita (IA da raquete 2)
+                if (ball.dx > 0) {
                     let targetY = ball.y;
                     paddle2.y += (targetY - (paddle2.y + paddle2.height / 2)) * 0.1;
-                } else { // Bola indo para a esquerda (IA da raquete 1)
+                } else {
                     let targetY = ball.y;
                     paddle1.y += (targetY - (paddle1.y + paddle1.height / 2)) * 0.1;
                 }
 
-
-                // Limita o movimento das raquetes dentro do canvas
                 paddle1.y = Math.max(0, Math.min(paddle1.y, canvas.height - paddle1.height));
                 paddle2.y = Math.max(0, Math.min(paddle2.y, canvas.height - paddle2.height));
             }
             
             function isColliding(b, p) {
-                return b.x < p.x + p.width &&
-                       b.x + b.width > p.x &&
-                       b.y < p.y + p.height &&
-                       b.y + b.height > p.y;
+                return b.x < p.x + p.width && b.x + b.width > p.x && b.y < p.y + p.height && b.y + b.height > p.y;
             }
 
             function gameLoop() {
@@ -767,11 +714,8 @@
                 animationFrameId = requestAnimationFrame(gameLoop);
             }
             
-            // Observador para redimensionar o canvas se o container mudar de tamanho
             const resizeObserver = new ResizeObserver(() => {
-                if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId);
-                }
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
                 resizeCanvas();
                 gameLoop();
             });
