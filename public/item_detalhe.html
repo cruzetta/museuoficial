@@ -28,6 +28,16 @@
         .video-title {
             @apply text-center text-sm font-semibold mt-2 text-gray-300;
         }
+        /* Estilos para a nova galeria */
+        .gallery-nav-btn {
+            @apply bg-neon-blue/20 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all duration-200;
+        }
+        .gallery-nav-btn:hover {
+            @apply bg-neon-blue text-black scale-110;
+        }
+        .gallery-counter {
+            @apply text-lg font-semibold text-white;
+        }
     </style>
 </head>
 <body class="antialiased" style="background: var(--metal-bg);">
@@ -86,17 +96,36 @@
         const itemContainer = document.getElementById('item-container');
         const loader = document.getElementById('loader');
         const audioPlayer = document.getElementById('audio-player');
+        
+        // Variáveis globais para a galeria
+        let galleryImages = [];
+        let currentIndex = 0;
 
-        // Funções globais para botões inline
-        window.changeImage = (newSrc) => {
+        // Função para atualizar a visualização da galeria
+        function updateGalleryView() {
             const mainImage = document.getElementById('main-item-image');
-            if (mainImage) {
-                mainImage.style.opacity = 0;
-                setTimeout(() => {
-                    mainImage.src = newSrc;
-                    mainImage.style.opacity = 1;
-                }, 300);
+            const counter = document.getElementById('gallery-counter');
+            if (!mainImage || !counter) return;
+
+            mainImage.style.opacity = 0;
+            setTimeout(() => {
+                mainImage.src = galleryImages[currentIndex];
+                mainImage.style.opacity = 1;
+            }, 200);
+
+            counter.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
+        }
+
+        // Funções globais para os botões de navegação
+        window.navigateGallery = (direction) => {
+            if (galleryImages.length <= 1) return;
+            currentIndex += direction;
+            if (currentIndex >= galleryImages.length) {
+                currentIndex = 0; // Volta para o início
+            } else if (currentIndex < 0) {
+                currentIndex = galleryImages.length - 1; // Vai para o fim
             }
+            updateGalleryView();
         };
 
         window.playSound = (soundUrl) => {
@@ -107,16 +136,6 @@
         };
 
         // --- Funções para gerar partes do conteúdo ---
-
-        const createGalleryButtons = (item) => {
-            const buttons = (item.galeria_imagens && Array.isArray(item.galeria_imagens))
-                ? item.galeria_imagens
-                    .filter(img => img && img.url)
-                    .map(img => `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome || 'Ver Imagem'}</button>`)
-                    .join('')
-                : '';
-            return `<div class="flex flex-wrap gap-3 mt-4">${buttons}</div>`;
-        };
         
         const createSonsContent = (item) => {
             const buttons = (item.sons_iconicos && Array.isArray(item.sons_iconicos))
@@ -173,6 +192,22 @@
                 if (docSnap.exists()) {
                     const item = docSnap.data();
                     document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
+                    
+                    // Preenche a lista de imagens da galeria
+                    galleryImages = [];
+                    if (item.imagem_principal) {
+                        galleryImages.push(item.imagem_principal);
+                    }
+                    if (item.galeria_imagens && Array.isArray(item.galeria_imagens)) {
+                        item.galeria_imagens.forEach(img => {
+                            if (img && img.url) galleryImages.push(img.url);
+                        });
+                    }
+                    
+                    // Se não houver imagem principal, mas houver galeria, usa a primeira da galeria
+                    if (galleryImages.length === 0) {
+                        galleryImages.push('https://placehold.co/600x400/0D0D1A/E0E0E0?text=Sem+Imagem');
+                    }
 
                     const fichaTecnicaFields = [
                         { icon: 'fa-microchip', label: 'Fabricante', value: item.fabricante },
@@ -194,12 +229,22 @@
                             <div class="lg:col-span-2">
                                 <div class="hud-border rounded-lg p-2">
                                     <img id="main-item-image" 
-                                         src="${item.imagem_principal || 'https://placehold.co/600x400/0D0D1A/E0E0E0?text=Sem+Imagem'}" 
+                                         src="${galleryImages[0]}" 
                                          alt="Imagem principal de ${item.nome || 'Item'}" 
                                          class="w-full h-auto rounded-md object-cover transition-opacity duration-300 aspect-video"
                                          onerror="this.onerror=null;this.src='https://placehold.co/600x400/0D0D1A/E0E0E0?text=Imagem+Indispon%C3%ADvel';">
                                 </div>
-                                ${createGalleryButtons(item)}
+                                ${galleryImages.length > 1 ? `
+                                <div class="flex items-center justify-center gap-6 mt-4">
+                                    <button onclick="navigateGallery(-1)" class="gallery-nav-btn" aria-label="Imagem anterior">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span id="gallery-counter" class="gallery-counter">1 / ${galleryImages.length}</span>
+                                    <button onclick="navigateGallery(1)" class="gallery-nav-btn" aria-label="Próxima imagem">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                ` : ''}
                             </div>
                             
                             <div class="hud-border rounded-lg p-6 self-start">
