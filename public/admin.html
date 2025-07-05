@@ -330,13 +330,11 @@
         import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // ### CORREÇÃO FINAL APLICADA AQUI ###
-        // O valor de 'storageBucket' foi corrigido para o nome correto do seu bucket.
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.firebasestorage.app",
+            storageBucket: "museu-cca6d.appspot.com",
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
@@ -412,6 +410,7 @@
             pendingFiles.set(input.id, file);
             const fileNameDisplay = input.parentElement.querySelector('.file-name-display');
             fileNameDisplay.textContent = file.name;
+            fileNameDisplay.dataset.existingUrl = ''; // Limpa a URL antiga ao selecionar um novo ficheiro
         };
 
         window.addRepeaterItem = (type, data = {}) => {
@@ -428,15 +427,21 @@
             container.appendChild(itemDiv);
             
             if (typeof data === 'object' && data !== null) {
+                // Preenche o campo de nome, se houver
                 for (const key in data) {
                     const input = itemDiv.querySelector(`[data-field="${key}"]`);
                     if (input) input.value = data[key];
-                    const url = data.url || data.embed_url;
-                    if(url && (key === 'url' || key === 'embed_url')){
-                       const fileNameDisplay = itemDiv.querySelector('.file-name-display');
-                       if(fileNameDisplay) fileNameDisplay.textContent = decodeURIComponent(url.split('%2F').pop().split('?')[0]);
-                    }
                 }
+                
+                // ### INÍCIO DA CORREÇÃO ###
+                // Guarda a URL existente e mostra o nome do ficheiro
+                const url = data.url || data.embed_url;
+                const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+                if(fileNameDisplay && url){
+                   fileNameDisplay.textContent = decodeURIComponent(url.split('%2F').pop().split('?')[0].split('_').slice(1).join('_'));
+                   fileNameDisplay.dataset.existingUrl = url; // Guarda a URL antiga num atributo de dados
+                }
+                // ### FIM DA CORREÇÃO ###
             }
 
             itemDiv.querySelector('.remove-item-btn').addEventListener('click', () => {
@@ -534,7 +539,7 @@
             container.querySelector('.upload-file-input').value = '';
             container.querySelector('.upload-preview').src = '#';
             container.querySelector('.upload-preview-wrapper').classList.add('hidden');
-            container.querySelector('.upload-drop-zone').classList.remove('hidden'); // ### ALTERAÇÃO: Garante que a zona de drop reaparece
+            container.querySelector('.upload-drop-zone').classList.remove('hidden');
             const urlInput = document.getElementById(`${containerKey}-url`);
             if (urlInput) urlInput.value = '';
         }
@@ -595,15 +600,20 @@
                             itemData[input.dataset.field] = input.value.trim();
                         });
                         
+                        // ### INÍCIO DA CORREÇÃO ###
                         const fileInput = itemDiv.querySelector('input[type="file"]');
+                        const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+                        const existingUrl = fileNameDisplay?.dataset.existingUrl;
                         const urlField = (type === 'videos_epoca') ? 'embed_url' : 'url';
-                        const existingUrl = itemDiv.querySelector('.file-name-display')?.dataset.existingUrl;
 
                         if (fileInput && pendingFiles.has(fileInput.id)) {
-                             // New file, will be processed during upload.
+                             // Novo ficheiro selecionado, será processado no upload.
+                             // A URL será adicionada depois do upload.
                         } else if (existingUrl) {
+                            // Nenhum ficheiro novo, reutiliza a URL antiga.
                             itemData[urlField] = existingUrl;
                         }
+                        // ### FIM DA CORREÇÃO ###
                         
                         if(Object.keys(itemData).length === 0){
                             const simpleInput = itemDiv.querySelector('input');
@@ -703,14 +713,11 @@
                 console.error("ERRO DETALHADO NO UPLOAD:", error);
                 showNotification('Erro ao guardar os dados. Verifique a consola.', true);
                 
-                // ### INÍCIO DA ALTERAÇÃO ###
-                // Limpa os ficheiros que estavam na tentativa de upload que falhou.
-                // Isso previne que o utilizador fique "preso" com um ficheiro inválido.
                 filesToUpload.forEach(([key, _]) => {
-                    // Reseta a interface de upload para cada ficheiro que estava a ser processado.
-                    resetUploadUI(key);
+                    if (!key.startsWith('repeater-file-')) {
+                        resetUploadUI(key);
+                    }
                 });
-                // ### FIM DA ALTERAÇÃO ###
 
             } finally {
                 submitButton.disabled = false;
