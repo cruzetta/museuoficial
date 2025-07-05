@@ -106,12 +106,13 @@
 
                     // --- GERAÇÃO DOS COMPONENTES HTML ---
 
+                    // ### CORREÇÃO PARA GALERIA DE IMAGENS ###
                     let galleryButtonsHTML = '';
-                    if (item.galeria_imagens && item.galeria_imagens.length > 0) {
+                    if (item.galeria_imagens && Array.isArray(item.galeria_imagens)) {
                         galleryButtonsHTML = item.galeria_imagens
-                            // ### CORREÇÃO APLICADA AQUI ###
-                            // A verificação 'img.nome' foi removida. Agora só precisa do URL.
-                            .filter(img => img.url)
+                            // O filtro foi corrigido para verificar apenas se o URL existe.
+                            // Isto garante que a imagem aparece mesmo que o nome não tenha sido preenchido.
+                            .filter(img => img && img.url)
                             .map(img => `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome || 'Ver Imagem'}</button>`)
                             .join('');
                     }
@@ -121,12 +122,12 @@
                             <div class="prose-custom">${item.detalhes}</div>
                         </section>` : '';
 
+                    // ### CORREÇÃO PARA SONS ICÓNICOS ###
                     let sonsHTML = '';
-                    if (item.sons_iconicos && item.sons_iconicos.length > 0) {
+                    if (item.sons_iconicos && Array.isArray(item.sons_iconicos)) {
                         const soundButtons = item.sons_iconicos
-                            // ### CORREÇÃO APLICADA AQUI ###
-                            // A verificação 'som.nome' foi removida. Agora só precisa do URL.
-                            .filter(som => som.url)
+                            // O filtro foi corrigido para verificar apenas se o URL existe.
+                            .filter(som => som && som.url)
                             .map(som => `<button onclick="playSound('${som.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${som.nome || 'Ouvir Som'}</button>`)
                             .join('');
                         if (soundButtons) {
@@ -140,12 +141,12 @@
                         }
                     }
                     
+                    // ### CORREÇÃO PARA VÍDEOS DA ÉPOCA ###
                     let videosHTML = '';
-                    if (item.videos_epoca && item.videos_epoca.length > 0) {
+                    if (item.videos_epoca && Array.isArray(item.videos_epoca)) {
                         const videoEmbeds = item.videos_epoca
-                            // ### CORREÇÃO APLICADA AQUI ###
-                            // A verificação 'video.nome' foi removida. Agora só precisa do URL.
-                            .filter(video => video.embed_url)
+                            // O filtro foi corrigido para verificar apenas se o URL do vídeo existe.
+                            .filter(video => video && video.embed_url)
                             .map(video => `
                                 <div class="hud-border rounded-lg p-4 flex flex-col">
                                     <h4 class="font-semibold text-white mb-3 text-lg">${video.nome || 'Vídeo'}</h4>
