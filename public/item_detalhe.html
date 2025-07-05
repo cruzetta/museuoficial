@@ -50,13 +50,12 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ### CORREÇÃO APLICADA AQUI ###
-        // O valor de 'storageBucket' foi corrigido para o formato correto.
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.firebasestorage.app", // CORRIGIDO
+            storageBucket: "museu-cca6d.firebasestorage.app",
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
@@ -69,6 +68,7 @@
         const loader = document.getElementById('loader');
         const audioPlayer = document.getElementById('audio-player');
 
+        // Funções globais para botões inline
         window.changeImage = (newSrc) => {
             const mainImage = document.getElementById('main-item-image');
             if (mainImage) {
@@ -109,8 +109,10 @@
                     let galleryButtonsHTML = '';
                     if (item.galeria_imagens && item.galeria_imagens.length > 0) {
                         galleryButtonsHTML = item.galeria_imagens
-                            .filter(img => img.nome && img.url)
-                            .map(img => `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome}</button>`)
+                            // ### CORREÇÃO APLICADA AQUI ###
+                            // A verificação 'img.nome' foi removida. Agora só precisa do URL.
+                            .filter(img => img.url)
+                            .map(img => `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome || 'Ver Imagem'}</button>`)
                             .join('');
                     }
 
@@ -122,8 +124,10 @@
                     let sonsHTML = '';
                     if (item.sons_iconicos && item.sons_iconicos.length > 0) {
                         const soundButtons = item.sons_iconicos
-                            .filter(som => som.nome && som.url)
-                            .map(som => `<button onclick="playSound('${som.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${som.nome}</button>`)
+                            // ### CORREÇÃO APLICADA AQUI ###
+                            // A verificação 'som.nome' foi removida. Agora só precisa do URL.
+                            .filter(som => som.url)
+                            .map(som => `<button onclick="playSound('${som.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${som.nome || 'Ouvir Som'}</button>`)
                             .join('');
                         if (soundButtons) {
                             sonsHTML = `
@@ -139,10 +143,12 @@
                     let videosHTML = '';
                     if (item.videos_epoca && item.videos_epoca.length > 0) {
                         const videoEmbeds = item.videos_epoca
-                            .filter(video => video.nome && video.embed_url)
+                            // ### CORREÇÃO APLICADA AQUI ###
+                            // A verificação 'video.nome' foi removida. Agora só precisa do URL.
+                            .filter(video => video.embed_url)
                             .map(video => `
                                 <div class="hud-border rounded-lg p-4 flex flex-col">
-                                    <h4 class="font-semibold text-white mb-3 text-lg">${video.nome}</h4>
+                                    <h4 class="font-semibold text-white mb-3 text-lg">${video.nome || 'Vídeo'}</h4>
                                     <div class="bg-black rounded-md overflow-hidden">
                                         <video controls class="w-full h-auto">
                                             <source src="${video.embed_url}" type="video/mp4">
