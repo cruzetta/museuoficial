@@ -534,6 +534,7 @@
             container.querySelector('.upload-file-input').value = '';
             container.querySelector('.upload-preview').src = '#';
             container.querySelector('.upload-preview-wrapper').classList.add('hidden');
+            container.querySelector('.upload-drop-zone').classList.remove('hidden'); // ### ALTERAÇÃO: Garante que a zona de drop reaparece
             const urlInput = document.getElementById(`${containerKey}-url`);
             if (urlInput) urlInput.value = '';
         }
@@ -701,6 +702,16 @@
             } catch (error) {
                 console.error("ERRO DETALHADO NO UPLOAD:", error);
                 showNotification('Erro ao guardar os dados. Verifique a consola.', true);
+                
+                // ### INÍCIO DA ALTERAÇÃO ###
+                // Limpa os ficheiros que estavam na tentativa de upload que falhou.
+                // Isso previne que o utilizador fique "preso" com um ficheiro inválido.
+                filesToUpload.forEach(([key, _]) => {
+                    // Reseta a interface de upload para cada ficheiro que estava a ser processado.
+                    resetUploadUI(key);
+                });
+                // ### FIM DA ALTERAÇÃO ###
+
             } finally {
                 submitButton.disabled = false;
                 if(progressContainer) setTimeout(() => progressContainer.classList.add('hidden'), 1000);
