@@ -104,69 +104,109 @@
                     const item = docSnap.data();
                     document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
 
-                    // --- GERAÇÃO DOS COMPONENTES HTML (LÓGICA CORRIGIDA) ---
+                    // --- GERAÇÃO DOS COMPONENTES HTML (LÓGICA ATUALIZADA) ---
 
                     const createGalleryButtons = (item) => {
-                        if (!item.galeria_imagens || !Array.isArray(item.galeria_imagens)) return '';
-                        const buttons = item.galeria_imagens
-                            .filter(img => img && img.url)
-                            .map(img => `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome || 'Ver Imagem'}</button>`)
-                            .join('');
-                        return buttons ? `<div class="flex flex-wrap gap-2">${buttons}</div>` : '';
+                        const buttons = (item.galeria_imagens && Array.isArray(item.galeria_imagens))
+                            ? item.galeria_imagens
+                                .filter(img => img && img.url)
+                                .map(img => `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome || 'Ver Imagem'}</button>`)
+                                .join('')
+                            : '';
+                        // Sempre retorna o container. Se estiver vazio, não mostra nada.
+                        return `<div class="flex flex-wrap gap-2 mt-4">${buttons}</div>`;
                     };
 
                     const createSobreSection = (item) => {
-                        if (!item.detalhes) return '';
-                        return `<section class="hud-border rounded-lg p-8 mt-12"><div class="prose-custom">${item.detalhes}</div></section>`;
+                        const content = item.detalhes
+                            ? `<div class="prose-custom">${item.detalhes}</div>`
+                            : `<p class="text-gray-400 italic">Nenhuma descrição detalhada disponível para este item.</p>`;
+                        return `<section class="hud-border rounded-lg p-8 mt-12">${content}</section>`;
                     };
 
                     const createSonsSection = (item) => {
-                        if (!item.sons_iconicos || !Array.isArray(item.sons_iconicos)) return '';
-                        const buttons = item.sons_iconicos
-                            .filter(som => som && som.url)
-                            .map(som => `<button onclick="playSound('${som.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${som.nome || 'Ouvir Som'}</button>`)
-                            .join('');
-                        if (!buttons) return '';
-                        return `<section class="mt-12"><h2 class="section-title">Sons Icónicos</h2><div class="hud-border rounded-lg p-8 flex flex-wrap gap-4 justify-center">${buttons}</div></section>`;
+                        const buttons = (item.sons_iconicos && Array.isArray(item.sons_iconicos))
+                            ? item.sons_iconicos
+                                .filter(som => som && som.url)
+                                .map(som => `<button onclick="playSound('${som.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${som.nome || 'Ouvir Som'}</button>`)
+                                .join('')
+                            : '';
+                        
+                        const content = buttons
+                            ? `<div class="flex flex-wrap gap-4 justify-center">${buttons}</div>`
+                            : `<p class="text-gray-400 italic text-center">Nenhum som icónico registado.</p>`;
+
+                        return `
+                            <section class="mt-12">
+                                <h2 class="section-title">Sons Icónicos</h2>
+                                <div class="hud-border rounded-lg p-8">${content}</div>
+                            </section>`;
                     };
                     
                     const createVideosSection = (item) => {
-                        if (!item.videos_epoca || !Array.isArray(item.videos_epoca)) return '';
-                        const embeds = item.videos_epoca
-                            .filter(video => video && video.embed_url)
-                            .map(video => `
-                                <div class="hud-border rounded-lg p-4 flex flex-col">
-                                    <h4 class="font-semibold text-white mb-3 text-lg">${video.nome || 'Vídeo'}</h4>
-                                    <div class="bg-black rounded-md overflow-hidden">
-                                        <video controls class="w-full h-auto">
-                                            <source src="${video.embed_url}" type="video/mp4">
-                                            O seu navegador não suporta a tag de vídeo.
-                                        </video>
-                                    </div>
-                                </div>`)
-                            .join('');
-                        if (!embeds) return '';
-                        return `<section class="mt-12"><h2 class="section-title">Vídeos da Época</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-8">${embeds}</div></section>`;
+                        const embeds = (item.videos_epoca && Array.isArray(item.videos_epoca))
+                            ? item.videos_epoca
+                                .filter(video => video && video.embed_url)
+                                .map(video => `
+                                    <div class="hud-border rounded-lg p-4 flex flex-col">
+                                        <h4 class="font-semibold text-white mb-3 text-lg">${video.nome || 'Vídeo'}</h4>
+                                        <div class="bg-black rounded-md overflow-hidden">
+                                            <video controls class="w-full h-auto">
+                                                <source src="${video.embed_url}" type="video/mp4">
+                                                O seu navegador não suporta a tag de vídeo.
+                                            </video>
+                                        </div>
+                                    </div>`)
+                                .join('')
+                            : '';
+
+                        const content = embeds
+                            ? `<div class="grid grid-cols-1 md:grid-cols-2 gap-8">${embeds}</div>`
+                            : `<p class="text-gray-400 italic text-center">Nenhum vídeo da época registado.</p>`;
+                        
+                        return `
+                            <section class="mt-12">
+                                <h2 class="section-title">Vídeos da Época</h2>
+                                ${content}
+                            </section>`;
                     };
 
                     const createVoceSabiaSection = (item) => {
-                        if (!item.voce_sabia || !Array.isArray(item.voce_sabia) || item.voce_sabia.length === 0) return '';
-                        const fatos = item.voce_sabia
-                            .filter(fato => fato)
-                            .map(fato => `<li class="did-you-know-item"><i class="fas fa-star text-yellow-400"></i><span>${fato}</span></li>`)
-                            .join('');
-                        if (!fatos) return '';
-                        return `<section class="mt-12"><h2 class="section-title">Você Sabia?</h2><div class="hud-border rounded-lg p-8"><ul class="space-y-4">${fatos}</ul></div></section>`;
+                        const fatos = (item.voce_sabia && Array.isArray(item.voce_sabia) && item.voce_sabia.length > 0)
+                            ? item.voce_sabia
+                                .filter(fato => fato)
+                                .map(fato => `<li class="did-you-know-item"><i class="fas fa-star text-yellow-400"></i><span>${fato}</span></li>`)
+                                .join('')
+                            : '';
+                        
+                        const content = fatos
+                            ? `<ul class="space-y-4">${fatos}</ul>`
+                            : `<p class="text-gray-400 italic">Nenhuma curiosidade registada.</p>`;
+
+                        return `
+                            <section class="mt-12">
+                                <h2 class="section-title">Você Sabia?</h2>
+                                <div class="hud-border rounded-lg p-8">${content}</div>
+                            </section>`;
                     };
                     
                     const createJogosEssenciaisSection = (item) => {
-                        if (!item.jogos_essenciais || !Array.isArray(item.jogos_essenciais) || item.jogos_essenciais.length === 0) return '';
-                        const jogos = item.jogos_essenciais
-                            .filter(jogo => jogo)
-                            .map(jogo => `<div class="essential-game-card">${jogo}</div>`)
-                            .join('');
-                        if (!jogos) return '';
-                        return `<section class="mt-12"><h2 class="section-title">Jogos Essenciais</h2><div class="flex flex-wrap gap-4 justify-center">${jogos}</div></section>`;
+                        const jogos = (item.jogos_essenciais && Array.isArray(item.jogos_essenciais) && item.jogos_essenciais.length > 0)
+                            ? item.jogos_essenciais
+                                .filter(jogo => jogo)
+                                .map(jogo => `<div class="essential-game-card">${jogo}</div>`)
+                                .join('')
+                            : '';
+
+                        const content = jogos
+                            ? `<div class="flex flex-wrap gap-4 justify-center">${jogos}</div>`
+                            : `<p class="text-gray-400 italic text-center">Nenhum jogo essencial registado.</p>`;
+                        
+                        return `
+                            <section class="mt-12">
+                                <h2 class="section-title">Jogos Essenciais</h2>
+                                <div class="hud-border rounded-lg p-8">${content}</div>
+                            </section>`;
                     };
 
                     const createFichaTecnica = (item) => {
@@ -177,23 +217,31 @@
                             { icon: 'fa-sd-card', label: 'Média', value: item.media },
                             { icon: 'fa-chart-line', label: 'Vendas', value: item.vendas }
                         ];
+                        
                         const html = fields
-                            .filter(field => field.value)
-                            .map(field => `<li><strong><i class="fa-solid ${field.icon} w-6 text-neon-blue"></i> ${field.label}:</strong> ${field.value}</li>`)
+                            .map(field => `<li><strong><i class="fa-solid ${field.icon} w-6 text-neon-blue"></i> ${field.label}:</strong> ${field.value || 'N/A'}</li>`)
                             .join('');
-                        return html ? `<div class="lg:col-span-2 hud-border rounded-lg p-6 self-start"><h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2><ul class="space-y-3 text-lg">${html}</ul></div>` : '';
+                            
+                        return `
+                            <div class="lg:col-span-2 hud-border rounded-lg p-6 self-start">
+                                <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
+                                <ul class="space-y-3 text-lg">${html}</ul>
+                            </div>`;
                     };
 
                     // --- MONTAGEM FINAL DO HTML ---
                     const contentHTML = `
-                        ${item.nome ? `<h1 class="text-5xl md:text-7xl font-black text-center mb-12 holographic-text">${item.nome}</h1>` : ''}
+                        <h1 class="text-5xl md:text-7xl font-black text-center mb-12 holographic-text">${item.nome || 'Item Desconhecido'}</h1>
                         
                         <section class="grid grid-cols-1 lg:grid-cols-5 gap-8">
                             <div class="lg:col-span-3">
-                                ${item.imagem_principal ? `
                                 <div class="hud-border rounded-lg p-2 mb-4">
-                                    <img id="main-item-image" src="${item.imagem_principal}" alt="Imagem principal de ${item.nome || 'Item'}" class="w-full h-auto rounded-md object-cover transition-opacity duration-300 aspect-video">
-                                </div>` : ''}
+                                    <img id="main-item-image" 
+                                         src="${item.imagem_principal || 'https://placehold.co/600x400/0D0D1A/E0E0E0?text=Sem+Imagem'}" 
+                                         alt="Imagem principal de ${item.nome || 'Item'}" 
+                                         class="w-full h-auto rounded-md object-cover transition-opacity duration-300 aspect-video"
+                                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/0D0D1A/E0E0E0?text=Imagem+Indispon%C3%ADvel';">
+                                </div>
                                 ${createGalleryButtons(item)}
                             </div>
                             ${createFichaTecnica(item)}
