@@ -28,15 +28,19 @@
         .video-title {
             @apply text-center text-sm font-semibold mt-2 text-gray-300;
         }
-        /* Estilos para a nova galeria */
-        .gallery-nav-btn {
-            @apply bg-neon-blue/20 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all duration-200;
+        /* Estilos para a galeria de miniaturas */
+        .thumbnail-btn {
+            @apply hud-border border-2 border-neon-blue/50 rounded-lg px-3 py-2 text-sm text-white font-semibold uppercase tracking-wider transition-all duration-200 flex-grow text-center;
+            box-shadow: none;
         }
-        .gallery-nav-btn:hover {
-            @apply bg-neon-blue text-black scale-110;
+        .thumbnail-btn:hover {
+            border-color: var(--neon-purple);
+            color: var(--neon-purple);
         }
-        .gallery-counter {
-            @apply text-lg font-semibold text-white;
+        .thumbnail-btn.active {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
         }
     </style>
 </head>
@@ -98,34 +102,23 @@
         const audioPlayer = document.getElementById('audio-player');
         
         // Variáveis globais para a galeria
-        let galleryImages = [];
-        let currentIndex = 0;
+        let galleryData = [];
 
-        // Função para atualizar a visualização da galeria
-        function updateGalleryView() {
+        // Função para selecionar uma imagem da galeria
+        window.selectImage = (index) => {
+            if (!galleryData[index]) return;
+
             const mainImage = document.getElementById('main-item-image');
-            const counter = document.getElementById('gallery-counter');
-            if (!mainImage || !counter) return;
-
             mainImage.style.opacity = 0;
             setTimeout(() => {
-                mainImage.src = galleryImages[currentIndex];
+                mainImage.src = galleryData[index].url;
                 mainImage.style.opacity = 1;
             }, 200);
 
-            counter.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
-        }
-
-        // Funções globais para os botões de navegação
-        window.navigateGallery = (direction) => {
-            if (galleryImages.length <= 1) return;
-            currentIndex += direction;
-            if (currentIndex >= galleryImages.length) {
-                currentIndex = 0; // Volta para o início
-            } else if (currentIndex < 0) {
-                currentIndex = galleryImages.length - 1; // Vai para o fim
-            }
-            updateGalleryView();
+            // Atualiza o botão ativo
+            document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
         };
 
         window.playSound = (soundUrl) => {
@@ -136,6 +129,22 @@
         };
 
         // --- Funções para gerar partes do conteúdo ---
+        const createThumbnailGallery = () => {
+            if (galleryData.length <= 1) return ''; // Não mostra a galeria se tiver 1 imagem ou menos
+
+            const buttons = galleryData.map((imgData, index) => 
+                `<button onclick="selectImage(${index})" class="thumbnail-btn ${index === 0 ? 'active' : ''}">${imgData.name}</button>`
+            ).join('');
+
+            return `
+                <div class="mt-8">
+                    <h2 class="card-title">Galeria</h2>
+                    <div class="flex flex-wrap gap-3">
+                        ${buttons}
+                    </div>
+                </div>
+            `;
+        };
         
         const createSonsContent = (item) => {
             const buttons = (item.sons_iconicos && Array.isArray(item.sons_iconicos))
@@ -193,20 +202,21 @@
                     const item = docSnap.data();
                     document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
                     
-                    // Preenche a lista de imagens da galeria
-                    galleryImages = [];
+                    // Preenche a lista de imagens da galeria com nome e url
+                    galleryData = [];
                     if (item.imagem_principal) {
-                        galleryImages.push(item.imagem_principal);
+                        galleryData.push({ name: 'Principal', url: item.imagem_principal });
                     }
                     if (item.galeria_imagens && Array.isArray(item.galeria_imagens)) {
                         item.galeria_imagens.forEach(img => {
-                            if (img && img.url) galleryImages.push(img.url);
+                            if (img && img.url) {
+                                galleryData.push({ name: img.nome || 'Imagem', url: img.url });
+                            }
                         });
                     }
                     
-                    // Se não houver imagem principal, mas houver galeria, usa a primeira da galeria
-                    if (galleryImages.length === 0) {
-                        galleryImages.push('https://placehold.co/600x400/0D0D1A/E0E0E0?text=Sem+Imagem');
+                    if (galleryData.length === 0) {
+                        galleryData.push({ name: 'Principal', url: 'https://placehold.co/600x400/0D0D1A/E0E0E0?text=Sem+Imagem' });
                     }
 
                     const fichaTecnicaFields = [
@@ -229,29 +239,21 @@
                             <div class="lg:col-span-2">
                                 <div class="hud-border rounded-lg p-2">
                                     <img id="main-item-image" 
-                                         src="${galleryImages[0]}" 
+                                         src="${galleryData[0].url}" 
                                          alt="Imagem principal de ${item.nome || 'Item'}" 
                                          class="w-full h-auto rounded-md object-cover transition-opacity duration-300 aspect-video"
                                          onerror="this.onerror=null;this.src='https://placehold.co/600x400/0D0D1A/E0E0E0?text=Imagem+Indispon%C3%ADvel';">
                                 </div>
-                                ${galleryImages.length > 1 ? `
-                                <div class="flex items-center justify-center gap-6 mt-4">
-                                    <button onclick="navigateGallery(-1)" class="gallery-nav-btn" aria-label="Imagem anterior">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </button>
-                                    <span id="gallery-counter" class="gallery-counter">1 / ${galleryImages.length}</span>
-                                    <button onclick="navigateGallery(1)" class="gallery-nav-btn" aria-label="Próxima imagem">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </button>
-                                </div>
-                                ` : ''}
                             </div>
                             
-                            <div class="hud-border rounded-lg p-6 self-start">
-                                <h2 class="card-title">Ficha Técnica</h2>
-                                <ul class="space-y-3 text-lg">
-                                    ${fichaTecnicaFields.map(field => `<li><strong><i class="fa-solid ${field.icon} w-6 text-neon-blue"></i> ${field.label}:</strong> ${field.value || 'N/A'}</li>`).join('')}
-                                </ul>
+                            <div class="flex flex-col">
+                                <div class="hud-border rounded-lg p-6 self-start w-full">
+                                    <h2 class="card-title">Ficha Técnica</h2>
+                                    <ul class="space-y-3 text-lg">
+                                        ${fichaTecnicaFields.map(field => `<li><strong><i class="fa-solid ${field.icon} w-6 text-neon-blue"></i> ${field.label}:</strong> ${field.value || 'N/A'}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                ${createThumbnailGallery()}
                             </div>
                         </section>
 
