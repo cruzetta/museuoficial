@@ -10,6 +10,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="styles/gallery_style.css">
+    <style>
+        /* Estilos específicos para a nova estrutura da página de detalhes */
+        .card-title {
+            @apply text-2xl font-bold text-white border-b-2 border-neon-blue/50 pb-2 mb-6;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+        .card-subtitle {
+            @apply text-xl font-bold text-neon-blue mb-4;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+        .video-card {
+            @apply bg-black/30 p-2 rounded-md;
+        }
+        .video-title {
+            @apply text-center text-sm font-semibold mt-2 text-gray-300;
+        }
+    </style>
 </head>
 <body class="antialiased" style="background: var(--metal-bg);">
 
@@ -87,6 +106,57 @@
             }
         };
 
+        // --- Funções para gerar partes do conteúdo ---
+
+        const createGalleryButtons = (item) => {
+            const buttons = (item.galeria_imagens && Array.isArray(item.galeria_imagens))
+                ? item.galeria_imagens
+                    .filter(img => img && img.url)
+                    .map(img => `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome || 'Ver Imagem'}</button>`)
+                    .join('')
+                : '';
+            return `<div class="flex flex-wrap gap-3 mt-4">${buttons}</div>`;
+        };
+        
+        const createSonsContent = (item) => {
+            const buttons = (item.sons_iconicos && Array.isArray(item.sons_iconicos))
+                ? item.sons_iconicos
+                    .filter(som => som && som.url)
+                    .map(som => `<button onclick="playSound('${som.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${som.nome || 'Ouvir Som'}</button>`)
+                    .join('')
+                : '';
+            const content = buttons ? `<div class="flex flex-wrap gap-4">${buttons}</div>` : `<p class="text-gray-400 italic text-sm">Nenhum som registado.</p>`;
+            return `<div><h3 class="card-subtitle">Sons Icónicos</h3>${content}</div>`;
+        };
+
+        const createVideosContent = (item) => {
+            const embeds = (item.videos_epoca && Array.isArray(item.videos_epoca))
+                ? item.videos_epoca
+                    .filter(video => video && video.embed_url)
+                    .map(video => `
+                        <div class="video-card">
+                            <video controls class="w-full h-auto rounded-md">
+                                <source src="${video.embed_url}" type="video/mp4">
+                                O seu navegador não suporta a tag de vídeo.
+                            </video>
+                            <h4 class="video-title">${video.nome || 'Vídeo'}</h4>
+                        </div>`)
+                    .join('')
+                : '';
+            const content = embeds ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${embeds}</div>` : `<p class="text-gray-400 italic text-sm">Nenhum vídeo registado.</p>`;
+            return `<div class="mt-8"><h3 class="card-subtitle">Vídeos da Época</h3>${content}</div>`;
+        };
+
+        const createVoceSabiaContent = (item) => {
+            const fatos = (item.voce_sabia && Array.isArray(item.voce_sabia) && item.voce_sabia.length > 0)
+                ? item.voce_sabia
+                    .filter(fato => fato)
+                    .map(fato => `<li class="did-you-know-item"><i class="fas fa-star text-yellow-400"></i><span>${fato}</span></li>`)
+                    .join('')
+                : '';
+            return fatos ? `<ul class="space-y-4">${fatos}</ul>` : `<p class="text-gray-400 italic">Nenhuma curiosidade registada.</p>`;
+        };
+
         async function carregarItem() {
             const params = new URLSearchParams(window.location.search);
             const itemId = params.get('id');
@@ -104,138 +174,25 @@
                     const item = docSnap.data();
                     document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
 
-                    // --- GERAÇÃO DOS COMPONENTES HTML (LÓGICA ATUALIZADA) ---
+                    const fichaTecnicaFields = [
+                        { icon: 'fa-microchip', label: 'Fabricante', value: item.fabricante },
+                        { icon: 'fa-calendar-days', label: 'Lançamento', value: item.lancamento },
+                        { icon: 'fa-gamepad', label: 'Geração', value: item.geracao },
+                        { icon: 'fa-sd-card', label: 'Média', value: item.media },
+                        { icon: 'fa-chart-line', label: 'Vendas', value: item.vendas }
+                    ];
 
-                    const createGalleryButtons = (item) => {
-                        const buttons = (item.galeria_imagens && Array.isArray(item.galeria_imagens))
-                            ? item.galeria_imagens
-                                .filter(img => img && img.url)
-                                .map(img => `<button onclick="changeImage('${img.url}')" class="gallery-thumb-btn">${img.nome || 'Ver Imagem'}</button>`)
-                                .join('')
-                            : '';
-                        // Sempre retorna o container. Se estiver vazio, não mostra nada.
-                        return `<div class="flex flex-wrap gap-2 mt-4">${buttons}</div>`;
-                    };
-
-                    const createSobreSection = (item) => {
-                        const content = item.detalhes
-                            ? `<div class="prose-custom">${item.detalhes}</div>`
-                            : `<p class="text-gray-400 italic">Nenhuma descrição detalhada disponível para este item.</p>`;
-                        return `<section class="hud-border rounded-lg p-8 mt-12">${content}</section>`;
-                    };
-
-                    const createSonsSection = (item) => {
-                        const buttons = (item.sons_iconicos && Array.isArray(item.sons_iconicos))
-                            ? item.sons_iconicos
-                                .filter(som => som && som.url)
-                                .map(som => `<button onclick="playSound('${som.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${som.nome || 'Ouvir Som'}</button>`)
-                                .join('')
-                            : '';
-                        
-                        const content = buttons
-                            ? `<div class="flex flex-wrap gap-4 justify-center">${buttons}</div>`
-                            : `<p class="text-gray-400 italic text-center">Nenhum som icónico registado.</p>`;
-
-                        return `
-                            <section class="mt-12">
-                                <h2 class="section-title">Sons Icónicos</h2>
-                                <div class="hud-border rounded-lg p-8">${content}</div>
-                            </section>`;
-                    };
-                    
-                    const createVideosSection = (item) => {
-                        const embeds = (item.videos_epoca && Array.isArray(item.videos_epoca))
-                            ? item.videos_epoca
-                                .filter(video => video && video.embed_url)
-                                .map(video => `
-                                    <div class="hud-border rounded-lg p-4 flex flex-col">
-                                        <h4 class="font-semibold text-white mb-3 text-lg">${video.nome || 'Vídeo'}</h4>
-                                        <div class="bg-black rounded-md overflow-hidden">
-                                            <video controls class="w-full h-auto">
-                                                <source src="${video.embed_url}" type="video/mp4">
-                                                O seu navegador não suporta a tag de vídeo.
-                                            </video>
-                                        </div>
-                                    </div>`)
-                                .join('')
-                            : '';
-
-                        const content = embeds
-                            ? `<div class="grid grid-cols-1 md:grid-cols-2 gap-8">${embeds}</div>`
-                            : `<p class="text-gray-400 italic text-center">Nenhum vídeo da época registado.</p>`;
-                        
-                        return `
-                            <section class="mt-12">
-                                <h2 class="section-title">Vídeos da Época</h2>
-                                ${content}
-                            </section>`;
-                    };
-
-                    const createVoceSabiaSection = (item) => {
-                        const fatos = (item.voce_sabia && Array.isArray(item.voce_sabia) && item.voce_sabia.length > 0)
-                            ? item.voce_sabia
-                                .filter(fato => fato)
-                                .map(fato => `<li class="did-you-know-item"><i class="fas fa-star text-yellow-400"></i><span>${fato}</span></li>`)
-                                .join('')
-                            : '';
-                        
-                        const content = fatos
-                            ? `<ul class="space-y-4">${fatos}</ul>`
-                            : `<p class="text-gray-400 italic">Nenhuma curiosidade registada.</p>`;
-
-                        return `
-                            <section class="mt-12">
-                                <h2 class="section-title">Você Sabia?</h2>
-                                <div class="hud-border rounded-lg p-8">${content}</div>
-                            </section>`;
-                    };
-                    
-                    const createJogosEssenciaisSection = (item) => {
-                        const jogos = (item.jogos_essenciais && Array.isArray(item.jogos_essenciais) && item.jogos_essenciais.length > 0)
-                            ? item.jogos_essenciais
-                                .filter(jogo => jogo)
-                                .map(jogo => `<div class="essential-game-card">${jogo}</div>`)
-                                .join('')
-                            : '';
-
-                        const content = jogos
-                            ? `<div class="flex flex-wrap gap-4 justify-center">${jogos}</div>`
-                            : `<p class="text-gray-400 italic text-center">Nenhum jogo essencial registado.</p>`;
-                        
-                        return `
-                            <section class="mt-12">
-                                <h2 class="section-title">Jogos Essenciais</h2>
-                                <div class="hud-border rounded-lg p-8">${content}</div>
-                            </section>`;
-                    };
-
-                    const createFichaTecnica = (item) => {
-                        const fields = [
-                            { icon: 'fa-microchip', label: 'Fabricante', value: item.fabricante },
-                            { icon: 'fa-calendar-days', label: 'Lançamento', value: item.lancamento },
-                            { icon: 'fa-gamepad', label: 'Geração', value: item.geracao },
-                            { icon: 'fa-sd-card', label: 'Média', value: item.media },
-                            { icon: 'fa-chart-line', label: 'Vendas', value: item.vendas }
-                        ];
-                        
-                        const html = fields
-                            .map(field => `<li><strong><i class="fa-solid ${field.icon} w-6 text-neon-blue"></i> ${field.label}:</strong> ${field.value || 'N/A'}</li>`)
-                            .join('');
-                            
-                        return `
-                            <div class="lg:col-span-2 hud-border rounded-lg p-6 self-start">
-                                <h2 class="text-2xl font-bold mb-4 border-b-2 border-neon-blue/50 pb-2">Ficha Técnica</h2>
-                                <ul class="space-y-3 text-lg">${html}</ul>
-                            </div>`;
-                    };
+                    const jogosEssenciaisContent = (item.jogos_essenciais && item.jogos_essenciais.length > 0)
+                        ? `<div class="flex flex-wrap gap-4 justify-center">${item.jogos_essenciais.map(j => `<div class="essential-game-card">${j}</div>`).join('')}</div>`
+                        : '<p class="text-gray-400 italic text-center">Nenhum jogo essencial registado.</p>';
 
                     // --- MONTAGEM FINAL DO HTML ---
                     const contentHTML = `
                         <h1 class="text-5xl md:text-7xl font-black text-center mb-12 holographic-text">${item.nome || 'Item Desconhecido'}</h1>
                         
-                        <section class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                            <div class="lg:col-span-3">
-                                <div class="hud-border rounded-lg p-2 mb-4">
+                        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                            <div class="lg:col-span-2">
+                                <div class="hud-border rounded-lg p-2">
                                     <img id="main-item-image" 
                                          src="${item.imagem_principal || 'https://placehold.co/600x400/0D0D1A/E0E0E0?text=Sem+Imagem'}" 
                                          alt="Imagem principal de ${item.nome || 'Item'}" 
@@ -244,14 +201,40 @@
                                 </div>
                                 ${createGalleryButtons(item)}
                             </div>
-                            ${createFichaTecnica(item)}
+                            
+                            <div class="hud-border rounded-lg p-6 self-start">
+                                <h2 class="card-title">Ficha Técnica</h2>
+                                <ul class="space-y-3 text-lg">
+                                    ${fichaTecnicaFields.map(field => `<li><strong><i class="fa-solid ${field.icon} w-6 text-neon-blue"></i> ${field.label}:</strong> ${field.value || 'N/A'}</li>`).join('')}
+                                </ul>
+                            </div>
                         </section>
 
-                        ${createSobreSection(item)}
-                        ${createSonsSection(item)}
-                        ${createVideosSection(item)}
-                        ${createVoceSabiaSection(item)}
-                        ${createJogosEssenciaisSection(item)}
+                        <section class="hud-border rounded-lg p-8 mb-12">
+                            <h2 class="card-title">A História do Herói</h2>
+                            <div class="prose-custom mt-4">
+                                ${item.detalhes || '<p class="text-gray-400 italic">Nenhuma descrição detalhada disponível para este item.</p>'}
+                            </div>
+                        </section>
+
+                        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                            <div class="hud-border rounded-lg p-8 flex flex-col">
+                                <h2 class="card-title">Em Ação</h2>
+                                ${createSonsContent(item)}
+                                ${createVideosContent(item)}
+                            </div>
+                            <div class="hud-border rounded-lg p-8">
+                                <h2 class="card-title">Você Sabia?</h2>
+                                ${createVoceSabiaContent(item)}
+                            </div>
+                        </section>
+
+                        <section>
+                            <h2 class="section-title">Jogos Essenciais</h2>
+                            <div class="hud-border rounded-lg p-8 mt-6">
+                                ${jogosEssenciaisContent}
+                            </div>
+                        </section>
                     `;
                     
                     itemContainer.innerHTML = contentHTML;
