@@ -81,6 +81,37 @@
         .file-name-display {
             @apply text-xs text-gray-500 italic mt-1 truncate;
         }
+
+        /* ### INÍCIO DA CORREÇÃO (CSS) ### */
+        .repeater-preview {
+            width: 120px; /* Largura fixa para a pré-visualização */
+            height: 80px;  /* Altura fixa para a pré-visualização */
+            border-radius: 0.375rem; /* 6px */
+            background-color: #e5e7eb; /* gray-200 */
+            object-fit: cover; /* Garante que a imagem cubra o espaço */
+            border: 1px solid #d1d5db; /* gray-300 */
+        }
+        .repeater-preview-placeholder {
+            width: 120px;
+            height: 80px;
+            border-radius: 0.375rem;
+            background-color: #f3f4f6; /* gray-100 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #d1d5db; /* gray-300 */
+            color: #6b7280; /* gray-500 */
+            text-align: center;
+            font-size: 0.75rem; /* 12px */
+        }
+        .repeater-preview[src=""], .repeater-preview:not([src]) {
+            display: none; /* Esconde a pré-visualização se não tiver source */
+        }
+        .repeater-preview-placeholder.hidden {
+            display: none;
+        }
+        /* ### FIM DA CORREÇÃO (CSS) ### */
+
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -375,8 +406,11 @@
             'lojas': { isSingleDoc: false, fields: ['nome', 'preco', 'imagem'], listDisplayField: 'nome' }
         };
 
+        // ### INÍCIO DA CORREÇÃO (Templates com pré-visualização) ###
         const repeaterTemplates = {
             galeria_imagens: (uuid) => `
+                <div class="repeater-preview-placeholder"><i class="fas fa-image text-2xl"></i></div>
+                <img class="repeater-preview" alt="Pré-visualização da Imagem">
                 <input type="text" class="repeater-input" data-field="nome" placeholder="Nome do Botão (Ex: Controle)">
                 <div class="flex-grow">
                     <input type="file" id="${uuid}" class="hidden" accept="image/*" onchange="window.handleRepeaterFileSelect(this)">
@@ -385,6 +419,8 @@
                 </div>
             `,
             sons_iconicos: (uuid) => `
+                <div class="repeater-preview-placeholder"><i class="fas fa-music text-2xl"></i></div>
+                <audio class="repeater-preview" controls></audio>
                 <input type="text" class="repeater-input" data-field="nome" placeholder="Nome do Som (Ex: Moeda do Mario)">
                  <div class="flex-grow">
                     <input type="file" id="${uuid}" class="hidden" accept="audio/*" onchange="window.handleRepeaterFileSelect(this)">
@@ -393,6 +429,8 @@
                 </div>
             `,
             videos_epoca: (uuid) => `
+                <div class="repeater-preview-placeholder"><i class="fas fa-video text-2xl"></i></div>
+                <video class="repeater-preview" controls></video>
                 <input type="text" class="repeater-input" data-field="nome" placeholder="Título do Vídeo (Ex: Anúncio de TV)">
                  <div class="flex-grow">
                     <input type="file" id="${uuid}" class="hidden" accept="video/*" onchange="window.handleRepeaterFileSelect(this)">
@@ -403,15 +441,36 @@
             voce_sabia: () => `<input type="text" class="repeater-input" placeholder="Escreva a curiosidade">`,
             jogos_essenciais: () => `<input type="text" class="repeater-input" placeholder="Nome do Jogo">`
         };
+        // ### FIM DA CORREÇÃO (Templates com pré-visualização) ###
         
+        // ### INÍCIO DA CORREÇÃO (Função de seleção de ficheiro com pré-visualização) ###
         window.handleRepeaterFileSelect = (input) => {
             const file = input.files[0];
+            const itemDiv = input.closest('.repeater-item');
+            if (!itemDiv) return;
+
+            const previewElement = itemDiv.querySelector('.repeater-preview');
+            const placeholderElement = itemDiv.querySelector('.repeater-preview-placeholder');
+            const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+
             if (!file) return;
+
             pendingFiles.set(input.id, file);
-            const fileNameDisplay = input.parentElement.querySelector('.file-name-display');
             fileNameDisplay.textContent = file.name;
-            fileNameDisplay.dataset.existingUrl = ''; // Limpa a URL antiga ao selecionar um novo ficheiro
+            fileNameDisplay.dataset.existingUrl = ''; // Limpa a URL antiga
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (previewElement) {
+                    previewElement.src = e.target.result;
+                    previewElement.style.display = 'block';
+                    previewElement.parentElement.style.width = 'auto'; // Ajusta o container do audio/video
+                }
+                if (placeholderElement) placeholderElement.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
         };
+        // ### FIM DA CORREÇÃO (Função de seleção de ficheiro com pré-visualização) ###
 
         window.addRepeaterItem = (type, data = {}) => {
             const container = document.getElementById(`acervos-${type}-container`);
@@ -421,11 +480,12 @@
             itemDiv.className = 'repeater-item flex items-center gap-2 p-2 border rounded-md bg-gray-50';
             itemDiv.setAttribute('data-repeater-type', type);
             itemDiv.innerHTML = `
-                <div class="flex-grow flex gap-2">${repeaterTemplates[type] ? repeaterTemplates[type](uuid) : ''}</div>
+                <div class="flex-grow flex items-center gap-2">${repeaterTemplates[type] ? repeaterTemplates[type](uuid) : ''}</div>
                 <button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>
             `;
             container.appendChild(itemDiv);
             
+            // ### INÍCIO DA CORREÇÃO (Lógica para preencher pré-visualização na edição) ###
             if (typeof data === 'object' && data !== null) {
                 // Preenche o campo de nome, se houver
                 for (const key in data) {
@@ -433,16 +493,20 @@
                     if (input) input.value = data[key];
                 }
                 
-                // ### INÍCIO DA CORREÇÃO ###
-                // Guarda a URL existente e mostra o nome do ficheiro
                 const url = data.url || data.embed_url;
                 const fileNameDisplay = itemDiv.querySelector('.file-name-display');
-                if(fileNameDisplay && url){
-                   fileNameDisplay.textContent = decodeURIComponent(url.split('%2F').pop().split('?')[0].split('_').slice(1).join('_'));
-                   fileNameDisplay.dataset.existingUrl = url; // Guarda a URL antiga num atributo de dados
+                const previewElement = itemDiv.querySelector('.repeater-preview');
+                const placeholderElement = itemDiv.querySelector('.repeater-preview-placeholder');
+
+                if (url && previewElement) {
+                   fileNameDisplay.textContent = decodeURIComponent(url.split('%2F').pop().split('?')[0].split('_').slice(1).join('_')) || 'Ficheiro existente';
+                   fileNameDisplay.dataset.existingUrl = url;
+                   previewElement.src = url;
+                   previewElement.style.display = 'block';
+                   if (placeholderElement) placeholderElement.classList.add('hidden');
                 }
-                // ### FIM DA CORREÇÃO ###
             }
+            // ### FIM DA CORREÇÃO (Lógica para preencher pré-visualização na edição) ###
 
             itemDiv.querySelector('.remove-item-btn').addEventListener('click', () => {
                 const fileInput = itemDiv.querySelector('input[type="file"]');
@@ -600,20 +664,17 @@
                             itemData[input.dataset.field] = input.value.trim();
                         });
                         
-                        // ### INÍCIO DA CORREÇÃO ###
                         const fileInput = itemDiv.querySelector('input[type="file"]');
                         const fileNameDisplay = itemDiv.querySelector('.file-name-display');
                         const existingUrl = fileNameDisplay?.dataset.existingUrl;
                         const urlField = (type === 'videos_epoca') ? 'embed_url' : 'url';
 
                         if (fileInput && pendingFiles.has(fileInput.id)) {
-                             // Novo ficheiro selecionado, será processado no upload.
-                             // A URL será adicionada depois do upload.
+                             // Novo ficheiro, será processado no upload.
                         } else if (existingUrl) {
                             // Nenhum ficheiro novo, reutiliza a URL antiga.
                             itemData[urlField] = existingUrl;
                         }
-                        // ### FIM DA CORREÇÃO ###
                         
                         if(Object.keys(itemData).length === 0){
                             const simpleInput = itemDiv.querySelector('input');
