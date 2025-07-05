@@ -330,14 +330,17 @@
         import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
+        // ### CORREÇÃO FINAL APLICADA AQUI ###
+        // O valor de 'storageBucket' foi corrigido para o nome correto do seu bucket.
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.appspot.com",
+            storageBucket: "museu-cca6d.firebasestorage.app", // CORRIGIDO
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
+        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -535,13 +538,6 @@
             if (urlInput) urlInput.value = '';
         }
 
-        /**
-         * Uploads a file to Firebase Storage and reports progress.
-         * @param {File} file The file to upload.
-         * @param {string} path The path in Storage to upload to.
-         * @param {function(number):void} [progressCallback] Optional callback to report progress (0.0 to 1.0).
-         * @returns {Promise<string>} A promise that resolves with the download URL.
-         */
         function uploadFile(file, path, progressCallback) {
             return new Promise((resolve, reject) => {
                 const storageRef = ref(storage, `${path}${Date.now()}_${file.name}`);
@@ -549,7 +545,6 @@
                 
                 uploadTask.on('state_changed', 
                     (snapshot) => {
-                        // Report progress
                         const progress = snapshot.totalBytes > 0 ? (snapshot.bytesTransferred / snapshot.totalBytes) : 0;
                         if (progressCallback) {
                             progressCallback(progress);
@@ -623,7 +618,6 @@
             const progressContainer = document.getElementById(`${entity}-upload-progress-container`);
             const progressBar = document.getElementById(`${entity}-upload-progress-bar`);
             
-            // Setup for progress tracking
             const fileProgress = {};
             let totalSize = 0;
             filesToUpload.forEach(([key, file]) => {
@@ -705,8 +699,6 @@
                 window.clearForm(entity);
 
             } catch (error) {
-                // ### ALTERAÇÃO APLICADA AQUI ###
-                // Adicionada uma linha para garantir que qualquer erro seja impresso na consola.
                 console.error("ERRO DETALHADO NO UPLOAD:", error);
                 showNotification('Erro ao guardar os dados. Verifique a consola.', true);
             } finally {
