@@ -1,8 +1,22 @@
 [
   {
-    "origin": ["https://museu-cca6d.web.app"],
-    "method": ["GET", "POST", "PUT"],
-    "responseHeader": ["Content-Type"],
+    "origin": [
+      "https://museu-cca6d.web.app",
+      "https://museu-cca6d.firebaseapp.com",
+      "http://localhost:5000",
+      "http://127.0.0.1:5000"
+    ],
+    "method": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "X-Goog-Resumable"
+    ],
     "maxAgeSeconds": 3600
   }
 ]
