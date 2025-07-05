@@ -705,7 +705,9 @@
                 window.clearForm(entity);
 
             } catch (error) {
-                console.error(`Erro ao guardar ${entity}:`, error);
+                // ### ALTERAÇÃO APLICADA AQUI ###
+                // Adicionada uma linha para garantir que qualquer erro seja impresso na consola.
+                console.error("ERRO DETALHADO NO UPLOAD:", error);
                 showNotification('Erro ao guardar os dados. Verifique a consola.', true);
             } finally {
                 submitButton.disabled = false;
