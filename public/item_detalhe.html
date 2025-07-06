@@ -298,8 +298,8 @@
                         
                         <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
                             <div class="lg:col-span-2">
-                                <div class="hud-border rounded-lg p-2">
-                                    <img id="main-item-image" src="${mainImageURL}" alt="Imagem de ${item.nome}" class="w-full h-auto rounded-md object-cover transition-opacity duration-300 aspect-video" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0D0D1A/E0E0E0?text=Imagem+Indispon%C3%ADvel';">
+                                <div class="hud-border rounded-lg p-2 bg-black">
+                                    <img id="main-item-image" src="${mainImageURL}" alt="Imagem de ${item.nome}" class="w-full rounded-md object-contain transition-opacity duration-300 aspect-video" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0D0D1A/E0E0E0?text=Imagem+Indispon%C3%ADvel';">
                                 </div>
                                 ${imageNavHTML}
                             </div>
