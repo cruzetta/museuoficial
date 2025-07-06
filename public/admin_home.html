@@ -1,0 +1,82 @@
+<!-- Conteúdo da Aba Home -->
+<div id="home-form" class="bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Gerir Página Inicial</h2>
+    <form id="form-home" class="space-y-4">
+        <input type="hidden" id="home-id" value="main_content">
+        <div>
+            <label for="home-titulo" class="block text-sm font-medium text-gray-700">Título Principal</label>
+            <input type="text" id="home-titulo">
+        </div>
+        <div>
+            <label for="home-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo</label>
+            <textarea id="home-subtitulo" rows="3"></textarea>
+        </div>
+        <div>
+            <label for="home-botao" class="block text-sm font-medium text-gray-700">Texto do Botão</label>
+            <input type="text" id="home-botao">
+        </div>
+        <div class="flex flex-col sm:flex-row gap-4">
+            <button type="submit">Guardar Alterações da Home</button>
+            <button type="button" id="load-home-data">Carregar Dados Atuais</button>
+        </div>
+    </form>
+</div>
+
+<!-- Script Específico da Aba Home -->
+<script data-tab-script="home">
+{
+    // Obtém serviços e configurações globais
+    const { db, doc, getDoc, setDoc } = window.firebaseServices;
+    const { appId } = window.appConfig;
+
+    const form = document.getElementById('form-home');
+    const loadButton = document.getElementById('load-home-data');
+    const docRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
+
+    // Função para carregar dados
+    const loadHomeData = async () => {
+        try {
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById('home-titulo').value = data.titulo || '';
+                document.getElementById('home-subtitulo').value = data.subtitulo || '';
+                document.getElementById('home-botao').value = data.botao || '';
+                window.showNotification('Dados carregados!');
+            }
+        } catch (error) {
+            console.error("Erro ao carregar dados da home:", error);
+            window.showNotification('Erro ao carregar dados.', true);
+        }
+    };
+
+    // Submissão do formulário
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
+        const data = {
+            titulo: document.getElementById('home-titulo').value,
+            subtitulo: document.getElementById('home-subtitulo').value,
+            botao: document.getElementById('home-botao').value,
+        };
+
+        try {
+            await setDoc(docRef, data);
+            window.showNotification('Dados da Home guardados com sucesso!');
+        } catch (error) {
+            console.error("Erro ao guardar dados da home:", error);
+            window.showNotification('Erro ao guardar dados.', true);
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+
+    // Event listener para o botão de carregar
+    loadButton.addEventListener('click', loadHomeData);
+
+    // Carrega os dados iniciais ao abrir a aba
+    loadHomeData();
+}
+</script>

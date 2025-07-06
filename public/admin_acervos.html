@@ -1,0 +1,328 @@
+<!-- Conteúdo da Aba Acervos -->
+<div id="acervos-form-container" class="form-section bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Gerir Acervos da Galeria</h2>
+    <form id="form-acervos" class="space-y-6">
+        <input type="hidden" id="acervos-id">
+        
+        <fieldset class="border p-4 rounded-md">
+            <legend class="text-lg font-semibold px-2">Informações Principais</legend>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome do Item</label><input type="text" id="acervos-nome"></div>
+                <div><label for="acervos-fabricante" class="block text-sm font-medium text-gray-700">Fabricante</label><input type="text" id="acervos-fabricante"></div>
+                <div><label for="acervos-lancamento" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label><input type="number" id="acervos-lancamento" placeholder="Ex: 1983"></div>
+                <div><label for="acervos-geracao" class="block text-sm font-medium text-gray-700">Geração</label><input type="text" id="acervos-geracao" placeholder="Ex: 3ª Geração (8-bit)"></div>
+                <div><label for="acervos-media" class="block text-sm font-medium text-gray-700">Média</label><input type="text" id="acervos-media" placeholder="Ex: Cartucho"></div>
+                <div><label for="acervos-vendas" class="block text-sm font-medium text-gray-700">Vendas (aprox.)</label><input type="text" id="acervos-vendas" placeholder="Ex: ~50 milhões"></div>
+                
+                <div class="md:col-span-2" data-upload-container="acervos-imagem_principal">
+                    <input type="hidden" id="acervos-imagem_principal-url">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Imagem Principal</label>
+                    <div class="upload-preview-wrapper hidden mb-4">
+                        <div class="upload-preview-container rounded-lg overflow-hidden">
+                            <img src="#" alt="Preview da imagem" class="upload-preview rounded-lg">
+                        </div>
+                        <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover imagem</button>
+                    </div>
+                    <div class="upload-drop-zone">
+                        <input type="file" class="upload-file-input hidden" accept="image/*">
+                        <div class="text-gray-500">
+                            <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                            <p><strong>Arraste e solte</strong> ou <strong>clique para selecionar</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="border p-4 rounded-md">
+            <legend class="text-lg font-semibold px-2">Conteúdo Detalhado</legend>
+            <div class="space-y-4 pt-2">
+                <div>
+                    <label for="acervos-detalhes" class="block text-sm font-medium text-gray-700 mb-2">Sobre o Item (História, Legado, etc.)</label>
+                    <textarea id="acervos-detalhes"></textarea>
+                </div>
+                <div class="border-t pt-4">
+                    <label class="block text-sm font-medium text-gray-700">Galeria de Imagens</label>
+                    <div id="acervos-galeria_imagens-container" class="space-y-3 mt-2"></div>
+                    <button type="button" data-repeater-add="galeria_imagens" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Imagem</button>
+                </div>
+                 <div class="border-t pt-4">
+                    <label class="block text-sm font-medium text-gray-700">Sons Icónicos</label>
+                    <div id="acervos-sons_iconicos-container" class="space-y-3 mt-2"></div>
+                    <button type="button" data-repeater-add="sons_iconicos" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Som</button>
+                </div>
+                <div class="border-t pt-4">
+                    <label class="block text-sm font-medium text-gray-700">Vídeos da Época</label>
+                    <div id="acervos-videos_epoca-container" class="space-y-3 mt-2"></div>
+                    <button type="button" data-repeater-add="videos_epoca" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Vídeo</button>
+                </div>
+                <div class="border-t pt-4">
+                    <label class="block text-sm font-medium text-gray-700">Curiosidades ("Você Sabia?")</label>
+                    <div id="acervos-voce_sabia-container" class="space-y-3 mt-2"></div>
+                    <button type="button" data-repeater-add="voce_sabia" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Fato</button>
+                </div>
+                <div class="border-t pt-4">
+                    <label class="block text-sm font-medium text-gray-700">Jogos Essenciais</label>
+                    <div id="acervos-jogos_essenciais-container" class="space-y-3 mt-2"></div>
+                    <button type="button" data-repeater-add="jogos_essenciais" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors"><i class="fas fa-plus mr-1"></i> Adicionar Jogo</button>
+                </div>
+            </div>
+        </fieldset>
+        
+        <div id="acervos-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4">
+            <div id="acervos-upload-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">0%</div>
+        </div>
+
+        <div class="flex gap-4 pt-4"><button type="submit">Guardar Item do Acervo</button><button type="button" id="cancel-acervo-edit" class="w-auto">Cancelar</button></div>
+    </form>
+    <div class="mt-8"><h3 class="text-xl font-bold mb-4">Itens do Acervo</h3><div id="acervos-lista" class="space-y-4"></div></div>
+</div>
+
+<!-- Script Específico da Aba Acervos -->
+<script data-tab-script="acervos">
+{
+    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, ref, deleteObject } = window.firebaseServices;
+    const { appId } = window.appConfig;
+
+    const entity = 'acervos';
+    const form = document.getElementById(`form-${entity}`);
+    const listContainer = document.getElementById(`${entity}-lista`);
+    const editorId = `${entity}-detalhes`;
+    
+    const repeaterFields = ['galeria_imagens', 'voce_sabia', 'sons_iconicos', 'videos_epoca', 'jogos_essenciais'];
+
+    tinymce.init({ selector: `#${editorId}`, height: 400, plugins: 'link lists', toolbar: 'undo redo | blocks | bold italic | bullist numlist | link removeformat' });
+    window.currentEditor = `#${editorId}`;
+
+    const repeaterTemplates = {
+        galeria_imagens: (uuid) => `<div class="repeater-preview-placeholder"><i class="fas fa-image text-2xl"></i></div><img class="repeater-preview" alt="Pré-visualização da Imagem"><input type="text" class="repeater-input" data-field="nome" placeholder="Nome do Botão (Ex: Controle)"><div class="flex-grow"><input type="file" id="${uuid}" class="hidden" accept="image/*"><button type="button" class="repeater-file-button" onclick="document.getElementById('${uuid}').click()">Selecionar Imagem</button><div class="file-name-display">Nenhum ficheiro selecionado</div></div>`,
+        sons_iconicos: (uuid) => `<div class="repeater-preview-placeholder"><i class="fas fa-music text-2xl"></i></div><audio class="repeater-preview" controls></audio><input type="text" class="repeater-input" data-field="nome" placeholder="Nome do Som (Ex: Moeda do Mario)"><div class="flex-grow"><input type="file" id="${uuid}" class="hidden" accept="audio/*"><button type="button" class="repeater-file-button" onclick="document.getElementById('${uuid}').click()">Selecionar Áudio</button><div class="file-name-display">Nenhum ficheiro selecionado</div></div>`,
+        videos_epoca: (uuid) => `<div class="repeater-preview-placeholder"><i class="fas fa-video text-2xl"></i></div><video class="repeater-preview" controls></video><input type="text" class="repeater-input" data-field="nome" placeholder="Título do Vídeo (Ex: Anúncio de TV)"><div class="flex-grow"><input type="file" id="${uuid}" class="hidden" accept="video/*"><button type="button" class="repeater-file-button" onclick="document.getElementById('${uuid}').click()">Selecionar Vídeo</button><div class="file-name-display">Nenhum ficheiro selecionado</div></div>`,
+        voce_sabia: () => `<input type="text" class="repeater-input" placeholder="Escreva a curiosidade">`,
+        jogos_essenciais: () => `<input type="text" class="repeater-input" placeholder="Nome do Jogo">`
+    };
+
+    const handleRepeaterFileSelect = (input) => {
+        const file = input.files[0];
+        const itemDiv = input.closest('.repeater-item');
+        if (!itemDiv) return;
+
+        const previewElement = itemDiv.querySelector('.repeater-preview');
+        const placeholderElement = itemDiv.querySelector('.repeater-preview-placeholder');
+        const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+
+        if (!file) return;
+
+        window.pendingFiles.set(input.id, file);
+        fileNameDisplay.textContent = file.name;
+        fileNameDisplay.dataset.existingUrl = ''; // Limpa a URL antiga
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (previewElement) {
+                previewElement.src = e.target.result;
+                previewElement.style.display = 'block';
+            }
+            if (placeholderElement) placeholderElement.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    };
+    
+    const addRepeaterItem = (type, data = {}) => {
+        const container = document.getElementById(`acervos-${type}-container`);
+        if (!container) return;
+        const uuid = `repeater-file-${crypto.randomUUID()}`;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'repeater-item flex items-center gap-2 p-2 border rounded-md bg-gray-50';
+        itemDiv.setAttribute('data-repeater-type', type);
+        itemDiv.innerHTML = `<div class="flex-grow flex items-center gap-2">${repeaterTemplates[type] ? repeaterTemplates[type](uuid) : ''}</div><button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>`;
+        container.appendChild(itemDiv);
+        
+        const fileInput = itemDiv.querySelector('input[type="file"]');
+        if(fileInput) fileInput.addEventListener('change', () => handleRepeaterFileSelect(fileInput));
+
+        if (typeof data === 'object' && data !== null) {
+            for (const key in data) {
+                const input = itemDiv.querySelector(`[data-field="${key}"]`);
+                if (input) input.value = data[key];
+            }
+            const url = data.url || data.embed_url;
+            const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+            const previewElement = itemDiv.querySelector('.repeater-preview');
+            const placeholderElement = itemDiv.querySelector('.repeater-preview-placeholder');
+
+            if (url && previewElement) {
+               fileNameDisplay.textContent = decodeURIComponent(url.split('%2F').pop().split('?')[0].split('_').slice(1).join('_')) || 'Ficheiro existente';
+               fileNameDisplay.dataset.existingUrl = url;
+               previewElement.src = url;
+               previewElement.style.display = 'block';
+               if (placeholderElement) placeholderElement.classList.add('hidden');
+            }
+        } else if (typeof data === 'string') {
+            const simpleInput = itemDiv.querySelector('input');
+            if (simpleInput) simpleInput.value = data;
+        }
+
+        itemDiv.querySelector('.remove-item-btn').addEventListener('click', () => {
+            if (fileInput && window.pendingFiles.has(fileInput.id)) {
+                window.pendingFiles.delete(fileInput.id);
+            }
+            itemDiv.remove();
+        });
+    };
+
+    const clearForm = () => {
+        form.reset();
+        document.getElementById(`${entity}-id`).value = '';
+        tinymce.get(editorId)?.setContent('');
+        repeaterFields.forEach(type => {
+            const container = document.getElementById(`acervos-${type}-container`);
+            if(container) container.innerHTML = '';
+        });
+        window.resetUploadUI('acervos-imagem_principal');
+        window.pendingFiles.clear();
+    };
+
+    const editDoc = async (id) => {
+        clearForm();
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById(`${entity}-id`).value = docSnap.id;
+                ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas'].forEach(field => {
+                    document.getElementById(`${entity}-${field}`).value = data[field] || '';
+                });
+                tinymce.get(editorId)?.setContent(data.detalhes || '');
+
+                if (data.imagem_principal) {
+                    const container = document.querySelector('[data-upload-container="acervos-imagem_principal"]');
+                    container.querySelector('.upload-preview').src = data.imagem_principal;
+                    container.querySelector('.upload-preview-wrapper').classList.remove('hidden');
+                    container.querySelector('.upload-drop-zone').classList.add('hidden');
+                    document.getElementById('acervos-imagem_principal-url').value = data.imagem_principal;
+                }
+                repeaterFields.forEach(type => {
+                    if (data[type] && Array.isArray(data[type])) {
+                        data[type].forEach(itemData => addRepeaterItem(type, itemData));
+                    }
+                });
+                window.scrollTo(0, 0);
+            }
+        } catch (error) {
+            console.error(`Erro ao carregar ${entity}:`, error);
+            window.showNotification('Erro ao carregar dados.', true);
+        }
+    };
+    
+    // Submissão do formulário
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
+        const data = {
+            nome: document.getElementById('acervos-nome').value,
+            fabricante: document.getElementById('acervos-fabricante').value,
+            lancamento: document.getElementById('acervos-lancamento').value,
+            geracao: document.getElementById('acervos-geracao').value,
+            media: document.getElementById('acervos-media').value,
+            vendas: document.getElementById('acervos-vendas').value,
+            detalhes: tinymce.get(editorId)?.getContent() || '',
+        };
+        
+        repeaterFields.forEach(type => {
+            data[type] = [];
+            document.getElementById(`acervos-${type}-container`).querySelectorAll('.repeater-item').forEach(itemDiv => {
+                const itemData = {};
+                const simpleInput = itemDiv.querySelector('input:not([type=file])');
+                const complexInputs = itemDiv.querySelectorAll('input[data-field]');
+                
+                if (complexInputs.length > 0) {
+                     complexInputs.forEach(input => { itemData[input.dataset.field] = input.value.trim(); });
+                     const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+                     const existingUrl = fileNameDisplay?.dataset.existingUrl;
+                     if(existingUrl) itemData.url = existingUrl;
+                     data[type].push(itemData);
+                } else if(simpleInput && simpleInput.value) {
+                    data[type].push(simpleInput.value.trim());
+                }
+            });
+        });
+
+        try {
+            const filesToUpload = Array.from(window.pendingFiles.entries());
+            const uploadPromises = filesToUpload.map(([key, file]) => {
+                let path = key.startsWith('repeater-file-') ? 'acervos/repeater/' : 'acervos/main/';
+                return window.uploadFile(file, path).then(url => ({ key, url }));
+            });
+            const uploadResults = await Promise.all(uploadPromises);
+
+            uploadResults.forEach(({ key, url }) => {
+                if (key === 'acervos-imagem_principal') {
+                    data.imagem_principal = url;
+                } else if (key.startsWith('repeater-file-')) {
+                    const fileInput = document.getElementById(key);
+                    const repeaterItem = fileInput.closest('.repeater-item');
+                    const repeaterType = repeaterItem.dataset.repeaterType;
+                    const itemIndex = [...repeaterItem.parentElement.children].indexOf(repeaterItem);
+                    if (data[repeaterType] && data[repeaterType][itemIndex]) {
+                        const urlField = (repeaterType === 'videos_epoca') ? 'embed_url' : 'url';
+                        data[repeaterType][itemIndex][urlField] = url;
+                    }
+                }
+            });
+            
+            if (!data.imagem_principal) data.imagem_principal = document.getElementById('acervos-imagem_principal-url').value || '';
+
+            const id = document.getElementById(`${entity}-id`).value;
+            const path = `/artifacts/${appId}/public/data/${entity}`;
+            if (id) {
+                await updateDoc(doc(db, path, id), data);
+            } else {
+                await addDoc(collection(db, path), data);
+            }
+
+            window.showNotification('Item do acervo guardado com sucesso!');
+            clearForm();
+        } catch (error) {
+            console.error("Erro ao guardar acervo:", error);
+            window.showNotification('Erro ao guardar os dados.', true);
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+
+    // Listener da coleção
+    onSnapshot(collection(db, `/artifacts/${appId}/public/data/${entity}`), (snapshot) => {
+        listContainer.innerHTML = '';
+        if (snapshot.empty) {
+            listContainer.innerHTML = '<p class="text-sm text-gray-500">Nenhum item registado.</p>';
+            return;
+        }
+        snapshot.docs.forEach(docData => {
+            const data = docData.data();
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+            itemDiv.innerHTML = `<p class="font-semibold text-sm truncate pr-4">${data.nome || 'Item sem nome'}</p><div class="flex-shrink-0 flex gap-2"><button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${docData.id}">Editar</button><button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${docData.id}">Eliminar</button></div>`;
+            listContainer.appendChild(itemDiv);
+        });
+    });
+
+    // Event listeners
+    document.getElementById('acervos-form-container').addEventListener('click', (e) => {
+        if (e.target.matches('[data-repeater-add]')) {
+            addRepeaterItem(e.target.dataset.repeaterAdd);
+        }
+    });
+    listContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
+        if (e.target.classList.contains('delete-btn')) { /* Lógica de apagar aqui */ }
+    });
+    document.getElementById('cancel-acervo-edit').addEventListener('click', clearForm);
+
+    // Inicialização
+    window.setupUploadComponent(document.querySelector('[data-upload-container="acervos-imagem_principal"]'));
+}
+</script>
