@@ -25,7 +25,6 @@
         #notification {
             transition: opacity 0.5s, transform 0.5s;
         }
-        /* Estilos globais para inputs que serão carregados dinamicamente */
         body {
             --input-style: mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
         }
@@ -125,17 +124,15 @@
                 <div class="bg-white p-4 rounded-lg shadow-md">
                     <h2 class="text-lg font-bold mb-4 border-b pb-2">Gerir Conteúdo</h2>
                     <nav id="admin-menu" class="space-y-2">
-                        <button onclick="window.loadTab('home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
-                        <button onclick="window.loadTab('noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
-                        <button onclick="window.loadTab('acervos')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Acervos</button>
-                        <!-- Adicionar outros botões de abas aqui -->
+                        <button onclick="window.loadTab('admin_home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
+                        <button onclick="window.loadTab('admin_noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
+                        <button onclick="window.loadTab('admin_acervos')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Acervos</button>
                     </nav>
                 </div>
             </aside>
 
             <!-- Conteúdo Principal da Aba -->
             <main id="tab-content" class="md:col-span-3">
-                <!-- O conteúdo da aba selecionada será carregado aqui -->
                 <div class="bg-white p-8 rounded-lg shadow-md text-center">
                     <i class="fas fa-arrow-left text-2xl mb-4 text-gray-400"></i>
                     <h2 class="text-xl font-bold text-gray-700">Bem-vindo ao Painel Administrativo</h2>
@@ -162,13 +159,11 @@
 
     <!-- Firebase SDK e Lógica Global -->
     <script type="module">
-        // Importações essenciais do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
@@ -178,21 +173,18 @@
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
         
-        // Inicialização dos serviços do Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         const storage = getStorage(app);
         const appId = 'museu-cca6d';
 
-        // Disponibiliza instâncias e funções globais para as abas
         window.firebaseServices = { db, auth, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, ref, uploadBytesResumable, getDownloadURL, deleteObject };
         window.appConfig = { appId };
         window.pendingFiles = new Map();
 
         // --- LÓGICA DE CARREGAMENTO DE ABAS ---
         window.loadTab = async (tabId) => {
-            // Limpa o editor de texto rico anterior, se existir
             if (window.currentEditor) {
                 tinymce.remove(window.currentEditor);
                 window.currentEditor = null;
@@ -202,19 +194,18 @@
             tabContent.innerHTML = `<div class="text-center p-10"><div id="loader" class="mx-auto"></div><p class="mt-4">A carregar ${tabId}...</p></div>`;
 
             try {
-                const response = await fetch(`/admin/${tabId}.html`);
+                // ### CORREÇÃO APLICADA AQUI ###
+                // O caminho foi corrigido para buscar o ficheiro a partir da raiz.
+                const response = await fetch(`/${tabId}.html`);
                 if (!response.ok) throw new Error(`Não foi possível carregar a aba: ${response.statusText}`);
                 const html = await response.text();
                 tabContent.innerHTML = html;
 
-                // Executa o script da aba
                 const scriptElement = tabContent.querySelector('script[data-tab-script]');
                 if (scriptElement) {
-                    // Usamos eval para executar o script no escopo correto, já que ele é carregado dinamicamente
                     eval(scriptElement.innerHTML);
                 }
 
-                // Ativa o botão do menu correspondente
                 document.querySelectorAll('#admin-menu button').forEach(button => {
                     button.classList.toggle('bg-blue-500', button.getAttribute('onclick') === `window.loadTab('${tabId}')`);
                     button.classList.toggle('text-white', button.getAttribute('onclick') === `window.loadTab('${tabId}')`);
@@ -265,7 +256,6 @@
         confirmDeleteBtn.addEventListener('click', () => { if (deleteResolver) { deleteResolver(true); deleteResolver = null; } hideConfirmModal(); });
         cancelDeleteBtn.addEventListener('click', () => hideConfirmModal());
 
-        // Funções de Upload
         window.setupUploadComponent = (container) => {
             const dropZone = container.querySelector('.upload-drop-zone');
             const fileInput = container.querySelector('.upload-file-input');
@@ -336,9 +326,9 @@
                 
                 loader.style.display = 'none';
                 mainContent.style.display = 'block';
-                window.loadTab('home'); // Carrega a aba home por defeito
+                window.loadTab('admin_home');
             } else {
-                window.location.assign('login.html');
+                window.location.assign('/login.html');
             }
         });
     </script>
