@@ -26,12 +26,28 @@
             text-transform: uppercase;
         }
         .hud-border {
-            border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px rgba(0, 191, 255, 0.5);
-            background: rgba(13, 13, 26, 0.85);
-            backdrop-filter: blur(10px);
-            position: relative;
-        }
+    background: rgba(18, 16, 38, 0.6); /* Fundo escuro semi-transparente */
+    backdrop-filter: blur(10px);      /* Efeito de vidro fosco */
+    border: 1px solid rgba(0, 255, 255, 0.2); /* Borda ciano subtil */
+    border-radius: 12px;              /* Cantos arredondados */
+    transition: all 0.3s ease-in-out; /* Transição suave para todos os efeitos */
+    position: relative; 
+
+    box-shadow: none;
+}
+
+.hud-border:hover {
+    /* Efeitos que aparecem ao passar o mouse */
+    transform: translateY(-8px) scale(1.03);     /* Eleva e aumenta ligeiramente o quadro */
+    border-color: rgba(0, 255, 255, 0.7);       /* A borda fica mais visível e brilhante */
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3); /* A aura (glow) suave aparece */
+    background: rgba(18, 16, 38, 0.8);          /* O fundo fica um pouco mais opaco para dar destaque */
+}
+
+.hud-border::before, .hud-border::after {
+    content: '';
+    display: none;
+}
         .holographic-text {
             background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
             background-size: 200% 200%;
