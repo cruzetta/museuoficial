@@ -30,28 +30,27 @@
         }
 
         .hud-border {
-    background: rgba(18, 16, 38, 0.6); /* Fundo escuro semi-transparente */
-    backdrop-filter: blur(10px);      /* Efeito de vidro fosco */
-    border: 1px solid rgba(0, 255, 255, 0.2); /* Borda ciano subtil */
-    border-radius: 12px;              /* Cantos arredondados */
-    transition: all 0.3s ease-in-out; /* Transição suave para todos os efeitos */
-    position: relative; 
+            background: rgba(18, 16, 38, 0.6); /* Fundo escuro semi-transparente */
+            backdrop-filter: blur(10px);      /* Efeito de vidro fosco */
+            border: 1px solid rgba(0, 255, 255, 0.2); /* Borda ciano subtil */
+            border-radius: 12px;              /* Cantos arredondados */
+            transition: all 0.3s ease-in-out; /* Transição suave para todos os efeitos */
+            position: relative; 
+            box-shadow: none;
+        }
 
-    box-shadow: none;
-}
+        .hud-border:hover {
+            /* Efeitos que aparecem ao passar o mouse */
+            transform: translateY(-8px) scale(1.03);     /* Eleva e aumenta ligeiramente o quadro */
+            border-color: rgba(0, 255, 255, 0.7);       /* A borda fica mais visível e brilhante */
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3); /* A aura (glow) suave aparece */
+            background: rgba(18, 16, 38, 0.8);          /* O fundo fica um pouco mais opaco para dar destaque */
+        }
 
-.hud-border:hover {
-    /* Efeitos que aparecem ao passar o mouse */
-    transform: translateY(-8px) scale(1.03);     /* Eleva e aumenta ligeiramente o quadro */
-    border-color: rgba(0, 255, 255, 0.7);       /* A borda fica mais visível e brilhante */
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3); /* A aura (glow) suave aparece */
-    background: rgba(18, 16, 38, 0.8);          /* O fundo fica um pouco mais opaco para dar destaque */
-}
-
-.hud-border::before, .hud-border::after {
-    content: '';
-    display: none;
-}
+        .hud-border::before, .hud-border::after {
+            content: '';
+            display: none;
+        }
 
         .holographic-text {
             background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-blue));
@@ -97,14 +96,35 @@
         .autocomplete-item:hover {
             background-color: var(--neon-purple);
         }
+
+        /* Remove a borda e todos os efeitos de hover APENAS do cabeçalho */
+        header .hud-border {
+            border: none;
+        }
+        header .hud-border:hover {
+            transform: none;
+            box-shadow: none;
+            background: rgba(18, 16, 38, 0.6);
+            border-color: transparent;
+        }
+        
+        /* Estilo para controlar o tamanho da logo */
+        #header-logo {
+            height: 160px; /* Altere este valor para ajustar o tamanho da logo. */
+            width: auto;  /* A largura se ajusta automaticamente */
+        }
     </style>
 </head>
 <body class="antialiased">
 
     <!-- Header / HUD Fixo -->
     <header class="fixed top-0 left-0 right-0 z-50 p-4">
-        <nav class="container mx-auto hud-border rounded-xl px-4 sm:px-6 py-3 flex justify-between items-center gap-4">
-            <a href="galeria.html" class="text-2xl font-bold tracking-widest holographic-text">MIV</a>
+        <!-- ALTERAÇÃO: Removido 'py-3' e adicionado 'h-20' para uma altura fixa de 80px -->
+        <nav class="container mx-auto hud-border rounded-xl px-4 sm:px-6 h-20 flex justify-between items-center gap-4">
+            <!-- Logo do Museu -->
+            <a href="galeria.html" class="flex-shrink-0">
+                <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+            </a>
             
             <div class="flex-grow flex justify-center px-2 sm:px-4">
                 <div id="search-container" class="relative w-full max-w-lg">

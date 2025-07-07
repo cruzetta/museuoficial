@@ -89,13 +89,32 @@
         .share-btn:hover { @apply bg-neon-purple text-white scale-110 shadow-lg shadow-neon-purple/30; }
         #notification-toast { @apply fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform translate-y-20 opacity-0; }
         #notification-toast.show { @apply transform translate-y-0 opacity-100; }
+
+        /* Remove a borda e todos os efeitos de hover APENAS do cabeçalho */
+        header .hud-border {
+            border: none;
+        }
+        header .hud-border:hover {
+            transform: none;
+            box-shadow: none;
+            background: rgba(18, 16, 38, 0.6);
+            border-color: transparent;
+        }
+        
+        /* Estilo para controlar o tamanho da logo */
+        #header-logo {
+           height: 160px; /* Altere este valor para ajustar o tamanho da logo. */
+            width: auto;  /* A largura se ajusta automaticamente */
+        }
     </style>
 </head>
 <body class="antialiased" style="background: var(--metal-bg);">
 
     <header class="sticky top-0 z-50 p-4">
-        <div class="container mx-auto hud-border rounded-xl px-4 py-3 flex justify-between items-center">
-            <a href="galeria.html" class="text-2xl font-bold tracking-widest holographic-text">MIV</a>
+        <div class="container mx-auto hud-border rounded-xl px-4 h-20 flex justify-between items-center">
+            <a href="galeria.html" class="flex-shrink-0">
+                <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+            </a>
             <a href="galeria.html" class="text-sm font-bold text-neon-blue hover:text-white transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>Voltar para a Galeria
             </a>
