@@ -30,28 +30,26 @@
         }
 
         .hud-border {
-    background: rgba(18, 16, 38, 0.6); /* Fundo escuro semi-transparente */
-    backdrop-filter: blur(10px);      /* Efeito de vidro fosco */
-    border: 1px solid rgba(0, 255, 255, 0.2); /* Borda ciano subtil */
-    border-radius: 12px;              /* Cantos arredondados */
-    transition: all 0.3s ease-in-out; /* Transição suave para todos os efeitos */
-    position: relative; 
+            background: rgba(18, 16, 38, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
+            transition: all 0.3s ease-in-out;
+            position: relative; 
+            box-shadow: none;
+        }
 
-    box-shadow: none;
-}
+        .hud-border:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: rgba(0, 255, 255, 0.7);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            background: rgba(18, 16, 38, 0.8);
+        }
 
-.hud-border:hover {
-    /* Efeitos que aparecem ao passar o mouse */
-    transform: translateY(-8px) scale(1.03);     /* Eleva e aumenta ligeiramente o quadro */
-    border-color: rgba(0, 255, 255, 0.7);       /* A borda fica mais visível e brilhante */
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3); /* A aura (glow) suave aparece */
-    background: rgba(18, 16, 38, 0.8);          /* O fundo fica um pouco mais opaco para dar destaque */
-}
-
-.hud-border::before, .hud-border::after {
-    content: '';
-    display: none;
-}
+        .hud-border::before, .hud-border::after {
+            content: '';
+            display: none;
+        }
 
         .holographic-text {
             background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-blue));
@@ -66,128 +64,35 @@
             to { background-position: 200% center; }
         }
 
-        /* --- ESTILOS GERAIS (antes em gallery_style.css) --- */
-        #searchInput {
-            background: rgba(13, 13, 26, 0.8);
-            border: 1px solid var(--neon-blue);
-            box-shadow: 0 0 8px var(--neon-blue);
-        }
-        #searchInput:focus {
-            outline: none;
-            box-shadow: 0 0 15px var(--neon-purple);
-            border-color: var(--neon-purple);
-        }
-        .explore-btn {
-            background: var(--neon-purple);
-            color: white;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px var(--neon-purple);
-        }
-        .explore-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px var(--neon-purple);
-        }
-        .prose-custom {
-            @apply text-lg leading-relaxed space-y-4;
-        }
-        .prose-custom h1, .prose-custom h2, .prose-custom h3 {
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            @apply holographic-text my-6;
-        }
-        .prose-custom a {
-            color: var(--neon-blue);
-            text-decoration: underline;
-        }
-        .prose-custom p {
-            @apply mb-4;
-        }
-        .sound-play-btn {
-            @apply flex items-center gap-3 px-4 py-2 rounded-lg font-bold text-white transition-all duration-200;
-            background-color: rgba(57, 255, 20, 0.2);
-            border: 2px solid var(--neon-green);
-        }
-        .sound-play-btn:hover {
-            background-color: var(--neon-green);
-            color: var(--dark-bg);
-            box-shadow: 0 0 15px var(--neon-green);
-            transform: scale(1.05);
-        }
-        .did-you-know-item {
-            @apply flex items-start gap-4 text-lg;
-        }
-        .did-you-know-item i {
-            @apply mt-1;
-        }
-        .essential-game-card {
-            @apply hud-border rounded-lg p-4 text-center font-bold text-lg w-48 h-24 flex items-center justify-center;
-            transition: all 0.2s ease-in-out;
-        }
-        .essential-game-card:hover {
-            border-color: var(--neon-purple);
-            color: var(--neon-purple);
-            transform: translateY(-4px);
-        }
-
-        /* --- ESTILOS ESPECÍFICOS DA PÁGINA DE DETALHES --- */
-        .card-title {
-            @apply text-2xl font-bold text-white border-b-2 border-neon-blue/50 pb-2 mb-6;
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-        }
-        .card-subtitle {
-            @apply text-xl font-bold text-neon-blue mb-4;
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-        }
-        .video-card {
-            @apply bg-black/30 p-2 rounded-md;
-        }
-        .video-title {
-            @apply text-center text-sm font-semibold mt-2 text-gray-300;
-        }
-        .thumbnail-btn {
-            @apply hud-border border-2 border-neon-blue/50 rounded-lg px-3 py-2 text-sm text-white font-semibold uppercase tracking-wider transition-all duration-200 flex-grow text-center;
-            box-shadow: none;
-        }
-        .thumbnail-btn:hover {
-            border-color: var(--neon-purple);
-            color: var(--neon-purple);
-        }
-        .thumbnail-btn.active {
-            border-color: var(--neon-green);
-            color: var(--neon-green);
-            box-shadow: 0 0 10px var(--neon-green);
-        }
-        .placeholder-card {
-            @apply text-center text-gray-400 italic p-6 border-2 border-dashed border-gray-600 rounded-lg;
-        }
-        .placeholder-card i {
-            @apply text-3xl text-neon-blue mb-3;
-        }
-        .image-nav-btn {
-            @apply h-10 w-10 bg-neon-blue/20 text-neon-blue border-2 border-neon-blue rounded-full flex items-center justify-center transition-all duration-200;
-        }
-        .image-nav-btn:hover {
-            @apply bg-neon-purple text-white border-neon-purple scale-110;
-        }
-        .share-btn {
-            @apply bg-transparent border-2 border-neon-purple text-neon-purple rounded-full h-12 w-12 flex items-center justify-center transition-all duration-300;
-        }
-        .share-btn:hover {
-            @apply bg-neon-purple text-white scale-110 shadow-lg shadow-neon-purple/30;
-        }
-        #notification-toast {
-            @apply fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform translate-y-20 opacity-0;
-        }
-        #notification-toast.show {
-            @apply transform translate-y-0 opacity-100;
-        }
+        .prose-custom { @apply text-lg leading-relaxed space-y-4; }
+        .prose-custom h1, .prose-custom h2, .prose-custom h3 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; @apply holographic-text my-6; }
+        .prose-custom a { color: var(--neon-blue); text-decoration: underline; }
+        .prose-custom p { @apply mb-4; }
+        .sound-play-btn { @apply flex items-center gap-3 px-4 py-2 rounded-lg font-bold text-white transition-all duration-200; background-color: rgba(57, 255, 20, 0.2); border: 2px solid var(--neon-green); }
+        .sound-play-btn:hover { background-color: var(--neon-green); color: var(--dark-bg); box-shadow: 0 0 15px var(--neon-green); transform: scale(1.05); }
+        .did-you-know-item { @apply flex items-start gap-4 text-lg; }
+        .did-you-know-item i { @apply mt-1; }
+        .essential-game-card { @apply hud-border rounded-lg p-4 text-center font-bold text-lg w-48 h-24 flex items-center justify-center; transition: all 0.2s ease-in-out; }
+        .essential-game-card:hover { border-color: var(--neon-purple); color: var(--neon-purple); transform: translateY(-4px); }
+        .card-title { @apply text-2xl font-bold text-white border-b-2 border-neon-blue/50 pb-2 mb-6; font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
+        .card-subtitle { @apply text-xl font-bold text-neon-blue mb-4; font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
+        .video-card { @apply bg-black/30 p-2 rounded-md; }
+        .video-title { @apply text-center text-sm font-semibold mt-2 text-gray-300; }
+        .thumbnail-btn { @apply hud-border border-2 border-neon-blue/50 rounded-lg px-3 py-2 text-sm text-white font-semibold uppercase tracking-wider transition-all duration-200 flex-grow text-center; box-shadow: none; }
+        .thumbnail-btn:hover { border-color: var(--neon-purple); color: var(--neon-purple); }
+        .thumbnail-btn.active { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+        .placeholder-card { @apply text-center text-gray-400 italic p-6 border-2 border-dashed border-gray-600 rounded-lg; }
+        .placeholder-card i { @apply text-3xl text-neon-blue mb-3; }
+        .image-nav-btn { @apply h-10 w-10 bg-neon-blue/20 text-neon-blue border-2 border-neon-blue rounded-full flex items-center justify-center transition-all duration-200; }
+        .image-nav-btn:hover { @apply bg-neon-purple text-white border-neon-purple scale-110; }
+        .share-btn { @apply bg-transparent border-2 border-neon-purple text-neon-purple rounded-full h-12 w-12 flex items-center justify-center transition-all duration-300; }
+        .share-btn:hover { @apply bg-neon-purple text-white scale-110 shadow-lg shadow-neon-purple/30; }
+        #notification-toast { @apply fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform translate-y-20 opacity-0; }
+        #notification-toast.show { @apply transform translate-y-0 opacity-100; }
     </style>
 </head>
 <body class="antialiased" style="background: var(--metal-bg);">
 
-    <!-- Header Fixo Simplificado -->
     <header class="sticky top-0 z-50 p-4">
         <div class="container mx-auto hud-border rounded-xl px-4 py-3 flex justify-between items-center">
             <a href="galeria.html" class="text-2xl font-bold tracking-widest holographic-text">MIV</a>
@@ -198,19 +103,13 @@
     </header>
 
     <main class="container mx-auto px-4 pt-12 pb-16">
-        <!-- Conteúdo do Item Carregado Dinamicamente -->
-        <article id="item-container" class="opacity-0 transition-opacity duration-500">
-            <!-- O conteúdo será preenchido pelo JavaScript -->
-        </article>
+        <article id="item-container" class="opacity-0 transition-opacity duration-500"></article>
         
-        <!-- Estado de Carregamento Global / Erro -->
         <div id="status-container" class="text-center py-20">
-             <!-- Loader inicial -->
             <div id="loader">
                 <i class="fas fa-sync fa-spin text-5xl text-neon-blue"></i>
                 <p class="mt-4 text-2xl holographic-text">A carregar detalhes do item...</p>
             </div>
-            <!-- Mensagem de erro global -->
             <div id="error-message" class="hidden">
                 <i class="fas fa-exclamation-triangle text-5xl text-red-500"></i>
                 <p class="mt-4 text-2xl text-red-400">Ocorreu um Erro</p>
@@ -219,7 +118,6 @@
         </div>
     </main>
     
-    <!-- Elementos Globais -->
     <audio id="audio-player"></audio>
     <div id="notification-toast">Link copiado para a área de transferência!</div>
 
@@ -229,12 +127,10 @@
         </div>
     </footer>
 
-    <!-- Firebase e Lógica da Página -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
@@ -248,7 +144,6 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // Elementos do DOM
         const itemContainer = document.getElementById('item-container');
         const statusContainer = document.getElementById('status-container');
         const loader = document.getElementById('loader');
@@ -256,11 +151,9 @@
         const errorText = document.getElementById('error-text');
         const audioPlayer = document.getElementById('audio-player');
         
-        // Estado da Galeria
         let galleryData = [];
         let currentImageIndex = 0;
 
-        // --- Funções da Galeria e UI ---
         window.selectImage = (index) => {
             currentImageIndex = index;
             const mainImage = document.getElementById('main-item-image');
@@ -271,98 +164,48 @@
                     mainImage.style.opacity = 1;
                 }, 200);
             }
-            
-            document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => {
-                btn.classList.toggle('active', i === index);
-            });
-
+            document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
             const imageCounter = document.getElementById('image-counter');
-            if (imageCounter) {
-                imageCounter.textContent = `${index + 1} / ${galleryData.length}`;
-            }
+            if (imageCounter) imageCounter.textContent = `${index + 1} / ${galleryData.length}`;
         };
-
-        window.nextImage = () => {
-            const newIndex = (currentImageIndex + 1) % galleryData.length;
-            selectImage(newIndex);
-        };
-
-        window.prevImage = () => {
-            const newIndex = (currentImageIndex - 1 + galleryData.length) % galleryData.length;
-            selectImage(newIndex);
-        };
-
-        window.playSound = (soundUrl) => {
-            if (audioPlayer) {
-                audioPlayer.src = soundUrl;
-                audioPlayer.play();
-            }
-        };
-
-        // --- Função de Partilha ---
+        window.nextImage = () => selectImage((currentImageIndex + 1) % galleryData.length);
+        window.prevImage = () => selectImage((currentImageIndex - 1 + galleryData.length) % galleryData.length);
+        window.playSound = (soundUrl) => { if (audioPlayer) { audioPlayer.src = soundUrl; audioPlayer.play(); } };
         window.sharePage = () => {
-            const urlToCopy = window.location.href;
             const tempInput = document.createElement('textarea');
-            tempInput.value = urlToCopy;
+            tempInput.value = window.location.href;
             document.body.appendChild(tempInput);
             tempInput.select();
             document.execCommand('copy');
             document.body.removeChild(tempInput);
-
-            // Mostra notificação
             const toast = document.getElementById('notification-toast');
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         };
 
-        // --- Funções de Renderização de Conteúdo ---
         const createPlaceholder = (icon, text) => `<div class="placeholder-card"><i class="fas ${icon}"></i><p>${text}</p></div>`;
-
-        const createHistorySection = (item) => {
-            const content = item.detalhes 
-                ? `<div class="prose-custom mt-4">${item.detalhes}</div>`
-                : createPlaceholder('fa-book-open', 'Em breve: A história completa e o legado deste item serão adicionados.');
-            return `<section class="hud-border rounded-lg p-8 mb-12"><h2 class="card-title">A História do Herói</h2>${content}</section>`;
-        };
-
+        const createHistorySection = (item) => `<section class="hud-border rounded-lg p-8 mb-12"><h2 class="card-title">A História do Herói</h2>${item.detalhes ? `<div class="prose-custom mt-4">${item.detalhes}</div>` : createPlaceholder('fa-book-open', 'Em breve: A história completa e o legado deste item serão adicionados.')}</section>`;
         const createActionSection = (item) => {
-            const sons = (item.sons_iconicos && item.sons_iconicos.length > 0)
-                ? `<div class="flex flex-wrap gap-4">${item.sons_iconicos.filter(s => s && s.url).map(s => `<button onclick="playSound('${s.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${s.nome || 'Ouvir'}</button>`).join('')}</div>`
-                : createPlaceholder('fa-music', 'Estamos a procurar os sons mais marcantes. Volte em breve!');
-            const videos = (item.videos_epoca && item.videos_epoca.length > 0)
-                ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${item.videos_epoca.filter(v => v && v.embed_url).map(v => `<div class="video-card"><video controls class="w-full h-auto rounded-md"><source src="${v.embed_url}" type="video/mp4"></video><h4 class="video-title">${v.nome || 'Vídeo'}</h4></div>`).join('')}</div>`
-                : createPlaceholder('fa-video', 'Em breve: Vídeos e comerciais de época para uma viagem no tempo.');
-
+            const sons = (item.sons_iconicos?.length > 0) ? `<div class="flex flex-wrap gap-4">${item.sons_iconicos.filter(s => s?.url).map(s => `<button onclick="playSound('${s.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${s.nome || 'Ouvir'}</button>`).join('')}</div>` : createPlaceholder('fa-music', 'Estamos a procurar os sons mais marcantes. Volte em breve!');
+            const videos = (item.videos_epoca?.length > 0) ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${item.videos_epoca.filter(v => v?.embed_url).map(v => `<div class="video-card"><video controls class="w-full h-auto rounded-md"><source src="${v.embed_url}" type="video/mp4"></video><h4 class="video-title">${v.nome || 'Vídeo'}</h4></div>`).join('')}</div>` : createPlaceholder('fa-video', 'Em breve: Vídeos e comerciais de época.');
             return `<div class="hud-border rounded-lg p-8 flex flex-col"><h2 class="card-title">Em Ação</h2><div><h3 class="card-subtitle">Sons Icónicos</h3>${sons}</div><div class="mt-8"><h3 class="card-subtitle">Vídeos da Época</h3>${videos}</div></div>`;
         };
-
         const createDidYouKnowSection = (item) => {
-            const fatos = (item.voce_sabia && item.voce_sabia.length > 0)
-                ? `<ul class="space-y-4">${item.voce_sabia.filter(f => f).map(f => `<li class="did-you-know-item"><i class="fas fa-star text-yellow-400"></i><span>${f}</span></li>`).join('')}</ul>`
-                : createPlaceholder('fa-lightbulb', 'Estamos a desenterrar as curiosidades mais interessantes. Fique atento!');
+            const fatos = (item.voce_sabia?.length > 0) ? `<ul class="space-y-4">${item.voce_sabia.filter(f => f).map(f => `<li class="did-you-know-item"><i class="fas fa-star text-yellow-400"></i><span>${f}</span></li>`).join('')}</ul>` : createPlaceholder('fa-lightbulb', 'Estamos a desenterrar as curiosidades mais interessantes.');
             return `<div class="hud-border rounded-lg p-8"><h2 class="card-title">Você Sabia?</h2>${fatos}</div>`;
         };
-        
         const createGamesSection = (item) => {
-            const content = (item.jogos_essenciais && item.jogos_essenciais.length > 0)
-                ? `<div class="flex flex-wrap gap-4 justify-center">${item.jogos_essenciais.map(j => `<div class="essential-game-card">${j}</div>`).join('')}</div>`
-                : createPlaceholder('fa-ghost', 'A nossa lista de jogos imperdíveis para esta plataforma está a ser preparada.');
+            const content = (item.jogos_essenciais?.length > 0) ? `<div class="flex flex-wrap gap-4 justify-center">${item.jogos_essenciais.map(j => `<div class="essential-game-card">${j}</div>`).join('')}</div>` : createPlaceholder('fa-ghost', 'A nossa lista de jogos imperdíveis para esta plataforma está a ser preparada.');
             return `<section><h2 class="text-3xl font-bold text-center mb-6 holographic-text">Jogos Essenciais</h2><div class="hud-border rounded-lg p-8 mt-6">${content}</div></section>`;
         };
-        
         const showStatus = (isError, message = '') => {
             loader.classList.add('hidden');
             errorMessage.classList.remove('hidden');
             errorText.textContent = message;
         };
 
-        // --- Função Principal de Carregamento ---
         async function carregarItem() {
-            const params = new URLSearchParams(window.location.search);
-            const itemId = params.get('id');
-
+            const itemId = new URLSearchParams(window.location.search).get('id');
             if (!itemId) {
                 showStatus(true, 'ID do item não encontrado na URL.');
                 return;
@@ -378,26 +221,12 @@
                     
                     galleryData = [];
                     if (item.imagem_principal) galleryData.push({ name: 'Principal', url: item.imagem_principal });
-                    if (item.galeria_imagens && Array.isArray(item.galeria_imagens)) {
-                        item.galeria_imagens.forEach(img => {
-                            if (img && img.url) galleryData.push({ name: img.nome || 'Imagem', url: img.url });
-                        });
-                    }
+                    if (item.galeria_imagens) galleryData.push(...item.galeria_imagens.filter(img => img?.url));
                     
                     const mainImageURL = galleryData.length > 0 ? galleryData[0].url : 'https://placehold.co/600x400/0D0D1A/E0E0E0?text=Sem+Imagem';
-                    
-                    const imageNavHTML = galleryData.length > 1 ? `
-                        <div id="image-nav-container" class="flex items-center justify-center gap-6 mt-4">
-                            <button id="prev-image-btn" onclick="prevImage()" class="image-nav-btn"><i class="fas fa-chevron-left"></i></button>
-                            <span id="image-counter" class="text-lg font-bold text-white">1 / ${galleryData.length}</span>
-                            <button id="next-image-btn" onclick="nextImage()" class="image-nav-btn"><i class="fas fa-chevron-right"></i></button>
-                        </div>` : '';
+                    const imageNavHTML = galleryData.length > 1 ? `<div id="image-nav-container" class="flex items-center justify-center gap-6 mt-4"><button onclick="prevImage()" class="image-nav-btn"><i class="fas fa-chevron-left"></i></button><span id="image-counter" class="text-lg font-bold text-white">1 / ${galleryData.length}</span><button onclick="nextImage()" class="image-nav-btn"><i class="fas fa-chevron-right"></i></button></div>` : '';
+                    const thumbnailGalleryHTML = galleryData.length > 1 ? `<div class="mt-8 hud-border rounded-lg p-6"><h2 class="card-title">Galeria</h2><div class="flex flex-wrap gap-3">${galleryData.map((img, i) => `<button onclick="selectImage(${i})" class="thumbnail-btn ${i === 0 ? 'active' : ''}">${img.name || 'Imagem'}</button>`).join('')}</div></div>` : '';
 
-                    const thumbnailGalleryHTML = galleryData.length > 1 
-                        ? `<div class="mt-8 hud-border rounded-lg p-6"><h2 class="card-title">Galeria</h2><div class="flex flex-wrap gap-3">${galleryData.map((img, i) => `<button onclick="selectImage(${i})" class="thumbnail-btn ${i === 0 ? 'active' : ''}">${img.name}</button>`).join('')}</div></div>`
-                        : '';
-
-                    // ATUALIZADO: Lista de campos da ficha técnica com os novos itens e ícones.
                     const fichaTecnicaFields = [
                         { icon: 'fa-microchip', label: 'Fabricante', value: item.fabricante },
                         { icon: 'fa-calendar-days', label: 'Lançamento', value: item.lancamento },
@@ -412,48 +241,47 @@
                         { icon: 'fa-chart-line', label: 'Vendas', value: item.vendas },
                         { icon: 'fa-dollar-sign', label: 'Preço Lanç.', value: item.preco }
                     ];
+                    
+                    // NOVO: Renderizar campos personalizados
+                    let customFieldsHTML = '';
+                    if (item.camposPersonalizados && typeof item.camposPersonalizados === 'object') {
+                        for (const [key, value] of Object.entries(item.camposPersonalizados)) {
+                            if (value) { // Apenas renderiza se houver valor
+                                customFieldsHTML += `<li><strong><i class="fa-solid fa-cogs w-6 text-neon-blue"></i> ${key}:</strong> ${value}</li>`;
+                            }
+                        }
+                    }
 
                     const contentHTML = `
                         <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
                             <h1 class="text-5xl md:text-7xl font-black text-center md:text-left holographic-text flex-grow">${item.nome || 'Item Desconhecido'}</h1>
-                            <button onclick="sharePage()" class="share-btn flex-shrink-0" title="Partilhar esta página">
-                                <i class="fas fa-share-alt text-xl"></i>
-                            </button>
+                            <button onclick="sharePage()" class="share-btn flex-shrink-0" title="Partilhar esta página"><i class="fas fa-share-alt text-xl"></i></button>
                         </div>
-                        
                         <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
                             <div class="lg:col-span-2">
-                                <div class="hud-border rounded-lg p-2 bg-black">
-                                    <img id="main-item-image" src="${mainImageURL}" alt="Imagem de ${item.nome}" class="w-full rounded-md object-contain transition-opacity duration-300 aspect-video" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0D0D1A/E0E0E0?text=Imagem+Indispon%C3%ADvel';">
-                                </div>
+                                <div class="hud-border rounded-lg p-2 bg-black"><img id="main-item-image" src="${mainImageURL}" alt="Imagem de ${item.nome}" class="w-full rounded-md object-contain transition-opacity duration-300 aspect-video" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0D0D1A/E0E0E0?text=Imagem+Indispon%C3%ADvel';"></div>
                                 ${imageNavHTML}
                             </div>
-                            
                             <div class="flex flex-col">
                                 <div class="hud-border rounded-lg p-6 self-start w-full">
                                     <h2 class="card-title">Ficha Técnica</h2>
                                     <ul class="space-y-3 text-lg">
                                         ${fichaTecnicaFields.map(f => f.value ? `<li><strong><i class="fa-solid ${f.icon} w-6 text-neon-blue"></i> ${f.label}:</strong> ${f.value}</li>` : '').join('')}
+                                        ${customFieldsHTML}
                                     </ul>
                                 </div>
                                 ${thumbnailGalleryHTML}
                             </div>
                         </section>
-
                         ${createHistorySection(item)}
-
-                        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                            ${createActionSection(item)}
-                            ${createDidYouKnowSection(item)}
-                        </section>
-
+                        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">${createActionSection(item)}${createDidYouKnowSection(item)}</section>
                         ${createGamesSection(item)}
                     `;
                     
                     itemContainer.innerHTML = contentHTML;
                     statusContainer.style.display = 'none';
                     itemContainer.classList.remove('opacity-0');
-                    selectImage(0); // Inicia o contador e o estado ativo
+                    if(galleryData.length > 0) selectImage(0);
 
                 } else {
                     showStatus(true, 'Item não encontrado na nossa base de dados.');

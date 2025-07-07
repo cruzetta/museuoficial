@@ -46,6 +46,11 @@
                 <div><label for="acervos-cores" class="block text-sm font-medium text-gray-700">Paleta de Cores</label><input type="text" id="acervos-cores" placeholder="Ex: 16 cores"></div>
                 <div><label for="acervos-vendas" class="block text-sm font-medium text-gray-700">Vendas (aprox.)</label><input type="text" id="acervos-vendas" placeholder="Ex: ~50 milhões"></div>
                 <div class="md:col-span-2"><label for="acervos-preco" class="block text-sm font-medium text-gray-700">Preço de Lançamento</label><input type="text" id="acervos-preco" placeholder="Ex: US$ 199 (dólares de 1983)"></div>
+                
+                <!-- NOVO: Container para campos personalizados -->
+                <div id="acervos-campos-personalizados-container" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 mt-2">
+                    <!-- Campos personalizados serão injetados aqui pelo JavaScript -->
+                </div>
             </div>
         </fieldset>
 
@@ -118,7 +123,6 @@
             const currentValue = selectElement.value; // Preserve current value if possible
             let options = snapshot.docs.map(doc => doc.data());
 
-            // Sort options
             options.sort((a,b) => {
                 if (typeof a[fieldName] === 'string') return a[fieldName].localeCompare(b[fieldName]);
                 return a[fieldName] - b[fieldName];
@@ -135,10 +139,39 @@
         });
     };
     
-    // POPULAR OS SELECTS AO CARREGAR A ABA
+    // NOVO: FUNÇÃO PARA CARREGAR CAMPOS PERSONALIZADOS
+    const loadCustomFields = () => {
+        const container = document.getElementById('acervos-campos-personalizados-container');
+        container.innerHTML = ''; // Limpa antes de carregar
+        const customFieldsRef = collection(db, `/artifacts/${appId}/public/data/opcoes_campos_personalizados`);
+        onSnapshot(customFieldsRef, (snapshot) => {
+            container.innerHTML = ''; // Limpa novamente para evitar duplicatas em atualizações
+            if (snapshot.empty) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'grid';
+            snapshot.docs.forEach(doc => {
+                const fieldData = doc.data();
+                const fieldId = `custom-field-${doc.id}`;
+                const fieldName = fieldData.nome;
+                const fieldPlaceholder = fieldData.placeholder || '';
+                
+                const fieldWrapper = document.createElement('div');
+                fieldWrapper.innerHTML = `
+                    <label for="${fieldId}" class="block text-sm font-medium text-gray-700">${fieldName}</label>
+                    <input type="text" id="${fieldId}" data-field-name="${fieldName}" placeholder="${fieldPlaceholder}">
+                `;
+                container.appendChild(fieldWrapper);
+            });
+        });
+    };
+
+    // POPULAR OS SELECTS E CARREGAR CAMPOS PERSONALIZADOS
     populateSelect('acervos-fabricante', 'opcoes_fabricantes', 'nome', 'Selecione um fabricante');
     populateSelect('acervos-geracao', 'opcoes_geracoes', 'nome', 'Selecione uma geração');
     populateSelect('acervos-lancamento', 'opcoes_anos', 'ano', 'Selecione um ano');
+    loadCustomFields(); // Chamar a nova função
 
 
     const repeaterTemplates = {
@@ -226,6 +259,8 @@
             const container = document.getElementById(`acervos-${type}-container`);
             if(container) container.innerHTML = '';
         });
+        // NOVO: Limpar campos personalizados
+        document.querySelectorAll('#acervos-campos-personalizados-container input').forEach(input => input.value = '');
         window.resetUploadUI('acervos-imagem_principal');
         window.pendingFiles.clear();
     };
@@ -239,13 +274,11 @@
                 const data = docSnap.data();
                 document.getElementById(`${entity}-id`).value = docSnap.id;
                 
-                // Campos de texto simples
                 ['nome', 'media', 'vendas', 'cpu', 'gpu', 'audio', 'ram', 'resolucao', 'cores', 'preco'].forEach(field => {
                     const element = document.getElementById(`${entity}-${field}`);
                     if (element) element.value = data[field] || '';
                 });
 
-                // Campos SELECT
                 ['fabricante', 'lancamento', 'geracao'].forEach(field => {
                     const element = document.getElementById(`${entity}-${field}`);
                     if (element) element.value = data[field] || '';
@@ -265,6 +298,17 @@
                         data[type].forEach(itemData => addRepeaterItem(type, itemData));
                     }
                 });
+                
+                // NOVO: Preencher campos personalizados
+                if (data.camposPersonalizados) {
+                    document.querySelectorAll('#acervos-campos-personalizados-container input').forEach(input => {
+                        const fieldName = input.dataset.fieldName;
+                        if (data.camposPersonalizados[fieldName]) {
+                            input.value = data.camposPersonalizados[fieldName];
+                        }
+                    });
+                }
+
                 window.scrollTo(0, 0);
             }
         } catch (error) {
@@ -273,9 +317,6 @@
         }
     };
     
-    // ==================================================================
-    // === INÍCIO DA CORREÇÃO: NOVA FUNÇÃO DE EXCLUSÃO PARA ACERVOS ===
-    // ==================================================================
     const performDeleteDoc = async (id) => {
         const confirmed = await window.showConfirmModal();
         if (!confirmed) return;
@@ -287,34 +328,25 @@
 
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                
-                // Coleta todas as URLs dos arquivos a serem excluídos
-                if (data.imagem_principal) {
-                    urlsToDelete.push(data.imagem_principal);
-                }
-                
+                if (data.imagem_principal) urlsToDelete.push(data.imagem_principal);
                 const fileRepeaterFields = ['galeria_imagens', 'sons_iconicos', 'videos_epoca'];
                 fileRepeaterFields.forEach(field => {
                     if (data[field] && Array.isArray(data[field])) {
                         data[field].forEach(item => {
                             const url = item.url || item.embed_url;
-                            if(url) {
-                                urlsToDelete.push(url);
-                            }
+                            if(url) urlsToDelete.push(url);
                         });
                     }
                 });
             }
 
-            // Deleta cada arquivo do Storage
-            // Usamos Promise.allSettled para tentar deletar todos, mesmo que alguns falhem
             const deletePromises = urlsToDelete.map(url => {
                 try {
                     const fileRef = ref(storage, url);
                     return deleteObject(fileRef);
                 } catch (e) {
                     console.warn("URL inválida, não foi possível criar referência para apagar:", url, e);
-                    return Promise.resolve(); // Ignora URL inválida e continua
+                    return Promise.resolve();
                 }
             });
 
@@ -325,7 +357,6 @@
                 }
             });
 
-            // Finalmente, deleta o documento do Firestore
             await deleteDoc(docRef);
             window.showNotification("Item do acervo eliminado com sucesso!");
             clearForm();
@@ -335,9 +366,6 @@
             window.showNotification("Erro ao eliminar o item.", true);
         }
     };
-    // ==================================================================
-    // === FIM DA CORREÇÃO ===
-    // ==================================================================
     
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -346,11 +374,9 @@
 
         const data = {
             nome: document.getElementById('acervos-nome').value,
-            // PEGAR VALORES DOS SELECTS
             fabricante: document.getElementById('acervos-fabricante').value,
             lancamento: document.getElementById('acervos-lancamento').value,
             geracao: document.getElementById('acervos-geracao').value,
-            // RESTANTE DOS CAMPOS
             media: document.getElementById('acervos-media').value,
             vendas: document.getElementById('acervos-vendas').value,
             cpu: document.getElementById('acervos-cpu').value,
@@ -361,8 +387,18 @@
             cores: document.getElementById('acervos-cores').value,
             preco: document.getElementById('acervos-preco').value,
             detalhes: tinymce.get(editorId)?.getContent() || '',
+            camposPersonalizados: {} // NOVO: Inicializa o objeto para campos personalizados
         };
         
+        // NOVO: Coletar dados dos campos personalizados
+        document.querySelectorAll('#acervos-campos-personalizados-container input').forEach(input => {
+            const fieldName = input.dataset.fieldName;
+            const fieldValue = input.value.trim();
+            if (fieldName && fieldValue) {
+                data.camposPersonalizados[fieldName] = fieldValue;
+            }
+        });
+
         repeaterFields.forEach(type => {
             data[type] = [];
             document.getElementById(`acervos-${type}-container`).querySelectorAll('.repeater-item').forEach(itemDiv => {
@@ -458,7 +494,6 @@
             return;
         }
         const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        // Ordena os itens alfabeticamente pelo nome para consistência
         docs.sort((a,b) => (a.nome || '').localeCompare(b.nome || ''));
 
         docs.forEach(data => {
@@ -475,7 +510,6 @@
         }
     });
 
-    // Listener de clique atualizado para chamar a função de exclusão
     listContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('edit-btn')) {
             editDoc(e.target.dataset.id);

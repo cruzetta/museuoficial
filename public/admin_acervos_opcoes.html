@@ -60,6 +60,30 @@
             <div id="anos-lista" class="space-y-3"></div>
         </div>
     </div>
+
+    <!-- NOVO: Gestor de Campos Personalizados -->
+    <div id="campos-personalizados-manager" class="manager-section bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6">Gerir Campos da Ficha Técnica</h2>
+        <form id="form-campos-personalizados" class="space-y-4 mb-6 pb-6 border-b">
+            <input type="hidden" id="campos-personalizados-id">
+            <div>
+                <label for="campos-personalizados-nome" class="block text-sm font-medium text-gray-700">Nome do Campo</label>
+                <input type="text" id="campos-personalizados-nome" placeholder="Ex: Voltagem, Cor, Modelo" required>
+            </div>
+            <div>
+                <label for="campos-personalizados-placeholder" class="block text-sm font-medium text-gray-700">Texto de Exemplo (Placeholder)</label>
+                <input type="text" id="campos-personalizados-placeholder" placeholder="Ex: 110V / 220V (Bivolt)">
+            </div>
+            <div class="flex gap-4">
+                <button type="submit">Guardar Campo</button>
+                <button type="button" class="cancel-edit-btn w-auto">Cancelar Edição</button>
+            </div>
+        </form>
+        <div>
+            <h3 class="text-xl font-bold mb-4">Campos Personalizados Existentes</h3>
+            <div id="campos-personalizados-lista" class="space-y-3"></div>
+        </div>
+    </div>
 </div>
 
 <!-- Script Específico da Aba Opções -->
@@ -69,25 +93,27 @@
     const { appId } = window.appConfig;
 
     const optionTypes = [
-        { name: 'fabricantes', field: 'nome' },
-        { name: 'geracoes', field: 'nome' },
-        { name: 'anos', field: 'ano' }
+        { name: 'fabricantes', fields: { nome: 'text' } },
+        { name: 'geracoes', fields: { nome: 'text' } },
+        { name: 'anos', fields: { ano: 'number' } },
+        // NOVO: Configuração para campos personalizados
+        { name: 'campos-personalizados', collectionName: 'opcoes_campos_personalizados', fields: { nome: 'text', placeholder: 'text' } }
     ];
 
     const setupManager = (typeConfig) => {
-        const { name, field } = typeConfig;
+        const name = typeConfig.name;
+        const collectionName = typeConfig.collectionName || `opcoes_${name.replace('-', '_')}`;
         const form = document.getElementById(`form-${name}`);
         const listContainer = document.getElementById(`${name}-lista`);
         const idInput = document.getElementById(`${name}-id`);
-        const nameInput = document.getElementById(`${name}-nome`);
         const cancelButton = form.querySelector('.cancel-edit-btn');
 
-        const collectionRef = collection(db, `/artifacts/${appId}/public/data/opcoes_${name}`);
+        const collectionRef = collection(db, `/artifacts/${appId}/public/data/${collectionName}`);
 
         const clearForm = () => {
             form.reset();
             idInput.value = '';
-            form.querySelector('button[type="submit"]').textContent = `Guardar ${name.slice(0, -1)}`;
+            form.querySelector('button[type="submit"]').textContent = `Guardar ${name.slice(0, -1).replace('-', ' ')}`;
             cancelButton.classList.add('hidden');
         };
 
@@ -97,10 +123,28 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = idInput.value;
-            const value = nameInput.value.trim();
-            if (!value) return;
+            const data = {};
+            let hasValue = false;
 
-            const data = { [field]: (field === 'ano' ? Number(value) : value) };
+            Object.keys(typeConfig.fields).forEach(field => {
+                const input = document.getElementById(`${name}-${field}`);
+                if (input) {
+                    const value = input.value.trim();
+                    if (value) hasValue = true;
+                    const fieldType = typeConfig.fields[field];
+                    data[field] = fieldType === 'number' ? Number(value) : value;
+                }
+            });
+
+            if (!hasValue) {
+                 // Pega o primeiro campo como obrigatório se nenhum valor for fornecido
+                const firstField = Object.keys(typeConfig.fields)[0];
+                const firstInput = document.getElementById(`${name}-${firstField}`);
+                if (!firstInput.value.trim()){
+                    window.showNotification(`O campo '${firstField}' é obrigatório.`, true);
+                    return;
+                }
+            }
 
             try {
                 if (id) {
@@ -125,10 +169,10 @@
             
             const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
             
-            // Sort by the specific field
+            const firstFieldName = Object.keys(typeConfig.fields)[0];
             docs.sort((a, b) => {
-                const valA = a[field];
-                const valB = b[field];
+                const valA = a[firstFieldName];
+                const valB = b[firstFieldName];
                 if (typeof valA === 'string') return valA.localeCompare(valB);
                 return valA - valB;
             });
@@ -136,10 +180,22 @@
             docs.forEach(docData => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+                
+                let displayHTML = `<p class="font-semibold text-sm truncate pr-4">${docData[firstFieldName]}</p>`;
+                // Para campos personalizados, mostrar também o placeholder
+                if (name === 'campos-personalizados' && docData.placeholder) {
+                     displayHTML += `<p class="text-xs text-gray-500 italic truncate pr-4">Ex: ${docData.placeholder}</p>`;
+                }
+
+                let dataAttributes = '';
+                Object.keys(docData).forEach(key => {
+                    dataAttributes += `data-${key}="${docData[key]}" `;
+                });
+
                 itemDiv.innerHTML = `
-                    <p class="font-semibold text-sm truncate pr-4">${docData[field]}</p>
+                    <div class="flex-grow">${displayHTML}</div>
                     <div class="flex-shrink-0 flex gap-2">
-                        <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${docData.id}" data-value="${docData[field]}">Editar</button>
+                        <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${docData.id}" ${dataAttributes}>Editar</button>
                         <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${docData.id}">Eliminar</button>
                     </div>
                 `;
@@ -151,10 +207,18 @@
             const target = e.target;
             if (target.classList.contains('edit-btn')) {
                 idInput.value = target.dataset.id;
-                nameInput.value = target.dataset.value;
+                
+                Object.keys(typeConfig.fields).forEach(field => {
+                    const input = document.getElementById(`${name}-${field}`);
+                    if (input && target.dataset[field]) {
+                        input.value = target.dataset[field];
+                    }
+                });
+
                 form.querySelector('button[type="submit"]').textContent = 'Atualizar';
                 cancelButton.classList.remove('hidden');
-                nameInput.focus();
+                const firstInput = document.getElementById(`${name}-${Object.keys(typeConfig.fields)[0]}`);
+                if(firstInput) firstInput.focus();
                 window.scrollTo({ top: form.offsetTop - 20, behavior: 'smooth' });
             }
             if (target.classList.contains('delete-btn')) {
