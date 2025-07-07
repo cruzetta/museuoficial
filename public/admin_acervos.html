@@ -82,7 +82,8 @@
             </div>
         </fieldset>
         
-        <div id="acervos-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4">
+        <!-- ### NOVO: BARRA DE PROGRESSO ### -->
+        <div id="acervos-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700">
             <div id="acervos-upload-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">0%</div>
         </div>
 
@@ -172,7 +173,7 @@
                if (placeholderElement) placeholderElement.classList.add('hidden');
             }
         } else if (typeof data === 'string') {
-            const simpleInput = itemDiv.querySelector('input');
+            const simpleInput = itemDiv.querySelector('input.repeater-input');
             if (simpleInput) simpleInput.value = data;
         }
 
@@ -255,58 +256,85 @@
             detalhes: tinymce.get(editorId)?.getContent() || '',
         };
         
-        // ### CORREÇÃO DO BUG DE EDIÇÃO APLICADA AQUI ###
+        // ### CORREÇÃO BUG DE EDIÇÃO (LÓGICA ROBUSTA) ###
         repeaterFields.forEach(type => {
             data[type] = [];
             document.getElementById(`acervos-${type}-container`).querySelectorAll('.repeater-item').forEach(itemDiv => {
-                const itemData = {};
-                const simpleInput = itemDiv.querySelector('input:not([type=file])');
-                const complexInputs = itemDiv.querySelectorAll('input[data-field]');
-                
-                if (complexInputs.length > 0) {
-                    // Coleta campos de texto como 'nome'
-                    complexInputs.forEach(input => { itemData[input.dataset.field] = input.value.trim(); });
-                    
-                    // Pega a URL do arquivo que JÁ EXISTIA e estava carregado na página
-                    const fileNameDisplay = itemDiv.querySelector('.file-name-display');
-                    const existingUrl = fileNameDisplay?.dataset.existingUrl;
-                    
-                    if (existingUrl) {
-                        // Define a chave correta ('embed_url' para vídeos, 'url' para os outros)
-                        const urlField = (type === 'videos_epoca') ? 'embed_url' : 'url';
-                        itemData[urlField] = existingUrl;
-                    }
-                    data[type].push(itemData);
+                const simpleInput = itemDiv.querySelector('input.repeater-input:not([data-field])');
+                const complexInputs = itemDiv.querySelectorAll('input.repeater-input[data-field]');
 
-                } else if (simpleInput && simpleInput.value) {
-                    // Para campos simples como 'voce_sabia' e 'jogos_essenciais'
-                    data[type].push(simpleInput.value.trim());
+                // Lida com repetidores de texto simples (ex: curiosidades)
+                if (simpleInput) {
+                    if (simpleInput.value) {
+                        data[type].push(simpleInput.value.trim());
+                    }
+                    return; // vai para o próximo item
+                }
+
+                // Lida com repetidores complexos com arquivos (ex: galeria, sons, vídeos)
+                if (complexInputs.length > 0) {
+                    const itemData = {};
+                    complexInputs.forEach(input => {
+                        itemData[input.dataset.field] = input.value.trim();
+                    });
+
+                    // Preserva a URL existente se nenhum arquivo novo foi selecionado para este item
+                    const fileInput = itemDiv.querySelector('input[type="file"]');
+                    if (fileInput && !window.pendingFiles.has(fileInput.id)) {
+                        const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+                        const existingUrl = fileNameDisplay?.dataset.existingUrl;
+                        if (existingUrl) {
+                            const urlField = (type === 'videos_epoca') ? 'embed_url' : 'url';
+                            itemData[urlField] = existingUrl;
+                        }
+                    }
+                    
+                    data[type].push(itemData);
                 }
             });
         });
 
+        const progressContainer = document.getElementById('acervos-upload-progress-container');
+        const progressBar = document.getElementById('acervos-upload-progress-bar');
+        
         try {
             const filesToUpload = Array.from(window.pendingFiles.entries());
-            const uploadPromises = filesToUpload.map(([key, file]) => {
-                let path = key.startsWith('repeater-file-') ? 'acervos/repeater/' : 'acervos/main/';
-                return window.uploadFile(file, path).then(url => ({ key, url }));
-            });
-            const uploadResults = await Promise.all(uploadPromises);
+            
+            if (filesToUpload.length > 0) {
+                progressContainer.classList.remove('hidden');
+                const individualProgress = new Array(filesToUpload.length).fill(0);
 
-            uploadResults.forEach(({ key, url }) => {
-                if (key === 'acervos-imagem_principal') {
-                    data.imagem_principal = url;
-                } else if (key.startsWith('repeater-file-')) {
-                    const fileInput = document.getElementById(key);
-                    const repeaterItem = fileInput.closest('.repeater-item');
-                    const repeaterType = repeaterItem.dataset.repeaterType;
-                    const itemIndex = [...repeaterItem.parentElement.children].indexOf(repeaterItem);
-                    if (data[repeaterType] && data[repeaterType][itemIndex]) {
-                        const urlField = (repeaterType === 'videos_epoca') ? 'embed_url' : 'url';
-                        data[repeaterType][itemIndex][urlField] = url;
+                const uploadPromises = filesToUpload.map(([key, file], index) => {
+                    let path = key.startsWith('repeater-file-') ? 'acervos/repeater/' : 'acervos/main/';
+                    
+                    // ### NOVO: LÓGICA DA BARRA DE PROGRESSO ###
+                    const progressCallback = (progress) => {
+                        individualProgress[index] = progress;
+                        const totalProgress = individualProgress.reduce((sum, p) => sum + p, 0) / individualProgress.length;
+                        const percentage = Math.round(totalProgress * 100);
+                        progressBar.style.width = `${percentage}%`;
+                        progressBar.textContent = `${percentage}%`;
+                    };
+                    
+                    return window.uploadFile(file, path, progressCallback).then(url => ({ key, url }));
+                });
+
+                const uploadResults = await Promise.all(uploadPromises);
+                 uploadResults.forEach(({ key, url }) => {
+                    if (key === 'acervos-imagem_principal') {
+                        data.imagem_principal = url;
+                    } else if (key.startsWith('repeater-file-')) {
+                        const fileInput = document.getElementById(key);
+                        const repeaterItem = fileInput.closest('.repeater-item');
+                        const repeaterType = repeaterItem.dataset.repeaterType;
+                        const itemIndex = [...repeaterItem.parentElement.children].indexOf(repeaterItem);
+                        if (data[repeaterType] && data[repeaterType][itemIndex]) {
+                            const urlField = (repeaterType === 'videos_epoca') ? 'embed_url' : 'url';
+                            data[repeaterType][itemIndex][urlField] = url;
+                        }
                     }
-                }
-            });
+                });
+            }
             
             if (!data.imagem_principal) data.imagem_principal = document.getElementById('acervos-imagem_principal-url').value || '';
 
@@ -325,6 +353,9 @@
             window.showNotification('Erro ao guardar os dados.', true);
         } finally {
             submitButton.disabled = false;
+            progressContainer.classList.add('hidden');
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
         }
     });
 
