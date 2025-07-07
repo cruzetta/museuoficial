@@ -204,7 +204,6 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 document.getElementById(`${entity}-id`).value = docSnap.id;
-                // ATUALIZADO: Lista de todos os campos para carregar
                 ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas', 'cpu', 'gpu', 'audio', 'ram', 'resolucao', 'cores', 'preco'].forEach(field => {
                     const element = document.getElementById(`${entity}-${field}`);
                     if (element) {
@@ -239,7 +238,6 @@
         const submitButton = form.querySelector('button[type="submit"]');
         submitButton.disabled = true;
 
-        // ATUALIZADO: Objeto de dados com todos os novos campos
         const data = {
             nome: document.getElementById('acervos-nome').value,
             fabricante: document.getElementById('acervos-fabricante').value,
@@ -257,6 +255,7 @@
             detalhes: tinymce.get(editorId)?.getContent() || '',
         };
         
+        // ### CORREÇÃO DO BUG DE EDIÇÃO APLICADA AQUI ###
         repeaterFields.forEach(type => {
             data[type] = [];
             document.getElementById(`acervos-${type}-container`).querySelectorAll('.repeater-item').forEach(itemDiv => {
@@ -265,12 +264,22 @@
                 const complexInputs = itemDiv.querySelectorAll('input[data-field]');
                 
                 if (complexInputs.length > 0) {
-                     complexInputs.forEach(input => { itemData[input.dataset.field] = input.value.trim(); });
-                     const fileNameDisplay = itemDiv.querySelector('.file-name-display');
-                     const existingUrl = fileNameDisplay?.dataset.existingUrl;
-                     if(existingUrl) itemData.url = existingUrl;
-                     data[type].push(itemData);
-                } else if(simpleInput && simpleInput.value) {
+                    // Coleta campos de texto como 'nome'
+                    complexInputs.forEach(input => { itemData[input.dataset.field] = input.value.trim(); });
+                    
+                    // Pega a URL do arquivo que JÁ EXISTIA e estava carregado na página
+                    const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+                    const existingUrl = fileNameDisplay?.dataset.existingUrl;
+                    
+                    if (existingUrl) {
+                        // Define a chave correta ('embed_url' para vídeos, 'url' para os outros)
+                        const urlField = (type === 'videos_epoca') ? 'embed_url' : 'url';
+                        itemData[urlField] = existingUrl;
+                    }
+                    data[type].push(itemData);
+
+                } else if (simpleInput && simpleInput.value) {
+                    // Para campos simples como 'voce_sabia' e 'jogos_essenciais'
                     data[type].push(simpleInput.value.trim());
                 }
             });

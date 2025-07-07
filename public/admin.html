@@ -194,8 +194,8 @@
             tabContent.innerHTML = `<div class="text-center p-10"><div id="loader" class="mx-auto"></div><p class="mt-4">A carregar ${tabId}...</p></div>`;
 
             try {
-                // ### CORREÇÃO APLICADA AQUI ###
-                // O caminho foi corrigido para buscar o ficheiro a partir da raiz.
+                // ### CORREÇÃO DE CACHE APLICADA AQUI ###
+                // Adiciona um timestamp à URL para evitar que o navegador use uma versão em cache do arquivo HTML da aba.
                 const response = await fetch(`${tabId}.html?v=${new Date().getTime()}`);
                 if (!response.ok) throw new Error(`Não foi possível carregar a aba: ${response.statusText}`);
                 const html = await response.text();
