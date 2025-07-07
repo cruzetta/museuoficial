@@ -273,6 +273,72 @@
         }
     };
     
+    // ==================================================================
+    // === INÍCIO DA CORREÇÃO: NOVA FUNÇÃO DE EXCLUSÃO PARA ACERVOS ===
+    // ==================================================================
+    const performDeleteDoc = async (id) => {
+        const confirmed = await window.showConfirmModal();
+        if (!confirmed) return;
+
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+            const urlsToDelete = [];
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                // Coleta todas as URLs dos arquivos a serem excluídos
+                if (data.imagem_principal) {
+                    urlsToDelete.push(data.imagem_principal);
+                }
+                
+                const fileRepeaterFields = ['galeria_imagens', 'sons_iconicos', 'videos_epoca'];
+                fileRepeaterFields.forEach(field => {
+                    if (data[field] && Array.isArray(data[field])) {
+                        data[field].forEach(item => {
+                            const url = item.url || item.embed_url;
+                            if(url) {
+                                urlsToDelete.push(url);
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Deleta cada arquivo do Storage
+            // Usamos Promise.allSettled para tentar deletar todos, mesmo que alguns falhem
+            const deletePromises = urlsToDelete.map(url => {
+                try {
+                    const fileRef = ref(storage, url);
+                    return deleteObject(fileRef);
+                } catch (e) {
+                    console.warn("URL inválida, não foi possível criar referência para apagar:", url, e);
+                    return Promise.resolve(); // Ignora URL inválida e continua
+                }
+            });
+
+            const results = await Promise.allSettled(deletePromises);
+            results.forEach(result => {
+                if (result.status === 'rejected' && result.reason.code !== 'storage/object-not-found') {
+                    console.warn("Erro ao deletar arquivo do storage:", result.reason);
+                }
+            });
+
+            // Finalmente, deleta o documento do Firestore
+            await deleteDoc(docRef);
+            window.showNotification("Item do acervo eliminado com sucesso!");
+            clearForm();
+
+        } catch(error) {
+            console.error(`Erro ao eliminar ${entity}:`, error);
+            window.showNotification("Erro ao eliminar o item.", true);
+        }
+    };
+    // ==================================================================
+    // === FIM DA CORREÇÃO ===
+    // ==================================================================
+    
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = form.querySelector('button[type="submit"]');
@@ -391,11 +457,14 @@
             listContainer.innerHTML = '<p class="text-sm text-gray-500">Nenhum item registado.</p>';
             return;
         }
-        snapshot.docs.forEach(docData => {
-            const data = docData.data();
+        const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Ordena os itens alfabeticamente pelo nome para consistência
+        docs.sort((a,b) => (a.nome || '').localeCompare(b.nome || ''));
+
+        docs.forEach(data => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
-            itemDiv.innerHTML = `<p class="font-semibold text-sm truncate pr-4">${data.nome || 'Item sem nome'}</p><div class="flex-shrink-0 flex gap-2"><button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${docData.id}">Editar</button><button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${docData.id}">Eliminar</button></div>`;
+            itemDiv.innerHTML = `<p class="font-semibold text-sm truncate pr-4">${data.nome || 'Item sem nome'}</p><div class="flex-shrink-0 flex gap-2"><button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${data.id}">Editar</button><button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${data.id}">Eliminar</button></div>`;
             listContainer.appendChild(itemDiv);
         });
     });
@@ -405,9 +474,15 @@
             addRepeaterItem(e.target.dataset.repeaterAdd);
         }
     });
+
+    // Listener de clique atualizado para chamar a função de exclusão
     listContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
-        if (e.target.classList.contains('delete-btn')) { /* Lógica de apagar aqui */ }
+        if (e.target.classList.contains('edit-btn')) {
+            editDoc(e.target.dataset.id);
+        }
+        if (e.target.classList.contains('delete-btn')) {
+            performDeleteDoc(e.target.dataset.id);
+        }
     });
     document.getElementById('cancel-acervo-edit').addEventListener('click', clearForm);
 
