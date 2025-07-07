@@ -195,8 +195,8 @@
 
             try {
                 // ### CORREÇÃO APLICADA AQUI ###
-                // O caminho foi alterado para ser relativo, funcionando tanto localmente quanto no Firebase.
-                const response = await fetch(`${tabId}.html`);
+                // O caminho foi corrigido para buscar o ficheiro a partir da raiz.
+                const response = await fetch(`${tabId}.html?v=${new Date().getTime()}`);
                 if (!response.ok) throw new Error(`Não foi possível carregar a aba: ${response.statusText}`);
                 const html = await response.text();
                 tabContent.innerHTML = html;
