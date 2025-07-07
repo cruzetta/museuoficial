@@ -381,18 +381,25 @@
                         ? `<div class="mt-8 hud-border rounded-lg p-6"><h2 class="card-title">Galeria</h2><div class="flex flex-wrap gap-3">${galleryData.map((img, i) => `<button onclick="selectImage(${i})" class="thumbnail-btn ${i === 0 ? 'active' : ''}">${img.name}</button>`).join('')}</div></div>`
                         : '';
 
+                    // ATUALIZADO: Lista de campos da ficha técnica com os novos itens e ícones.
                     const fichaTecnicaFields = [
                         { icon: 'fa-microchip', label: 'Fabricante', value: item.fabricante },
                         { icon: 'fa-calendar-days', label: 'Lançamento', value: item.lancamento },
                         { icon: 'fa-gamepad', label: 'Geração', value: item.geracao },
-                        { icon: 'fa-sd-card', label: 'Média', value: item.media },
-                        { icon: 'fa-chart-line', label: 'Vendas', value: item.vendas }
+                        { icon: 'fa-brain', label: 'CPU', value: item.cpu },
+                        { icon: 'fa-image', label: 'Gráficos', value: item.gpu },
+                        { icon: 'fa-music', label: 'Áudio', value: item.audio },
+                        { icon: 'fa-memory', label: 'Memória RAM', value: item.ram },
+                        { icon: 'fa-sd-card', label: 'Mídia', value: item.media },
+                        { icon: 'fa-ruler-combined', label: 'Resolução', value: item.resolucao },
+                        { icon: 'fa-palette', label: 'Cores', value: item.cores },
+                        { icon: 'fa-chart-line', label: 'Vendas', value: item.vendas },
+                        { icon: 'fa-dollar-sign', label: 'Preço Lanç.', value: item.preco }
                     ];
 
                     const contentHTML = `
                         <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
                             <h1 class="text-5xl md:text-7xl font-black text-center md:text-left holographic-text flex-grow">${item.nome || 'Item Desconhecido'}</h1>
-                            <!-- Botão de Partilha Adicionado -->
                             <button onclick="sharePage()" class="share-btn flex-shrink-0" title="Partilhar esta página">
                                 <i class="fas fa-share-alt text-xl"></i>
                             </button>
