@@ -50,22 +50,15 @@
             to { background-position: 200% center; }
         }
 
-        /* --- ESTILOS DA PÁGINA DE GALERIA --- */
-
-        #searchInput {
+        #searchInput, .filter-select {
             background: rgba(13, 13, 26, 0.8);
             border: 1px solid var(--neon-blue);
             box-shadow: 0 0 8px var(--neon-blue);
         }
-        #searchInput:focus {
+        #searchInput:focus, .filter-select:focus {
             outline: none;
             box-shadow: 0 0 15px var(--neon-purple);
             border-color: var(--neon-purple);
-        }
-
-        #sort-select {
-            background: rgba(13, 13, 26, 0.8);
-            border: 1px solid var(--neon-blue);
         }
 
         .explore-btn {
@@ -87,91 +80,6 @@
         }
         .autocomplete-item:hover {
             background-color: var(--neon-purple);
-        }
-
-
-        /* --- ESTILOS PARA A PÁGINA DE DETALHES (item_detalhe.html) --- */
-
-        .section-title {
-            @apply text-3xl font-bold text-center mb-6 holographic-text;
-        }
-
-        .section-subtitle {
-            @apply text-xl font-bold text-neon-blue;
-        }
-
-        /* Botões da galeria de imagens */
-        .gallery-thumb-btn {
-            @apply hud-border rounded-lg px-4 py-2 text-white font-semibold uppercase tracking-wider transition-all duration-200;
-        }
-        .gallery-thumb-btn:hover {
-            background-color: var(--neon-purple);
-            border-color: var(--neon-purple);
-            box-shadow: 0 0 15px var(--neon-purple);
-            transform: translateY(-2px);
-        }
-
-        /* Estilos para o conteúdo de texto vindo do editor */
-        .prose-custom {
-            @apply text-lg leading-relaxed space-y-4;
-        }
-        .prose-custom h1, .prose-custom h2, .prose-custom h3 {
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            @apply holographic-text my-6;
-        }
-        .prose-custom a {
-            color: var(--neon-blue);
-            text-decoration: underline;
-        }
-        .prose-custom p {
-            @apply mb-4;
-        }
-
-        /* Seção "Em Ação" */
-        .sound-play-btn {
-            @apply flex items-center gap-3 px-4 py-2 rounded-lg font-bold text-white transition-all duration-200;
-            background-color: rgba(57, 255, 20, 0.2);
-            border: 2px solid var(--neon-green);
-        }
-        .sound-play-btn:hover {
-            background-color: var(--neon-green);
-            color: var(--dark-bg);
-            box-shadow: 0 0 15px var(--neon-green);
-            transform: scale(1.05);
-        }
-
-        .video-placeholder {
-            @apply hud-border rounded-lg p-4 w-48 h-24 flex flex-col items-center justify-center text-center text-white font-bold transition-all duration-200;
-        }
-        .video-placeholder i {
-            @apply text-3xl mb-2 text-neon-blue;
-        }
-        .video-placeholder:hover {
-            border-color: var(--neon-purple);
-            transform: scale(1.05);
-        }
-        .video-placeholder:hover i {
-            color: var(--neon-purple);
-        }
-
-        /* Seção "Você Sabia?" */
-        .did-you-know-item {
-            @apply flex items-start gap-4 text-lg;
-        }
-        .did-you-know-item i {
-            @apply mt-1;
-        }
-
-        /* Seção "Jogos Essenciais" */
-        .essential-game-card {
-            @apply hud-border rounded-lg p-4 text-center font-bold text-lg w-48 h-24 flex items-center justify-center;
-            transition: all 0.2s ease-in-out;
-        }
-        .essential-game-card:hover {
-            border-color: var(--neon-purple);
-            color: var(--neon-purple);
-            transform: translateY(-4px);
         }
     </style>
 </head>
@@ -202,21 +110,29 @@
         
         <div id="gallery" class="page active">
             <div class="container mx-auto px-4">
-                <h1 class="text-5xl md:text-7xl font-black text-center mb-8 holographic-text">Galeria do Acervo</h1>
+                <h1 class="text-5xl md:text-7xl font-black text-center mb-4 holographic-text">Galeria do Acervo</h1>
                 
-                <div class="flex justify-end mb-8">
-                    <div class="relative">
-                        <select id="sort-select" class="hud-border appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer">
-                            <option value="lancamento-asc">Mais Antigos</option>
-                            <option value="lancamento-desc">Mais Recentes</option>
-                            <option value="nome-asc">Ordem Alfabética (A-Z)</option>
-                            <option value="nome-desc">Ordem Alfabética (Z-A)</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neon-blue">
-                            <i class="fa-solid fa-chevron-down"></i>
+                <!-- ÁREA DE FILTROS E ORDENAÇÃO -->
+                <div class="hud-border rounded-lg p-4 mb-12">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+                        <!-- FILTROS DINÂMICOS -->
+                        <div id="filter-fabricante-container"></div>
+                        <div id="filter-geracao-container"></div>
+                        <div id="filter-ano-container"></div>
+                        
+                        <!-- ORDENAÇÃO -->
+                        <div>
+                            <label for="sort-select" class="block text-sm font-bold mb-1 text-neon-blue">Ordenar por</label>
+                            <select id="sort-select" class="filter-select w-full appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer">
+                                <option value="lancamento-asc">Mais Antigos</option>
+                                <option value="lancamento-desc">Mais Recentes</option>
+                                <option value="nome-asc">Ordem Alfabética (A-Z)</option>
+                                <option value="nome-desc">Ordem Alfabética (Z-A)</option>
+                            </select>
                         </div>
                     </div>
                 </div>
+
 
                 <!-- Grid da Galeria - Conteúdo será carregado aqui -->
                 <div id="gallery-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
@@ -241,12 +157,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ### CORREÇÃO APLICADA AQUI ###
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.firebasestorage.app", // CORRIGIDO
+            storageBucket: "museu-cca6d.firebasestorage.app",
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
@@ -268,7 +183,7 @@
         const sortSelect = document.getElementById('sort-select');
         const autocompleteResults = document.getElementById('autocomplete-results');
 
-        // --- RENDER FUNCTION (ATUALIZADA) ---
+        // --- RENDER FUNCTION ---
         function renderGallery() {
             galleryGrid.innerHTML = '';
             if (state.filteredItems.length === 0 && galleryLoader.style.display === 'none') {
@@ -281,8 +196,8 @@
                 card.className = 'item-card';
                 card.innerHTML = `
                     <div class="hud-border rounded-lg p-4 flex flex-col h-full transition-transform hover:scale-105">
-                        ${item.imagem_principal ? `<img src="${item.imagem_principal}" alt="Imagem de ${item.nome || 'Item'}" class="w-full h-48 rounded-md object-cover mb-4">` : ''}
-                        ${item.nome ? `<h3 class="item-title text-2xl font-bold mb-3">${item.nome}</h3>` : ''}
+                        <img src="${item.imagem_principal || 'https://placehold.co/400x300/1a1a2e/E0E0E0?text=Sem+Imagem'}" alt="Imagem de ${item.nome || 'Item'}" class="w-full h-48 rounded-md object-cover mb-4">
+                        <h3 class="item-title text-2xl font-bold mb-3">${item.nome || 'Item sem nome'}</h3>
                         <div class="text-sm space-y-2 mb-4 flex-grow">
                             ${item.fabricante ? `<p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> ${item.fabricante}</p>` : ''}
                             ${item.geracao ? `<p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> ${item.geracao}</p>` : ''}
@@ -295,25 +210,44 @@
             });
         }
 
-        // --- DATA PROCESSING FUNCTIONS ---
+        // --- DATA PROCESSING FUNCTIONS (ATUALIZADA) ---
         function applyFiltersAndSort() {
             const searchTerm = searchInput.value.toLowerCase();
             const sortValue = sortSelect.value;
             
+            // Get filter values
+            const fabricanteFilter = document.getElementById('filter-fabricante')?.value;
+            const geracaoFilter = document.getElementById('filter-geracao')?.value;
+            const anoFilter = document.getElementById('filter-ano')?.value;
+
             let tempItems = state.items;
+
+            // Apply search term filter
             if (searchTerm) {
-                tempItems = state.items.filter(item => 
+                tempItems = tempItems.filter(item => 
                     (item.nome && item.nome.toLowerCase().includes(searchTerm)) ||
                     (item.fabricante && item.fabricante.toLowerCase().includes(searchTerm))
                 );
             }
 
+            // Apply dropdown filters
+            if (fabricanteFilter) {
+                tempItems = tempItems.filter(item => item.fabricante === fabricanteFilter);
+            }
+            if (geracaoFilter) {
+                tempItems = tempItems.filter(item => item.geracao === geracaoFilter);
+            }
+            if (anoFilter) {
+                tempItems = tempItems.filter(item => item.lancamento == anoFilter);
+            }
+
+            // Apply sorting
             tempItems.sort((a, b) => {
                 const [field, direction] = sortValue.split('-');
                 const valA = a[field];
                 const valB = b[field];
 
-                if (!valA) return 1; // Move items without the sort field to the end
+                if (!valA) return 1;
                 if (!valB) return -1;
 
                 if (field === 'nome') {
@@ -356,31 +290,67 @@
         function carregarAcervo() {
             try {
                 const acervosRef = collection(db, `/artifacts/${appId}/public/data/acervos`);
-                const q = query(acervosRef);
-                
-                onSnapshot(q, (querySnapshot) => {
+                onSnapshot(query(acervosRef), (querySnapshot) => {
                     state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    
-                    if (galleryLoader) {
-                        galleryLoader.style.display = 'none';
-                    }
-                    
+                    if (galleryLoader) galleryLoader.style.display = 'none';
                     applyFiltersAndSort(); 
                 }, (error) => {
                     console.error("Erro ao carregar o acervo:", error);
-                    galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar o acervo. Tente novamente mais tarde.</p>`;
+                    galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar o acervo.</p>`;
                 });
-
             } catch (error) {
                 console.error("Erro ao configurar o listener do acervo:", error);
-                galleryLoader.style.display = 'none';
-                galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Ocorreu um erro inesperado. Verifique a consola para mais detalhes.</p>`;
+                if (galleryLoader) galleryLoader.style.display = 'none';
+                galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Ocorreu um erro inesperado.</p>`;
             }
         }
+        
+        // FUNÇÃO PARA CRIAR E POPULAR OS FILTROS
+        const createFilter = (containerId, collectionName, fieldName, label) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const labelEl = document.createElement('label');
+            labelEl.htmlFor = `filter-${fieldName}`;
+            labelEl.className = 'block text-sm font-bold mb-1 text-neon-blue';
+            labelEl.textContent = label;
+
+            const selectEl = document.createElement('select');
+            selectEl.id = `filter-${fieldName}`;
+            selectEl.className = 'filter-select w-full appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer';
+            selectEl.innerHTML = `<option value="">Todos</option>`;
+            
+            selectEl.addEventListener('change', applyFiltersAndSort);
+
+            container.appendChild(labelEl);
+            container.appendChild(selectEl);
+
+            const q = collection(db, `/artifacts/${appId}/public/data/${collectionName}`);
+            onSnapshot(q, (snapshot) => {
+                let options = snapshot.docs.map(doc => doc.data());
+                options.sort((a,b) => {
+                    if (typeof a[fieldName] === 'string') return a[fieldName].localeCompare(b[fieldName]);
+                    return a[fieldName] - b[fieldName];
+                });
+                options.forEach(data => {
+                    const option = document.createElement('option');
+                    option.value = data[fieldName];
+                    option.textContent = data[fieldName];
+                    selectEl.appendChild(option);
+                });
+            });
+        };
+
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             carregarAcervo();
+            
+            // Criar os filtros na página
+            createFilter('filter-fabricante-container', 'opcoes_fabricantes', 'nome', 'Fabricante');
+            createFilter('filter-geracao-container', 'opcoes_geracoes', 'nome', 'Geração');
+            createFilter('filter-ano-container', 'opcoes_anos', 'ano', 'Ano');
+
             searchInput.addEventListener('input', applyFiltersAndSort);
             sortSelect.addEventListener('change', applyFiltersAndSort);
             

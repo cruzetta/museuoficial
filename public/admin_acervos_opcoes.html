@@ -1,0 +1,176 @@
+<!-- Conteúdo da Aba Opções de Filtro -->
+<div id="opcoes-container" class="space-y-12">
+
+    <!-- Gestor de Fabricantes -->
+    <div id="fabricantes-manager" class="manager-section bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6">Gerir Fabricantes</h2>
+        <form id="form-fabricantes" class="space-y-4 mb-6 pb-6 border-b">
+            <input type="hidden" id="fabricantes-id">
+            <div>
+                <label for="fabricantes-nome" class="block text-sm font-medium text-gray-700">Nome do Fabricante</label>
+                <input type="text" id="fabricantes-nome" placeholder="Ex: Nintendo, Sega, Sony" required>
+            </div>
+            <div class="flex gap-4">
+                <button type="submit">Guardar Fabricante</button>
+                <button type="button" class="cancel-edit-btn w-auto">Cancelar Edição</button>
+            </div>
+        </form>
+        <div>
+            <h3 class="text-xl font-bold mb-4">Fabricantes Existentes</h3>
+            <div id="fabricantes-lista" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- Gestor de Gerações -->
+    <div id="geracoes-manager" class="manager-section bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6">Gerir Gerações</h2>
+        <form id="form-geracoes" class="space-y-4 mb-6 pb-6 border-b">
+            <input type="hidden" id="geracoes-id">
+            <div>
+                <label for="geracoes-nome" class="block text-sm font-medium text-gray-700">Nome da Geração</label>
+                <input type="text" id="geracoes-nome" placeholder="Ex: 3ª Geração (8-bit)" required>
+            </div>
+            <div class="flex gap-4">
+                <button type="submit">Guardar Geração</button>
+                <button type="button" class="cancel-edit-btn w-auto">Cancelar Edição</button>
+            </div>
+        </form>
+        <div>
+            <h3 class="text-xl font-bold mb-4">Gerações Existentes</h3>
+            <div id="geracoes-lista" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- Gestor de Anos -->
+    <div id="anos-manager" class="manager-section bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6">Gerir Anos de Lançamento</h2>
+        <form id="form-anos" class="space-y-4 mb-6 pb-6 border-b">
+            <input type="hidden" id="anos-id">
+            <div>
+                <label for="anos-nome" class="block text-sm font-medium text-gray-700">Ano</label>
+                <input type="number" id="anos-nome" placeholder="Ex: 1983" required>
+            </div>
+            <div class="flex gap-4">
+                <button type="submit">Guardar Ano</button>
+                <button type="button" class="cancel-edit-btn w-auto">Cancelar Edição</button>
+            </div>
+        </form>
+        <div>
+            <h3 class="text-xl font-bold mb-4">Anos Existentes</h3>
+            <div id="anos-lista" class="space-y-3"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Script Específico da Aba Opções -->
+<script data-tab-script="opcoes">
+{
+    const { db, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc } = window.firebaseServices;
+    const { appId } = window.appConfig;
+
+    const optionTypes = [
+        { name: 'fabricantes', field: 'nome' },
+        { name: 'geracoes', field: 'nome' },
+        { name: 'anos', field: 'ano' }
+    ];
+
+    const setupManager = (typeConfig) => {
+        const { name, field } = typeConfig;
+        const form = document.getElementById(`form-${name}`);
+        const listContainer = document.getElementById(`${name}-lista`);
+        const idInput = document.getElementById(`${name}-id`);
+        const nameInput = document.getElementById(`${name}-nome`);
+        const cancelButton = form.querySelector('.cancel-edit-btn');
+
+        const collectionRef = collection(db, `/artifacts/${appId}/public/data/opcoes_${name}`);
+
+        const clearForm = () => {
+            form.reset();
+            idInput.value = '';
+            form.querySelector('button[type="submit"]').textContent = `Guardar ${name.slice(0, -1)}`;
+            cancelButton.classList.add('hidden');
+        };
+
+        cancelButton.addEventListener('click', clearForm);
+        clearForm(); // Initial state
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = idInput.value;
+            const value = nameInput.value.trim();
+            if (!value) return;
+
+            const data = { [field]: (field === 'ano' ? Number(value) : value) };
+
+            try {
+                if (id) {
+                    await updateDoc(doc(collectionRef, id), data);
+                } else {
+                    await addDoc(collectionRef, data);
+                }
+                window.showNotification('Opção guardada com sucesso!');
+                clearForm();
+            } catch (error) {
+                console.error(`Erro ao guardar ${name}:`, error);
+                window.showNotification('Erro ao guardar a opção.', true);
+            }
+        });
+
+        onSnapshot(collectionRef, (snapshot) => {
+            listContainer.innerHTML = '';
+            if (snapshot.empty) {
+                listContainer.innerHTML = '<p class="text-sm text-gray-500">Nenhuma opção registada.</p>';
+                return;
+            }
+            
+            const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            // Sort by the specific field
+            docs.sort((a, b) => {
+                const valA = a[field];
+                const valB = b[field];
+                if (typeof valA === 'string') return valA.localeCompare(valB);
+                return valA - valB;
+            });
+
+            docs.forEach(docData => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+                itemDiv.innerHTML = `
+                    <p class="font-semibold text-sm truncate pr-4">${docData[field]}</p>
+                    <div class="flex-shrink-0 flex gap-2">
+                        <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${docData.id}" data-value="${docData[field]}">Editar</button>
+                        <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${docData.id}">Eliminar</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        });
+
+        listContainer.addEventListener('click', async (e) => {
+            const target = e.target;
+            if (target.classList.contains('edit-btn')) {
+                idInput.value = target.dataset.id;
+                nameInput.value = target.dataset.value;
+                form.querySelector('button[type="submit"]').textContent = 'Atualizar';
+                cancelButton.classList.remove('hidden');
+                nameInput.focus();
+                window.scrollTo({ top: form.offsetTop - 20, behavior: 'smooth' });
+            }
+            if (target.classList.contains('delete-btn')) {
+                const confirmed = await window.showConfirmModal();
+                if (confirmed) {
+                    try {
+                        await deleteDoc(doc(collectionRef, target.dataset.id));
+                        window.showNotification('Opção eliminada com sucesso!');
+                    } catch (error) {
+                        window.showNotification('Erro ao eliminar a opção.', true);
+                    }
+                }
+            }
+        });
+    };
+
+    optionTypes.forEach(setupManager);
+}
+</script>

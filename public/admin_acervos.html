@@ -8,9 +8,11 @@
             <legend class="text-lg font-semibold px-2">Informações Principais</legend>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                 <div><label for="acervos-nome" class="block text-sm font-medium text-gray-700">Nome do Item</label><input type="text" id="acervos-nome"></div>
-                <div><label for="acervos-fabricante" class="block text-sm font-medium text-gray-700">Fabricante</label><input type="text" id="acervos-fabricante"></div>
-                <div><label for="acervos-lancamento" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label><input type="number" id="acervos-lancamento" placeholder="Ex: 1983"></div>
-                <div><label for="acervos-geracao" class="block text-sm font-medium text-gray-700">Geração</label><input type="text" id="acervos-geracao" placeholder="Ex: 3ª Geração (8-bit)"></div>
+                
+                <!-- CAMPOS ATUALIZADOS PARA SELECT -->
+                <div><label for="acervos-fabricante" class="block text-sm font-medium text-gray-700">Fabricante</label><select id="acervos-fabricante"></select></div>
+                <div><label for="acervos-lancamento" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label><select id="acervos-lancamento"></select></div>
+                <div><label for="acervos-geracao" class="block text-sm font-medium text-gray-700">Geração</label><select id="acervos-geracao"></select></div>
                 
                 <div class="md:col-span-2" data-upload-container="acervos-imagem_principal">
                     <input type="hidden" id="acervos-imagem_principal-url">
@@ -82,7 +84,6 @@
             </div>
         </fieldset>
         
-        <!-- ### NOVO: BARRA DE PROGRESSO ### -->
         <div id="acervos-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700">
             <div id="acervos-upload-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">0%</div>
         </div>
@@ -107,6 +108,38 @@
 
     tinymce.init({ selector: `#${editorId}`, height: 400, plugins: 'link lists', toolbar: 'undo redo | blocks | bold italic | bullist numlist | link removeformat' });
     window.currentEditor = `#${editorId}`;
+    
+    // FUNÇÃO PARA POPULAR OS SELECTS
+    const populateSelect = (selectId, collectionName, fieldName, placeholder) => {
+        const selectElement = document.getElementById(selectId);
+        selectElement.innerHTML = `<option value="">${placeholder}</option>`;
+        const q = collection(db, `/artifacts/${appId}/public/data/${collectionName}`);
+        onSnapshot(q, (snapshot) => {
+            const currentValue = selectElement.value; // Preserve current value if possible
+            let options = snapshot.docs.map(doc => doc.data());
+
+            // Sort options
+            options.sort((a,b) => {
+                if (typeof a[fieldName] === 'string') return a[fieldName].localeCompare(b[fieldName]);
+                return a[fieldName] - b[fieldName];
+            });
+
+            selectElement.innerHTML = `<option value="">${placeholder}</option>`; // Reset before populating
+            options.forEach(data => {
+                const option = document.createElement('option');
+                option.value = data[fieldName];
+                option.textContent = data[fieldName];
+                selectElement.appendChild(option);
+            });
+            selectElement.value = currentValue;
+        });
+    };
+    
+    // POPULAR OS SELECTS AO CARREGAR A ABA
+    populateSelect('acervos-fabricante', 'opcoes_fabricantes', 'nome', 'Selecione um fabricante');
+    populateSelect('acervos-geracao', 'opcoes_geracoes', 'nome', 'Selecione uma geração');
+    populateSelect('acervos-lancamento', 'opcoes_anos', 'ano', 'Selecione um ano');
+
 
     const repeaterTemplates = {
         galeria_imagens: (uuid) => `<div class="repeater-preview-placeholder"><i class="fas fa-image text-2xl"></i></div><img class="repeater-preview" alt="Pré-visualização da Imagem"><input type="text" class="repeater-input" data-field="nome" placeholder="Nome do Botão (Ex: Controle)"><div class="flex-grow"><input type="file" id="${uuid}" class="hidden" accept="image/*"><button type="button" class="repeater-file-button" onclick="document.getElementById('${uuid}').click()">Selecionar Imagem</button><div class="file-name-display">Nenhum ficheiro selecionado</div></div>`,
@@ -129,7 +162,7 @@
 
         window.pendingFiles.set(input.id, file);
         fileNameDisplay.textContent = file.name;
-        fileNameDisplay.dataset.existingUrl = ''; // Limpa a URL antiga
+        fileNameDisplay.dataset.existingUrl = ''; 
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -205,12 +238,19 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 document.getElementById(`${entity}-id`).value = docSnap.id;
-                ['nome', 'fabricante', 'lancamento', 'geracao', 'media', 'vendas', 'cpu', 'gpu', 'audio', 'ram', 'resolucao', 'cores', 'preco'].forEach(field => {
+                
+                // Campos de texto simples
+                ['nome', 'media', 'vendas', 'cpu', 'gpu', 'audio', 'ram', 'resolucao', 'cores', 'preco'].forEach(field => {
                     const element = document.getElementById(`${entity}-${field}`);
-                    if (element) {
-                        element.value = data[field] || '';
-                    }
+                    if (element) element.value = data[field] || '';
                 });
+
+                // Campos SELECT
+                ['fabricante', 'lancamento', 'geracao'].forEach(field => {
+                    const element = document.getElementById(`${entity}-${field}`);
+                    if (element) element.value = data[field] || '';
+                });
+
                 tinymce.get(editorId)?.setContent(data.detalhes || '');
 
                 if (data.imagem_principal) {
@@ -233,7 +273,6 @@
         }
     };
     
-    // Submissão do formulário
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = form.querySelector('button[type="submit"]');
@@ -241,9 +280,11 @@
 
         const data = {
             nome: document.getElementById('acervos-nome').value,
+            // PEGAR VALORES DOS SELECTS
             fabricante: document.getElementById('acervos-fabricante').value,
             lancamento: document.getElementById('acervos-lancamento').value,
             geracao: document.getElementById('acervos-geracao').value,
+            // RESTANTE DOS CAMPOS
             media: document.getElementById('acervos-media').value,
             vendas: document.getElementById('acervos-vendas').value,
             cpu: document.getElementById('acervos-cpu').value,
@@ -256,29 +297,19 @@
             detalhes: tinymce.get(editorId)?.getContent() || '',
         };
         
-        // ### CORREÇÃO BUG DE EDIÇÃO (LÓGICA ROBUSTA) ###
         repeaterFields.forEach(type => {
             data[type] = [];
             document.getElementById(`acervos-${type}-container`).querySelectorAll('.repeater-item').forEach(itemDiv => {
                 const simpleInput = itemDiv.querySelector('input.repeater-input:not([data-field])');
                 const complexInputs = itemDiv.querySelectorAll('input.repeater-input[data-field]');
 
-                // Lida com repetidores de texto simples (ex: curiosidades)
                 if (simpleInput) {
-                    if (simpleInput.value) {
-                        data[type].push(simpleInput.value.trim());
-                    }
-                    return; // vai para o próximo item
+                    if (simpleInput.value) data[type].push(simpleInput.value.trim());
+                    return;
                 }
-
-                // Lida com repetidores complexos com arquivos (ex: galeria, sons, vídeos)
                 if (complexInputs.length > 0) {
                     const itemData = {};
-                    complexInputs.forEach(input => {
-                        itemData[input.dataset.field] = input.value.trim();
-                    });
-
-                    // Preserva a URL existente se nenhum arquivo novo foi selecionado para este item
+                    complexInputs.forEach(input => { itemData[input.dataset.field] = input.value.trim(); });
                     const fileInput = itemDiv.querySelector('input[type="file"]');
                     if (fileInput && !window.pendingFiles.has(fileInput.id)) {
                         const fileNameDisplay = itemDiv.querySelector('.file-name-display');
@@ -288,7 +319,6 @@
                             itemData[urlField] = existingUrl;
                         }
                     }
-                    
                     data[type].push(itemData);
                 }
             });
@@ -303,11 +333,8 @@
             if (filesToUpload.length > 0) {
                 progressContainer.classList.remove('hidden');
                 const individualProgress = new Array(filesToUpload.length).fill(0);
-
                 const uploadPromises = filesToUpload.map(([key, file], index) => {
                     let path = key.startsWith('repeater-file-') ? 'acervos/repeater/' : 'acervos/main/';
-                    
-                    // ### NOVO: LÓGICA DA BARRA DE PROGRESSO ###
                     const progressCallback = (progress) => {
                         individualProgress[index] = progress;
                         const totalProgress = individualProgress.reduce((sum, p) => sum + p, 0) / individualProgress.length;
@@ -315,7 +342,6 @@
                         progressBar.style.width = `${percentage}%`;
                         progressBar.textContent = `${percentage}%`;
                     };
-                    
                     return window.uploadFile(file, path, progressCallback).then(url => ({ key, url }));
                 });
 
@@ -359,7 +385,6 @@
         }
     });
 
-    // Listener da coleção
     onSnapshot(collection(db, `/artifacts/${appId}/public/data/${entity}`), (snapshot) => {
         listContainer.innerHTML = '';
         if (snapshot.empty) {
@@ -375,7 +400,6 @@
         });
     });
 
-    // Event listeners
     document.getElementById('acervos-form-container').addEventListener('click', (e) => {
         if (e.target.matches('[data-repeater-add]')) {
             addRepeaterItem(e.target.dataset.repeaterAdd);
@@ -387,7 +411,6 @@
     });
     document.getElementById('cancel-acervo-edit').addEventListener('click', clearForm);
 
-    // Inicialização
     window.setupUploadComponent(document.querySelector('[data-upload-container="acervos-imagem_principal"]'));
 }
 </script>

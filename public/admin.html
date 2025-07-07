@@ -127,6 +127,7 @@
                         <button onclick="window.loadTab('admin_home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
                         <button onclick="window.loadTab('admin_noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
                         <button onclick="window.loadTab('admin_acervos')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Acervos</button>
+                        <button onclick="window.loadTab('admin_acervos_opcoes')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-tags fa-fw"></i> Opções de Filtro</button>
                     </nav>
                 </div>
             </aside>
@@ -194,8 +195,6 @@
             tabContent.innerHTML = `<div class="text-center p-10"><div id="loader" class="mx-auto"></div><p class="mt-4">A carregar ${tabId}...</p></div>`;
 
             try {
-                // ### CORREÇÃO DE CACHE APLICADA AQUI ###
-                // Adiciona um timestamp à URL para evitar que o navegador use uma versão em cache do arquivo HTML da aba.
                 const response = await fetch(`${tabId}.html?v=${new Date().getTime()}`);
                 if (!response.ok) throw new Error(`Não foi possível carregar a aba: ${response.statusText}`);
                 const html = await response.text();
