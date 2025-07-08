@@ -15,15 +15,6 @@
             "value": "no-cache, no-store, must-revalidate"
           }
         ]
-      },
-      {
-        "source": "/**/@(galeria|index|noticia|noticias|item_detalhe).html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
-          }
-        ]
       }
     ]
   }
