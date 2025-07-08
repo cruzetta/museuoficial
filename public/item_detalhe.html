@@ -223,7 +223,20 @@
         };
         window.nextImage = () => selectImage((currentImageIndex + 1) % galleryData.length);
         window.prevImage = () => selectImage((currentImageIndex - 1 + galleryData.length) % galleryData.length);
-        window.playSound = (soundUrl) => { if (audioPlayer) { audioPlayer.src = soundUrl; audioPlayer.play(); } };
+        
+        // --- [NOVO] Função de Play/Pause ---
+        window.toggleSound = (button, soundUrl) => {
+            // Se o som clicado já estiver a tocar, pausa.
+            if (!audioPlayer.paused && audioPlayer.src === soundUrl) {
+                audioPlayer.pause();
+            } else {
+                // Caso contrário, define o novo som e toca.
+                // O evento 'pause' do som anterior (se houver) tratará de resetar o seu botão.
+                audioPlayer.src = soundUrl;
+                audioPlayer.play();
+            }
+        };
+
         window.sharePage = () => {
             const tempInput = document.createElement('textarea');
             tempInput.value = window.location.href;
@@ -238,8 +251,10 @@
 
         const createPlaceholder = (icon, text) => `<div class="placeholder-card"><i class="fas ${icon}"></i><p>${text}</p></div>`;
         const createHistorySection = (item) => `<section class="hud-border rounded-lg p-8 mb-12"><h2 class="card-title">A História do Herói</h2>${item.detalhes ? `<div class="prose-custom mt-4">${item.detalhes}</div>` : createPlaceholder('fa-book-open', 'Em breve: A história completa e o legado deste item serão adicionados.')}</section>`;
+        
+        // --- [ATUALIZADO] Geração dos botões de som ---
         const createActionSection = (item) => {
-            const sons = (item.sons_iconicos?.length > 0) ? `<div class="flex flex-wrap gap-4">${item.sons_iconicos.filter(s => s?.url).map(s => `<button onclick="playSound('${s.url}')" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${s.nome || 'Ouvir'}</button>`).join('')}</div>` : createPlaceholder('fa-music', 'Estamos a procurar os sons mais marcantes. Volte em breve!');
+            const sons = (item.sons_iconicos?.length > 0) ? `<div class="flex flex-wrap gap-4">${item.sons_iconicos.filter(s => s?.url).map(s => `<button onclick="toggleSound(this, '${s.url}')" data-sound-url="${s.url}" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${s.nome || 'Ouvir'}</button>`).join('')}</div>` : createPlaceholder('fa-music', 'Estamos a procurar os sons mais marcantes. Volte em breve!');
             const videos = (item.videos_epoca?.length > 0) ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${item.videos_epoca.filter(v => v?.embed_url).map(v => `<div class="video-card"><video controls class="w-full h-auto rounded-md"><source src="${v.embed_url}" type="video/mp4"></video><h4 class="video-title">${v.nome || 'Vídeo'}</h4></div>`).join('')}</div>` : createPlaceholder('fa-video', 'Em breve: Vídeos e comerciais de época.');
             return `<div class="hud-border rounded-lg p-8 flex flex-col"><h2 class="card-title">Em Ação</h2><div><h3 class="card-subtitle">Sons Icónicos</h3>${sons}</div><div class="mt-8"><h3 class="card-subtitle">Vídeos da Época</h3>${videos}</div></div>`;
         };
@@ -360,7 +375,35 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', carregarItem);
+        // --- [ATUALIZADO] Adiciona listeners para o estado do áudio ---
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarItem();
+
+            // Ouve o evento 'play' do player de áudio
+            audioPlayer.addEventListener('play', () => {
+                document.querySelectorAll('.sound-play-btn').forEach(button => {
+                    const icon = button.querySelector('i');
+                    // Compara o URL do botão com o URL do áudio a tocar
+                    if (button.dataset.soundUrl === audioPlayer.src) {
+                        icon.classList.remove('fa-play');
+                        icon.classList.add('fa-pause');
+                    } else {
+                        // Garante que todos os outros botões mostram 'play'
+                        icon.classList.remove('fa-pause');
+                        icon.classList.add('fa-play');
+                    }
+                });
+            });
+
+            // Ouve o evento 'pause' (que também é acionado no fim do áudio)
+            audioPlayer.addEventListener('pause', () => {
+                // Reseta todos os botões que estiverem com o ícone de 'pause'
+                document.querySelectorAll('.sound-play-btn i.fa-pause').forEach(icon => {
+                    icon.classList.remove('fa-pause');
+                    icon.classList.add('fa-play');
+                });
+            });
+        });
     </script>
 </body>
 </html>
