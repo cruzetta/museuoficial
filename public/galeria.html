@@ -40,11 +40,10 @@
         }
 
         .hud-border:hover {
-            /* Efeitos que aparecem ao passar o mouse */
-            transform: translateY(-8px) scale(1.03);     /* Eleva e aumenta ligeiramente o quadro */
-            border-color: rgba(0, 255, 255, 0.7);       /* A borda fica mais visível e brilhante */
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3); /* A aura (glow) suave aparece */
-            background: rgba(18, 16, 38, 0.8);          /* O fundo fica um pouco mais opaco para dar destaque */
+            transform: translateY(-8px) scale(1.03);
+            border-color: rgba(0, 255, 255, 0.7);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            background: rgba(18, 16, 38, 0.8);
         }
 
         .hud-border::before, .hud-border::after {
@@ -65,13 +64,20 @@
             to { background-position: 200% center; }
         }
 
-        #searchInput, .filter-select {
+        #searchInput, .filter-select, #toggle-filters-btn {
             background: rgba(13, 13, 26, 0.8);
             border: 1px solid var(--neon-blue);
             box-shadow: 0 0 8px var(--neon-blue);
+            transition: all 0.3s ease;
         }
-        #searchInput:focus, .filter-select:focus {
+        #searchInput:focus, .filter-select:focus, #toggle-filters-btn:focus {
             outline: none;
+            box-shadow: 0 0 15px var(--neon-purple);
+            border-color: var(--neon-purple);
+        }
+        
+        /* Estilo para o botão de filtro ativo */
+        #toggle-filters-btn.active {
             box-shadow: 0 0 15px var(--neon-purple);
             border-color: var(--neon-purple);
         }
@@ -97,7 +103,6 @@
             background-color: var(--neon-purple);
         }
 
-        /* Remove a borda e todos os efeitos de hover APENAS do cabeçalho */
         header .hud-border {
             border: none;
         }
@@ -108,10 +113,27 @@
             border-color: transparent;
         }
         
-        /* Estilo para controlar o tamanho da logo */
         #header-logo {
-            height: 160px; /* Altere este valor para ajustar o tamanho da logo. */
-            width: auto;  /* A largura se ajusta automaticamente */
+            height: 160px;
+            width: auto;
+        }
+
+        /* Estilos para o painel de filtros e sua transição */
+        #filter-panel {
+            transition: opacity 0.4s ease, max-height 0.5s ease, transform 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+            max-height: 500px; /* Um valor maior que a altura do painel */
+            overflow: hidden;
+            transform-origin: top;
+        }
+
+        #filter-panel.hidden {
+            opacity: 0;
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            transform: translateY(-1rem);
+            border-width: 0;
         }
     </style>
 </head>
@@ -119,21 +141,27 @@
 
     <!-- Header / HUD Fixo -->
     <header class="fixed top-0 left-0 right-0 z-50 p-4">
-        <!-- ALTERAÇÃO: Removido 'py-3' e adicionado 'h-20' para uma altura fixa de 80px -->
         <nav class="container mx-auto hud-border rounded-xl px-4 sm:px-6 h-20 flex justify-between items-center gap-4">
             <!-- Logo do Museu -->
             <a href="galeria.html" class="flex-shrink-0">
                 <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
             </a>
             
-            <div class="flex-grow flex justify-center px-2 sm:px-4">
+            <!-- [ALTERADO] Container para Pesquisa e Botão de Filtro -->
+            <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
+                <!-- Barra de Pesquisa -->
                 <div id="search-container" class="relative w-full max-w-lg">
-                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="w-full rounded-lg py-2 pl-4 pr-10 text-white placeholder-gray-500 transition-all">
+                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="w-full rounded-lg py-2 pl-4 pr-10 text-white placeholder-gray-500">
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-neon-blue">
                         <i class="fa-solid fa-search"></i>
                     </span>
                     <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 hud-border rounded-lg z-10 overflow-hidden hidden"></div>
                 </div>
+                <!-- [NOVO] Botão de Filtro -->
+                <button id="toggle-filters-btn" title="Mostrar/Ocultar Filtros" class="flex-shrink-0 flex items-center gap-2 rounded-lg py-2 px-4 text-white">
+                    <i class="fa-solid fa-filter"></i>
+                    <span class="hidden sm:inline">Filtros</span>
+                </button>
             </div>
 
             <a href="index.html" class="nav-link text-gray-300 hover:text-white hover:drop-shadow-[0_0_5px_var(--neon-blue)] transition-all flex-shrink-0">
@@ -146,10 +174,10 @@
         
         <div id="gallery" class="page active">
             <div class="container mx-auto px-4">
-                <h1 class="text-5xl md:text-7xl font-black text-center mb-4 holographic-text">Galeria do Acervo</h1>
+                <h1 class="text-5xl md:text-7xl font-black text-center mb-12 holographic-text">Galeria do Acervo</h1>
                 
-                <!-- ÁREA DE FILTROS E ORDENAÇÃO -->
-                <div class="hud-border rounded-lg p-4 mb-12">
+                <!-- [ALTERADO] ÁREA DE FILTROS E ORDENAÇÃO - Agora pode ser oculta -->
+                <div id="filter-panel" class="hud-border rounded-lg p-4 mb-12 hidden">
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
                         <!-- FILTROS DINÂMICOS -->
                         <div id="filter-fabricante-container"></div>
@@ -218,6 +246,8 @@
         const searchInput = document.getElementById('searchInput');
         const sortSelect = document.getElementById('sort-select');
         const autocompleteResults = document.getElementById('autocomplete-results');
+        const toggleFiltersBtn = document.getElementById('toggle-filters-btn'); // [NOVO]
+        const filterPanel = document.getElementById('filter-panel'); // [NOVO]
 
         // --- RENDER FUNCTION ---
         function renderGallery() {
@@ -246,19 +276,17 @@
             });
         }
 
-        // --- DATA PROCESSING FUNCTIONS (ATUALIZADA) ---
+        // --- DATA PROCESSING FUNCTIONS ---
         function applyFiltersAndSort() {
             const searchTerm = searchInput.value.toLowerCase();
             const sortValue = sortSelect.value;
             
-            // Get filter values using their unique IDs
             const fabricanteFilter = document.getElementById('filter-fabricante')?.value;
             const geracaoFilter = document.getElementById('filter-geracao')?.value;
             const anoFilter = document.getElementById('filter-ano')?.value;
 
             let tempItems = state.items;
 
-            // Apply search term filter
             if (searchTerm) {
                 tempItems = tempItems.filter(item => 
                     (item.nome && item.nome.toLowerCase().includes(searchTerm)) ||
@@ -266,7 +294,6 @@
                 );
             }
 
-            // Apply dropdown filters
             if (fabricanteFilter) {
                 tempItems = tempItems.filter(item => item.fabricante === fabricanteFilter);
             }
@@ -277,7 +304,6 @@
                 tempItems = tempItems.filter(item => item.lancamento == anoFilter);
             }
 
-            // Apply sorting
             tempItems.sort((a, b) => {
                 const [field, direction] = sortValue.split('-');
                 const valA = a[field];
@@ -288,7 +314,7 @@
 
                 if (field === 'nome') {
                     return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                } else { // Assumes numeric sort for 'lancamento'
+                } else {
                     return direction === 'asc' ? valA - valB : valB - valA;
                 }
             });
@@ -341,7 +367,6 @@
             }
         }
         
-        // FUNÇÃO PARA CRIAR E POPULAR OS FILTROS (CORRIGIDA)
         const createFilter = (containerId, collectionName, fieldName, label, filterKey) => {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -352,7 +377,7 @@
             labelEl.textContent = label;
 
             const selectEl = document.createElement('select');
-            selectEl.id = `filter-${filterKey}`; // Usa a chave única para o ID
+            selectEl.id = `filter-${filterKey}`;
             selectEl.className = 'filter-select w-full appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer';
             selectEl.innerHTML = `<option value="">Todos</option>`;
             
@@ -382,7 +407,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             carregarAcervo();
             
-            // Criar os filtros na página com chaves únicas
             createFilter('filter-fabricante-container', 'opcoes_fabricantes', 'nome', 'Fabricante', 'fabricante');
             createFilter('filter-geracao-container', 'opcoes_geracoes', 'nome', 'Geração', 'geracao');
             createFilter('filter-ano-container', 'opcoes_anos', 'ano', 'Ano', 'ano');
@@ -390,6 +414,12 @@
             searchInput.addEventListener('input', applyFiltersAndSort);
             sortSelect.addEventListener('change', applyFiltersAndSort);
             
+            // [NOVO] Event listener para o botão de filtros
+            toggleFiltersBtn.addEventListener('click', () => {
+                filterPanel.classList.toggle('hidden');
+                toggleFiltersBtn.classList.toggle('active');
+            });
+
             document.addEventListener('click', (e) => {
                 if (!document.getElementById('search-container').contains(e.target)) {
                     autocompleteResults.classList.add('hidden');
