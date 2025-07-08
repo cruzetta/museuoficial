@@ -72,8 +72,42 @@
         .sound-play-btn:hover { background-color: var(--neon-green); color: var(--dark-bg); box-shadow: 0 0 15px var(--neon-green); transform: scale(1.05); }
         .did-you-know-item { @apply flex items-start gap-4 text-lg; }
         .did-you-know-item i { @apply mt-1; }
-        .essential-game-card { @apply hud-border rounded-lg p-4 text-center font-bold text-lg w-48 h-24 flex items-center justify-center; transition: all 0.2s ease-in-out; }
-        .essential-game-card:hover { border-color: var(--neon-purple); color: var(--neon-purple); transform: translateY(-4px); }
+        
+        /* ESTILO CORRIGIDO PARA OS JOGOS ESSENCIAIS */
+        .essential-game-card {
+            /* Propriedades do .hud-border */
+            background: rgba(18, 16, 38, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            
+            /* Propriedades do Tailwind */
+            border-radius: 0.75rem; /* rounded-lg */
+            padding: 1rem; /* p-4 */
+            text-align: center;
+            font-weight: 700; /* font-bold */
+            font-size: 1.125rem; /* text-lg */
+            line-height: 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /* Propriedades originais */
+            transition: all 0.3s ease-in-out;
+            flex-grow: 1;
+            flex-basis: 200px;
+            max-width: 300px;
+            min-height: 100px;
+        }
+        
+        .essential-game-card:hover {
+            /* Efeito hover combinado com a cor corrigida */
+            transform: translateY(-8px);
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            background: rgba(18, 16, 38, 0.8);
+        }
+
         .card-title { @apply text-2xl font-bold text-white border-b-2 border-neon-blue/50 pb-2 mb-6; font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
         .card-subtitle { @apply text-xl font-bold text-neon-blue mb-4; font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
         .video-card { @apply bg-black/30 p-2 rounded-md; }
@@ -213,10 +247,26 @@
             const fatos = (item.voce_sabia?.length > 0) ? `<ul class="space-y-4">${item.voce_sabia.filter(f => f).map(f => `<li class="did-you-know-item"><i class="fas fa-star text-yellow-400"></i><span>${f}</span></li>`).join('')}</ul>` : createPlaceholder('fa-lightbulb', 'Estamos a desenterrar as curiosidades mais interessantes.');
             return `<div class="hud-border rounded-lg p-8"><h2 class="card-title">Você Sabia?</h2>${fatos}</div>`;
         };
+        
         const createGamesSection = (item) => {
-            const content = (item.jogos_essenciais?.length > 0) ? `<div class="flex flex-wrap gap-4 justify-center">${item.jogos_essenciais.map(j => `<div class="essential-game-card">${j}</div>`).join('')}</div>` : createPlaceholder('fa-ghost', 'A nossa lista de jogos imperdíveis para esta plataforma está a ser preparada.');
-            return `<section><h2 class="text-3xl font-bold text-center mb-6 holographic-text">Jogos Essenciais</h2><div class="hud-border rounded-lg p-8 mt-6">${content}</div></section>`;
+            const sectionTitle = `<h2 class="text-3xl font-bold text-center mb-8 holographic-text">Jogos Essenciais</h2>`;
+            const jogos = item.jogos_essenciais;
+
+            if (!jogos || !Array.isArray(jogos) || jogos.length === 0) {
+                const placeholder = createPlaceholder('fa-ghost', 'A nossa lista de jogos imperdíveis para esta plataforma está a ser preparada.');
+                return `<section class="mt-12">${sectionTitle}<div class="hud-border rounded-lg p-8 mt-6">${placeholder}</div></section>`;
+            }
+            
+            const gameCardsHTML = jogos
+                .filter(gameName => typeof gameName === 'string' && gameName.trim() !== '')
+                .map(gameName => `<div class="essential-game-card">${gameName}</div>`)
+                .join('');
+            
+            const gamesContainer = `<div class="flex flex-wrap gap-6 justify-center">${gameCardsHTML}</div>`;
+            
+            return `<section class="mt-12">${sectionTitle}${gamesContainer}</section>`;
         };
+
         const showStatus = (isError, message = '') => {
             loader.classList.add('hidden');
             errorMessage.classList.remove('hidden');
@@ -261,11 +311,10 @@
                         { icon: 'fa-dollar-sign', label: 'Preço Lanç.', value: item.preco }
                     ];
                     
-                    // NOVO: Renderizar campos personalizados
                     let customFieldsHTML = '';
                     if (item.camposPersonalizados && typeof item.camposPersonalizados === 'object') {
                         for (const [key, value] of Object.entries(item.camposPersonalizados)) {
-                            if (value) { // Apenas renderiza se houver valor
+                            if (value) {
                                 customFieldsHTML += `<li><strong><i class="fa-solid fa-cogs w-6 text-neon-blue"></i> ${key}:</strong> ${value}</li>`;
                             }
                         }
