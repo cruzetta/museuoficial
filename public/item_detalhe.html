@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galeria do Acervo - Museu do Videojogo</title>
+    <title>Detalhes do Item - Museu do Videojogo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,38 +64,67 @@
             to { background-position: 200% center; }
         }
 
-        #searchInput, .filter-select {
-            background: rgba(13, 13, 26, 0.8);
-            border: 1px solid var(--neon-blue);
-            box-shadow: 0 0 8px var(--neon-blue);
+        .prose-custom { @apply text-lg leading-relaxed space-y-4; }
+        .prose-custom h1, .prose-custom h2, .prose-custom h3 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; @apply holographic-text my-6; }
+        .prose-custom a { color: var(--neon-blue); text-decoration: underline; }
+        .prose-custom p { @apply mb-4; }
+        .sound-play-btn { @apply flex items-center gap-3 px-4 py-2 rounded-lg font-bold text-white transition-all duration-200; background-color: rgba(57, 255, 20, 0.2); border: 2px solid var(--neon-green); }
+        .sound-play-btn:hover { background-color: var(--neon-green); color: var(--dark-bg); box-shadow: 0 0 15px var(--neon-green); transform: scale(1.05); }
+        .did-you-know-item { @apply flex items-start gap-4 text-lg; }
+        .did-you-know-item i { @apply mt-1; }
+        
+        /* ESTILO CORRIGIDO PARA OS JOGOS ESSENCIAIS */
+        .essential-game-card {
+            /* Propriedades do .hud-border */
+            background: rgba(18, 16, 38, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            
+            /* Propriedades do Tailwind */
+            border-radius: 0.75rem; /* rounded-lg */
+            padding: 1rem; /* p-4 */
+            text-align: center;
+            font-weight: 700; /* font-bold */
+            font-size: 1.125rem; /* text-lg */
+            line-height: 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /* Propriedades originais */
+            transition: all 0.3s ease-in-out;
+            flex-grow: 1;
+            flex-basis: 200px;
+            max-width: 300px;
+            min-height: 100px;
         }
-        #searchInput:focus, .filter-select:focus {
-            outline: none;
-            box-shadow: 0 0 15px var(--neon-purple);
-            border-color: var(--neon-purple);
+        
+        .essential-game-card:hover {
+            /* Efeito hover combinado com a cor corrigida */
+            transform: translateY(-8px);
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            background: rgba(18, 16, 38, 0.8);
         }
 
-        .explore-btn {
-            background: var(--neon-purple);
-            color: white;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px var(--neon-purple);
-        }
-        .explore-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px var(--neon-purple);
-        }
+        .card-title { @apply text-2xl font-bold text-white border-b-2 border-neon-blue/50 pb-2 mb-6; font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
+        .card-subtitle { @apply text-xl font-bold text-neon-blue mb-4; font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
+        .video-card { @apply bg-black/30 p-2 rounded-md; }
+        .video-title { @apply text-center text-sm font-semibold mt-2 text-gray-300; }
+        .thumbnail-btn { @apply hud-border border-2 border-neon-blue/50 rounded-lg px-3 py-2 text-sm text-white font-semibold uppercase tracking-wider transition-all duration-200 flex-grow text-center; box-shadow: none; }
+        .thumbnail-btn:hover { border-color: var(--neon-purple); color: var(--neon-purple); }
+        .thumbnail-btn.active { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+        .placeholder-card { @apply text-center text-gray-400 italic p-6 border-2 border-dashed border-gray-600 rounded-lg; }
+        .placeholder-card i { @apply text-3xl text-neon-blue mb-3; }
+        .image-nav-btn { @apply h-10 w-10 bg-neon-blue/20 text-neon-blue border-2 border-neon-blue rounded-full flex items-center justify-center transition-all duration-200; }
+        .image-nav-btn:hover { @apply bg-neon-purple text-white border-neon-purple scale-110; }
+        .share-btn { @apply bg-transparent border-2 border-neon-purple text-neon-purple rounded-full h-12 w-12 flex items-center justify-center transition-all duration-300; }
+        .share-btn:hover { @apply bg-neon-purple text-white scale-110 shadow-lg shadow-neon-purple/30; }
+        #notification-toast { @apply fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform translate-y-20 opacity-0; }
+        #notification-toast.show { @apply transform translate-y-0 opacity-100; }
 
-        .autocomplete-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            color: white;
-            transition: background-color 0.2s;
-        }
-        .autocomplete-item:hover {
-            background-color: var(--neon-purple);
-        }
-
+        /* Remove a borda e todos os efeitos de hover APENAS do cabeçalho */
         header .hud-border {
             border: none;
         }
@@ -106,126 +135,60 @@
             border-color: transparent;
         }
         
+        /* Estilo para controlar o tamanho da logo */
         #header-logo {
-            height: 60px;
-            width: auto;
+           height: 160px; /* Altere este valor para ajustar o tamanho da logo. */
+            width: auto;  /* A largura se ajusta automaticamente */
         }
-
-        /* --- ESTILOS PARA O PAINEL DE FILTROS --- */
-        #filters-panel {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: max-height 0.7s ease-in-out, opacity 0.5s ease-in-out, margin-bottom 0.7s ease-in-out;
-            margin-bottom: 0 !important;
-        }
-        #filters-panel.open {
-            max-height: 500px; /* Valor alto para acomodar o conteúdo */
-            opacity: 1;
-            margin-bottom: 3rem !important; /* mb-12 */
-        }
-        
-        /* Estilo para o botão de filtro ativo */
-        #filter-toggle-btn.active {
-            border-color: var(--neon-green) !important;
-            color: var(--neon-green);
-            box-shadow: 0 0 15px var(--neon-green) !important;
-        }
-
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased" style="background: var(--metal-bg);">
 
-    <!-- Header / HUD Fixo -->
-    <header class="fixed top-0 left-0 right-0 z-50 p-4">
-        <nav class="container mx-auto hud-border rounded-xl px-4 sm:px-6 h-20 flex justify-between items-center gap-4">
-            <!-- Logo do Museu -->
+    <header class="sticky top-0 z-50 p-4">
+        <div class="container mx-auto hud-border rounded-xl px-4 h-20 flex justify-between items-center">
             <a href="galeria.html" class="flex-shrink-0">
-                <img id="header-logo" src="https://i.imgur.com/2901m4o.png" alt="Logo Museu do Videogame">
+                <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
             </a>
-            
-            <!-- Container central para Pesquisa e Botão de Filtro -->
-            <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
-                <!-- Barra de Pesquisa -->
-                <div id="search-container" class="relative w-full max-w-lg">
-                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="w-full rounded-lg py-2 pl-4 pr-10 text-white placeholder-gray-500 transition-all">
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-neon-blue">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 hud-border rounded-lg z-10 overflow-hidden hidden"></div>
-                </div>
-                <!-- Botão para Abrir Filtros -->
-                <button id="filter-toggle-btn" title="Mostrar/Ocultar Filtros" class="flex-shrink-0 border-2 border-neon-purple text-neon-purple hover:text-white hover:bg-neon-purple px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300">
-                    <i class="fa-solid fa-filter"></i>
-                    <span class="hidden sm:inline">Filtros</span>
-                </button>
-            </div>
-
-            <!-- Link de Voltar -->
-            <a href="index.html" class="nav-link text-gray-300 hover:text-white hover:drop-shadow-[0_0_5px_var(--neon-blue)] transition-all flex-shrink-0">
-                <i class="fa-solid fa-arrow-left mr-2"></i><span class="hidden sm:inline">Voltar ao Site</span>
+            <a href="galeria.html" class="text-sm font-bold text-neon-blue hover:text-white transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Voltar para a Galeria
             </a>
-        </nav>
+        </div>
     </header>
 
-    <main class="pt-32" style="background: var(--metal-bg);">
+    <main class="container mx-auto px-4 pt-12 pb-16">
+        <article id="item-container" class="opacity-0 transition-opacity duration-500"></article>
         
-        <div id="gallery" class="page active">
-            <div class="container mx-auto px-4">
-                <h1 class="text-5xl md:text-7xl font-black text-center mb-4 holographic-text">Galeria do Acervo</h1>
-                
-                <!-- PAINEL DE FILTROS E ORDENAÇÃO (INICIALMENTE OCULTO) -->
-                <div id="filters-panel" class="mb-12">
-                    <div class="hud-border rounded-lg p-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
-                            <!-- FILTROS DINÂMICOS -->
-                            <div id="filter-fabricante-container"></div>
-                            <div id="filter-geracao-container"></div>
-                            <div id="filter-ano-container"></div>
-                            
-                            <!-- ORDENAÇÃO -->
-                            <div>
-                                <label for="sort-select" class="block text-sm font-bold mb-1 text-neon-blue">Ordenar por</label>
-                                <select id="sort-select" class="filter-select w-full appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer">
-                                    <option value="lancamento-asc">Mais Antigos</option>
-                                    <option value="lancamento-desc">Mais Recentes</option>
-                                    <option value="nome-asc">Ordem Alfabética (A-Z)</option>
-                                    <option value="nome-desc">Ordem Alfabética (Z-A)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Grid da Galeria - Conteúdo será carregado aqui -->
-                <div id="gallery-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-                    <!-- Estado de Carregamento Inicial -->
-                    <div id="gallery-loader" class="col-span-full text-center py-20">
-                         <i class="fas fa-sync fa-spin text-5xl text-neon-blue"></i>
-                         <p class="mt-4 text-2xl holographic-text">A carregar acervo...</p>
-                    </div>
-                </div>
+        <div id="status-container" class="text-center py-20">
+            <div id="loader">
+                <i class="fas fa-sync fa-spin text-5xl text-neon-blue"></i>
+                <p class="mt-4 text-2xl holographic-text">A carregar detalhes do item...</p>
+            </div>
+            <div id="error-message" class="hidden">
+                <i class="fas fa-exclamation-triangle text-5xl text-red-500"></i>
+                <p class="mt-4 text-2xl text-red-400">Ocorreu um Erro</p>
+                <p id="error-text" class="text-gray-400"></p>
             </div>
         </div>
     </main>
     
+    <audio id="audio-player"></audio>
+    <div id="notification-toast">Link copiado para a área de transferência!</div>
+
     <footer class="py-10 mt-16" style="background: var(--metal-bg)">
         <div class="container mx-auto text-center text-gray-400">
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
 
-    <!-- Firebase e Lógica da Galeria -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.appspot.com",
+            storageBucket: "museu-cca6d.firebasestorage.app",
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
@@ -234,193 +197,213 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // --- STATE MANAGEMENT ---
-        const state = {
-            items: [],
-            filteredItems: []
+        const itemContainer = document.getElementById('item-container');
+        const statusContainer = document.getElementById('status-container');
+        const loader = document.getElementById('loader');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const audioPlayer = document.getElementById('audio-player');
+        
+        let galleryData = [];
+        let currentImageIndex = 0;
+
+        window.selectImage = (index) => {
+            currentImageIndex = index;
+            const mainImage = document.getElementById('main-item-image');
+            if (mainImage) {
+                mainImage.style.opacity = 0;
+                setTimeout(() => {
+                    mainImage.src = galleryData[index].url;
+                    mainImage.style.opacity = 1;
+                }, 200);
+            }
+            document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
+            const imageCounter = document.getElementById('image-counter');
+            if (imageCounter) imageCounter.textContent = `${index + 1} / ${galleryData.length}`;
+        };
+        window.nextImage = () => selectImage((currentImageIndex + 1) % galleryData.length);
+        window.prevImage = () => selectImage((currentImageIndex - 1 + galleryData.length) % galleryData.length);
+        
+        // --- [NOVO] Função de Play/Pause ---
+        window.toggleSound = (button, soundUrl) => {
+            // Se o som clicado já estiver a tocar, pausa.
+            if (!audioPlayer.paused && audioPlayer.src === soundUrl) {
+                audioPlayer.pause();
+            } else {
+                // Caso contrário, define o novo som e toca.
+                // O evento 'pause' do som anterior (se houver) tratará de resetar o seu botão.
+                audioPlayer.src = soundUrl;
+                audioPlayer.play();
+            }
         };
 
-        // --- DOM ELEMENTS ---
-        const galleryGrid = document.getElementById('gallery-grid');
-        const galleryLoader = document.getElementById('gallery-loader');
-        const searchInput = document.getElementById('searchInput');
-        const sortSelect = document.getElementById('sort-select');
-        const autocompleteResults = document.getElementById('autocomplete-results');
-        const filterToggleButton = document.getElementById('filter-toggle-btn');
-        const filtersPanel = document.getElementById('filters-panel');
+        window.sharePage = () => {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = window.location.href;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            const toast = document.getElementById('notification-toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        };
 
-        // --- RENDER FUNCTION ---
-        function renderGallery() {
-            galleryGrid.innerHTML = '';
-            if (state.filteredItems.length === 0 && galleryLoader.style.display === 'none') {
-                galleryGrid.innerHTML = `<p class="col-span-full text-center text-2xl text-neon-purple py-10">Nenhum item encontrado com os critérios atuais.</p>`;
+        const createPlaceholder = (icon, text) => `<div class="placeholder-card"><i class="fas ${icon}"></i><p>${text}</p></div>`;
+        const createHistorySection = (item) => `<section class="hud-border rounded-lg p-8 mb-12"><h2 class="card-title">A História do Herói</h2>${item.detalhes ? `<div class="prose-custom mt-4">${item.detalhes}</div>` : createPlaceholder('fa-book-open', 'Em breve: A história completa e o legado deste item serão adicionados.')}</section>`;
+        
+        // --- [ATUALIZADO] Geração dos botões de som ---
+        const createActionSection = (item) => {
+            const sons = (item.sons_iconicos?.length > 0) ? `<div class="flex flex-wrap gap-4">${item.sons_iconicos.filter(s => s?.url).map(s => `<button onclick="toggleSound(this, '${s.url}')" data-sound-url="${s.url}" class="sound-play-btn"><i class="fas fa-play mr-2"></i> ${s.nome || 'Ouvir'}</button>`).join('')}</div>` : createPlaceholder('fa-music', 'Estamos a procurar os sons mais marcantes. Volte em breve!');
+            const videos = (item.videos_epoca?.length > 0) ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${item.videos_epoca.filter(v => v?.embed_url).map(v => `<div class="video-card"><video controls class="w-full h-auto rounded-md"><source src="${v.embed_url}" type="video/mp4"></video><h4 class="video-title">${v.nome || 'Vídeo'}</h4></div>`).join('')}</div>` : createPlaceholder('fa-video', 'Em breve: Vídeos e comerciais de época.');
+            return `<div class="hud-border rounded-lg p-8 flex flex-col"><h2 class="card-title">Em Ação</h2><div><h3 class="card-subtitle">Sons Icónicos</h3>${sons}</div><div class="mt-8"><h3 class="card-subtitle">Vídeos da Época</h3>${videos}</div></div>`;
+        };
+        const createDidYouKnowSection = (item) => {
+            const fatos = (item.voce_sabia?.length > 0) ? `<ul class="space-y-4">${item.voce_sabia.filter(f => f).map(f => `<li class="did-you-know-item"><i class="fas fa-star text-yellow-400"></i><span>${f}</span></li>`).join('')}</ul>` : createPlaceholder('fa-lightbulb', 'Estamos a desenterrar as curiosidades mais interessantes.');
+            return `<div class="hud-border rounded-lg p-8"><h2 class="card-title">Você Sabia?</h2>${fatos}</div>`;
+        };
+        
+        const createGamesSection = (item) => {
+            const sectionTitle = `<h2 class="text-3xl font-bold text-center mb-8 holographic-text">Jogos Essenciais</h2>`;
+            const jogos = item.jogos_essenciais;
+
+            if (!jogos || !Array.isArray(jogos) || jogos.length === 0) {
+                const placeholder = createPlaceholder('fa-ghost', 'A nossa lista de jogos imperdíveis para esta plataforma está a ser preparada.');
+                return `<section class="mt-12">${sectionTitle}<div class="hud-border rounded-lg p-8 mt-6">${placeholder}</div></section>`;
+            }
+            
+            const gameCardsHTML = jogos
+                .filter(gameName => typeof gameName === 'string' && gameName.trim() !== '')
+                .map(gameName => `<div class="essential-game-card">${gameName}</div>`)
+                .join('');
+            
+            const gamesContainer = `<div class="flex flex-wrap gap-6 justify-center">${gameCardsHTML}</div>`;
+            
+            return `<section class="mt-12">${sectionTitle}${gamesContainer}</section>`;
+        };
+
+        const showStatus = (isError, message = '') => {
+            loader.classList.add('hidden');
+            errorMessage.classList.remove('hidden');
+            errorText.textContent = message;
+        };
+
+        async function carregarItem() {
+            const itemId = new URLSearchParams(window.location.search).get('id');
+            if (!itemId) {
+                showStatus(true, 'ID do item não encontrado na URL.');
                 return;
             }
 
-            state.filteredItems.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'item-card';
-                card.innerHTML = `
-                    <a href="item_detalhe.html?id=${item.id}" class="block h-full">
-                        <div class="hud-border rounded-lg p-4 flex flex-col h-full transition-transform">
-                            <img src="${item.imagem_principal || 'https://placehold.co/400x300/1a1a2e/E0E0E0?text=Sem+Imagem'}" alt="Imagem de ${item.nome || 'Item'}" class="w-full h-48 rounded-md object-cover mb-4" onerror="this.onerror=null;this.src='https://placehold.co/400x300/1a1a2e/E0E0E0?text=Sem+Imagem';">
-                            <h3 class="item-title text-2xl font-bold mb-3">${item.nome || 'Item sem nome'}</h3>
-                            <div class="text-sm space-y-2 mb-4 flex-grow">
-                                ${item.fabricante ? `<p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> ${item.fabricante}</p>` : ''}
-                                ${item.geracao ? `<p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> ${item.geracao}</p>` : ''}
-                                ${item.lancamento ? `<p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> ${item.lancamento}</p>` : ''}
-                            </div>
-                            <div class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</div>
-                        </div>
-                    </a>
-                `;
-                galleryGrid.appendChild(card);
-            });
-        }
-
-        // --- DATA PROCESSING FUNCTIONS ---
-        function applyFiltersAndSort() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const sortValue = sortSelect.value;
-            
-            const fabricanteFilter = document.getElementById('filter-fabricante')?.value;
-            const geracaoFilter = document.getElementById('filter-geracao')?.value;
-            const anoFilter = document.getElementById('filter-ano')?.value;
-
-            let tempItems = state.items;
-
-            if (searchTerm) {
-                tempItems = tempItems.filter(item => 
-                    (item.nome && item.nome.toLowerCase().includes(searchTerm)) ||
-                    (item.fabricante && item.fabricante.toLowerCase().includes(searchTerm))
-                );
-            }
-
-            if (fabricanteFilter) tempItems = tempItems.filter(item => item.fabricante === fabricanteFilter);
-            if (geracaoFilter) tempItems = tempItems.filter(item => item.geracao === geracaoFilter);
-            if (anoFilter) tempItems = tempItems.filter(item => item.lancamento == anoFilter);
-
-            tempItems.sort((a, b) => {
-                const [field, direction] = sortValue.split('-');
-                const valA = a[field];
-                const valB = b[field];
-
-                if (!valA) return 1; if (!valB) return -1;
-
-                if (field === 'nome') {
-                    return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                } else {
-                    return direction === 'asc' ? valA - valB : valB - valA;
-                }
-            });
-
-            state.filteredItems = tempItems;
-            renderGallery();
-            updateAutocomplete(searchTerm);
-        }
-        
-        function updateAutocomplete(query) {
-             autocompleteResults.innerHTML = '';
-             if (query.length === 0) {
-                 autocompleteResults.classList.add('hidden');
-                 return;
-             }
-             const matchedItems = state.items.filter(item => item.nome && item.nome.toLowerCase().includes(query)).slice(0, 5);
-             if (matchedItems.length > 0) {
-                 matchedItems.forEach(item => {
-                     const suggestionDiv = document.createElement('div');
-                     suggestionDiv.className = 'autocomplete-item';
-                     suggestionDiv.textContent = item.nome;
-                     suggestionDiv.onclick = () => {
-                         searchInput.value = item.nome;
-                         autocompleteResults.classList.add('hidden');
-                         applyFiltersAndSort();
-                     };
-                     autocompleteResults.appendChild(suggestionDiv);
-                 });
-                 autocompleteResults.classList.remove('hidden');
-             } else {
-                 autocompleteResults.classList.add('hidden');
-             }
-        }
-        
-        function carregarAcervo() {
             try {
-                const acervosRef = collection(db, `/artifacts/${appId}/public/data/acervos`);
-                onSnapshot(query(acervosRef), (querySnapshot) => {
-                    state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    if (galleryLoader) galleryLoader.style.display = 'none';
-                    applyFiltersAndSort(); 
-                }, (error) => {
-                    console.error("Erro ao carregar o acervo:", error);
-                    galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar o acervo.</p>`;
-                });
+                const docRef = doc(db, `/artifacts/${appId}/public/data/acervos`, itemId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const item = docSnap.data();
+                    document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
+                    
+                    galleryData = [];
+                    if (item.imagem_principal) galleryData.push({ name: 'Principal', url: item.imagem_principal });
+                    if (item.galeria_imagens) galleryData.push(...item.galeria_imagens.filter(img => img?.url));
+                    
+                    const mainImageURL = galleryData.length > 0 ? galleryData[0].url : 'https://placehold.co/600x400/0D0D1A/E0E0E0?text=Sem+Imagem';
+                    const imageNavHTML = galleryData.length > 1 ? `<div id="image-nav-container" class="flex items-center justify-center gap-6 mt-4"><button onclick="prevImage()" class="image-nav-btn"><i class="fas fa-chevron-left"></i></button><span id="image-counter" class="text-lg font-bold text-white">1 / ${galleryData.length}</span><button onclick="nextImage()" class="image-nav-btn"><i class="fas fa-chevron-right"></i></button></div>` : '';
+                    const thumbnailGalleryHTML = galleryData.length > 1 ? `<div class="mt-8 hud-border rounded-lg p-6"><h2 class="card-title">Galeria</h2><div class="flex flex-wrap gap-3">${galleryData.map((img, i) => `<button onclick="selectImage(${i})" class="thumbnail-btn ${i === 0 ? 'active' : ''}">${img.name || 'Imagem'}</button>`).join('')}</div></div>` : '';
+
+                    const fichaTecnicaFields = [
+                        { icon: 'fa-microchip', label: 'Fabricante', value: item.fabricante },
+                        { icon: 'fa-calendar-days', label: 'Lançamento', value: item.lancamento },
+                        { icon: 'fa-gamepad', label: 'Geração', value: item.geracao },
+                        { icon: 'fa-brain', label: 'CPU', value: item.cpu },
+                        { icon: 'fa-image', label: 'Gráficos', value: item.gpu },
+                        { icon: 'fa-music', label: 'Áudio', value: item.audio },
+                        { icon: 'fa-memory', label: 'Memória RAM', value: item.ram },
+                        { icon: 'fa-sd-card', label: 'Mídia', value: item.media },
+                        { icon: 'fa-ruler-combined', label: 'Resolução', value: item.resolucao },
+                        { icon: 'fa-palette', label: 'Cores', value: item.cores },
+                        { icon: 'fa-chart-line', label: 'Vendas', value: item.vendas },
+                        { icon: 'fa-dollar-sign', label: 'Preço Lanç.', value: item.preco }
+                    ];
+                    
+                    let customFieldsHTML = '';
+                    if (item.camposPersonalizados && typeof item.camposPersonalizados === 'object') {
+                        for (const [key, value] of Object.entries(item.camposPersonalizados)) {
+                            if (value) {
+                                customFieldsHTML += `<li><strong><i class="fa-solid fa-cogs w-6 text-neon-blue"></i> ${key}:</strong> ${value}</li>`;
+                            }
+                        }
+                    }
+
+                    const contentHTML = `
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+                            <h1 class="text-5xl md:text-7xl font-black text-center md:text-left holographic-text flex-grow">${item.nome || 'Item Desconhecido'}</h1>
+                            <button onclick="sharePage()" class="share-btn flex-shrink-0" title="Partilhar esta página"><i class="fas fa-share-alt text-xl"></i></button>
+                        </div>
+                        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                            <div class="lg:col-span-2">
+                                <div class="hud-border rounded-lg p-2 bg-black"><img id="main-item-image" src="${mainImageURL}" alt="Imagem de ${item.nome}" class="w-full rounded-md object-contain transition-opacity duration-300 aspect-video" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0D0D1A/E0E0E0?text=Imagem+Indispon%C3%ADvel';"></div>
+                                ${imageNavHTML}
+                            </div>
+                            <div class="flex flex-col">
+                                <div class="hud-border rounded-lg p-6 self-start w-full">
+                                    <h2 class="card-title">Ficha Técnica</h2>
+                                    <ul class="space-y-3 text-lg">
+                                        ${fichaTecnicaFields.map(f => f.value ? `<li><strong><i class="fa-solid ${f.icon} w-6 text-neon-blue"></i> ${f.label}:</strong> ${f.value}</li>` : '').join('')}
+                                        ${customFieldsHTML}
+                                    </ul>
+                                </div>
+                                ${thumbnailGalleryHTML}
+                            </div>
+                        </section>
+                        ${createHistorySection(item)}
+                        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">${createActionSection(item)}${createDidYouKnowSection(item)}</section>
+                        ${createGamesSection(item)}
+                    `;
+                    
+                    itemContainer.innerHTML = contentHTML;
+                    statusContainer.style.display = 'none';
+                    itemContainer.classList.remove('opacity-0');
+                    if(galleryData.length > 0) selectImage(0);
+
+                } else {
+                    showStatus(true, 'Item não encontrado na nossa base de dados.');
+                }
             } catch (error) {
-                console.error("Erro ao configurar o listener do acervo:", error);
-                if (galleryLoader) galleryLoader.style.display = 'none';
-                galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Ocorreu um erro inesperado.</p>`;
+                console.error("Erro ao carregar o item:", error);
+                showStatus(true, 'Ocorreu um erro de rede ao carregar os detalhes. Tente novamente.');
             }
         }
-        
-        const createFilter = (containerId, collectionName, fieldName, label, filterKey) => {
-            const container = document.getElementById(containerId);
-            if (!container) return;
 
-            const labelEl = document.createElement('label');
-            labelEl.htmlFor = `filter-${filterKey}`;
-            labelEl.className = 'block text-sm font-bold mb-1 text-neon-blue';
-            labelEl.textContent = label;
-
-            const selectEl = document.createElement('select');
-            selectEl.id = `filter-${filterKey}`;
-            selectEl.className = 'filter-select w-full appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer';
-            selectEl.innerHTML = `<option value="">Todos</option>`;
-            
-            selectEl.addEventListener('change', applyFiltersAndSort);
-
-            container.appendChild(labelEl);
-            container.appendChild(selectEl);
-
-            const q = collection(db, `/artifacts/${appId}/public/data/${collectionName}`);
-            onSnapshot(q, (snapshot) => {
-                let options = snapshot.docs.map(doc => doc.data());
-                options.sort((a,b) => {
-                    if (typeof a[fieldName] === 'string') return a[fieldName].localeCompare(b[fieldName]);
-                    return a[fieldName] - b[fieldName];
-                });
-                options.forEach(data => {
-                    const option = document.createElement('option');
-                    option.value = data[fieldName];
-                    option.textContent = data[fieldName];
-                    selectEl.appendChild(option);
-                });
-            });
-        };
-
-        // --- EVENT LISTENERS ---
+        // --- [ATUALIZADO] Adiciona listeners para o estado do áudio ---
         document.addEventListener('DOMContentLoaded', () => {
-            carregarAcervo();
-            
-            createFilter('filter-fabricante-container', 'opcoes_fabricantes', 'nome', 'Fabricante', 'fabricante');
-            createFilter('filter-geracao-container', 'opcoes_geracoes', 'nome', 'Geração', 'geracao');
-            createFilter('filter-ano-container', 'opcoes_anos', 'ano', 'Ano', 'ano');
+            carregarItem();
 
-            searchInput.addEventListener('input', applyFiltersAndSort);
-            sortSelect.addEventListener('change', applyFiltersAndSort);
-            
-            // Event listener para o botão de filtros
-            filterToggleButton.addEventListener('click', () => {
-                filtersPanel.classList.toggle('open');
-                filterToggleButton.classList.toggle('active');
+            // Ouve o evento 'play' do player de áudio
+            audioPlayer.addEventListener('play', () => {
+                document.querySelectorAll('.sound-play-btn').forEach(button => {
+                    const icon = button.querySelector('i');
+                    // Compara o URL do botão com o URL do áudio a tocar
+                    if (button.dataset.soundUrl === audioPlayer.src) {
+                        icon.classList.remove('fa-play');
+                        icon.classList.add('fa-pause');
+                    } else {
+                        // Garante que todos os outros botões mostram 'play'
+                        icon.classList.remove('fa-pause');
+                        icon.classList.add('fa-play');
+                    }
+                });
             });
 
-            document.addEventListener('click', (e) => {
-                if (!document.getElementById('search-container').contains(e.target)) {
-                    autocompleteResults.classList.add('hidden');
-                }
+            // Ouve o evento 'pause' (que também é acionado no fim do áudio)
+            audioPlayer.addEventListener('pause', () => {
+                // Reseta todos os botões que estiverem com o ícone de 'pause'
+                document.querySelectorAll('.sound-play-btn i.fa-pause').forEach(icon => {
+                    icon.classList.remove('fa-pause');
+                    icon.classList.add('fa-play');
+                });
             });
         });
-
     </script>
 </body>
 </html>
