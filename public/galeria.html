@@ -251,7 +251,7 @@
             const searchTerm = searchInput.value.toLowerCase();
             const sortValue = sortSelect.value;
             
-            // Get filter values
+            // Get filter values using their unique IDs
             const fabricanteFilter = document.getElementById('filter-fabricante')?.value;
             const geracaoFilter = document.getElementById('filter-geracao')?.value;
             const anoFilter = document.getElementById('filter-ano')?.value;
@@ -341,18 +341,18 @@
             }
         }
         
-        // FUNÇÃO PARA CRIAR E POPULAR OS FILTROS
-        const createFilter = (containerId, collectionName, fieldName, label) => {
+        // FUNÇÃO PARA CRIAR E POPULAR OS FILTROS (CORRIGIDA)
+        const createFilter = (containerId, collectionName, fieldName, label, filterKey) => {
             const container = document.getElementById(containerId);
             if (!container) return;
 
             const labelEl = document.createElement('label');
-            labelEl.htmlFor = `filter-${fieldName}`;
+            labelEl.htmlFor = `filter-${filterKey}`;
             labelEl.className = 'block text-sm font-bold mb-1 text-neon-blue';
             labelEl.textContent = label;
 
             const selectEl = document.createElement('select');
-            selectEl.id = `filter-${fieldName}`;
+            selectEl.id = `filter-${filterKey}`; // Usa a chave única para o ID
             selectEl.className = 'filter-select w-full appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer';
             selectEl.innerHTML = `<option value="">Todos</option>`;
             
@@ -382,10 +382,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             carregarAcervo();
             
-            // Criar os filtros na página
-            createFilter('filter-fabricante-container', 'opcoes_fabricantes', 'nome', 'Fabricante');
-            createFilter('filter-geracao-container', 'opcoes_geracoes', 'nome', 'Geração');
-            createFilter('filter-ano-container', 'opcoes_anos', 'ano', 'Ano');
+            // Criar os filtros na página com chaves únicas
+            createFilter('filter-fabricante-container', 'opcoes_fabricantes', 'nome', 'Fabricante', 'fabricante');
+            createFilter('filter-geracao-container', 'opcoes_geracoes', 'nome', 'Geração', 'geracao');
+            createFilter('filter-ano-container', 'opcoes_anos', 'ano', 'Ano', 'ano');
 
             searchInput.addEventListener('input', applyFiltersAndSort);
             sortSelect.addEventListener('change', applyFiltersAndSort);
