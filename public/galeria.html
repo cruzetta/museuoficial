@@ -7,121 +7,124 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        /*
+         * TEMA ATUALIZADO: MUSEU MODERNO E CONSERVADOR
+         * Inspirado em item_detalhe.html
+        */
         :root {
-            --neon-blue: #00BFFF;
-            --neon-purple: #A020F0;
-            --neon-green: #39FF14;
-            --dark-bg: #0D0D1A;
-            --metal-bg: linear-gradient(145deg, #1a1a2e, #161625);
+            --primary-color: #f59e0b; /* Amarelo/Dourado vibrante (Tailwind amber-500) */
+            --primary-hover: #d97706; /* Tom mais escuro para hover (Tailwind amber-600) */
+            --dark-header: #111827; /* Cinza escuro para o cabeçalho (Tailwind gray-900) */
+            --text-dark: #212529;
+            --text-light: #495057;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
         }
 
         body {
-            font-family: 'Roboto Mono', monospace;
-            background-color: var(--dark-bg);
-            color: #E0E0E0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
         }
 
-        h1, h2, h3, .nav-link {
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
+        h1, h2, h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--text-dark);
         }
 
-        .hud-border {
-            background: rgba(18, 16, 38, 0.6); /* Fundo escuro semi-transparente */
-            backdrop-filter: blur(10px);      /* Efeito de vidro fosco */
-            border: 1px solid rgba(0, 255, 255, 0.2); /* Borda ciano subtil */
-            border-radius: 12px;              /* Cantos arredondados */
-            transition: all 0.3s ease-in-out; /* Transição suave para todos os efeitos */
-            position: relative; 
-            box-shadow: none;
-        }
-
-        .hud-border:hover {
-            transform: translateY(-8px) scale(1.03);
-            border-color: rgba(0, 255, 255, 0.7);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-            background: rgba(18, 16, 38, 0.8);
-        }
-
-        .hud-border::before, .hud-border::after {
-            content: '';
-            display: none;
-        }
-
-        .holographic-text {
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-blue));
-            background-size: 200% 200%;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: holographic-shine 5s linear infinite;
-        }
-
-        @keyframes holographic-shine {
-            to { background-position: 200% center; }
-        }
-
-        #searchInput, .filter-select, #toggle-filters-btn {
-            background: rgba(13, 13, 26, 0.8);
-            border: 1px solid var(--neon-blue);
-            box-shadow: 0 0 8px var(--neon-blue);
-            transition: all 0.3s ease;
-        }
-        #searchInput:focus, .filter-select:focus, #toggle-filters-btn:focus {
-            outline: none;
-            box-shadow: 0 0 15px var(--neon-purple);
-            border-color: var(--neon-purple);
+        .content-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
         }
         
-        /* Estilo para o botão de filtro ativo */
-        #toggle-filters-btn.active {
-            box-shadow: 0 0 15px var(--neon-purple);
-            border-color: var(--neon-purple);
+        .gallery-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
-        .explore-btn {
-            background: var(--neon-purple);
-            color: white;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px var(--neon-purple);
+        .gallery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
-        .explore-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px var(--neon-purple);
-        }
-
-        .autocomplete-item {
-            padding: 12px 16px;
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
             cursor: pointer;
-            color: white;
-            transition: background-color 0.2s;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: var(--text-dark);
+            border-color: #ced4da;
+        }
+        .btn-secondary:hover {
+            background-color: #dee2e6;
+            border-color: #adb5bd;
+        }
+
+        /* Estilos para formulários */
+        .form-input, .form-select {
+            width: 100%;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+        }
+        
+        .autocomplete-results {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .autocomplete-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            color: var(--text-dark);
         }
         .autocomplete-item:hover {
-            background-color: var(--neon-purple);
-        }
-
-        header .hud-border {
-            border: none;
-        }
-        header .hud-border:hover {
-            transform: none;
-            box-shadow: none;
-            background: rgba(18, 16, 38, 0.6);
-            border-color: transparent;
+            background-color: var(--bg-light);
         }
         
         #header-logo {
-            height: 160px;
+            height: 120px; /* Ajustado para o novo header */
             width: auto;
         }
 
-        /* Estilos para o painel de filtros e sua transição */
         #filter-panel {
             transition: opacity 0.4s ease, max-height 0.5s ease, transform 0.4s ease, padding 0.4s ease, margin 0.4s ease;
-            max-height: 500px; /* Um valor maior que a altura do painel */
+            max-height: 500px;
             overflow: hidden;
             transform-origin: top;
         }
@@ -132,86 +135,85 @@
             padding-top: 0;
             padding-bottom: 0;
             margin-bottom: 0;
-            transform: translateY(-1rem);
+            transform: scaleY(0.95);
             border-width: 0;
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- Header / HUD Fixo -->
-    <header class="fixed top-0 left-0 right-0 z-50 p-4">
-        <nav class="container mx-auto hud-border rounded-xl px-4 sm:px-6 h-20 flex justify-between items-center gap-4">
+    <!-- CABEÇALHO ATUALIZADO COM FUNDO ESCURO -->
+    <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
+        <nav class="container mx-auto px-4 sm:px-6 h-24 flex justify-between items-center gap-4">
             <!-- Logo do Museu -->
-            <a href="galeria.html" class="flex-shrink-0">
+            <a href="index.html" class="flex-shrink-0">
                 <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
             </a>
             
-            <!-- [ALTERADO] Container para Pesquisa e Botão de Filtro -->
+            <!-- Container para Pesquisa e Botão de Filtro -->
             <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
                 <!-- Barra de Pesquisa -->
                 <div id="search-container" class="relative w-full max-w-lg">
-                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="w-full rounded-lg py-2 pl-4 pr-10 text-white placeholder-gray-500">
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-neon-blue">
+                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="form-input w-full py-2 pl-10 pr-4">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                         <i class="fa-solid fa-search"></i>
                     </span>
-                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 hud-border rounded-lg z-10 overflow-hidden hidden"></div>
+                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 z-10 overflow-hidden hidden"></div>
                 </div>
-                <!-- [NOVO] Botão de Filtro -->
-                <button id="toggle-filters-btn" title="Mostrar/Ocultar Filtros" class="flex-shrink-0 flex items-center gap-2 rounded-lg py-2 px-4 text-white">
+                <!-- Botão de Filtro -->
+                <button id="toggle-filters-btn" title="Mostrar/Ocultar Filtros" class="btn btn-secondary flex-shrink-0">
                     <i class="fa-solid fa-filter"></i>
                     <span class="hidden sm:inline">Filtros</span>
                 </button>
             </div>
 
-            <a href="index.html" class="nav-link text-gray-300 hover:text-white hover:drop-shadow-[0_0_5px_var(--neon-blue)] transition-all flex-shrink-0">
-                <i class="fa-solid fa-arrow-left mr-2"></i><span class="hidden sm:inline">Voltar ao Site Principal</span>
+            <a href="index.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Voltar ao Início</span>
             </a>
         </nav>
     </header>
 
-    <main class="pt-32" style="background: var(--metal-bg);">
+    <main class="pt-12 pb-16">
         
-        <div id="gallery" class="page active">
-            <div class="container mx-auto px-4">
-                <h1 class="text-5xl md:text-7xl font-black text-center mb-12 holographic-text">Galeria do Acervo</h1>
-                
-                <!-- [ALTERADO] ÁREA DE FILTROS E ORDENAÇÃO - Agora pode ser oculta -->
-                <div id="filter-panel" class="hud-border rounded-lg p-4 mb-12 hidden">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
-                        <!-- FILTROS DINÂMICOS -->
-                        <div id="filter-fabricante-container"></div>
-                        <div id="filter-geracao-container"></div>
-                        <div id="filter-ano-container"></div>
-                        
-                        <!-- ORDENAÇÃO -->
-                        <div>
-                            <label for="sort-select" class="block text-sm font-bold mb-1 text-neon-blue">Ordenar por</label>
-                            <select id="sort-select" class="filter-select w-full appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer">
-                                <option value="lancamento-asc">Mais Antigos</option>
-                                <option value="lancamento-desc">Mais Recentes</option>
-                                <option value="nome-asc">Ordem Alfabética (A-Z)</option>
-                                <option value="nome-desc">Ordem Alfabética (Z-A)</option>
-                            </select>
-                        </div>
+        <div class="container mx-auto px-4">
+            <!-- TÍTULO COM DIVISOR -->
+            <h1 class="text-4xl md:text-5xl font-bold text-center mb-12 pb-6 border-b border-gray-200">Galeria do Acervo</h1>
+            
+            <!-- ÁREA DE FILTROS E ORDENAÇÃO -->
+            <div id="filter-panel" class="content-card mb-12 hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+                    <!-- FILTROS DINÂMICOS -->
+                    <div id="filter-fabricante-container"></div>
+                    <div id="filter-geracao-container"></div>
+                    <div id="filter-ano-container"></div>
+                    
+                    <!-- ORDENAÇÃO -->
+                    <div>
+                        <label for="sort-select" class="block text-sm font-medium mb-1">Ordenar por</label>
+                        <select id="sort-select" class="form-select">
+                            <option value="lancamento-desc">Mais Recentes</option>
+                            <option value="lancamento-asc">Mais Antigos</option>
+                            <option value="nome-asc">Ordem Alfabética (A-Z)</option>
+                            <option value="nome-desc">Ordem Alfabética (Z-A)</option>
+                        </select>
                     </div>
                 </div>
+            </div>
 
-
-                <!-- Grid da Galeria - Conteúdo será carregado aqui -->
-                <div id="gallery-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-                    <!-- Estado de Carregamento Inicial -->
-                    <div id="gallery-loader" class="col-span-full text-center py-20">
-                         <i class="fas fa-sync fa-spin text-5xl text-neon-blue"></i>
-                         <p class="mt-4 text-2xl holographic-text">A carregar acervo...</p>
-                    </div>
+            <!-- Grid da Galeria -->
+            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Estado de Carregamento Inicial -->
+                <div id="gallery-loader" class="col-span-full text-center py-20">
+                     <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
+                     <p class="mt-4 text-xl text-gray-600">A carregar acervo...</p>
                 </div>
             </div>
         </div>
     </main>
     
-    <footer class="py-10 mt-16" style="background: var(--metal-bg)">
-        <div class="container mx-auto text-center text-gray-400">
+    <footer class="py-8 mt-16 bg-gray-200 border-t border-gray-300">
+        <div class="container mx-auto text-center text-gray-600">
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
@@ -246,30 +248,36 @@
         const searchInput = document.getElementById('searchInput');
         const sortSelect = document.getElementById('sort-select');
         const autocompleteResults = document.getElementById('autocomplete-results');
-        const toggleFiltersBtn = document.getElementById('toggle-filters-btn'); // [NOVO]
-        const filterPanel = document.getElementById('filter-panel'); // [NOVO]
+        const toggleFiltersBtn = document.getElementById('toggle-filters-btn');
+        const filterPanel = document.getElementById('filter-panel');
 
-        // --- RENDER FUNCTION ---
+        // --- RENDER FUNCTION (ATUALIZADA) ---
         function renderGallery() {
             galleryGrid.innerHTML = '';
             if (state.filteredItems.length === 0 && galleryLoader.style.display === 'none') {
-                galleryGrid.innerHTML = `<p class="col-span-full text-center text-2xl text-neon-purple py-10">Nenhum item encontrado com os critérios atuais.</p>`;
+                galleryGrid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-search-minus text-4xl text-gray-400"></i><p class="mt-4 text-xl text-gray-600">Nenhum item encontrado.</p><p class="text-gray-500">Tente ajustar seus filtros ou termo de busca.</p></div>`;
                 return;
             }
 
             state.filteredItems.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'item-card';
+                card.className = 'gallery-card';
                 card.innerHTML = `
-                    <div class="hud-border rounded-lg p-4 flex flex-col h-full transition-transform hover:scale-105">
-                        <img src="${item.imagem_principal || 'https://placehold.co/400x300/1a1a2e/E0E0E0?text=Sem+Imagem'}" alt="Imagem de ${item.nome || 'Item'}" class="w-full h-48 rounded-md object-cover mb-4">
-                        <h3 class="item-title text-2xl font-bold mb-3">${item.nome || 'Item sem nome'}</h3>
-                        <div class="text-sm space-y-2 mb-4 flex-grow">
-                            ${item.fabricante ? `<p><i class="fa-solid fa-microchip w-5 text-neon-blue"></i> <strong>Fabricante:</strong> ${item.fabricante}</p>` : ''}
-                            ${item.geracao ? `<p><i class="fa-solid fa-gamepad w-5 text-neon-blue"></i> <strong>Geração:</strong> ${item.geracao}</p>` : ''}
-                            ${item.lancamento ? `<p><i class="fa-solid fa-calendar-days w-5 text-neon-blue"></i> <strong>Lançamento:</strong> ${item.lancamento}</p>` : ''}
+                    <div class="p-4 bg-gray-100">
+                        <a href="item_detalhe.html?id=${item.id}" class="block">
+                            <img src="${item.imagem_principal || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="Imagem de ${item.nome || 'Item'}" class="w-full h-48 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/400x300/e9ecef/6c757d?text=Imagem+Inv%C3%A1lida';">
+                        </a>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800">${item.nome || 'Item sem nome'}</h3>
+                        <div class="text-sm text-gray-600 space-y-1 mb-4 flex-grow">
+                            ${item.fabricante ? `<p><i class="fa-solid fa-microchip w-5 text-gray-400"></i> ${item.fabricante}</p>` : ''}
+                            ${item.lancamento ? `<p><i class="fa-solid fa-calendar-days w-5 text-gray-400"></i> ${item.lancamento}</p>` : ''}
                         </div>
-                        <a href="item_detalhe.html?id=${item.id}" class="explore-btn w-full text-center font-bold py-3 px-4 rounded-lg uppercase mt-auto">Explorar Item</a>
+                        <a href="item_detalhe.html?id=${item.id}" class="btn btn-primary w-full mt-auto">
+                            Explorar Item
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
                     </div>
                 `;
                 galleryGrid.appendChild(card);
@@ -306,13 +314,18 @@
 
             tempItems.sort((a, b) => {
                 const [field, direction] = sortValue.split('-');
-                const valA = a[field];
-                const valB = b[field];
+                let valA = a[field];
+                let valB = b[field];
+                
+                if (field === 'lancamento') {
+                    valA = parseInt(valA, 10) || 0;
+                    valB = parseInt(valB, 10) || 0;
+                }
 
                 if (!valA) return 1;
                 if (!valB) return -1;
 
-                if (field === 'nome') {
+                if (typeof valA === 'string') {
                     return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
                 } else {
                     return direction === 'asc' ? valA - valB : valB - valA;
@@ -326,11 +339,14 @@
         
         function updateAutocomplete(query) {
              autocompleteResults.innerHTML = '';
-             if (query.length === 0) {
+             if (query.length < 2) {
                  autocompleteResults.classList.add('hidden');
                  return;
              }
-             const matchedItems = state.items.filter(item => item.nome && item.nome.toLowerCase().includes(query)).slice(0, 5);
+             const matchedItems = state.items
+                .filter(item => item.nome && item.nome.toLowerCase().includes(query))
+                .slice(0, 5);
+
              if (matchedItems.length > 0) {
                  matchedItems.forEach(item => {
                      const suggestionDiv = document.createElement('div');
@@ -373,12 +389,12 @@
 
             const labelEl = document.createElement('label');
             labelEl.htmlFor = `filter-${filterKey}`;
-            labelEl.className = 'block text-sm font-bold mb-1 text-neon-blue';
+            labelEl.className = 'block text-sm font-medium mb-1';
             labelEl.textContent = label;
 
             const selectEl = document.createElement('select');
             selectEl.id = `filter-${filterKey}`;
-            selectEl.className = 'filter-select w-full appearance-none rounded-lg py-2 pl-4 pr-10 text-white focus:outline-none cursor-pointer';
+            selectEl.className = 'form-select';
             selectEl.innerHTML = `<option value="">Todos</option>`;
             
             selectEl.addEventListener('change', applyFiltersAndSort);
@@ -402,7 +418,6 @@
             });
         };
 
-
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             carregarAcervo();
@@ -411,10 +426,9 @@
             createFilter('filter-geracao-container', 'opcoes_geracoes', 'nome', 'Geração', 'geracao');
             createFilter('filter-ano-container', 'opcoes_anos', 'ano', 'Ano', 'ano');
 
-            searchInput.addEventListener('input', applyFiltersAndSort);
+            searchInput.addEventListener('input', () => applyFiltersAndSort());
             sortSelect.addEventListener('change', applyFiltersAndSort);
             
-            // [NOVO] Event listener para o botão de filtros
             toggleFiltersBtn.addEventListener('click', () => {
                 filterPanel.classList.toggle('hidden');
                 toggleFiltersBtn.classList.toggle('active');
