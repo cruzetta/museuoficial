@@ -10,177 +10,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /*
-         * TEMA ATUALIZADO: MUSEU MODERNO E CONSERVADOR
-         * Cores: Fundo branco para clareza, texto escuro para legibilidade,
-         * e um amarelo-dourado vibrante como cor de destaque, inspirado na nova identidade visual.
-         * Estilo: Foco em espaçamento, bordas sutis e sombras leves para uma hierarquia visual clara e elegante.
-        */
         :root {
-            --primary-color: #f59e0b; /* Amarelo/Dourado vibrante (Tailwind amber-500) */
-            --primary-hover: #d97706; /* Tom mais escuro para hover (Tailwind amber-600) */
-            --dark-header: #111827; /* Cinza escuro para o cabeçalho (Tailwind gray-900) */
+            --primary-color: #f59e0b;
+            --primary-hover: #d97706;
+            --dark-header: #111827;
             --text-dark: #212529;
             --text-light: #343a40;
             --bg-light: #f8f9fa;
             --border-color: #dee2e6;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-        }
-
-        .content-card {
-            background-color: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            padding: 2rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-            margin-bottom: 2rem;
-        }
-        
-        .prose-custom {
-            font-family: 'Lora', serif;
-            color: var(--text-light);
-            font-size: 1.125rem;
-            line-height: 1.8;
-        }
-        .prose-custom h1, .prose-custom h2, .prose-custom h3 {
-            font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-        }
-        .prose-custom a {
-            color: var(--primary-color);
-            text-decoration: none;
-            border-bottom: 1px solid var(--primary-color);
-            transition: color 0.2s, border-color 0.2s;
-        }
-        .prose-custom a:hover {
-            color: var(--primary-hover);
-            border-color: var(--primary-hover);
-        }
-        .prose-custom p {
-            margin-bottom: 1.5rem;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            text-align: center;
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: #ffffff;
-        }
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .btn-secondary {
-            background-color: #e9ecef;
-            color: var(--text-dark);
-            border-color: #ced4da;
-        }
-        .btn-secondary:hover {
-            background-color: #dee2e6;
-            border-color: #adb5bd;
-        }
-        
-        .section-title {
-            font-size: 1.875rem;
-            font-weight: 600;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid #e9ecef;
-            margin-bottom: 2rem;
-        }
-
-        .share-btn {
-            background-color: #fff;
-            color: #495057;
-            border: 1px solid #ced4da;
-            height: 3rem;
-            width: 3rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .share-btn:hover {
-            background-color: #f8f9fa;
-            color: var(--primary-color);
-            border-color: var(--primary-color);
-            transform: scale(1.1);
-        }
-
-        #notification-toast {
-            position: fixed;
-            bottom: 1.25rem;
-            right: 1.25rem;
-            background-color: #28a745;
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 0.375rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: all 0.4s ease-in-out;
-            transform: translateY(200%);
-            opacity: 0;
-            z-index: 100;
-        }
-        #notification-toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        .placeholder-card {
-            text-align: center;
-            color: #6c757d;
-            padding: 2rem;
-            border: 2px dashed #e9ecef;
-            border-radius: 0.5rem;
-            background-color: #f8f9fa;
-        }
-        .placeholder-card i {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-            color: #adb5bd;
-        }
-        
-        .thumbnail-btn.active, .thumbnail-btn:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px var(--primary-color);
-        }
-        .thumbnail-btn:hover {
-            border-color: var(--primary-hover);
-        }
-
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
+        h1, h2, h3 { font-family: 'Inter', sans-serif; font-weight: 600; }
+        .content-card { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 2rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); margin-bottom: 2rem; }
+        .prose-custom { font-family: 'Lora', serif; color: var(--text-light); font-size: 1.125rem; line-height: 1.8; }
+        .prose-custom p { margin-bottom: 1.5rem; }
+        .prose-custom a { color: var(--primary-color); text-decoration: none; border-bottom: 1px solid var(--primary-color); }
+        .prose-custom a:hover { color: var(--primary-hover); border-color: var(--primary-hover); }
+        .prose-custom h1, .prose-custom h2, .prose-custom h3 { font-family: 'Inter', sans-serif; color: var(--text-dark); margin-bottom: 1rem; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; text-align: center; transition: all 0.2s ease-in-out; cursor: pointer; border: 1px solid transparent; }
+        .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
+        .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
+        .section-title { font-size: 1.875rem; font-weight: 600; padding-bottom: 0.75rem; border-bottom: 2px solid #e9ecef; margin-bottom: 2rem; }
+        .share-btn { background-color: #fff; color: #495057; border: 1px solid #ced4da; height: 3rem; width: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .share-btn:hover { background-color: #f8f9fa; color: var(--primary-color); border-color: var(--primary-color); transform: scale(1.1); }
+        #notification-toast { position: fixed; bottom: 1.25rem; right: 1.25rem; background-color: #28a745; color: white; padding: 1rem 1.5rem; border-radius: 0.375rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.4s ease-in-out; transform: translateY(200%); opacity: 0; z-index: 100; }
+        #notification-toast.show { transform: translateY(0); opacity: 1; }
+        .placeholder-card { text-align: center; color: #6c757d; padding: 2rem; border: 2px dashed #e9ecef; border-radius: 0.5rem; background-color: #f8f9fa; }
+        .media-thumbnail { cursor: pointer; border: 2px solid transparent; border-radius: 0.375rem; transition: border-color 0.2s, transform 0.2s; background-color: #e9ecef; }
+        .media-thumbnail:hover { transform: scale(1.05); }
+        .media-thumbnail.active { border-color: var(--primary-color); }
+        #media-display-area { background-color: #000; }
+        #media-display-area img, #media-display-area video { max-height: 60vh; }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- CABEÇALHO ATUALIZADO COM FUNDO ESCURO -->
     <header class="sticky top-0 z-50" style="background-color: var(--dark-header); border-bottom: 1px solid #374151;">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <a href="index.html">
-                    <!-- O logo branco agora ficará perfeitamente visível -->
                     <img src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videojogo" class="h-32 w-auto">
                 </a>
                 <a href="galeria.html" class="btn btn-secondary text-sm bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
@@ -192,10 +60,8 @@
     </header>
 
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16">
-        <!-- O conteúdo do item será injetado aqui pelo JavaScript -->
         <article id="item-container" class="opacity-0 transition-opacity duration-500"></article>
         
-        <!-- Mensagens de Status (Carregando/Erro) -->
         <div id="status-container" class="text-center py-20">
             <div id="loader">
                 <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
@@ -209,9 +75,6 @@
         </div>
     </main>
     
-    <!-- Player de áudio global e invisível -->
-    <audio id="audio-player"></audio>
-    <!-- Toast de notificação para a ação de copiar -->
     <div id="notification-toast">Link copiado para a área de transferência!</div>
 
     <footer class="bg-gray-800 text-gray-400 py-8 mt-16">
@@ -220,7 +83,6 @@
         </div>
     </footer>
 
-    <!-- SCRIPT (LÓGICA INALTERADA, FUNÇÕES DE RENDERIZAÇÃO ATUALIZADAS) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -244,125 +106,46 @@
         const loader = document.getElementById('loader');
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
-        const audioPlayer = document.getElementById('audio-player');
         
-        // Estado da galeria
-        let galleryData = [];
-        let currentImageIndex = 0;
+        // Função para exibir mídia na área de display principal
+        window.showMedia = (index, mediaGallery) => {
+            const media = mediaGallery[index];
+            if (!media) return;
 
-        // Funções de controle da galeria
-        window.selectImage = (index) => {
-            currentImageIndex = index;
-            const mainImage = document.getElementById('main-item-image');
-            if (mainImage) {
-                mainImage.style.opacity = 0;
-                setTimeout(() => {
-                    mainImage.src = galleryData[index].url;
-                    mainImage.alt = `Imagem de ${galleryData[index].name || 'item'}`;
-                    mainImage.style.opacity = 1;
-                }, 200);
+            const displayArea = document.getElementById('media-display-area');
+            let mediaHTML = '';
+
+            switch (media.tipo) {
+                case 'imagem':
+                    mediaHTML = `<img src="${media.url}" alt="${media.nome || 'Imagem'}" class="w-full h-full object-contain">`;
+                    break;
+                case 'video':
+                    mediaHTML = `<video src="${media.url}" controls class="w-full h-full object-contain"></video>`;
+                    break;
+                case 'audio':
+                    mediaHTML = `<div class="w-full h-full flex flex-col items-center justify-center text-white bg-gray-900 p-4"><i class="fas fa-music text-6xl mb-4"></i><p class="mb-4 text-lg">${media.nome || 'Faixa de áudio'}</p><audio src="${media.url}" controls></audio></div>`;
+                    break;
+                default:
+                     mediaHTML = `<img src="${media.url}" alt="${media.nome || 'Imagem'}" class="w-full h-full object-contain">`; // Padrão para imagem
             }
-            document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
-            const imageCounter = document.getElementById('image-counter');
-            if (imageCounter) imageCounter.textContent = `${index + 1} / ${galleryData.length}`;
-        };
-        window.nextImage = () => selectImage((currentImageIndex + 1) % galleryData.length);
-        window.prevImage = () => selectImage((currentImageIndex - 1 + galleryData.length) % galleryData.length);
-        
-        // Função de Play/Pause de som
-        window.toggleSound = (button, soundUrl) => {
-            if (!audioPlayer.paused && audioPlayer.src === soundUrl) {
-                audioPlayer.pause();
-            } else {
-                audioPlayer.src = soundUrl;
-                audioPlayer.play();
-            }
+            displayArea.innerHTML = mediaHTML;
+
+            // Atualiza a classe 'active' nas miniaturas
+            document.querySelectorAll('.media-thumbnail').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
         };
 
         // Função de partilha
         window.sharePage = () => {
-            const tempInput = document.createElement('textarea');
-            tempInput.value = window.location.href;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            const toast = document.getElementById('notification-toast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                const toast = document.getElementById('notification-toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            });
         };
-
-        // --- FUNÇÕES DE RENDERIZAÇÃO (ATUALIZADAS PARA O NOVO DESIGN) ---
 
         const createPlaceholder = (icon, text) => `<div class="placeholder-card"><i class="fas ${icon}"></i><p>${text}</p></div>`;
-
-        const createHistorySection = (item) => `
-            <div class="content-card">
-                <h2 class="section-title">A História do Herói</h2>
-                ${item.detalhes ? `<div class="prose-custom">${item.detalhes}</div>` : createPlaceholder('fa-book-open', 'Em breve: A história completa e o legado deste item serão adicionados.')}
-            </div>`;
-        
-        const createActionSection = (item) => {
-            const sons = (item.sons_iconicos?.length > 0) 
-                ? `<div class="flex flex-wrap gap-4">${item.sons_iconicos.filter(s => s?.url).map(s => `<button onclick="toggleSound(this, '${s.url}')" data-sound-url="${s.url}" class="btn btn-secondary"><i class="fas fa-play"></i> ${s.nome || 'Ouvir'}</button>`).join('')}</div>` 
-                : createPlaceholder('fa-music', 'Estamos a procurar os sons mais marcantes. Volte em breve!');
-            
-            const videos = (item.videos_epoca?.length > 0) 
-                ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">${item.videos_epoca.filter(v => v?.embed_url).map(v => `
-                    <div class="border rounded-lg overflow-hidden">
-                        <video controls class="w-full h-auto bg-black"><source src="${v.embed_url}" type="video/mp4"></video>
-                        <h4 class="text-center text-sm font-medium p-3 bg-gray-50">${v.nome || 'Vídeo'}</h4>
-                    </div>`).join('')}</div>` 
-                : createPlaceholder('fa-video', 'Em breve: Vídeos e comerciais de época.');
-
-            return `
-                <div class="content-card">
-                    <h2 class="section-title">Multimédia</h2>
-                    <div class="mb-8">
-                        <h3 class="text-xl font-semibold mb-4">Sons Icónicos</h3>
-                        ${sons}
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4">Vídeos da Época</h3>
-                        ${videos}
-                    </div>
-                </div>`;
-        };
-
-        const createDidYouKnowSection = (item) => {
-            const fatos = (item.voce_sabia?.length > 0) 
-                ? `<ul class="space-y-4">${item.voce_sabia.filter(f => f).map(f => `
-                    <li class="flex items-start gap-4 text-lg">
-                        <i class="fas fa-star text-yellow-500 mt-1"></i>
-                        <span>${f}</span>
-                    </li>`).join('')}</ul>` 
-                : createPlaceholder('fa-lightbulb', 'Estamos a desenterrar as curiosidades mais interessantes.');
-
-            return `
-                <div class="content-card">
-                    <h2 class="section-title">Você Sabia?</h2>
-                    ${fatos}
-                </div>`;
-        };
-        
-        const createGamesSection = (item) => {
-            const jogos = item.jogos_essenciais;
-
-            if (!jogos || !Array.isArray(jogos) || jogos.length === 0) {
-                return ''; // Não renderiza a seção se não houver jogos
-            }
-            
-            const gameCardsHTML = jogos
-                .filter(gameName => typeof gameName === 'string' && gameName.trim() !== '')
-                .map(gameName => `<div class="bg-gray-100 border border-gray-200 rounded-md p-4 text-center font-medium text-gray-700">${gameName}</div>`)
-                .join('');
-            
-            return `
-                <div class="content-card">
-                    <h2 class="section-title">Jogos Essenciais</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">${gameCardsHTML}</div>
-                </div>`;
-        };
 
         const showStatus = (isError, message = '') => {
             loader.classList.add('hidden');
@@ -386,94 +169,77 @@
                     const item = docSnap.data();
                     document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
                     
-                    galleryData = [];
-                    if (item.imagem_principal) galleryData.push({ name: 'Principal', url: item.imagem_principal });
-                    if (item.galeria_imagens) galleryData.push(...item.galeria_imagens.filter(img => img?.url));
-                    
-                    const mainImageURL = galleryData.length > 0 ? galleryData[0].url : 'https://placehold.co/800x600/e9ecef/6c757d?text=Sem+Imagem';
-                    
-                    const imageNavHTML = galleryData.length > 1 ? `
-                        <div id="image-nav-container" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-black/40 text-white p-2 rounded-full">
-                            <button onclick="prevImage()" class="h-8 w-8 rounded-full hover:bg-white/20 transition"><i class="fas fa-chevron-left"></i></button>
-                            <span id="image-counter" class="text-sm font-medium">1 / ${galleryData.length}</span>
-                            <button onclick="nextImage()" class="h-8 w-8 rounded-full hover:bg-white/20 transition"><i class="fas fa-chevron-right"></i></button>
-                        </div>` : '';
-
-                    const thumbnailGalleryHTML = galleryData.length > 1 ? `
-                        <div class="mt-4">
-                            <h3 class="text-lg font-semibold mb-3">Galeria</h3>
-                            <div class="grid grid-cols-3 gap-2">
-                                ${galleryData.map((img, i) => `
-                                <button onclick="selectImage(${i})" class="thumbnail-btn aspect-square bg-cover bg-center rounded-md border-2 border-transparent transition focus:outline-none ${i === 0 ? 'active' : ''}" style="background-image: url('${img.url}')" title="${img.name || 'Imagem'}"></button>
-                                `).join('')}
-                            </div>
-                        </div>` : '';
-
-                    const fichaTecnicaFields = [
-                        { icon: 'fa-microchip', label: 'Fabricante', value: item.fabricante },
-                        { icon: 'fa-calendar-days', label: 'Lançamento', value: item.lancamento },
-                        { icon: 'fa-gamepad', label: 'Geração', value: item.geracao },
-                        { icon: 'fa-brain', label: 'CPU', value: item.cpu },
-                        { icon: 'fa-image', label: 'Gráficos', value: item.gpu },
-                        { icon: 'fa-music', label: 'Áudio', value: item.audio },
-                        { icon: 'fa-memory', label: 'Memória RAM', value: item.ram },
-                        { icon: 'fa-sd-card', label: 'Mídia', value: item.media },
-                        { icon: 'fa-ruler-combined', label: 'Resolução', value: item.resolucao },
-                        { icon: 'fa-palette', label: 'Cores', value: item.cores },
-                        { icon: 'fa-chart-line', label: 'Vendas', value: item.vendas },
-                        { icon: 'fa-dollar-sign', label: 'Preço Lanç.', value: item.preco }
-                    ];
-                    
-                    let customFieldsHTML = '';
-                    if (item.camposPersonalizados && typeof item.camposPersonalizados === 'object') {
-                        for (const [key, value] of Object.entries(item.camposPersonalizados)) {
-                            if (value) {
-                                customFieldsHTML += `<li class="flex items-start"><i class="fa-solid fa-cogs w-6 text-gray-500 mt-1"></i><div><strong class="font-semibold">${key}:</strong> ${value}</div></li>`;
-                            }
-                        }
+                    const mediaGallery = [];
+                    if (item.imagem_principal) {
+                        mediaGallery.push({ tipo: 'imagem', url: item.imagem_principal, nome: 'Imagem Principal' });
+                    }
+                    if (item.galeria_midia && Array.isArray(item.galeria_midia)) {
+                        mediaGallery.push(...item.galeria_midia.filter(m => m.url));
                     }
 
-                    const contentHTML = `
+                    // --- Renderização do HTML ---
+                    
+                    // 1. Cabeçalho do item (Simplificado)
+                    const headerHTML = `
                         <div class="flex flex-col md:flex-row items-start justify-between gap-6 mb-8">
-                            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 flex-grow">${item.nome || 'Item Desconhecido'}</h1>
+                            <div>
+                                <h1 class="text-4xl md:text-5xl font-bold text-gray-900">${item.nome || 'Item Desconhecido'}</h1>
+                                ${item.lancamento ? `<p class="text-xl text-gray-600 mt-2">${item.lancamento}</p>` : ''}
+                            </div>
                             <button onclick="sharePage()" class="share-btn flex-shrink-0" title="Partilhar esta página">
                                 <i class="fas fa-share-alt text-lg"></i>
                             </button>
                         </div>
+                    `;
 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div class="lg:col-span-2">
-                                <div class="relative content-card p-2">
-                                    <img id="main-item-image" src="${mainImageURL}" alt="Imagem de ${item.nome}" class="w-full rounded-md object-contain transition-opacity duration-300 aspect-[4/3] bg-gray-100" onerror="this.onerror=null;this.src='https://placehold.co/800x600/e9ecef/6c757d?text=Imagem+Indispon%C3%ADvel';">
-                                    ${imageNavHTML}
+                    // 2. Galeria de Mídia
+                    let mediaSectionHTML = '';
+                    if (mediaGallery.length > 0) {
+                        const thumbnailsHTML = mediaGallery.map((media, index) => {
+                            let thumbContent = '';
+                            switch (media.tipo) {
+                                case 'video': thumbContent = `<i class="fas fa-play text-white text-2xl"></i>`; break;
+                                case 'audio': thumbContent = `<i class="fas fa-volume-up text-white text-2xl"></i>`; break;
+                                default: thumbContent = ''; // Imagem usa background
+                            }
+                            const bgImage = media.tipo === 'imagem' ? `background-image: url('${media.url}');` : '';
+                            return `
+                                <div onclick='showMedia(${index}, ${JSON.stringify(mediaGallery).replace(/'/g, "&apos;")})' 
+                                     class="media-thumbnail aspect-square bg-cover bg-center flex items-center justify-center" 
+                                     style="${bgImage}"
+                                     title="${media.nome || media.tipo}">
+                                    ${thumbContent}
+                                </div>`;
+                        }).join('');
+
+                        mediaSectionHTML = `
+                            <div class="content-card">
+                                <h2 class="section-title">Galeria de Mídia</h2>
+                                <div id="media-display-area" class="mb-4 rounded-lg flex items-center justify-center aspect-video overflow-hidden">
+                                    <!-- Mídia será carregada aqui -->
+                                </div>
+                                <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+                                    ${thumbnailsHTML}
                                 </div>
                             </div>
-                            <div class="flex flex-col">
-                                <div class="content-card p-6">
-                                    <h2 class="text-xl font-semibold mb-4">Ficha Técnica</h2>
-                                    <ul class="space-y-4 text-gray-700">
-                                        ${fichaTecnicaFields.map(f => f.value ? `<li class="flex items-start"><i class="fa-solid ${f.icon} w-6 text-gray-500 mt-1"></i><div><strong class="font-semibold">${f.label}:</strong> ${f.value}</div></li>` : '').join('')}
-                                        ${customFieldsHTML}
-                                    </ul>
-                                    ${thumbnailGalleryHTML}
-                                </div>
-                            </div>
-                        </div>
+                        `;
+                    }
 
-                        ${createHistorySection(item)}
-                        
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                            ${createActionSection(item)}
-                            ${createDidYouKnowSection(item)}
+                    // 3. Seção "Sobre"
+                    const aboutSectionHTML = `
+                        <div class="content-card">
+                            <h2 class="section-title">Sobre o Item</h2>
+                            ${item.detalhes ? `<div class="prose-custom">${item.detalhes}</div>` : createPlaceholder('fa-book-open', 'A história e o legado deste item serão adicionados em breve.')}
                         </div>
-
-                        ${createGamesSection(item)}
                     `;
                     
-                    itemContainer.innerHTML = contentHTML;
+                    itemContainer.innerHTML = headerHTML + mediaSectionHTML + aboutSectionHTML;
                     statusContainer.style.display = 'none';
                     itemContainer.classList.remove('opacity-0');
-                    if(galleryData.length > 0) selectImage(0);
+                    
+                    if (mediaGallery.length > 0) {
+                        window.showMedia(0, mediaGallery);
+                    }
 
                 } else {
                     showStatus(true, 'Item não encontrado na nossa base de dados.');
@@ -484,29 +250,7 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            carregarItem();
-
-            audioPlayer.addEventListener('play', () => {
-                document.querySelectorAll('.btn[data-sound-url]').forEach(button => {
-                    const icon = button.querySelector('i');
-                    if (button.dataset.soundUrl === audioPlayer.src) {
-                        icon.classList.remove('fa-play');
-                        icon.classList.add('fa-pause');
-                    } else {
-                        icon.classList.remove('fa-pause');
-                        icon.classList.add('fa-play');
-                    }
-                });
-            });
-
-            audioPlayer.addEventListener('pause', () => {
-                document.querySelectorAll('.btn[data-sound-url] i.fa-pause').forEach(icon => {
-                    icon.classList.remove('fa-pause');
-                    icon.classList.add('fa-play');
-                });
-            });
-        });
+        document.addEventListener('DOMContentLoaded', carregarItem);
     </script>
 </body>
 </html>

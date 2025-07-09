@@ -127,7 +127,6 @@
                         <button onclick="window.loadTab('admin_home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
                         <button onclick="window.loadTab('admin_noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
                         <button onclick="window.loadTab('admin_acervos')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Acervos</button>
-                        <button onclick="window.loadTab('admin_acervos_opcoes')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-tags fa-fw"></i> Opções de Filtro</button>
                     </nav>
                 </div>
             </aside>
@@ -184,30 +183,43 @@
         window.appConfig = { appId };
         window.pendingFiles = new Map();
 
-        // --- LÓGICA DE CARREGAMENTO DE ABAS ---
+        // --- LÓGICA DE CARREGAMENTO DE ABAS (CORRIGIDA) ---
         window.loadTab = async (tabId) => {
             if (window.currentEditor) {
-                tinymce.remove(window.currentEditor);
+                try {
+                    tinymce.remove(window.currentEditor);
+                } catch (e) {
+                    console.warn("Não foi possível remover o editor TinyMCE:", e);
+                }
                 window.currentEditor = null;
             }
             
             const tabContent = document.getElementById('tab-content');
-            tabContent.innerHTML = `<div class="text-center p-10"><div id="loader" class="mx-auto"></div><p class="mt-4">A carregar ${tabId}...</p></div>`;
+            // Animação de carregamento sem ID duplicado
+            tabContent.innerHTML = `<div class="text-center p-10"><div class="mx-auto" style="border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div><p class="mt-4">A carregar ${tabId}...</p></div>`;
 
             try {
                 const response = await fetch(`${tabId}.html?v=${new Date().getTime()}`);
                 if (!response.ok) throw new Error(`Não foi possível carregar a aba: ${response.statusText}`);
+                
                 const html = await response.text();
                 tabContent.innerHTML = html;
 
+                // Carrega o script da aba de forma mais segura, sem eval()
                 const scriptElement = tabContent.querySelector('script[data-tab-script]');
                 if (scriptElement) {
-                    eval(scriptElement.innerHTML);
+                    const newScript = document.createElement('script');
+                    // Envolve o script numa função para evitar conflitos de escopo
+                    newScript.innerHTML = `(() => { ${scriptElement.innerHTML} })();`;
+                    tabContent.appendChild(newScript);
+                    scriptElement.remove(); // Remove o template original
                 }
 
+                // Atualiza o botão ativo no menu
                 document.querySelectorAll('#admin-menu button').forEach(button => {
-                    button.classList.toggle('bg-blue-500', button.getAttribute('onclick') === `window.loadTab('${tabId}')`);
-                    button.classList.toggle('text-white', button.getAttribute('onclick') === `window.loadTab('${tabId}')`);
+                    const isCurrent = button.getAttribute('onclick') === `window.loadTab('${tabId}')`;
+                    button.classList.toggle('bg-blue-500', isCurrent);
+                    button.classList.toggle('text-white', isCurrent);
                 });
 
             } catch (error) {
