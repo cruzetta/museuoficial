@@ -46,7 +46,7 @@
             </div>
         </fieldset>
         
-        <div id="acervos-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700">
+        <div id="acervos-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4">
             <div id="acervos-upload-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">0%</div>
         </div>
 
@@ -55,7 +55,7 @@
     <div class="mt-8"><h3 class="text-xl font-bold mb-4">Itens do Acervo</h3><div id="acervos-lista" class="space-y-4"></div></div>
 </div>
 
-<!-- Script Específico da Aba Acervos (Versão Corrigida) -->
+<!-- Script Específico da Aba Acervos (Versão Corrigida com Barra de Carregamento) -->
 <script data-tab-script="acervos">
 {
     // --- SETUP INICIAL E VERIFICAÇÃO DE ELEMENTOS ---
@@ -70,7 +70,7 @@
 
     if (!formContainer || !form || !listContainer) {
         console.error("Erro Crítico: Elementos essenciais da aba 'Acervos' não foram encontrados. A inicialização foi interrompida.");
-        return; // Interrompe a execução se o HTML não estiver completo
+        return;
     }
 
     // --- INICIALIZAÇÃO DO EDITOR DE TEXTO ---
@@ -117,7 +117,6 @@
         itemDiv.innerHTML = `<div class="flex-grow flex items-center gap-2">${repeaterTemplates[type](uuid)}</div><button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>`;
         container.appendChild(itemDiv);
 
-        // Adiciona eventos de forma programática
         const fileInput = itemDiv.querySelector(`#${uuid}`);
         const typeSelect = itemDiv.querySelector('select[data-field="tipo"]');
         const selectFileButton = itemDiv.querySelector('.repeater-file-button');
@@ -133,7 +132,6 @@
             itemDiv.remove();
         });
 
-        // Preenche com dados existentes se estiver a editar
         if (data && typeof data === 'object') {
             if (data.tipo) typeSelect.value = data.tipo;
             if (data.nome) itemDiv.querySelector('input[data-field="nome"]').value = data.nome;
@@ -237,15 +235,26 @@
             const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
             const docSnap = await getDoc(docRef);
             const urlsToDelete = [];
+
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 if (data.imagem_principal) urlsToDelete.push(data.imagem_principal);
-                if (data.galeria_midia) data.galeria_midia.forEach(item => item.url && urlsToDelete.push(item.url));
+                if (data.galeria_midia && Array.isArray(data.galeria_midia)) {
+                    data.galeria_midia.forEach(item => {
+                        if (item.url) urlsToDelete.push(item.url);
+                    });
+                }
             }
-            const deletePromises = urlsToDelete.map(url => deleteObject(ref(storage, url)).catch(err => console.warn("Falha ao apagar ficheiro:", err)));
+
+            const deletePromises = urlsToDelete.map(url => {
+                const fileRef = ref(storage, url);
+                return deleteObject(fileRef).catch(err => console.warn("Falha ao apagar ficheiro do Storage:", err));
+            });
+            
             await Promise.allSettled(deletePromises);
             await deleteDoc(docRef);
-            window.showNotification("Item eliminado com sucesso!");
+
+            window.showNotification("Item e todos os seus ficheiros foram eliminados com sucesso!");
             clearForm();
         } catch (error) {
             console.error(`Erro ao eliminar ${entity}:`, error);
@@ -253,9 +262,14 @@
         }
     };
     
+    // =================================================================
+    // ATUALIZAÇÃO: LÓGICA DE SUBMISSÃO COM BARRA DE CARREGAMENTO
+    // =================================================================
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = form.querySelector('button[type="submit"]');
+        const progressContainer = document.getElementById('acervos-upload-progress-container');
+        const progressBar = document.getElementById('acervos-upload-progress-bar');
         submitButton.disabled = true;
 
         const data = {
@@ -276,20 +290,57 @@
             });
         });
 
+        // --- Lógica da Barra de Carregamento ---
+        const filesToUpload = data.galeria_midia.filter(item => item.fileKey);
+        if (window.pendingFiles.has('acervos-imagem_principal')) {
+            filesToUpload.push({ fileKey: 'acervos-imagem_principal' }); // Adiciona a imagem principal à contagem
+        }
+        
+        let totalProgress = 0;
+        const individualProgress = new Map();
+
+        const updateProgress = () => {
+            let currentTotal = 0;
+            individualProgress.forEach(value => { currentTotal += value; });
+            totalProgress = filesToUpload.length > 0 ? (currentTotal / filesToUpload.length) * 100 : 100;
+            progressBar.style.width = `${totalProgress}%`;
+            progressBar.textContent = `${Math.round(totalProgress)}%`;
+        };
+        
+        if (filesToUpload.length > 0) {
+            progressContainer.classList.remove('hidden');
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+        }
+        // --- Fim da Lógica da Barra de Carregamento ---
+
         try {
             const uploadPromises = data.galeria_midia
                 .filter(item => item.fileKey)
-                .map(item => window.uploadFile(window.pendingFiles.get(item.fileKey), 'acervos/media/')
-                .then(url => { item.url = url; }));
+                .map(item => {
+                    individualProgress.set(item.fileKey, 0);
+                    return window.uploadFile(window.pendingFiles.get(item.fileKey), 'acervos/media/', (progress) => {
+                        individualProgress.set(item.fileKey, progress);
+                        updateProgress();
+                    }).then(url => { item.url = url; });
+                });
 
             if (window.pendingFiles.has('acervos-imagem_principal')) {
-                uploadPromises.push(window.uploadFile(window.pendingFiles.get('acervos-imagem_principal'), 'acervos/main/').then(url => { data.imagem_principal = url; }));
+                const fileKey = 'acervos-imagem_principal';
+                individualProgress.set(fileKey, 0);
+                const file = window.pendingFiles.get(fileKey);
+                uploadPromises.push(
+                    window.uploadFile(file, 'acervos/main/', (progress) => {
+                        individualProgress.set(fileKey, progress);
+                        updateProgress();
+                    }).then(url => { data.imagem_principal = url; })
+                );
             } else {
                 data.imagem_principal = document.getElementById('acervos-imagem_principal-url').value || '';
             }
             
             await Promise.all(uploadPromises);
-            data.galeria_midia.forEach(item => delete item.fileKey); // Limpa o campo temporário
+            data.galeria_midia.forEach(item => delete item.fileKey);
 
             const id = document.getElementById(`${entity}-id`).value;
             const path = `/artifacts/${appId}/public/data/${entity}`;
@@ -302,6 +353,7 @@
             window.showNotification('Erro ao guardar os dados.', true);
         } finally {
             submitButton.disabled = false;
+            progressContainer.classList.add('hidden');
         }
     });
 
