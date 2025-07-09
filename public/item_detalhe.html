@@ -39,8 +39,12 @@
         .media-thumbnail { cursor: pointer; border: 2px solid transparent; border-radius: 0.375rem; transition: border-color 0.2s, transform 0.2s; background-color: #e9ecef; }
         .media-thumbnail:hover { transform: scale(1.05); }
         .media-thumbnail.active { border-color: var(--primary-color); }
-        #media-display-area { background-color: #000; }
-        #media-display-area img, #media-display-area video { max-height: 60vh; }
+        #media-display-area { background-color: #1f2937; }
+        #media-display-area img, #media-display-area video {
+            width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -117,16 +121,16 @@
 
             switch (media.tipo) {
                 case 'imagem':
-                    mediaHTML = `<img src="${media.url}" alt="${media.nome || 'Imagem'}" class="w-full h-full object-contain">`;
+                    mediaHTML = `<img src="${media.url}" alt="${media.nome || 'Imagem'}">`;
                     break;
                 case 'video':
-                    mediaHTML = `<video src="${media.url}" controls class="w-full h-full object-contain"></video>`;
+                    mediaHTML = `<video src="${media.url}" controls></video>`;
                     break;
                 case 'audio':
                     mediaHTML = `<div class="w-full h-full flex flex-col items-center justify-center text-white bg-gray-900 p-4"><i class="fas fa-music text-6xl mb-4"></i><p class="mb-4 text-lg">${media.nome || 'Faixa de áudio'}</p><audio src="${media.url}" controls></audio></div>`;
                     break;
                 default:
-                     mediaHTML = `<img src="${media.url}" alt="${media.nome || 'Imagem'}" class="w-full h-full object-contain">`; // Padrão para imagem
+                     mediaHTML = `<img src="${media.url}" alt="${media.nome || 'Imagem'}">`;
             }
             displayArea.innerHTML = mediaHTML;
 
@@ -179,20 +183,23 @@
 
                     // --- Renderização do HTML ---
                     
-                    // 1. Cabeçalho do item (Simplificado)
+                    // 1. Cabeçalho do item (centralizado)
                     const headerHTML = `
-                        <div class="flex flex-col md:flex-row items-start justify-between gap-6 mb-8">
-                            <div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 mb-8">
+                            <div class="hidden md:block"></div> <!-- Spacer on larger screens -->
+                            <div class="text-center order-first md:order-none">
                                 <h1 class="text-4xl md:text-5xl font-bold text-gray-900">${item.nome || 'Item Desconhecido'}</h1>
                                 ${item.lancamento ? `<p class="text-xl text-gray-600 mt-2">${item.lancamento}</p>` : ''}
                             </div>
-                            <button onclick="sharePage()" class="share-btn flex-shrink-0" title="Partilhar esta página">
-                                <i class="fas fa-share-alt text-lg"></i>
-                            </button>
+                            <div class="flex justify-center md:justify-end">
+                                <button onclick="sharePage()" class="share-btn" title="Partilhar esta página">
+                                    <i class="fas fa-share-alt text-lg"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
 
-                    // 2. Galeria de Mídia
+                    // 2. Galeria de Mídia (Sem o título h2)
                     let mediaSectionHTML = '';
                     if (mediaGallery.length > 0) {
                         const thumbnailsHTML = mediaGallery.map((media, index) => {
@@ -214,8 +221,7 @@
 
                         mediaSectionHTML = `
                             <div class="content-card">
-                                <h2 class="section-title">Galeria de Mídia</h2>
-                                <div id="media-display-area" class="mb-4 rounded-lg flex items-center justify-center aspect-video overflow-hidden">
+                                <div id="media-display-area" class="mb-4 rounded-lg flex items-center justify-center overflow-hidden">
                                     <!-- Mídia será carregada aqui -->
                                 </div>
                                 <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
