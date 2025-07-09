@@ -7,102 +7,132 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         :root {
-            --neon-blue: #00BFFF;
-            --neon-purple: #A020F0;
-            --dark-bg: #0D0D1A;
+            --primary-color: #f59e0b; /* Amarelo/Dourado vibrante (Tailwind amber-500) */
+            --primary-hover: #d97706; /* Tom mais escuro para hover (Tailwind amber-600) */
+            --dark-header: #111827; /* Cinza escuro para o cabeçalho (Tailwind gray-900) */
+            --text-dark: #212529;
+            --text-light: #495057;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
         }
+
         body {
-            font-family: 'Roboto Mono', monospace;
-            background-color: var(--dark-bg);
-            color: #E0E0E0;
-            background-image: url('https://www.transparenttextures.com/patterns/8-bit-surface.png');
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
         }
-        h1, h2, h3, .nav-link {
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
+
+        h1, h2, h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
         }
-        .hud-border {
-    background: rgba(18, 16, 38, 0.6); /* Fundo escuro semi-transparente */
-    backdrop-filter: blur(10px);      /* Efeito de vidro fosco */
-    border: 1px solid rgba(0, 255, 255, 0.2); /* Borda ciano subtil */
-    border-radius: 12px;              /* Cantos arredondados */
-    transition: all 0.3s ease-in-out; /* Transição suave para todos os efeitos */
-    position: relative; 
-
-    box-shadow: none;
-}
-
-.hud-border:hover {
-    /* Efeitos que aparecem ao passar o mouse */
-    transform: translateY(-8px) scale(1.03);     /* Eleva e aumenta ligeiramente o quadro */
-    border-color: rgba(0, 255, 255, 0.7);       /* A borda fica mais visível e brilhante */
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3); /* A aura (glow) suave aparece */
-    background: rgba(18, 16, 38, 0.8);          /* O fundo fica um pouco mais opaco para dar destaque */
-}
-
-.hud-border::before, .hud-border::after {
-    content: '';
-    display: none;
-}
-        .holographic-text {
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-            background-size: 200% 200%;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: holographic-shine 5s linear infinite;
+        
+        .section-title {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem; /* mb-12 */
+            padding-bottom: 1.5rem; /* pb-6 */
+            border-bottom: 1px solid var(--border-color);
         }
-        @keyframes holographic-shine {
-            to { background-position: 200% center; }
+        
+        .content-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: var(--text-dark);
+            border-color: #ced4da;
+        }
+        .btn-secondary:hover {
+            background-color: #dee2e6;
+            border-color: #adb5bd;
+        }
+        
+        #header-logo {
+            height: 120px;
+            width: auto;
+        }
+        
+        .card-image-wrapper {
+            background-color: #ffffff; /* Fundo branco para a imagem */
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- Header Fixo Simplificado -->
-    <header class="sticky top-0 z-50 p-4">
-        <div class="container mx-auto hud-border rounded-xl px-4 py-3 flex justify-between items-center">
-            <a href="/index.html" class="text-2xl font-bold tracking-widest holographic-text">MIV</a>
-            <a href="/index.html" class="text-sm font-bold text-neon-blue hover:text-white transition-colors">
-                <i class="fas fa-home mr-2"></i>Voltar à Página Inicial
-            </a>
+    <!-- Header -->
+    <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-24">
+                <a href="index.html" class="flex-shrink-0">
+                    <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+                </a>
+                <a href="index.html" class="btn btn-secondary bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                    <i class="fas fa-home mr-2"></i>Voltar à Página Inicial
+                </a>
+            </div>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-16">
-        <h1 class="text-4xl md:text-5xl font-bold mb-12 text-center holographic-text">Todas as Notícias</h1>
+        <h1 class="section-title">Todas as Notícias</h1>
         
-        <div id="todas-noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+        <div id="todas-noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Estado de carregamento inicial -->
             <div id="loader" class="col-span-full text-center py-20">
-                <i class="fas fa-sync fa-spin text-5xl text-neon-blue"></i>
-                <p class="mt-4 text-2xl holographic-text">A carregar notícias...</p>
+                <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
+                <p class="mt-4 text-xl text-gray-600">A carregar notícias...</p>
            </div>
         </div>
     </main>
 
-    <footer class="py-10 mt-16" style="background: linear-gradient(145deg, #1a1a2e, #161625);">
+    <footer class="py-10 mt-16 bg-gray-800">
         <div class="container mx-auto text-center text-gray-400">
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
 
-    <!-- Firebase e Lógica da Página -->
+    <!-- Firebase e Lógica da Página (LÓGICA INALTERADA, APENAS RENDER ATUALIZADO) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ### CORREÇÃO APLICADA AQUI ###
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.firebasestorage.app", // CORRIGIDO
+            storageBucket: "museu-cca6d.firebasestorage.app",
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
@@ -111,23 +141,26 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // Função que renderiza o HTML de uma notícia
+        // Função que renderiza o HTML de uma notícia com o novo design
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = '';
             if (data.data_publicacao && data.data_publicacao.toDate) {
-                dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
             }
             return `
-                <a href="noticia.html?id=${doc.id}" class="hud-border rounded-lg overflow-hidden text-left transition-transform hover:scale-105 block h-full flex flex-col">
-                    ${data.imagem ? `<img src="${data.imagem}" alt="${data.titulo || 'Notícia'}" class="w-full h-48 object-cover">` : ''}
-                    <div class="p-6 flex flex-col flex-grow">
-                        <div class="flex justify-between items-center mb-2">
-                           ${data.categoria ? `<span class="text-sm font-bold text-neon-blue">${data.categoria}</span>` : ''}
-                           ${dataFormatada ? `<span class="text-xs text-gray-400">${dataFormatada}</span>` : ''}
+                <a href="noticia.html?id=${doc.id}" class="content-card block">
+                    <div class="card-image-wrapper">
+                        <img src="${data.imagem || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo || 'Notícia'}" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <div class="mb-2">
+                            ${data.categoria ? `<span class="text-xs font-bold uppercase text-amber-600">${data.categoria}</span>` : ''}
+                            ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
+                            ${dataFormatada ? `<span class="text-xs text-gray-500">${dataFormatada}</span>` : ''}
                         </div>
-                        ${data.titulo ? `<h3 class="text-xl font-bold my-2">${data.titulo}</h3>` : ''}
-                        ${data.subtitulo ? `<p class="text-gray-400 text-sm flex-grow">${data.subtitulo}</p>` : '<div class="flex-grow"></div>'}
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800 flex-grow">${data.titulo}</h3>
+                        <p class="text-sm text-gray-600">${data.subtitulo || ''}</p>
                     </div>
                 </a>`;
         };
@@ -146,7 +179,7 @@
                     }
 
                     if (querySnapshot.empty) {
-                        container.innerHTML = '<p class="text-center col-span-full">Nenhuma notícia encontrada.</p>';
+                        container.innerHTML = '<p class="text-center col-span-full text-gray-600">Nenhuma notícia encontrada.</p>';
                         return;
                     }
 

@@ -7,120 +7,139 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --neon-blue: #00BFFF;
-            --neon-purple: #A020F0;
-            --dark-bg: #0D0D1A;
+            --primary-color: #f59e0b; /* Amarelo/Dourado vibrante (Tailwind amber-500) */
+            --primary-hover: #d97706; /* Tom mais escuro para hover (Tailwind amber-600) */
+            --dark-header: #111827; /* Cinza escuro para o cabeçalho (Tailwind gray-900) */
+            --text-dark: #212529;
+            --text-light: #495057;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
         }
+
         body {
-            font-family: 'Roboto Mono', monospace;
-            background-color: var(--dark-bg);
-            color: #E0E0E0;
-            background-image: url('https://www.transparenttextures.com/patterns/8-bit-surface.png');
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
         }
-        h1, h2, h3, .nav-link {
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-        }
-        .hud-border {
-    background: rgba(18, 16, 38, 0.6); /* Fundo escuro semi-transparente */
-    backdrop-filter: blur(10px);      /* Efeito de vidro fosco */
-    border: 1px solid rgba(0, 255, 255, 0.2); /* Borda ciano subtil */
-    border-radius: 12px;              /* Cantos arredondados */
-    transition: all 0.3s ease-in-out; /* Transição suave para todos os efeitos */
-    position: relative; 
 
-    box-shadow: none;
-}
+        h1, h2, h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
 
-.hud-border:hover {
-    /* Efeitos que aparecem ao passar o mouse */
-    transform: translateY(-8px) scale(1.03);     /* Eleva e aumenta ligeiramente o quadro */
-    border-color: rgba(0, 255, 255, 0.7);       /* A borda fica mais visível e brilhante */
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3); /* A aura (glow) suave aparece */
-    background: rgba(18, 16, 38, 0.8);          /* O fundo fica um pouco mais opaco para dar destaque */
-}
+        .content-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        }
 
-.hud-border::before, .hud-border::after {
-    content: '';
-    display: none;
-}
-        .holographic-text {
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-            background-size: 200% 200%;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: holographic-shine 5s linear infinite;
-        }
-        @keyframes holographic-shine {
-            to { background-position: 200% center; }
-        }
-        #noticia-descricao p { margin-bottom: 1rem; line-height: 1.75; }
-        #noticia-descricao a { color: var(--neon-blue); text-decoration: underline; }
-        #noticia-descricao h1, #noticia-descricao h2, #noticia-descricao h3, #noticia-descricao h4 { 
-            font-family: 'Orbitron', sans-serif; 
-            margin-top: 2rem; 
-            margin-bottom: 1rem; 
-            font-weight: bold;
-        }
-        #noticia-descricao h1 { font-size: 2.25rem; }
-        #noticia-descricao h2 { font-size: 1.875rem; }
-        #noticia-descricao h3 { font-size: 1.5rem; }
-        #noticia-descricao h4 { font-size: 1.25rem; }
-        #noticia-descricao ul, #noticia-descricao ol { margin-left: 1.5rem; margin-bottom: 1rem; }
-        #noticia-descricao ul { list-style-type: disc; }
-        #noticia-descricao ol { list-style-type: decimal; }
-        
-        #loader-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(13, 13, 26, 0.9);
-            display: flex;
+        .btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            z-index: 100;
-            transition: opacity 0.5s;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: var(--text-dark);
+            border-color: #ced4da;
+        }
+        .btn-secondary:hover {
+            background-color: #dee2e6;
+            border-color: #adb5bd;
+        }
+        
+        #header-logo {
+            height: 120px;
+            width: auto;
+        }
+        
+        /* Estilos para o corpo da notícia */
+        .prose-custom {
+            font-family: 'Lora', serif;
+            color: var(--text-light);
+            font-size: 1.125rem; /* 18px */
+            line-height: 1.8;
+        }
+        .prose-custom p { margin-bottom: 1.5rem; }
+        .prose-custom a {
+            color: var(--primary-color);
+            text-decoration: none;
+            border-bottom: 1px solid var(--primary-color);
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .prose-custom a:hover {
+            color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        .prose-custom h1, .prose-custom h2, .prose-custom h3, .prose-custom h4 { 
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-dark);
+            margin-top: 2.5rem; 
+            margin-bottom: 1rem; 
+            font-weight: 600;
+        }
+        .prose-custom h1 { font-size: 2.25rem; }
+        .prose-custom h2 { font-size: 1.875rem; }
+        .prose-custom h3 { font-size: 1.5rem; }
+        .prose-custom h4 { font-size: 1.25rem; }
+        .prose-custom ul, .prose-custom ol { margin-left: 1.5rem; margin-bottom: 1.5rem; padding-left: 0.5rem; }
+        .prose-custom ul { list-style-type: disc; }
+        .prose-custom ol { list-style-type: decimal; }
+        .prose-custom blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1rem;
+            margin-left: 0;
+            font-style: italic;
+            color: var(--text-light);
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <header class="sticky top-0 z-50 p-4">
-        <div class="container mx-auto hud-border rounded-xl px-4 py-3 flex justify-between items-center">
-            <a href="/index.html" class="text-2xl font-bold tracking-widest holographic-text">MIV</a>
-            <a href="/noticias.html" class="text-sm font-bold text-neon-blue hover:text-white transition-colors">
-                <i class="fas fa-arrow-left mr-2"></i>Voltar para Notícias
-            </a>
+    <!-- Header -->
+    <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-24">
+                <a href="index.html" class="flex-shrink-0">
+                    <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+                </a>
+                <a href="noticias.html" class="btn btn-secondary bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar para Notícias
+                </a>
+            </div>
         </div>
     </header>
 
-    <!-- Loader Overlay -->
-    <div id="loader-overlay">
-        <div class="text-center">
-            <i class="fas fa-sync fa-spin text-5xl text-neon-blue"></i>
-            <p class="mt-4 text-2xl holographic-text">A carregar notícia...</p>
-        </div>
-    </div>
-
     <main class="container mx-auto px-4 py-16">
-        <article id="noticia-content" class="max-w-4xl mx-auto hud-border p-6 md:p-8 rounded-lg hidden">
-            <h1 id="noticia-titulo" class="text-4xl md:text-5xl font-bold mb-4 text-center holographic-text"></h1>
-            <div id="noticia-meta" class="text-center text-gray-400 mb-8 text-lg"></div>
-            <div id="noticia-imagem-container" class="w-full h-auto max-h-[500px] bg-cover bg-center bg-no-repeat rounded-lg mb-8 hud-border p-1 bg-gray-800 overflow-hidden">
-                <img id="noticia-imagem" src="" alt="Imagem de Destaque da Notícia" class="w-full h-full object-cover">
+        <!-- Container para o conteúdo da notícia ou mensagens de status -->
+        <div id="content-wrapper" class="max-w-4xl mx-auto">
+            <!-- Loader -->
+            <div id="loader" class="text-center py-20">
+                <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
+                <p class="mt-4 text-xl text-gray-600">A carregar notícia...</p>
             </div>
-            <div id="noticia-descricao" class="text-lg leading-relaxed space-y-4 text-left"></div>
-        </article>
+            
+            <!-- Artigo da Notícia (inicialmente oculto) -->
+            <article id="noticia-content" class="content-card hidden">
+                <!-- O conteúdo será injetado aqui -->
+            </article>
+        </div>
     </main>
 
-    <footer class="py-10 mt-16">
+    <footer class="py-10 mt-16 bg-gray-800">
         <div class="container mx-auto text-center text-gray-400">
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
@@ -130,12 +149,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ### CORREÇÃO APLICADA AQUI ###
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.firebasestorage.app", // CORRIGIDO
+            storageBucket: "museu-cca6d.firebasestorage.app",
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
@@ -143,23 +161,29 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
+        
+        const contentWrapper = document.getElementById('content-wrapper');
+        const loader = document.getElementById('loader');
+        const noticiaContentEl = document.getElementById('noticia-content');
 
         function displayError(message) {
-            const contentEl = document.getElementById('noticia-content');
-            contentEl.innerHTML = `<h1 class="text-4xl md:text-5xl font-bold mb-4 text-center holographic-text">Erro</h1><p class='text-red-500 text-center'>${message}</p>`;
-            contentEl.classList.remove('hidden');
+            contentWrapper.innerHTML = `
+                <div class="content-card text-center p-8">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                    <h1 class="text-2xl font-bold text-red-700">Ocorreu um Erro</h1>
+                    <p class="text-gray-600 mt-2">${message}</p>
+                </div>
+            `;
         }
 
         async function carregarNoticia() {
-            const contentEl = document.getElementById('noticia-content');
-            const loaderOverlay = document.getElementById('loader-overlay');
-
             try {
                 const params = new URLSearchParams(window.location.search);
                 const noticiaId = params.get('id');
 
                 if (!noticiaId) {
                     displayError("ID da notícia não encontrado na URL. O link pode estar quebrado.");
+                    loader.style.display = 'none';
                     return;
                 }
 
@@ -171,45 +195,46 @@
                     
                     document.title = `${data.titulo || 'Notícia'} - MIV`;
                     
-                    const tituloEl = document.getElementById('noticia-titulo');
-                    if (data.titulo) tituloEl.textContent = data.titulo; else tituloEl.style.display = 'none';
-                    
-                    const metaEl = document.getElementById('noticia-meta');
                     let metaHTML = '';
                     if (data.categoria) {
-                        metaHTML += `<span class="text-neon-blue font-bold">${data.categoria}</span>`;
+                        metaHTML += `<span class="font-bold text-amber-600">${data.categoria}</span>`;
                     }
                     if (data.data_publicacao && data.data_publicacao.toDate) {
-                        const dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                        if (metaHTML) metaHTML += `<span class="mx-2">•</span>`;
-                        metaHTML += `<span>${dataFormatada}</span>`;
-                    }
-                    if (metaHTML) metaEl.innerHTML = metaHTML; else metaEl.style.display = 'none';
-
-                    const imgContainer = document.getElementById('noticia-imagem-container');
-                    if (data.imagem) {
-                        const imgElement = document.getElementById('noticia-imagem');
-                        imgElement.src = data.imagem;
-                        imgElement.alt = `Imagem de destaque para: ${data.titulo || 'Notícia'}`;
-                    } else {
-                        imgContainer.style.display = 'none';
+                        const dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+                        if (metaHTML) metaHTML += `<span class="text-gray-400 mx-2">•</span>`;
+                        metaHTML += `<span class="text-gray-500">${dataFormatada}</span>`;
                     }
 
-                    const descricaoEl = document.getElementById('noticia-descricao');
-                    if (data.descricao) descricaoEl.innerHTML = data.descricao; else descricaoEl.style.display = 'none';
+                    noticiaContentEl.innerHTML = `
+                        <div class="p-6 md:p-8">
+                            <div class="mb-8 text-center">
+                                <h1 class="text-3xl md:text-5xl font-bold mb-4">${data.titulo || 'Notícia sem Título'}</h1>
+                                <div id="noticia-meta" class="text-md">${metaHTML}</div>
+                            </div>
+                            
+                            ${data.imagem ? `
+                                <div class="mb-8 rounded-lg overflow-hidden border">
+                                    <img src="${data.imagem}" alt="Imagem de Destaque para: ${data.titulo || 'Notícia'}" class="w-full h-auto">
+                                </div>
+                            ` : ''}
 
-                    contentEl.classList.remove('hidden');
+                            <div class="prose-custom max-w-none">
+                                ${data.descricao || '<p>O conteúdo desta notícia não está disponível.</p>'}
+                            </div>
+                        </div>
+                    `;
+                    
+                    loader.style.display = 'none';
+                    noticiaContentEl.classList.remove('hidden');
+
                 } else {
                     displayError("A notícia que procura não existe ou foi removida.");
+                    loader.style.display = 'none';
                 }
             } catch (error) {
                 console.error("Ocorreu um erro geral ao carregar a notícia:", error);
                 displayError("Ocorreu um erro ao tentar carregar a notícia. Por favor, tente novamente mais tarde.");
-            } finally {
-                loaderOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loaderOverlay.style.display = 'none';
-                }, 500);
+                loader.style.display = 'none';
             }
         }
 
