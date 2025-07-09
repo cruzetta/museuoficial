@@ -7,177 +7,154 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         :root {
-            --neon-blue: #00BFFF;
-            --neon-purple: #A020F0;
-            --neon-green: #39FF14;
-            --dark-bg: #0D0D1A;
-            --metal-bg: linear-gradient(145deg, #1a1a2e, #161625);
+            --primary-color: #f59e0b; /* Amarelo/Dourado vibrante (Tailwind amber-500) */
+            --primary-hover: #d97706; /* Tom mais escuro para hover (Tailwind amber-600) */
+            --dark-header: #111827; /* Cinza escuro para o cabeçalho (Tailwind gray-900) */
+            --text-dark: #212529;
+            --text-light: #495057;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
         }
 
         body {
-            font-family: 'Roboto Mono', monospace;
-            background-color: var(--dark-bg);
-            color: #E0E0E0;
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: var(--text-dark);
             overflow-x: hidden;
         }
 
         h1, h2, h3, .nav-link {
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-        }
-
-        /* --- ESTILO DOS QUADROS ATUALIZADO (ÚNICA ALTERAÇÃO) --- */
-        .hud-border {
-            /* Estilo base, inspirado na sua referência */
-            background: rgba(18, 16, 38, 0.6); /* Fundo escuro semi-transparente */
-            backdrop-filter: blur(10px);      /* Efeito de vidro fosco */
-            border: 1px solid rgba(0, 255, 255, 0.2); /* Borda ciano subtil */
-            border-radius: 12px;              /* Cantos arredondados */
-            transition: all 0.3s ease-in-out; /* Transição suave para todos os efeitos */
-            position: relative; 
-
-            /* Garante que não há estilos de brilho ou sombra no estado padrão */
-            box-shadow: none;
-        }
-
-        .hud-border:hover {
-            /* Efeitos que aparecem ao passar o mouse */
-            transform: translateY(-8px) scale(1.03);     /* Eleva e aumenta ligeiramente o quadro */
-            border-color: rgba(0, 255, 255, 0.7);       /* A borda fica mais visível e brilhante */
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3); /* A aura (glow) suave aparece */
-            background: rgba(18, 16, 38, 0.8);          /* O fundo fica um pouco mais opaco para dar destaque */
-        }
-
-        /* Esconde os cantos decorativos do estilo antigo que não são mais necessários */
-        .hud-border::before, .hud-border::after {
-            content: '';
-            display: none;
-        }
-        /* --- FIM DA ALTERAÇÃO --- */
-
-
-        .joystick-btn {
-            font-family: 'Orbitron', sans-serif;
-            background: var(--neon-purple);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            text-transform: uppercase;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px var(--neon-purple);
-        }
-        .joystick-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 35px var(--neon-purple);
-        }
-
-        .room-section {
-            padding: 120px 2rem 100px;
-            border-bottom: 2px solid rgba(0, 191, 255, 0.2);
-            position: relative;
-            background-size: cover;
-            background-position: center center;
-            background-attachment: fixed;
-        }
-        .room-section::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(13, 13, 26, 0.90);
-        }
-        .room-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        #home { background-image: url('https://www.transparenttextures.com/patterns/holographic.png'); background-attachment: scroll; }
-        #noticias { background-image: url('https://www.transparenttextures.com/patterns/8-bit-surface.png'); }
-        #acervos { background-image: url('https://www.transparenttextures.com/patterns/checkered-pattern.png'); }
-        #games { background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); }
-        #timeline { background-image: url('https://www.transparenttextures.com/patterns/subtle-prism.png'); }
-        #quiz { background-image: url('https://www.transparenttextures.com/patterns/fancy-cushion.png'); }
-        #curiosidades { background-image: url('https://www.transparenttextures.com/patterns/inspiration-geometry.png'); }
-        #onde-estamos { background-image: url('https://www.transparenttextures.com/patterns/maps.png'); }
-        #corporativo { background-image: url('https://www.transparenttextures.com/patterns/clean-textile.png'); }
-        #loja { background-image: url('https://www.transparenttextures.com/patterns/low-poly-grid.png'); }
-
-        .holographic-text {
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-green), var(--neon-blue));
-            background-size: 200% 200%;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: holographic-shine 5s linear infinite;
-        }
-
-        @keyframes holographic-shine {
-            to { background-position: 200% center; }
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
         }
         
+        .section-title {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem; /* mb-12 */
+        }
+        
+        .section-padding {
+            padding: 5rem 1rem;
+        }
+
+        .content-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .nav-link {
+            color: #d1d5db; /* gray-300 */
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: color 0.2s, background-color 0.2s;
+        }
+        .nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
         .nav-link.active {
-            color: white;
-            text-shadow: 0 0 10px var(--neon-blue);
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        #header-logo {
+            height: 120px;
+            width: auto;
+        }
+        
+        .card-image-wrapper {
+            background-color: var(--bg-light);
+            padding: 1rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            border: 3px solid #fff;
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- Header / HUD -->
-    <header class="fixed top-0 left-0 right-0 z-50 p-4 bg-dark-bg/80 backdrop-blur-sm">
-        <div class="container mx-auto flex justify-between items-center">
-            <!-- Logo -->
-            <a href="#home" class="flex-shrink-0">
-                <img src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame" class="h-20 w-auto">
-            </a>
-            
-            <!-- Navigation Bar -->
-            <nav id="desktop-nav" class="hidden md:flex items-center space-x-2 lg:space-x-4 text-sm">
-                <a href="#home" class="nav-link px-2 py-2">Home</a>
-                <a href="#noticias" class="nav-link px-2 py-2">Notícias</a>
-                <a href="galeria.html" class="nav-link px-2 py-2">Acervos</a>
-                <a href="#onde-estamos" class="nav-link px-2 py-2 whitespace-nowrap">Onde Estamos</a>
-                <a href="#loja" class="nav-link px-2 py-2">Loja</a>
-                
-                <!-- Dropdown Menu -->
-                <div class="relative group">
-                    <button class="nav-link px-2 py-2 flex items-center">
-                        Explorar <i class="fas fa-chevron-down ml-2 text-xs"></i>
-                    </button>
-                    <div class="absolute right-0 top-full mt-2 w-48 hud-border p-2 opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-200 ease-in-out">
-                        <a href="#games" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Games</a>
-                        <a href="#timeline" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Timeline</a>
-                        <a href="#quiz" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Quiz</a>
-                        <a href="#curiosidades" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Curiosidades</a>
-                        <a href="#corporativo" class="block px-4 py-2 nav-link hover:bg-neon-blue/20 rounded-md">Corporativo</a>
+    <!-- Header -->
+    <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-24">
+                <a href="#home" class="flex-shrink-0">
+                    <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+                </a>
+                <nav id="desktop-nav" class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm">
+                    <a href="#home" class="nav-link active">Home</a>
+                    <a href="#noticias" class="nav-link">Notícias</a>
+                    <a href="galeria.html" class="nav-link">Acervos</a>
+                    <a href="#onde-estamos" class="nav-link">Onde Estamos</a>
+                    <a href="#loja" class="nav-link">Loja</a>
+                    <div class="relative group">
+                        <button class="nav-link px-2 py-2 flex items-center">
+                            Explorar <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-200 ease-in-out">
+                            <a href="#games" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Games</a>
+                            <a href="#timeline" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Timeline</a>
+                            <a href="#quiz" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Quiz</a>
+                            <a href="#curiosidades" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Curiosidades</a>
+                            <a href="#corporativo" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Corporativo</a>
+                        </div>
                     </div>
-                </div>
-            </nav>
-
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-button" class="text-2xl text-white md:hidden">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+                </nav>
+                <button id="mobile-menu-button" class="text-2xl text-white md:hidden"><i class="fa-solid fa-bars"></i></button>
+            </div>
         </div>
     </header>
     
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden fixed top-28 left-4 right-4 z-40 hud-border p-4">
+    <div id="mobile-menu" class="hidden fixed top-24 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--dark-header);">
         <a href="#home" class="block text-center py-3 text-lg nav-link">Home</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
         <a href="galeria.html" class="block text-center py-3 text-lg nav-link">Acervos</a>
         <a href="#onde-estamos" class="block text-center py-3 text-lg nav-link">Onde Estamos</a>
         <a href="#loja" class="block text-center py-3 text-lg nav-link">Loja</a>
-        <hr class="border-neon-blue/30 my-2">
+        <hr class="border-gray-700 my-2">
         <a href="#games" class="block text-center py-3 text-lg nav-link">Games</a>
         <a href="#timeline" class="block text-center py-3 text-lg nav-link">Timeline</a>
         <a href="#quiz" class="block text-center py-3 text-lg nav-link">Quiz</a>
@@ -187,42 +164,27 @@
 
     <main>
         <!-- Seção Home -->
-        <section id="home" class="min-h-screen flex flex-col items-center justify-center text-center relative overflow-hidden pt-32">
-            <div class="room-content flex-grow flex flex-col items-center justify-center p-4">
-                <h1 id="home-titulo" class="text-5xl md:text-8xl font-black mb-4 holographic-text">A carregar...</h1>
-                <p id="home-subtitulo" class="text-lg md:text-xl max-w-3xl mx-auto mb-8">...</p>
-                <a id="home-botao" href="#noticias" class="joystick-btn">Iniciar Exploração</a>
+        <section id="home" class="bg-white">
+            <div class="container mx-auto px-4 sm:px-6 py-24 text-center">
+                <h1 id="home-titulo" class="text-4xl md:text-6xl font-bold mb-4">A Evolução dos Videojogos</h1>
+                <p id="home-subtitulo" class="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-gray-600">Explore décadas de história, inovação e cultura que moldaram o universo dos games.</p>
+                <a id="home-botao" href="#noticias" class="btn btn-primary text-lg">Iniciar Exploração</a>
             </div>
-            
-            <!-- Seção de Destaques -->
-            <div class="room-content w-full max-w-6xl mx-auto p-4 md:pb-8">
-                 <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Coluna da Notícia em Destaque -->
-                    <div id="destaque-noticia-container" class="md:col-span-2 hud-border p-4 text-left flex flex-col min-h-[450px]">
-                        <!-- Conteúdo da notícia em destaque será carregado aqui -->
-                        <div class="flex-grow flex items-center justify-center text-center p-8">
-                            <div>
-                                <i class="fas fa-sync fa-spin text-3xl text-neon-blue"></i>
-                                <p class="mt-4 text-gray-400">A carregar última notícia...</p>
-                            </div>
-                        </div>
+            <div class="container mx-auto px-4 sm:px-6 pb-24">
+                 <div class="grid lg:grid-cols-2 gap-8 items-stretch">
+                    <div id="destaque-noticia-container">
+                        <div class="content-card items-center justify-center text-center"><i class="fas fa-sync fa-spin text-3xl text-gray-400"></i><p class="mt-4 text-gray-500">A carregar...</p></div>
                     </div>
-
-                    <!-- Coluna dos outros destaques -->
                     <div class="space-y-8 flex flex-col">
-                        <!-- Card de Games Clássicos com Canvas do Pong -->
-                        <div id="pong-container" onclick="window.location.href='#games'" class="cursor-pointer relative hud-border p-6 text-center flex-grow flex flex-col justify-center overflow-hidden min-h-[200px]">
-                            <canvas id="pong-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
-                            <div class="relative z-10 pointer-events-none">
-                                <h3 class="text-xl font-bold mb-2">Games Clássicos</h3>
-                                <p class="text-gray-400">Relembre os jogos que marcaram gerações.</p>
-                            </div>
+                        <div class="content-card text-center flex-grow flex flex-col justify-center">
+                            <h3 class="text-2xl font-bold mb-2">Games Clássicos</h3>
+                            <p class="text-gray-500 mb-4">Relembre os jogos que marcaram gerações.</p>
+                            <a href="#games" class="btn btn-secondary mt-auto">Ver Games</a>
                         </div>
-                        <!-- Card "Visite-nos" -->
-                        <a href="#onde-estamos" class="block hud-border p-6 text-center flex-grow flex flex-col justify-center">
-                            <i class="fas fa-ticket-alt text-neon-green text-4xl mb-4"></i>
-                            <h3 class="text-xl font-bold mb-2">Visite-nos</h3>
-                            <p class="text-gray-400">Confira a nossa localização e planeie a sua visita.</p>
+                        <a href="#onde-estamos" class="content-card text-center flex-grow flex flex-col justify-center hover:bg-gray-50 transition">
+                            <i class="fas fa-ticket-alt text-amber-500 text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-2">Visite-nos</h3>
+                            <p class="text-gray-500">Confira a nossa localização e planeie a sua visita.</p>
                         </a>
                     </div>
                 </div>
@@ -230,103 +192,95 @@
         </section>
 
         <!-- Seção Notícias -->
-        <section id="noticias" class="room-section">
-            <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Mais Notícias e Eventos</h2>
-                <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-                    <!-- As outras notícias serão carregadas aqui -->
-                </div>
-                <div class="mt-12">
-                    <a href="noticias.html" class="joystick-btn">Ver todas as notícias</a>
-                </div>
+        <section id="noticias" class="section-padding bg-gray-50">
+            <div class="container mx-auto">
+                <h2 class="section-title">Mais Notícias e Eventos</h2>
+                <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+                <div class="mt-12 text-center"><a href="noticias.html" class="btn btn-primary">Ver todas as notícias</a></div>
             </div>
         </section>
 
-        <!-- Outras seções (Acervos, Games, etc.) -->
-        <section id="acervos" class="room-section">
-            <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Os Nossos Acervos</h2>
+        <!-- Seção Acervos -->
+        <section id="acervos" class="section-padding bg-white">
+            <div class="container mx-auto">
+                <h2 class="section-title">Os Nossos Acervos</h2>
                 <div id="acervos-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
-                 <div class="mt-12">
-                    <a href="galeria.html" class="joystick-btn">Explorar Galeria Completa</a>
-                </div>
+                 <div class="mt-12 text-center"><a href="galeria.html" class="btn btn-primary">Explorar Galeria Completa</a></div>
             </div>
         </section>
 
-        <section id="games" class="room-section">
-            <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Games Icónicos</h2>
+        <section id="games" class="section-padding bg-gray-50">
+            <div class="container mx-auto">
+                <h2 class="section-title">Games Icónicos</h2>
                 <div id="games-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
             </div>
         </section>
 
-        <section id="timeline" class="room-section">
-            <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Linha do Tempo dos Games</h2>
-                <div id="timeline-container" class="relative max-w-3xl mx-auto">
-                    <div class="absolute left-1/2 h-full w-1 bg-neon-blue/30 -translate-x-1/2"></div>
-                </div>
+        <section id="timeline" class="section-padding bg-white">
+            <div class="container mx-auto">
+                <h2 class="section-title">Linha do Tempo dos Games</h2>
+                <div id="timeline-container" class="relative max-w-3xl mx-auto border-l-2 border-gray-200 pl-8"></div>
             </div>
         </section>
 
-        <section id="quiz" class="room-section">
-            <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Teste os seus Conhecimentos</h2>
-                <div id="quiz-container" class="max-w-2xl mx-auto hud-border p-8"></div>
+        <section id="quiz" class="section-padding bg-gray-50">
+            <div class="container mx-auto">
+                <h2 class="section-title">Teste os seus Conhecimentos</h2>
+                <div id="quiz-container" class="max-w-2xl mx-auto p-8 border rounded-lg bg-white"></div>
             </div>
         </section>
 
-        <section id="curiosidades" class="room-section">
-            <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Sabia que?</h2>
+        <section id="curiosidades" class="section-padding bg-white">
+            <div class="container mx-auto">
+                <h2 class="section-title">Sabia que?</h2>
                 <div id="curiosidades-container" class="space-y-6 max-w-3xl mx-auto"></div>
             </div>
         </section>
 
-        <section id="onde-estamos" class="room-section">
-            <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Onde Estamos</h2>
+        <section id="onde-estamos" class="section-padding bg-gray-50">
+            <div class="container mx-auto">
+                <h2 class="section-title">Onde Estamos</h2>
                 <div class="grid md:grid-cols-2 gap-8 items-center">
-                    <div class="hud-border p-6 text-left">
+                    <div class="p-8 border rounded-lg bg-white">
                         <h3 class="text-2xl font-bold mb-4">O Nosso Endereço</h3>
-                        <p id="onde-estamos-endereco" class="mb-2 hidden"><i class="fas fa-map-marker-alt w-6 text-neon-blue"></i></p>
-                        <p id="onde-estamos-cidade" class="mb-6 hidden"><i class="fas fa-city w-6 text-neon-blue"></i></p>
+                        <p id="onde-estamos-endereco" class="mb-2"><i class="fas fa-map-marker-alt w-6 text-amber-500"></i> Carregando...</p>
+                        <p id="onde-estamos-cidade" class="mb-6"><i class="fas fa-city w-6 text-amber-500"></i> Carregando...</p>
                         <h3 id="onde-estamos-horario-titulo" class="text-2xl font-bold mt-6 mb-4 hidden">Horário</h3>
-                        <p id="onde-estamos-horario" class="mb-2 hidden"><i class="fas fa-clock w-6 text-neon-blue"></i></p>
-                        <p id="onde-estamos-fechado" class="hidden"><i class="fas fa-door-closed w-6 text-neon-blue"></i></p>
+                        <p id="onde-estamos-horario" class="mb-2 hidden"><i class="fas fa-clock w-6 text-amber-500"></i> Carregando...</p>
+                        <p id="onde-estamos-fechado" class="hidden"><i class="fas fa-door-closed w-6 text-amber-500"></i> Carregando...</p>
                     </div>
-                    <div class="h-96 overflow-hidden hud-border">
+                    <div class="h-96 overflow-hidden rounded-lg border">
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.188330542973!2d-43.17930938451152!3d-22.90641318501239!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997f58a6a00001%3A0x7d1d9c4f8dfc1a63!2sMuseu%20do%20Amanh%C3%A3!5e0!3m2!1spt-BR!2sbr!4v1672857335917!5m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="corporativo" class="room-section">
-            <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Sobre o Museu</h2>
-                <div class="max-w-4xl mx-auto hud-border p-8 text-left">
-                    <div id="corporativo-missao-container">
+        <section id="corporativo" class="section-padding bg-white">
+            <div class="container mx-auto">
+                <h2 class="section-title">Sobre o Museu</h2>
+                <div class="max-w-4xl mx-auto p-8 border rounded-lg">
+                    <div id="corporativo-missao-container" class="mb-6">
                         <h3 class="text-2xl font-bold mb-4">A Nossa Missão</h3>
-                        <p id="corporativo-missao" class="text-gray-300 mb-6"></p>
+                        <p id="corporativo-missao" class="text-gray-600 leading-relaxed"></p>
                     </div>
                     <div id="corporativo-visao-container">
                         <h3 class="text-2xl font-bold mb-4">A Nossa Visão</h3>
-                        <p id="corporativo-visao" class="text-gray-300"></p>
+                        <p id="corporativo-visao" class="text-gray-600 leading-relaxed"></p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="loja" class="room-section">
-            <div class="room-content container mx-auto text-center">
-                <h2 class="text-4xl font-bold mb-12">Loja do Museu</h2>
+        <section id="loja" class="section-padding bg-gray-50">
+            <div class="container mx-auto">
+                <h2 class="section-title">Loja do Museu</h2>
                 <div id="loja-container" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
             </div>
         </section>
     </main>
 
-    <footer class="py-10" style="background: var(--metal-bg)">
+    <footer class="py-10 bg-gray-800">
         <div class="container mx-auto text-center text-gray-400">
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
             <div class="mt-4 space-x-6">
@@ -342,12 +296,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ### CORREÇÃO APLICADA AQUI ###
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.firebasestorage.app", // CORRIGIDO
+            storageBucket: "museu-cca6d.firebasestorage.app",
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
@@ -372,7 +325,7 @@
                     if (targetElement) {
                         const headerHeight = document.querySelector('header').offsetHeight;
                         const elementPosition = targetElement.getBoundingClientRect().top;
-                        const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
                         window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                     }
                     if (!mobileMenu.classList.contains('hidden')) {
@@ -390,7 +343,8 @@
                     const id = entry.target.id;
                     navLinksForObserver.forEach(link => {
                         const href = link.getAttribute('href');
-                        if (href === `#${id}`) {
+                        const linkHref = href.startsWith('#') ? href : new URL(href).hash;
+                        if (linkHref === `#${id}`) {
                            link.classList.add('active');
                         } else if (href && href.startsWith('#')) {
                            link.classList.remove('active');
@@ -398,7 +352,7 @@
                     });
                 }
             });
-        }, { rootMargin: "-50% 0px -50% 0px" });
+        }, { rootMargin: "-40% 0px -60% 0px" });
         sections.forEach(section => observer.observe(section));
 
         // --- RENDERERS (ATUALIZADOS) ---
@@ -406,18 +360,21 @@
             const data = doc.data();
             let dataFormatada = '';
             if (data.data_publicacao && data.data_publicacao.toDate) {
-                dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
             }
             return `
-                ${data.imagem ? `<img src="${data.imagem}" alt="${data.titulo || 'Notícia'}" class="w-full h-64 object-cover rounded-lg mb-4">` : ''}
-                <div class="flex-grow flex flex-col p-2">
-                    <div class="flex justify-between items-center">
-                        ${data.categoria ? `<span class="text-sm font-bold text-neon-blue">${data.categoria}</span>` : ''}
-                        ${dataFormatada ? `<span class="text-xs text-gray-400">${dataFormatada}</span>` : ''}
+                <div class="content-card">
+                    <div class="card-image-wrapper">
+                        <a href="noticia.html?id=${doc.id}" class="block rounded-md overflow-hidden">
+                            <img src="${data.imagem || 'https://placehold.co/600x400/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo || 'Notícia'}" class="w-full h-64 object-cover transition-transform duration-300 hover:scale-105">
+                        </a>
                     </div>
-                    ${data.titulo ? `<h3 class="text-2xl font-bold my-2 flex-grow">${data.titulo}</h3>` : '<div class="flex-grow"></div>'}
-                    ${data.subtitulo ? `<p class="text-gray-400 text-sm mb-4">${data.subtitulo}</p>` : ''}
-                    <a href="noticia.html?id=${doc.id}" class="joystick-btn mt-auto text-center">Ler Mais</a>
+                    <div class="p-6 flex-grow flex flex-col">
+                        <h3 class="text-xl font-bold text-gray-400 mb-4">Últimas Notícias</h3>
+                        ${data.categoria ? `<span class="text-sm font-bold text-amber-500 mb-1">${data.categoria}</span>` : ''}
+                        <h4 class="text-2xl font-bold mb-2 flex-grow"><a href="noticia.html?id=${doc.id}" class="hover:text-amber-600 transition">${data.titulo}</a></h4>
+                        <p class="text-gray-500 text-sm">${dataFormatada}</p>
+                    </div>
                 </div>
             `;
         }
@@ -426,53 +383,59 @@
             const data = doc.data();
             let dataFormatada = '';
             if (data.data_publicacao && data.data_publicacao.toDate) {
-                dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
             }
             return `
-            <a href="noticia.html?id=${doc.id}" class="hud-border overflow-hidden text-left block h-full flex flex-col">
-                ${data.imagem ? `<img src="${data.imagem}" alt="${data.titulo || 'Notícia'}" class="w-full h-48 object-cover">` : ''}
-                <div class="p-6 flex flex-col flex-grow">
-                    <div class="flex justify-between items-center mb-2">
-                        ${data.categoria ? `<span class="text-sm font-bold text-neon-blue">${data.categoria}</span>` : ''}
-                        ${dataFormatada ? `<span class="text-xs text-gray-400">${dataFormatada}</span>` : ''}
-                    </div>
-                    ${data.titulo ? `<h3 class="text-xl font-bold my-2">${data.titulo}</h3>` : ''}
-                    ${data.subtitulo ? `<p class="text-gray-400 text-sm flex-grow">${data.subtitulo}</p>` : '<div class="flex-grow"></div>'}
+            <div class="content-card">
+                <div class="card-image-wrapper">
+                    <a href="noticia.html?id=${doc.id}" class="block">
+                        <img src="${data.imagem || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo || 'Notícia'}" class="w-full h-48 object-cover">
+                    </a>
                 </div>
-            </a>`;
+                <div class="p-4 flex flex-col flex-grow">
+                    <div class="mb-2">
+                        ${data.categoria ? `<span class="text-xs font-bold uppercase text-amber-600">${data.categoria}</span>` : ''}
+                        ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
+                        ${dataFormatada ? `<span class="text-xs text-gray-500">${dataFormatada}</span>` : ''}
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-800 flex-grow"><a href="noticia.html?id=${doc.id}" class="hover:text-amber-600 transition">${data.titulo}</a></h3>
+                </div>
+            </div>`;
         }
 
         const renderAcervo = (doc) => {
             const data = doc.data();
             return `
-            <a href="item_detalhe.html?id=${doc.id}" class="block hud-border p-4 text-center">
-                ${data.imagem_principal ? `<img src="${data.imagem_principal}" alt="${data.nome || 'Item do Acervo'}" class="mx-auto mb-4 h-32 object-contain">` : ''}
-                ${data.nome ? `<h3 class="text-lg font-bold">${data.nome}</h3>` : ''}
-                ${data.fabricante ? `<p class="text-gray-400 text-xs">${data.fabricante}</p>` : ''}
-            </a>`;
+            <div class="content-card text-center">
+                <div class="card-image-wrapper">
+                    <a href="item_detalhe.html?id=${doc.id}" class="block">
+                        <img src="${data.imagem_principal || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.nome || 'Item do Acervo'}" class="mx-auto h-32 object-contain">
+                    </a>
+                </div>
+                <div class="p-4 flex-grow flex flex-col">
+                    <h3 class="text-lg font-bold flex-grow">${data.nome}</h3>
+                    <p class="text-gray-500 text-xs">${data.fabricante}</p>
+                </div>
+            </div>`;
         };
             
         const renderGame = (doc) => {
             const data = doc.data();
             return `
-             <div class="hud-border p-4 text-center">
-                ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Jogo'}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-2 border-neon-purple">` : ''}
-                ${data.nome ? `<h3 class="text-md font-bold">${data.nome}</h3>` : ''}
-                ${data.ano ? `<p class="text-gray-400 text-xs">${data.ano}</p>` : ''}
+             <div class="p-4 border rounded-lg text-center bg-white">
+                ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Jogo'}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-2 border-gray-200">` : ''}
+                <h3 class="text-md font-bold">${data.nome}</h3>
+                <p class="text-gray-500 text-xs">${data.ano}</p>
             </div>`;
         }
 
         const renderTimeline = (doc, index) => {
             const data = doc.data();
             if (!data.titulo && !data.descricao) return '';
-            const alignment = index % 2 === 0 ? 'mr-[calc(50%+2rem)] text-right' : 'ml-[calc(50%+2rem)]';
             return `
-                <div class="relative mb-8">
-                    <div class="absolute left-1/2 w-6 h-6 bg-neon-purple rounded-full -translate-x-1/2 mt-1.5 border-2 border-white shadow-[0_0_10px_var(--neon-purple)]"></div>
-                    <div class="${alignment} hud-border p-4 text-left">
-                        ${data.titulo ? `<h3 class="font-bold text-lg">${data.titulo}</h3>` : ''}
-                        ${data.descricao ? `<p class="text-sm text-gray-400">${data.descricao}</p>` : ''}
-                    </div>
+                <div class="relative mb-8 timeline-item pl-8">
+                    <h3 class="font-bold text-lg text-amber-600">${data.titulo}</h3>
+                    <p class="text-sm text-gray-500">${data.descricao}</p>
                 </div>`;
         };
 
@@ -480,11 +443,11 @@
             const data = doc.data();
             if (!data.titulo && !data.descricao) return '';
             return `
-            <div class="hud-border p-6 flex items-start space-x-4 text-left">
-                <i class="fas fa-lightbulb text-yellow-400 text-3xl mt-1"></i>
+            <div class="p-6 flex items-start space-x-4 text-left border rounded-lg bg-white">
+                <i class="fas fa-lightbulb text-amber-500 text-3xl mt-1"></i>
                 <div>
-                    ${data.titulo ? `<h3 class="font-bold text-lg">${data.titulo}</h3>` : ''}
-                    ${data.descricao ? `<p class="text-gray-300">${data.descricao}</p>` : ''}
+                    <h3 class="font-bold text-lg">${data.titulo}</h3>
+                    <p class="text-gray-600">${data.descricao}</p>
                 </div>
             </div>`;
         }
@@ -493,7 +456,7 @@
             const data = doc.data();
             if (!data.pergunta || !data.opcoes) return '';
             const options = data.opcoes.split(',').map((opt, i) =>
-                `<button data-correct="${i == data.correta}" class="w-full text-left p-4 bg-gray-700/50 rounded-lg hover:bg-neon-blue hover:text-black transition-colors quiz-option">${String.fromCharCode(65 + i)}) ${opt.trim()}</button>`
+                `<button data-correct="${i == data.correta}" class="w-full text-left p-4 bg-gray-100 rounded-lg hover:bg-amber-500 hover:text-white transition-colors quiz-option">${String.fromCharCode(65 + i)}) ${opt.trim()}</button>`
             ).join('');
             return `
                 <h3 class="text-2xl font-semibold mb-6">${data.pergunta}</h3>
@@ -504,12 +467,14 @@
         const renderProdutoLoja = (doc) => {
             const data = doc.data();
             return `
-            <div class="hud-border overflow-hidden text-center group">
-                ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Produto'}" class="w-full h-64 object-cover group-hover:opacity-80 transition-opacity">` : ''}
-                <div class="p-4">
-                    ${data.nome ? `<h3 class="text-lg font-semibold">${data.nome}</h3>` : ''}
-                    ${data.preco ? `<p class="text-neon-green font-bold text-xl">R$ ${data.preco}</p>` : ''}
-                    <button class="mt-4 w-full joystick-btn text-sm py-2">Comprar</button>
+            <div class="content-card text-center">
+                <div class="card-image-wrapper">
+                    <img src="${data.imagem || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.nome || 'Produto'}" class="w-full h-56 object-cover">
+                </div>
+                <div class="p-4 flex-grow flex flex-col">
+                    <h3 class="text-lg font-semibold flex-grow">${data.nome}</h3>
+                    <p class="text-amber-600 font-bold text-xl my-2">R$ ${data.preco}</p>
+                    <button class="btn btn-secondary mt-2 w-full">Comprar</button>
                 </div>
             </div>`;
         }
@@ -522,7 +487,7 @@
             onSnapshot(collectionRef, (snapshot) => {
                 let content = '';
                 if (snapshot.empty) {
-                    content = `<p class="text-gray-400 text-center col-span-full">Nenhum item encontrado.</p>`;
+                    content = `<p class="text-gray-500 text-center col-span-full">Nenhum item encontrado.</p>`;
                 } else {
                     const docs = snapshot.docs;
                     docs.forEach((doc, index) => content += renderer(doc, index));
@@ -540,13 +505,9 @@
                     const el = document.getElementById(id);
                     const fieldValue = data[fieldMap[id]];
                     if (el) {
-                        if (fieldValue) {
-                            const iconHTML = el.querySelector('i') ? el.querySelector('i').outerHTML : '';
-                            el.innerHTML = `${iconHTML} ${fieldValue}`;
-                            el.classList.remove('hidden');
-                        } else {
-                            el.classList.add('hidden');
-                        }
+                        const iconHTML = el.querySelector('i') ? el.querySelector('i').outerHTML : '';
+                        el.innerHTML = `${iconHTML} ${fieldValue || 'Não disponível'}`;
+                        if(fieldValue) el.classList.remove('hidden'); else el.classList.add('hidden');
                     }
                 });
                 Object.keys(containerIds).forEach(id => {
@@ -580,8 +541,8 @@
 
             onSnapshot(noticiasQuery, (snapshot) => {
                 if (snapshot.empty) {
-                    if(destaqueContainer) destaqueContainer.innerHTML = '<p class="flex-grow flex items-center justify-center text-center p-8 text-gray-400">Nenhuma notícia encontrada.</p>';
-                    if(noticiasContainer) noticiasContainer.innerHTML = '<p class="text-center col-span-full text-gray-400">Nenhuma notícia para exibir.</p>';
+                    if(destaqueContainer) destaqueContainer.innerHTML = '<div class="content-card flex items-center justify-center"><p>Nenhuma notícia encontrada.</p></div>';
+                    if(noticiasContainer) noticiasContainer.innerHTML = '<p class="text-center col-span-full">Nenhuma notícia para exibir.</p>';
                     return;
                 }
 
@@ -594,13 +555,9 @@
                 if (noticiasContainer) {
                     const outrasNoticiasDocs = docs.slice(1);
                     if (outrasNoticiasDocs.length > 0) {
-                        let content = '';
-                        outrasNoticiasDocs.forEach(doc => {
-                            content += renderNoticia(doc);
-                        });
-                        noticiasContainer.innerHTML = content;
+                        noticiasContainer.innerHTML = outrasNoticiasDocs.map(renderNoticia).join('');
                     } else {
-                        noticiasContainer.innerHTML = '<p class="text-center col-span-full text-gray-400">Não há mais notícias para exibir.</p>';
+                        noticiasContainer.innerHTML = '<p class="text-center col-span-full">Não há mais notícias para exibir.</p>';
                     }
                 }
             });
@@ -618,17 +575,18 @@
                     });
                     
                     if (e.target.dataset.correct === 'true') {
-                        e.target.style.background = 'var(--neon-green)';
-                        e.target.style.color = 'black';
+                        e.target.classList.replace('bg-gray-100', 'bg-green-500');
+                        e.target.classList.add('text-white');
                         resultP.textContent = 'Resposta Correta!';
-                        resultP.style.color = 'var(--neon-green)';
+                        resultP.classList.remove('hidden');
+                        resultP.classList.add('text-green-600');
                     } else {
-                        e.target.style.background = 'red';
-                        e.target.style.color = 'white';
+                        e.target.classList.replace('bg-gray-100', 'bg-red-500');
+                        e.target.classList.add('text-white');
                         resultP.textContent = 'Resposta Incorreta.';
-                        resultP.style.color = 'red';
+                        resultP.classList.remove('hidden');
+                        resultP.classList.add('text-red-600');
                     }
-                    resultP.classList.remove('hidden');
                 }
             });
         }
@@ -638,9 +596,9 @@
             loadHomeData();
             loadNoticiasHomepage();
             
-            loadCollection('acervos', 'acervos-container', renderAcervo);
+            loadCollection('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), limit(4)));
             loadCollection('games', 'games-container', renderGame);
-            loadCollection('timeline', 'timeline-container', renderTimeline);
+            loadCollection('timeline', 'timeline-container', renderTimeline, query(collection(db, `/artifacts/${appId}/public/data/timeline`), orderBy("titulo")));
             loadCollection('curiosidades', 'curiosidades-container', renderCuriosidade);
             loadCollection('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
             loadCollection('loja', 'loja-container', renderProdutoLoja);
@@ -648,9 +606,6 @@
             loadSingleDoc('corporativo', { 
                 'corporativo-missao': 'missao', 
                 'corporativo-visao': 'visao' 
-            }, {
-                'corporativo-missao-container': 'missao',
-                'corporativo-visao-container': 'visao'
             });
 
             loadSingleDoc('onde-estamos', { 
@@ -658,127 +613,9 @@
                 'onde-estamos-cidade': 'cidade', 
                 'onde-estamos-horario': 'horario', 
                 'onde-estamos-fechado': 'fechado' 
+            }, {
+                'onde-estamos-horario-titulo': 'horario'
             });
-            
-            // Logic for "Onde Estamos" Horario title
-            const horarioRef = doc(db, `/artifacts/${appId}/public/data/onde-estamos/info`);
-            onSnapshot(horarioRef, (docSnap) => {
-                const horarioTitle = document.getElementById('onde-estamos-horario-titulo');
-                if (docSnap.exists() && docSnap.data().horario) {
-                    horarioTitle.classList.remove('hidden');
-                } else {
-                    horarioTitle.classList.add('hidden');
-                }
-            });
-        });
-    </script>
-    
-    <!-- SCRIPT DO JOGO PONG -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('pong-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const container = document.getElementById('pong-container');
-
-            let ball, paddle1, paddle2;
-            let animationFrameId;
-            const ballSize = 8; 
-
-            function resizeCanvas() {
-                if (!container.clientWidth || !container.clientHeight) return;
-                canvas.width = container.clientWidth;
-                canvas.height = container.clientHeight;
-                
-                const paddleHeight = canvas.height * 0.25; 
-                const paddleWidth = 6;
-
-                paddle1 = { x: 10, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, speed: 2.8 };
-                paddle2 = { x: canvas.width - 10 - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, speed: 2.8 };
-                
-                resetBall();
-            }
-
-            function resetBall() {
-                if (!canvas.width || !canvas.height) return;
-                ball = { x: canvas.width / 2, y: canvas.height / 2, width: ballSize, height: ballSize, dx: (Math.random() > 0.5 ? 1 : -1) * 3.5, dy: (Math.random() - 0.5) * 4 };
-            }
-
-            function draw() {
-                ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'white';
-                ctx.fillRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
-                ctx.fillRect(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
-                ctx.fillRect(ball.x, ball.y, ball.width, ball.height);
-                ctx.beginPath();
-                ctx.setLineDash([4, 8]);
-                ctx.moveTo(canvas.width / 2, 0);
-                ctx.lineTo(canvas.width / 2, canvas.height);
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                ctx.setLineDash([]);
-            }
-
-            function update() {
-                if (!ball) return;
-                ball.x += ball.dx;
-                ball.y += ball.dy;
-
-                if (ball.y + ball.height > canvas.height || ball.y < 0) {
-                    ball.dy *= -1;
-                }
-
-                let player = (ball.dx < 0) ? paddle1 : paddle2;
-
-                if (isColliding(ball, player)) {
-                    let collidePoint = (ball.y + (ball.height / 2)) - (player.y + (player.height / 2));
-                    collidePoint = collidePoint / (player.height / 2);
-                    let angleRad = (Math.PI / 4) * collidePoint;
-                    let direction = (ball.dx < 0) ? 1 : -1;
-                    let speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
-                    ball.dx = direction * speed * Math.cos(angleRad);
-                    ball.dy = speed * Math.sin(angleRad);
-                    ball.dx *= 1.02; 
-                    ball.dy *= 1.02;
-                }
-
-                if (ball.x + ball.width < 0 || ball.x > canvas.width) {
-                    resetBall();
-                }
-
-                if (ball.dx > 0) { 
-                    let targetY = ball.y;
-                    paddle2.y += (targetY - (paddle2.y + paddle2.height / 2)) * 0.1;
-                } else { 
-                    let targetY = ball.y;
-                    paddle1.y += (targetY - (paddle1.y + paddle1.height / 2)) * 0.1;
-                }
-
-                paddle1.y = Math.max(0, Math.min(paddle1.y, canvas.height - paddle1.height));
-                paddle2.y = Math.max(0, Math.min(paddle2.y, canvas.height - paddle2.height));
-            }
-            
-            function isColliding(b, p) {
-                return b.x < p.x + p.width && b.x + b.width > p.x && b.y < p.y + p.height && b.y + b.height > p.y;
-            }
-
-            function gameLoop() {
-                update();
-                draw();
-                animationFrameId = requestAnimationFrame(gameLoop);
-            }
-            
-            const resizeObserver = new ResizeObserver(() => {
-                if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                resizeCanvas();
-                if (container.clientWidth > 0 && container.clientHeight > 0) {
-                    gameLoop();
-                }
-            });
-
-            resizeObserver.observe(container);
         });
     </script>
 </body>
