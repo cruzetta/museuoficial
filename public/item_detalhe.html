@@ -36,14 +36,57 @@
         #notification-toast { position: fixed; bottom: 1.25rem; right: 1.25rem; background-color: #28a745; color: white; padding: 1rem 1.5rem; border-radius: 0.375rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.4s ease-in-out; transform: translateY(200%); opacity: 0; z-index: 100; }
         #notification-toast.show { transform: translateY(0); opacity: 1; }
         .placeholder-card { text-align: center; color: #6c757d; padding: 2rem; border: 2px dashed #e9ecef; border-radius: 0.5rem; background-color: #f8f9fa; }
-        .media-thumbnail { cursor: pointer; border: 2px solid transparent; border-radius: 0.375rem; transition: border-color 0.2s, transform 0.2s; background-color: #e9ecef; }
-        .media-thumbnail:hover { transform: scale(1.05); }
-        .media-thumbnail.active { border-color: var(--primary-color); }
-        #media-display-area { background-color: #1f2937; }
-        #media-display-area img, #media-display-area video {
+        
+        /* Estilos do Carrossel com Swipe */
+        #media-display-container {
+            overflow: hidden; /* Essencial para o efeito de slide */
+        }
+        #media-track {
+            display: flex;
+            transition: transform 0.4s ease-in-out; /* Animação do deslize */
+        }
+        .media-slide {
             width: 100%;
-            max-height: 70vh;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .media-slide img, .media-slide video {
+            width: 100%;
+            height: auto;
+            max-height: 75vh;
             object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        .control-btn {
+            background-color: #e9ecef;
+            color: var(--text-dark);
+            border: 1px solid #ced4da;
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .control-btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+        }
+        .control-btn:disabled {
+            background-color: #f8f9fa;
+            color: #adb5bd;
+            cursor: not-allowed;
+            border-color: #dee2e6;
+        }
+        #media-counter {
+            min-width: 50px;
+            text-align: center;
         }
     </style>
 </head>
@@ -104,43 +147,75 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // Elementos do DOM
+        // --- STATE MANAGEMENT ---
+        let currentMediaIndex = 0;
+        let mediaGallery = [];
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // --- DOM ELEMENTS ---
         const itemContainer = document.getElementById('item-container');
         const statusContainer = document.getElementById('status-container');
         const loader = document.getElementById('loader');
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
         
-        // Função para exibir mídia na área de display principal
-        window.showMedia = (index, mediaGallery) => {
-            const media = mediaGallery[index];
-            if (!media) return;
-
-            const displayArea = document.getElementById('media-display-area');
-            let mediaHTML = '';
-
-            switch (media.tipo) {
-                case 'imagem':
-                    mediaHTML = `<img src="${media.url}" alt="${media.nome || 'Imagem'}">`;
-                    break;
-                case 'video':
-                    mediaHTML = `<video src="${media.url}" controls></video>`;
-                    break;
-                case 'audio':
-                    mediaHTML = `<div class="w-full h-full flex flex-col items-center justify-center text-white bg-gray-900 p-4"><i class="fas fa-music text-6xl mb-4"></i><p class="mb-4 text-lg">${media.nome || 'Faixa de áudio'}</p><audio src="${media.url}" controls></audio></div>`;
-                    break;
-                default:
-                     mediaHTML = `<img src="${media.url}" alt="${media.nome || 'Imagem'}">`;
+        // --- FUNÇÕES DO CARROSSEL ---
+        function showMedia(index) {
+            if (index < 0 || index >= mediaGallery.length) {
+                return;
             }
-            displayArea.innerHTML = mediaHTML;
+            currentMediaIndex = index;
 
-            // Atualiza a classe 'active' nas miniaturas
-            document.querySelectorAll('.media-thumbnail').forEach((thumb, i) => {
-                thumb.classList.toggle('active', i === index);
+            const track = document.getElementById('media-track');
+            const prevBtn = document.getElementById('prev-media-btn');
+            const nextBtn = document.getElementById('next-media-btn');
+            const mediaCounter = document.getElementById('media-counter');
+
+            // Move a "pista" para a posição correta
+            if (track) {
+                track.style.transform = `translateX(-${index * 100}%)`;
+            }
+
+            // Atualiza o estado dos botões e do contador
+            if (prevBtn) prevBtn.disabled = index === 0;
+            if (nextBtn) nextBtn.disabled = index === mediaGallery.length - 1;
+            if (mediaCounter) {
+                mediaCounter.textContent = `${index + 1} / ${mediaGallery.length}`;
+            }
+        }
+
+        // --- LÓGICA DE SWIPE ---
+        function handleSwipe() {
+            const swipeThreshold = 50; // Mínimo de pixels para considerar um swipe
+            const difference = touchStartX - touchEndX;
+
+            if (Math.abs(difference) > swipeThreshold) {
+                if (difference > 0) {
+                    // Swipe para a esquerda (próximo)
+                    showMedia(currentMediaIndex + 1);
+                } else {
+                    // Swipe para a direita (anterior)
+                    showMedia(currentMediaIndex - 1);
+                }
+            }
+        }
+
+        function setupSwipeListeners() {
+            const displayContainer = document.getElementById('media-display-container');
+            if (!displayContainer) return;
+
+            displayContainer.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            displayContainer.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
             });
-        };
+        }
 
-        // Função de partilha
+        // --- FUNÇÕES AUXILIARES ---
         window.sharePage = () => {
             navigator.clipboard.writeText(window.location.href).then(() => {
                 const toast = document.getElementById('notification-toast');
@@ -149,7 +224,7 @@
             });
         };
 
-        const createPlaceholder = (icon, text) => `<div class="placeholder-card"><i class="fas ${icon}"></i><p>${text}</p></div>`;
+        const createPlaceholder = (icon, text) => `<div class="placeholder-card"><i class="fas ${icon} text-2xl mb-2"></i><p>${text}</p></div>`;
 
         const showStatus = (isError, message = '') => {
             loader.classList.add('hidden');
@@ -173,7 +248,7 @@
                     const item = docSnap.data();
                     document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
                     
-                    const mediaGallery = [];
+                    mediaGallery = [];
                     if (item.imagem_principal) {
                         mediaGallery.push({ tipo: 'imagem', url: item.imagem_principal, nome: 'Imagem Principal' });
                     }
@@ -181,12 +256,9 @@
                         mediaGallery.push(...item.galeria_midia.filter(m => m.url));
                     }
 
-                    // --- Renderização do HTML ---
-                    
-                    // 1. Cabeçalho do item (centralizado)
                     const headerHTML = `
                         <div class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 mb-8">
-                            <div class="hidden md:block"></div> <!-- Spacer on larger screens -->
+                            <div class="hidden md:block"></div>
                             <div class="text-center order-first md:order-none">
                                 <h1 class="text-4xl md:text-5xl font-bold text-gray-900">${item.nome || 'Item Desconhecido'}</h1>
                                 ${item.lancamento ? `<p class="text-xl text-gray-600 mt-2">${item.lancamento}</p>` : ''}
@@ -199,43 +271,49 @@
                         </div>
                     `;
 
-                    // 2. Galeria de Mídia (Sem o título h2)
                     let mediaSectionHTML = '';
                     if (mediaGallery.length > 0) {
-                        const thumbnailsHTML = mediaGallery.map((media, index) => {
-                            let thumbContent = '';
+                        const mediaSlidesHTML = mediaGallery.map(media => {
+                            let slideContent = '';
                             switch (media.tipo) {
-                                case 'video': thumbContent = `<i class="fas fa-play text-white text-2xl"></i>`; break;
-                                case 'audio': thumbContent = `<i class="fas fa-volume-up text-white text-2xl"></i>`; break;
-                                default: thumbContent = ''; // Imagem usa background
+                                case 'video':
+                                    slideContent = `<video src="${media.url}" controls muted loop></video>`;
+                                    break;
+                                case 'audio':
+                                    slideContent = `<div class="w-full h-64 flex flex-col items-center justify-center text-gray-700 bg-gray-100 p-4 rounded-lg"><i class="fas fa-music text-6xl mb-4 text-gray-400"></i><p class="mb-4 text-lg">${media.nome || 'Faixa de áudio'}</p><audio src="${media.url}" controls></audio></div>`;
+                                    break;
+                                default:
+                                    slideContent = `<img src="${media.url}" alt="${media.nome || 'Imagem do item'}">`;
                             }
-                            const bgImage = media.tipo === 'imagem' ? `background-image: url('${media.url}');` : '';
-                            return `
-                                <div onclick='showMedia(${index}, ${JSON.stringify(mediaGallery).replace(/'/g, "&apos;")})' 
-                                     class="media-thumbnail aspect-square bg-cover bg-center flex items-center justify-center" 
-                                     style="${bgImage}"
-                                     title="${media.nome || media.tipo}">
-                                    ${thumbContent}
-                                </div>`;
+                            return `<div class="media-slide">${slideContent}</div>`;
                         }).join('');
 
                         mediaSectionHTML = `
-                            <div class="content-card">
-                                <div id="media-display-area" class="mb-4 rounded-lg flex items-center justify-center overflow-hidden">
-                                    <!-- Mídia será carregada aqui -->
+                            <div class="content-card p-4">
+                                <div id="media-display-container" class="rounded-lg mb-4">
+                                    <div id="media-track">
+                                        ${mediaSlidesHTML}
+                                    </div>
                                 </div>
-                                <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-                                    ${thumbnailsHTML}
+                                ${mediaGallery.length > 1 ? `
+                                <div id="media-controls" class="flex items-center justify-center gap-4">
+                                    <button id="prev-media-btn" class="control-btn">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <span id="media-counter" class="text-lg font-semibold text-gray-700"></span>
+                                    <button id="next-media-btn" class="control-btn">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
                                 </div>
+                                ` : ''}
                             </div>
                         `;
                     }
 
-                    // 3. Seção "Sobre"
                     const aboutSectionHTML = `
                         <div class="content-card">
                             <h2 class="section-title">Sobre o Item</h2>
-                            ${item.detalhes ? `<div class="prose-custom">${item.detalhes}</div>` : createPlaceholder('fa-book-open', 'A história e o legado deste item serão adicionados em breve.')}
+                            ${item.detalhes ? `<div class="prose-custom max-w-none">${item.detalhes}</div>` : createPlaceholder('fa-book-open', 'A história e o legado deste item serão adicionados em breve.')}
                         </div>
                     `;
                     
@@ -244,7 +322,16 @@
                     itemContainer.classList.remove('opacity-0');
                     
                     if (mediaGallery.length > 0) {
-                        window.showMedia(0, mediaGallery);
+                        showMedia(0); // Inicia o carrossel
+
+                        // Adiciona listeners aos botões
+                        const prevBtn = document.getElementById('prev-media-btn');
+                        const nextBtn = document.getElementById('next-media-btn');
+                        if (prevBtn) prevBtn.addEventListener('click', () => showMedia(currentMediaIndex - 1));
+                        if (nextBtn) nextBtn.addEventListener('click', () => showMedia(currentMediaIndex + 1));
+
+                        // Configura os listeners de swipe
+                        setupSwipeListeners();
                     }
 
                 } else {
