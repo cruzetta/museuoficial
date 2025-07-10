@@ -226,6 +226,7 @@
             state.filteredItems.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'gallery-card';
+                // ATUALIZAÇÃO: Removido o fabricante e a classe flex-grow do container de texto para melhor distribuição.
                 card.innerHTML = `
                     <div class="p-4 bg-gray-100">
                         <a href="item_detalhe.html?id=${item.id}" class="block">
@@ -234,8 +235,7 @@
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
                         <h3 class="text-lg font-semibold mb-2 text-gray-800">${item.nome || 'Item sem nome'}</h3>
-                        <div class="text-sm text-gray-600 space-y-1 mb-4 flex-grow">
-                            ${item.fabricante ? `<p><i class="fa-solid fa-microchip w-5 text-gray-400"></i> ${item.fabricante}</p>` : ''}
+                        <div class="text-sm text-gray-600 mb-4">
                             ${item.lancamento ? `<p><i class="fa-solid fa-calendar-days w-5 text-gray-400"></i> ${item.lancamento}</p>` : ''}
                         </div>
                         <a href="item_detalhe.html?id=${item.id}" class="btn btn-primary w-full mt-auto">
@@ -258,7 +258,7 @@
             if (searchTerm) {
                 tempItems = tempItems.filter(item => 
                     (item.nome && item.nome.toLowerCase().includes(searchTerm)) ||
-                    (item.fabricante && item.fabricante.toLowerCase().includes(searchTerm))
+                    (item.fabricante && item.fabricante.toLowerCase().includes(searchTerm)) // Lógica de busca mantida conforme solicitado
                 );
             }
 
