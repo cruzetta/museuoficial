@@ -55,6 +55,9 @@
             align-items: center;
             justify-content: center;
         }
+        .media-slide img {
+            pointer-events: none; /* Impede que a imagem capture eventos do rato */
+        }
         .media-slide img, .media-slide video {
             width: 100%;
             height: auto;
@@ -62,8 +65,7 @@
             object-fit: contain;
             display: block;
             margin: 0 auto;
-            user-select: none; /* Impede a seleção da imagem ao arrastar */
-            pointer-events: none; /* Impede que a imagem capture eventos do rato */
+            user-select: none; /* Impede a seleção do conteúdo ao arrastar */
         }
         .control-btn {
             background-color: #e9ecef;
@@ -171,6 +173,7 @@
         // --- FUNÇÕES DO CARROSSEL ---
         function setPositionByIndex() {
             const track = document.getElementById('media-track');
+            if (!track) return;
             currentTranslate = currentIndex * -track.clientWidth;
             prevTranslate = currentTranslate;
             setSliderPosition(track);
@@ -194,10 +197,19 @@
         // --- LÓGICA DE ARRASTAR (DRAG/SWIPE) ---
         function dragStart(index) {
             return function(event) {
+                // Impede o início do arraste se o alvo for um controlo de vídeo/áudio
+                if (event.target.nodeName === 'VIDEO' || event.target.nodeName === 'AUDIO' || event.target.closest('video, audio')) {
+                    const mediaElement = event.target.closest('video, audio');
+                    // Permite o clique nos controlos nativos
+                    if (event.offsetY > mediaElement.offsetHeight - 40) { // Heurística para a barra de controlos
+                         return;
+                    }
+                }
+
                 isDragging = true;
                 startPos = getPositionX(event);
                 const track = document.getElementById('media-track');
-                track.style.transition = 'none'; // Remove a transição durante o arraste
+                track.style.transition = 'none';
                 animationID = requestAnimationFrame(animation);
                 document.getElementById('media-display-container').classList.add('dragging');
             }
@@ -211,13 +223,13 @@
         }
 
         function dragEnd(event) {
+            if (!isDragging) return;
             isDragging = false;
             cancelAnimationFrame(animationID);
             
             const movedBy = currentTranslate - prevTranslate;
             const track = document.getElementById('media-track');
 
-            // Lógica de "snap"
             if (movedBy < -50 && currentIndex < mediaGallery.length - 1) {
                 currentIndex += 1;
             }
@@ -244,12 +256,10 @@
             const container = document.getElementById('media-display-container');
             if (!container) return;
             
-            // Eventos de Toque (Mobile)
             container.addEventListener('touchstart', dragStart(currentIndex), { passive: true });
             container.addEventListener('touchmove', dragMove, { passive: true });
             container.addEventListener('touchend', dragEnd);
 
-            // Eventos de Rato (Desktop)
             container.addEventListener('mousedown', dragStart(currentIndex));
             container.addEventListener('mousemove', dragMove);
             container.addEventListener('mouseup', dragEnd);
@@ -369,8 +379,8 @@
 
                         const prevBtn = document.getElementById('prev-media-btn');
                         const nextBtn = document.getElementById('next-media-btn');
-                        if (prevBtn) prevBtn.addEventListener('click', () => { currentIndex -= 1; setPositionByIndex(); });
-                        if (nextBtn) nextBtn.addEventListener('click', () => { currentIndex += 1; setPositionByIndex(); });
+                        if (prevBtn) prevBtn.addEventListener('click', () => { if(currentIndex > 0) { currentIndex -= 1; setPositionByIndex(); } });
+                        if (nextBtn) nextBtn.addEventListener('click', () => { if(currentIndex < mediaGallery.length - 1) { currentIndex += 1; setPositionByIndex(); } });
 
                         setupDragListeners();
                     }
