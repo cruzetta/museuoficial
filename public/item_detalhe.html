@@ -37,13 +37,16 @@
         #notification-toast.show { transform: translateY(0); opacity: 1; }
         .placeholder-card { text-align: center; color: #6c757d; padding: 2rem; border: 2px dashed #e9ecef; border-radius: 0.5rem; background-color: #f8f9fa; }
         
-        /* Estilos do Carrossel com Swipe */
+        /* Estilos do Carrossel Arrastável */
         #media-display-container {
-            overflow: hidden; /* Essencial para o efeito de slide */
+            overflow: hidden;
+            cursor: grab;
+        }
+        #media-display-container.dragging {
+            cursor: grabbing;
         }
         #media-track {
             display: flex;
-            transition: transform 0.4s ease-in-out; /* Animação do deslize */
         }
         .media-slide {
             width: 100%;
@@ -59,6 +62,8 @@
             object-fit: contain;
             display: block;
             margin: 0 auto;
+            user-select: none; /* Impede a seleção da imagem ao arrastar */
+            pointer-events: none; /* Impede que a imagem capture eventos do rato */
         }
         .control-btn {
             background-color: #e9ecef;
@@ -148,10 +153,13 @@
         const appId = 'museu-cca6d';
 
         // --- STATE MANAGEMENT ---
-        let currentMediaIndex = 0;
         let mediaGallery = [];
-        let touchStartX = 0;
-        let touchEndX = 0;
+        let currentIndex = 0;
+        let isDragging = false;
+        let startPos = 0;
+        let currentTranslate = 0;
+        let prevTranslate = 0;
+        let animationID;
 
         // --- DOM ELEMENTS ---
         const itemContainer = document.getElementById('item-container');
@@ -161,57 +169,92 @@
         const errorText = document.getElementById('error-text');
         
         // --- FUNÇÕES DO CARROSSEL ---
-        function showMedia(index) {
-            if (index < 0 || index >= mediaGallery.length) {
-                return;
-            }
-            currentMediaIndex = index;
-
+        function setPositionByIndex() {
             const track = document.getElementById('media-track');
+            currentTranslate = currentIndex * -track.clientWidth;
+            prevTranslate = currentTranslate;
+            setSliderPosition(track);
+            updateControls();
+        }
+
+        function setSliderPosition(track) {
+            track.style.transform = `translateX(${currentTranslate}px)`;
+        }
+        
+        function updateControls() {
             const prevBtn = document.getElementById('prev-media-btn');
             const nextBtn = document.getElementById('next-media-btn');
             const mediaCounter = document.getElementById('media-counter');
 
-            // Move a "pista" para a posição correta
-            if (track) {
-                track.style.transform = `translateX(-${index * 100}%)`;
-            }
+            if (prevBtn) prevBtn.disabled = currentIndex === 0;
+            if (nextBtn) nextBtn.disabled = currentIndex === mediaGallery.length - 1;
+            if (mediaCounter) mediaCounter.textContent = `${currentIndex + 1} / ${mediaGallery.length}`;
+        }
 
-            // Atualiza o estado dos botões e do contador
-            if (prevBtn) prevBtn.disabled = index === 0;
-            if (nextBtn) nextBtn.disabled = index === mediaGallery.length - 1;
-            if (mediaCounter) {
-                mediaCounter.textContent = `${index + 1} / ${mediaGallery.length}`;
+        // --- LÓGICA DE ARRASTAR (DRAG/SWIPE) ---
+        function dragStart(index) {
+            return function(event) {
+                isDragging = true;
+                startPos = getPositionX(event);
+                const track = document.getElementById('media-track');
+                track.style.transition = 'none'; // Remove a transição durante o arraste
+                animationID = requestAnimationFrame(animation);
+                document.getElementById('media-display-container').classList.add('dragging');
             }
         }
 
-        // --- LÓGICA DE SWIPE ---
-        function handleSwipe() {
-            const swipeThreshold = 50; // Mínimo de pixels para considerar um swipe
-            const difference = touchStartX - touchEndX;
-
-            if (Math.abs(difference) > swipeThreshold) {
-                if (difference > 0) {
-                    // Swipe para a esquerda (próximo)
-                    showMedia(currentMediaIndex + 1);
-                } else {
-                    // Swipe para a direita (anterior)
-                    showMedia(currentMediaIndex - 1);
-                }
+        function dragMove(event) {
+            if (isDragging) {
+                const currentPosition = getPositionX(event);
+                currentTranslate = prevTranslate + currentPosition - startPos;
             }
         }
 
-        function setupSwipeListeners() {
-            const displayContainer = document.getElementById('media-display-container');
-            if (!displayContainer) return;
+        function dragEnd(event) {
+            isDragging = false;
+            cancelAnimationFrame(animationID);
+            
+            const movedBy = currentTranslate - prevTranslate;
+            const track = document.getElementById('media-track');
 
-            displayContainer.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
+            // Lógica de "snap"
+            if (movedBy < -50 && currentIndex < mediaGallery.length - 1) {
+                currentIndex += 1;
+            }
+            if (movedBy > 50 && currentIndex > 0) {
+                currentIndex -= 1;
+            }
 
-            displayContainer.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
+            track.style.transition = 'transform 0.4s ease-in-out';
+            setPositionByIndex();
+            document.getElementById('media-display-container').classList.remove('dragging');
+        }
+
+        function getPositionX(event) {
+            return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+        }
+        
+        function animation() {
+            const track = document.getElementById('media-track');
+            setSliderPosition(track);
+            if(isDragging) requestAnimationFrame(animation);
+        }
+
+        function setupDragListeners() {
+            const container = document.getElementById('media-display-container');
+            if (!container) return;
+            
+            // Eventos de Toque (Mobile)
+            container.addEventListener('touchstart', dragStart(currentIndex), { passive: true });
+            container.addEventListener('touchmove', dragMove, { passive: true });
+            container.addEventListener('touchend', dragEnd);
+
+            // Eventos de Rato (Desktop)
+            container.addEventListener('mousedown', dragStart(currentIndex));
+            container.addEventListener('mousemove', dragMove);
+            container.addEventListener('mouseup', dragEnd);
+            container.addEventListener('mouseleave', (e) => {
+                if(isDragging) dragEnd(e);
             });
         }
 
@@ -322,16 +365,14 @@
                     itemContainer.classList.remove('opacity-0');
                     
                     if (mediaGallery.length > 0) {
-                        showMedia(0); // Inicia o carrossel
+                        setPositionByIndex();
 
-                        // Adiciona listeners aos botões
                         const prevBtn = document.getElementById('prev-media-btn');
                         const nextBtn = document.getElementById('next-media-btn');
-                        if (prevBtn) prevBtn.addEventListener('click', () => showMedia(currentMediaIndex - 1));
-                        if (nextBtn) nextBtn.addEventListener('click', () => showMedia(currentMediaIndex + 1));
+                        if (prevBtn) prevBtn.addEventListener('click', () => { currentIndex -= 1; setPositionByIndex(); });
+                        if (nextBtn) nextBtn.addEventListener('click', () => { currentIndex += 1; setPositionByIndex(); });
 
-                        // Configura os listeners de swipe
-                        setupSwipeListeners();
+                        setupDragListeners();
                     }
 
                 } else {
