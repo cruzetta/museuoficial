@@ -7,8 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Swiper.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
     <style>
         :root {
@@ -96,11 +98,71 @@
             width: auto;
         }
         
-        .card-image-wrapper {
-            background-color: var(--bg-light);
-            padding: 1rem;
+        /* ESTILOS DO NOVO CARROSSEL */
+        #home {
+            height: 100vh;
         }
-        
+        .swiper-slide {
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+        .swiper-slide .slide-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.7) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        .swiper-slide .slide-content {
+            max-width: 800px;
+        }
+        .swiper-slide .slide-title {
+            font-size: 3rem; /* text-5xl */
+            font-weight: 900; /* font-black */
+            text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            line-height: 1.1;
+        }
+        @media (min-width: 768px) {
+            .swiper-slide .slide-title {
+                font-size: 5rem; /* ~text-7xl */
+            }
+        }
+        .swiper-slide video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translateX(-50%) translateY(-50%);
+            z-index: -1;
+            object-fit: cover;
+        }
+        .swiper-pagination-bullet {
+            background: rgba(255, 255, 255, 0.5);
+            width: 12px;
+            height: 12px;
+            opacity: 1;
+        }
+        .swiper-pagination-bullet-active {
+            background: var(--primary-color);
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: white;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        /* Estilo para a Timeline */
         .timeline-item::before {
             content: '';
             position: absolute;
@@ -163,38 +225,31 @@
     </div>
 
     <main>
-        <!-- Seção Home -->
-        <section id="home" class="bg-white">
-            <div class="container mx-auto px-4 sm:px-6 py-24 text-center">
-                <h1 id="home-titulo" class="text-4xl md:text-6xl font-bold mb-4">A Evolução dos Videojogos</h1>
-                <p id="home-subtitulo" class="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-gray-600">Explore décadas de história, inovação e cultura que moldaram o universo dos games.</p>
-                <a id="home-botao" href="#noticias" class="btn btn-primary text-lg">Iniciar Exploração</a>
-            </div>
-            <div class="container mx-auto px-4 sm:px-6 pb-24">
-                 <div class="grid lg:grid-cols-2 gap-8 items-stretch">
-                    <div id="destaque-noticia-container">
-                        <div class="content-card items-center justify-center text-center"><i class="fas fa-sync fa-spin text-3xl text-gray-400"></i><p class="mt-4 text-gray-500">A carregar...</p></div>
-                    </div>
-                    <div class="space-y-8 flex flex-col">
-                        <div class="content-card text-center flex-grow flex flex-col justify-center">
-                            <h3 class="text-2xl font-bold mb-2">Games Clássicos</h3>
-                            <p class="text-gray-500 mb-4">Relembre os jogos que marcaram gerações.</p>
-                            <a href="#games" class="btn btn-secondary mt-auto">Ver Games</a>
+        <!-- Seção Home com Carrossel -->
+        <section id="home" class="relative w-full bg-black">
+            <div id="home-slider-container" class="swiper h-full w-full">
+                <div class="swiper-wrapper" id="home-slider-wrapper">
+                    <!-- Slides serão injetados aqui -->
+                    <div class="swiper-slide" style="background-image:url(https://placehold.co/1920x1080/111827/7caeff?text=A+Carregar...&font=inter)">
+                        <div class="slide-overlay">
+                            <div class="slide-content">
+                                <h1 class="slide-title">A carregar conteúdo...</h1>
+                            </div>
                         </div>
-                        <a href="#onde-estamos" class="content-card text-center flex-grow flex flex-col justify-center hover:bg-gray-50 transition">
-                            <i class="fas fa-ticket-alt text-amber-500 text-4xl mb-4"></i>
-                            <h3 class="text-2xl font-bold mb-2">Visite-nos</h3>
-                            <p class="text-gray-500">Confira a nossa localização e planeie a sua visita.</p>
-                        </a>
                     </div>
                 </div>
+                <!-- Paginação -->
+                <div class="swiper-pagination"></div>
+                <!-- Botões de Navegação -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
         </section>
 
         <!-- Seção Notícias -->
         <section id="noticias" class="section-padding bg-gray-50">
             <div class="container mx-auto">
-                <h2 class="section-title">Mais Notícias e Eventos</h2>
+                <h2 class="section-title">Notícias e Eventos</h2>
                 <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
                 <div class="mt-12 text-center"><a href="noticias.html" class="btn btn-primary">Ver todas as notícias</a></div>
             </div>
@@ -209,6 +264,7 @@
             </div>
         </section>
 
+        <!-- SEÇÕES RESTAURADAS -->
         <section id="games" class="section-padding bg-gray-50">
             <div class="container mx-auto">
                 <h2 class="section-title">Games Icónicos</h2>
@@ -245,9 +301,6 @@
                         <h3 class="text-2xl font-bold mb-4">O Nosso Endereço</h3>
                         <p id="onde-estamos-endereco" class="mb-2"><i class="fas fa-map-marker-alt w-6 text-amber-500"></i> Carregando...</p>
                         <p id="onde-estamos-cidade" class="mb-6"><i class="fas fa-city w-6 text-amber-500"></i> Carregando...</p>
-                        <h3 id="onde-estamos-horario-titulo" class="text-2xl font-bold mt-6 mb-4 hidden">Horário</h3>
-                        <p id="onde-estamos-horario" class="mb-2 hidden"><i class="fas fa-clock w-6 text-amber-500"></i> Carregando...</p>
-                        <p id="onde-estamos-fechado" class="hidden"><i class="fas fa-door-closed w-6 text-amber-500"></i> Carregando...</p>
                     </div>
                     <div class="h-96 overflow-hidden rounded-lg border">
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.188330542973!2d-43.17930938451152!3d-22.90641318501239!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997f58a6a00001%3A0x7d1d9c4f8dfc1a63!2sMuseu%20do%20Amanh%C3%A3!5e0!3m2!1spt-BR!2sbr!4v1672857335917!5m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -256,10 +309,10 @@
             </div>
         </section>
 
-        <section id="corporativo" class="section-padding bg-white">
+        <section id="corporativo" class="section-padding bg-gray-50">
             <div class="container mx-auto">
                 <h2 class="section-title">Sobre o Museu</h2>
-                <div class="max-w-4xl mx-auto p-8 border rounded-lg">
+                <div class="max-w-4xl mx-auto p-8 border rounded-lg bg-white">
                     <div id="corporativo-missao-container" class="mb-6">
                         <h3 class="text-2xl font-bold mb-4">A Nossa Missão</h3>
                         <p id="corporativo-missao" class="text-gray-600 leading-relaxed"></p>
@@ -272,7 +325,7 @@
             </div>
         </section>
 
-        <section id="loja" class="section-padding bg-gray-50">
+        <section id="loja" class="section-padding bg-white">
             <div class="container mx-auto">
                 <h2 class="section-title">Loja do Museu</h2>
                 <div id="loja-container" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
@@ -291,6 +344,9 @@
         </div>
     </footer>
 
+    <!-- Swiper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
     <!-- Firebase e Lógica do Site -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -313,9 +369,7 @@
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         const internalNavLinks = document.querySelectorAll('a[href^="#"]');
-
         mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-
         internalNavLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 if (link.getAttribute('href').startsWith('#')) {
@@ -335,90 +389,39 @@
             });
         });
 
-        const sections = document.querySelectorAll('section');
-        const navLinksForObserver = document.querySelectorAll('#desktop-nav a, #mobile-menu a');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.id;
-                    navLinksForObserver.forEach(link => {
-                        const href = link.getAttribute('href');
-                        const linkHref = href.startsWith('#') ? href : new URL(href).hash;
-                        if (linkHref === `#${id}`) {
-                           link.classList.add('active');
-                        } else if (href && href.startsWith('#')) {
-                           link.classList.remove('active');
-                        }
-                    });
-                }
-            });
-        }, { rootMargin: "-40% 0px -60% 0px" });
-        sections.forEach(section => observer.observe(section));
-
-        // --- RENDERERS (ATUALIZADOS) ---
-        const renderNoticiaDestaque = (doc) => {
-            const data = doc.data();
-            let dataFormatada = '';
-            if (data.data_publicacao && data.data_publicacao.toDate) {
-                dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-            }
-            return `
-                <div class="content-card">
-                    <div class="card-image-wrapper">
-                        <a href="noticia.html?id=${doc.id}" class="block rounded-md overflow-hidden">
-                            <img src="${data.imagem || 'https://placehold.co/600x400/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo || 'Notícia'}" class="w-full h-64 object-cover transition-transform duration-300 hover:scale-105">
-                        </a>
-                    </div>
-                    <div class="p-6 flex-grow flex flex-col">
-                        <h3 class="text-xl font-bold text-gray-400 mb-4">Últimas Notícias</h3>
-                        ${data.categoria ? `<span class="text-sm font-bold text-amber-500 mb-1">${data.categoria}</span>` : ''}
-                        <h4 class="text-2xl font-bold mb-2 flex-grow"><a href="noticia.html?id=${doc.id}" class="hover:text-amber-600 transition">${data.titulo}</a></h4>
-                        <p class="text-gray-500 text-sm">${dataFormatada}</p>
-                    </div>
-                </div>
-            `;
-        }
-        
+        // --- RENDERERS ---
         const renderNoticia = (doc) => {
             const data = doc.data();
-            let dataFormatada = '';
-            if (data.data_publicacao && data.data_publicacao.toDate) {
-                dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
-            }
+            let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
             return `
             <div class="content-card">
-                <div class="card-image-wrapper">
-                    <a href="noticia.html?id=${doc.id}" class="block">
-                        <img src="${data.imagem || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo || 'Notícia'}" class="w-full h-48 object-cover">
-                    </a>
-                </div>
+                <a href="noticia.html?id=${doc.id}" class="block h-48 overflow-hidden"><img src="${data.imagem_principal || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo}" class="w-full h-full object-cover"></a>
                 <div class="p-4 flex flex-col flex-grow">
-                    <div class="mb-2">
-                        ${data.categoria ? `<span class="text-xs font-bold uppercase text-amber-600">${data.categoria}</span>` : ''}
-                        ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
-                        ${dataFormatada ? `<span class="text-xs text-gray-500">${dataFormatada}</span>` : ''}
-                    </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-800 flex-grow"><a href="noticia.html?id=${doc.id}" class="hover:text-amber-600 transition">${data.titulo}</a></h3>
+                     <h3 class="text-lg font-semibold mb-2 text-gray-800 flex-grow"><a href="noticia.html?id=${doc.id}" class="hover:text-amber-600 transition">${data.titulo}</a></h3>
+                     <p class="text-xs text-gray-500">${dataFormatada}</p>
                 </div>
             </div>`;
         }
-
         const renderAcervo = (doc) => {
             const data = doc.data();
             return `
             <div class="content-card text-center">
-                <div class="card-image-wrapper">
-                    <a href="item_detalhe.html?id=${doc.id}" class="block">
-                        <img src="${data.imagem_principal || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.nome || 'Item do Acervo'}" class="mx-auto h-32 object-contain">
-                    </a>
-                </div>
+                <a href="item_detalhe.html?id=${doc.id}" class="block h-32 flex items-center justify-center p-2"><img src="${data.imagem_principal || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain"></a>
+                <div class="p-4 flex-grow flex flex-col"><h3 class="text-lg font-bold flex-grow">${data.nome}</h3></div>
+            </div>`;
+        };
+        const renderProdutoLoja = (doc) => {
+            const data = doc.data();
+            return `
+            <div class="content-card text-center">
+                <div class="h-56 flex items-center justify-center p-2"><img src="${data.imagem || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-cover"></div>
                 <div class="p-4 flex-grow flex flex-col">
-                    <h3 class="text-lg font-bold flex-grow">${data.nome}</h3>
-                    <p class="text-gray-500 text-xs">${data.fabricante}</p>
+                    <h3 class="text-lg font-semibold flex-grow">${data.nome}</h3>
+                    <p class="text-amber-600 font-bold text-xl my-2">R$ ${data.preco}</p>
+                    <button class="btn btn-primary mt-2 w-full">Comprar</button>
                 </div>
             </div>`;
         };
-            
         const renderGame = (doc) => {
             const data = doc.data();
             return `
@@ -427,8 +430,7 @@
                 <h3 class="text-md font-bold">${data.nome}</h3>
                 <p class="text-gray-500 text-xs">${data.ano}</p>
             </div>`;
-        }
-
+        };
         const renderTimeline = (doc, index) => {
             const data = doc.data();
             if (!data.titulo && !data.descricao) return '';
@@ -438,7 +440,6 @@
                     <p class="text-sm text-gray-500">${data.descricao}</p>
                 </div>`;
         };
-
         const renderCuriosidade = (doc) => {
             const data = doc.data();
             if (!data.titulo && !data.descricao) return '';
@@ -450,8 +451,7 @@
                     <p class="text-gray-600">${data.descricao}</p>
                 </div>
             </div>`;
-        }
-
+        };
         const renderQuiz = (doc) => {
             const data = doc.data();
             if (!data.pergunta || !data.opcoes) return '';
@@ -464,106 +464,62 @@
                 <p class="quiz-result text-center mt-6 hidden font-bold text-lg"></p>`;
         };
 
-        const renderProdutoLoja = (doc) => {
-            const data = doc.data();
-            return `
-            <div class="content-card text-center">
-                <div class="card-image-wrapper">
-                    <img src="${data.imagem || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.nome || 'Produto'}" class="w-full h-56 object-cover">
-                </div>
-                <div class="p-4 flex-grow flex flex-col">
-                    <h3 class="text-lg font-semibold flex-grow">${data.nome}</h3>
-                    <p class="text-amber-600 font-bold text-xl my-2">R$ ${data.preco}</p>
-                    <button class="btn btn-secondary mt-2 w-full">Comprar</button>
-                </div>
-            </div>`;
-        }
-
         // --- DATA LOADERS ---
-        const loadCollection = (name, containerId, renderer, q) => {
+        const loadCollectionData = (name, containerId, renderer, q) => {
             const container = document.getElementById(containerId);
             if (!container) return;
             const collectionRef = q || collection(db, `/artifacts/${appId}/public/data/${name}`);
             onSnapshot(collectionRef, (snapshot) => {
-                let content = '';
-                if (snapshot.empty) {
-                    content = `<p class="text-gray-500 text-center col-span-full">Nenhum item encontrado.</p>`;
-                } else {
-                    const docs = snapshot.docs;
-                    docs.forEach((doc, index) => content += renderer(doc, index));
-                }
-                container.innerHTML = content;
+                container.innerHTML = snapshot.empty ? `<p class="text-gray-500 text-center col-span-full">Nenhum item encontrado.</p>` : snapshot.docs.map(renderer).join('');
                 if (name === 'quiz') attachQuizListeners();
             });
         };
-
-        const loadSingleDoc = (name, fieldMap, containerIds = {}) => {
+        const loadSingleDoc = (name, fieldMap) => {
             const docRef = doc(db, `/artifacts/${appId}/public/data/${name}/info`);
             onSnapshot(docRef, (docSnap) => {
                 const data = docSnap.exists() ? docSnap.data() : {};
                 Object.keys(fieldMap).forEach(id => {
                     const el = document.getElementById(id);
-                    const fieldValue = data[fieldMap[id]];
                     if (el) {
                         const iconHTML = el.querySelector('i') ? el.querySelector('i').outerHTML : '';
-                        el.innerHTML = `${iconHTML} ${fieldValue || 'Não disponível'}`;
-                        if(fieldValue) el.classList.remove('hidden'); else el.classList.add('hidden');
-                    }
-                });
-                Object.keys(containerIds).forEach(id => {
-                    const container = document.getElementById(id);
-                    const fieldValue = data[containerIds[id]];
-                    if(container) {
-                        if(fieldValue) container.classList.remove('hidden');
-                        else container.classList.add('hidden');
+                        el.innerHTML = `${iconHTML} ${data[fieldMap[id]] || 'Não disponível'}`;
                     }
                 });
             });
         };
         
-        const loadHomeData = () => {
-             const homeDocRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
-             onSnapshot(homeDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('home-titulo').textContent = data.titulo || 'Museu Itinerante';
-                    document.getElementById('home-subtitulo').textContent = data.subtitulo || 'A sua jornada começa aqui.';
-                    document.getElementById('home-botao').textContent = data.botao || 'Explorar';
-                }
-             });
-        }
-        
-        const loadNoticiasHomepage = () => {
-            const destaqueContainer = document.getElementById('destaque-noticia-container');
-            const noticiasContainer = document.getElementById('noticias-container');
-
-            const noticiasQuery = query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(4));
-
-            onSnapshot(noticiasQuery, (snapshot) => {
+        const loadHomeSlider = () => {
+            const wrapper = document.getElementById('home-slider-wrapper');
+            const sliderQuery = query(collection(db, `/artifacts/${appId}/public/data/home_slider`), orderBy("ordem", "asc"));
+            onSnapshot(sliderQuery, (snapshot) => {
                 if (snapshot.empty) {
-                    if(destaqueContainer) destaqueContainer.innerHTML = '<div class="content-card flex items-center justify-center"><p>Nenhuma notícia encontrada.</p></div>';
-                    if(noticiasContainer) noticiasContainer.innerHTML = '<p class="text-center col-span-full">Nenhuma notícia para exibir.</p>';
-                    return;
+                    wrapper.innerHTML = `<div class="swiper-slide" style="background-image:url(https://placehold.co/1920x1080/111827/ffffff?text=Bem-Vindo!&font=inter)"><div class="slide-overlay"><div class="slide-content"><h1 class="slide-title">Bem-Vindo ao Museu!</h1></div></div></div>`;
+                } else {
+                    wrapper.innerHTML = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        const link = data.linkId ? `${data.linkTipo}.html?id=${data.linkId}` : '#';
+                        const bgStyle = data.mediaTipo === 'imagem' ? `background-image: url('${data.mediaUrl}')` : '';
+                        const videoTag = data.mediaTipo === 'video' ? `<video src="${data.mediaUrl}" autoplay muted loop playsinline></video>` : '';
+                        return `
+                            <div class="swiper-slide" style="${bgStyle}">
+                                ${videoTag}
+                                <a href="${link}" class="slide-overlay">
+                                    <div class="slide-content">
+                                        ${data.titulo ? `<h1 class="slide-title">${data.titulo}</h1>` : ''}
+                                    </div>
+                                a/>
+                            </div>`;
+                    }).join('');
                 }
-
-                const docs = snapshot.docs;
-
-                if (destaqueContainer && docs.length > 0) {
-                    destaqueContainer.innerHTML = renderNoticiaDestaque(docs[0]);
-                }
-
-                if (noticiasContainer) {
-                    const outrasNoticiasDocs = docs.slice(1);
-                    if (outrasNoticiasDocs.length > 0) {
-                        noticiasContainer.innerHTML = outrasNoticiasDocs.map(renderNoticia).join('');
-                    } else {
-                        noticiasContainer.innerHTML = '<p class="text-center col-span-full">Não há mais notícias para exibir.</p>';
-                    }
-                }
+                new Swiper('#home-slider-container', {
+                    loop: true, autoplay: { delay: 5000, disableOnInteraction: false },
+                    pagination: { el: '.swiper-pagination', clickable: true },
+                    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                    effect: 'fade', fadeEffect: { crossFade: true },
+                });
             });
         };
-
-
+        
         function attachQuizListeners() {
             document.getElementById('quiz-container').addEventListener('click', (e) => {
                 if (e.target.classList.contains('quiz-option')) {
@@ -573,18 +529,17 @@
                         btn.disabled = true;
                         if(btn.dataset.correct !== 'true') btn.classList.add('opacity-50');
                     });
-                    
                     if (e.target.dataset.correct === 'true') {
                         e.target.classList.replace('bg-gray-100', 'bg-green-500');
                         e.target.classList.add('text-white');
                         resultP.textContent = 'Resposta Correta!';
-                        resultP.classList.remove('hidden');
+                        resultP.classList.remove('hidden', 'text-red-600');
                         resultP.classList.add('text-green-600');
                     } else {
                         e.target.classList.replace('bg-gray-100', 'bg-red-500');
                         e.target.classList.add('text-white');
                         resultP.textContent = 'Resposta Incorreta.';
-                        resultP.classList.remove('hidden');
+                        resultP.classList.remove('hidden', 'text-green-600');
                         resultP.classList.add('text-red-600');
                     }
                 }
@@ -593,29 +548,16 @@
 
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadHomeData();
-            loadNoticiasHomepage();
-            
-            loadCollection('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), limit(4)));
-            loadCollection('games', 'games-container', renderGame);
-            loadCollection('timeline', 'timeline-container', renderTimeline, query(collection(db, `/artifacts/${appId}/public/data/timeline`), orderBy("titulo")));
-            loadCollection('curiosidades', 'curiosidades-container', renderCuriosidade);
-            loadCollection('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
-            loadCollection('loja', 'loja-container', renderProdutoLoja);
-            
-            loadSingleDoc('corporativo', { 
-                'corporativo-missao': 'missao', 
-                'corporativo-visao': 'visao' 
-            });
-
-            loadSingleDoc('onde-estamos', { 
-                'onde-estamos-endereco': 'endereco', 
-                'onde-estamos-cidade': 'cidade', 
-                'onde-estamos-horario': 'horario', 
-                'onde-estamos-fechado': 'fechado' 
-            }, {
-                'onde-estamos-horario-titulo': 'horario'
-            });
+            loadHomeSlider();
+            loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
+            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), limit(4)));
+            loadCollectionData('games', 'games-container', renderGame);
+            loadCollectionData('timeline', 'timeline-container', renderTimeline, query(collection(db, `/artifacts/${appId}/public/data/timeline`), orderBy("titulo")));
+            loadCollectionData('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
+            loadCollectionData('curiosidades', 'curiosidades-container', renderCuriosidade);
+            loadCollectionData('loja', 'loja-container', renderProdutoLoja);
+            loadSingleDoc('corporativo', { 'corporativo-missao': 'missao', 'corporativo-visao': 'visao' });
+            loadSingleDoc('onde-estamos', { 'onde-estamos-endereco': 'endereco', 'onde-estamos-cidade': 'cidade' });
         });
     </script>
 </body>

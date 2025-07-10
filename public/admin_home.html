@@ -1,82 +1,310 @@
-<!-- Conteúdo da Aba Home -->
-<div id="home-form" class="bg-white p-8 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-6">Gerir Página Inicial</h2>
-    <form id="form-home" class="space-y-4">
-        <input type="hidden" id="home-id" value="main_content">
-        <div>
-            <label for="home-titulo" class="block text-sm font-medium text-gray-700">Título Principal</label>
-            <input type="text" id="home-titulo">
+<!-- Conteúdo da Aba Home (Gestor de Carrossel) -->
+<div id="home-slider-manager" class="space-y-8">
+    <div class="form-section bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6">Gerir Carrossel da Página Inicial</h2>
+        <form id="form-home-slider" class="space-y-6">
+            <input type="hidden" id="home-slider-id">
+            
+            <fieldset class="border p-4 rounded-md">
+                <legend class="text-lg font-semibold px-2">Conteúdo do Slide</legend>
+                <div class="space-y-4 pt-2">
+                    <div>
+                        <label for="home-slider-titulo" class="block text-sm font-medium text-gray-700">Título (Opcional)</label>
+                        <input type="text" id="home-slider-titulo" placeholder="Ex: A Era de Ouro dos Arcades">
+                    </div>
+                    
+                    <div data-upload-container="home-slider-media">
+                        <input type="hidden" id="home-slider-media-url">
+                        <input type="hidden" id="home-slider-media-tipo">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mídia de Fundo (Imagem ou Vídeo)</label>
+                        <div class="upload-preview-wrapper hidden mb-4">
+                            <div class="upload-preview-container rounded-lg overflow-hidden bg-gray-900">
+                                <img src="#" alt="Preview da imagem" class="upload-preview rounded-lg" data-media-type="imagem">
+                                <video src="#" alt="Preview do vídeo" class="upload-preview rounded-lg" data-media-type="video" controls muted></video>
+                            </div>
+                            <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover mídia</button>
+                        </div>
+                        <div class="upload-drop-zone">
+                            <input type="file" class="upload-file-input hidden" accept="image/*,video/*">
+                            <div class="text-gray-500">
+                                <i class="fas fa-photo-video text-3xl mb-2"></i>
+                                <p><strong>Arraste e solte</strong> ou <strong>clique para selecionar</strong></p>
+                                <p class="text-xs mt-1">Imagens (JPG, PNG, WEBP) ou Vídeos (MP4)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="border p-4 rounded-md">
+                <legend class="text-lg font-semibold px-2">Link e Ordem</legend>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div>
+                        <label for="home-slider-linkTipo" class="block text-sm font-medium text-gray-700">Link para (Opcional)</label>
+                        <select id="home-slider-linkTipo">
+                            <option value="nenhum">Nenhum Link</option>
+                            <option value="noticia">Notícia</option>
+                            <option value="acervo">Acervo</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="home-slider-linkId" class="block text-sm font-medium text-gray-700">Item Específico</label>
+                        <select id="home-slider-linkId" disabled>
+                            <option value="">Primeiro selecione o tipo de link</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="home-slider-ordem" class="block text-sm font-medium text-gray-700">Ordem de Exibição</label>
+                        <input type="number" id="home-slider-ordem" placeholder="Ex: 1, 2, 3... (menor aparece primeiro)" min="0">
+                    </div>
+                </div>
+            </fieldset>
+            
+            <div id="home-slider-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4">
+                <div id="home-slider-upload-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">0%</div>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="submit">Guardar Slide</button>
+                <button type="button" id="cancel-home-slider-edit" class="w-auto">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white p-8 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold mb-4">Slides do Carrossel</h3>
+        <div id="home-slider-lista" class="space-y-4">
+             <p class="text-sm text-gray-500">A carregar slides...</p>
         </div>
-        <div>
-            <label for="home-subtitulo" class="block text-sm font-medium text-gray-700">Subtítulo</label>
-            <textarea id="home-subtitulo" rows="3"></textarea>
-        </div>
-        <div>
-            <label for="home-botao" class="block text-sm font-medium text-gray-700">Texto do Botão</label>
-            <input type="text" id="home-botao">
-        </div>
-        <div class="flex flex-col sm:flex-row gap-4">
-            <button type="submit">Guardar Alterações da Home</button>
-            <button type="button" id="load-home-data">Carregar Dados Atuais</button>
-        </div>
-    </form>
+    </div>
 </div>
 
-<!-- Script Específico da Aba Home -->
-<script data-tab-script="home">
+<!-- Script Específico da Aba Home Slider -->
+<script data-tab-script="home-slider">
 {
-    // Obtém serviços e configurações globais
-    const { db, doc, getDoc, setDoc } = window.firebaseServices;
+    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, getDocs, query, orderBy, ref, deleteObject } = window.firebaseServices;
     const { appId } = window.appConfig;
 
-    const form = document.getElementById('form-home');
-    const loadButton = document.getElementById('load-home-data');
-    const docRef = doc(db, `/artifacts/${appId}/public/data/home/main_content`);
+    const entity = 'home-slider';
+    const form = document.getElementById(`form-${entity}`);
+    const listContainer = document.getElementById(`${entity}-lista`);
 
-    // Função para carregar dados
-    const loadHomeData = async () => {
+    // --- State para guardar dados das coleções de link ---
+    const linkableData = {
+        noticia: [],
+        acervo: []
+    };
+
+    // --- FUNÇÕES DE GESTÃO DO FORMULÁRIO (CRUD) ---
+    const clearForm = () => {
+        form.reset();
+        document.getElementById(`${entity}-id`).value = '';
+        document.getElementById(`${entity}-linkId`).innerHTML = '<option value="">Primeiro selecione o tipo de link</option>';
+        document.getElementById(`${entity}-linkId`).disabled = true;
+        window.resetUploadUI(`${entity}-media`);
+    };
+
+    const editDoc = async (id) => {
+        clearForm();
         try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                document.getElementById('home-titulo').value = data.titulo || '';
-                document.getElementById('home-subtitulo').value = data.subtitulo || '';
-                document.getElementById('home-botao').value = data.botao || '';
-                window.showNotification('Dados carregados!');
+                document.getElementById(`${entity}-id`).value = docSnap.id;
+                document.getElementById(`${entity}-titulo`).value = data.titulo || '';
+                document.getElementById(`${entity}-ordem`).value = data.ordem || 0;
+                
+                const linkTipoSelect = document.getElementById(`${entity}-linkTipo`);
+                linkTipoSelect.value = data.linkTipo || 'nenhum';
+                
+                // Dispara o evento change para popular o segundo select
+                linkTipoSelect.dispatchEvent(new Event('change')); 
+                
+                // Aguarda um pouco para o select ser populado
+                setTimeout(() => {
+                    document.getElementById(`${entity}-linkId`).value = data.linkId || '';
+                }, 100);
+
+                if (data.mediaUrl) {
+                    const container = document.querySelector(`[data-upload-container="${entity}-media"]`);
+                    const previewImg = container.querySelector('.upload-preview[data-media-type="imagem"]');
+                    const previewVideo = container.querySelector('.upload-preview[data-media-type="video"]');
+                    
+                    previewImg.style.display = 'none';
+                    previewVideo.style.display = 'none';
+
+                    if (data.mediaTipo === 'video') {
+                        previewVideo.src = data.mediaUrl;
+                        previewVideo.style.display = 'block';
+                    } else {
+                        previewImg.src = data.mediaUrl;
+                        previewImg.style.display = 'block';
+                    }
+
+                    container.querySelector('.upload-preview-wrapper').classList.remove('hidden');
+                    container.querySelector('.upload-drop-zone').classList.add('hidden');
+                    document.getElementById(`${entity}-media-url`).value = data.mediaUrl;
+                    document.getElementById(`${entity}-media-tipo`).value = data.mediaTipo;
+                }
+                window.scrollTo(0, 0);
             }
         } catch (error) {
-            console.error("Erro ao carregar dados da home:", error);
+            console.error(`Erro ao carregar ${entity}:`, error);
             window.showNotification('Erro ao carregar dados.', true);
         }
     };
-
-    // Submissão do formulário
+    
+    const performDeleteDoc = async (id) => {
+        if (!await window.showConfirmModal()) return;
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists() && docSnap.data().mediaUrl) {
+                const fileRef = ref(storage, docSnap.data().mediaUrl);
+                await deleteObject(fileRef).catch(err => console.warn("Falha ao apagar ficheiro do Storage:", err));
+            }
+            await deleteDoc(docRef);
+            window.showNotification("Slide eliminado com sucesso!");
+            clearForm();
+        } catch (error) {
+            console.error(`Erro ao eliminar ${entity}:`, error);
+            window.showNotification("Erro ao eliminar o slide.", true);
+        }
+    };
+    
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = form.querySelector('button[type="submit"]');
+        const progressContainer = document.getElementById(`${entity}-upload-progress-container`);
+        const progressBar = document.getElementById(`${entity}-upload-progress-bar`);
         submitButton.disabled = true;
 
         const data = {
-            titulo: document.getElementById('home-titulo').value,
-            subtitulo: document.getElementById('home-subtitulo').value,
-            botao: document.getElementById('home-botao').value,
+            titulo: document.getElementById(`${entity}-titulo`).value.trim(),
+            linkTipo: document.getElementById(`${entity}-linkTipo`).value,
+            linkId: document.getElementById(`${entity}-linkId`).value,
+            ordem: Number(document.getElementById(`${entity}-ordem`).value) || 0,
+            mediaUrl: document.getElementById(`${entity}-media-url`).value,
+            mediaTipo: document.getElementById(`${entity}-media-tipo`).value,
         };
 
         try {
-            await setDoc(docRef, data);
-            window.showNotification('Dados da Home guardados com sucesso!');
+            const file = window.pendingFiles.get(`${entity}-media`);
+            if (file) {
+                progressContainer.classList.remove('hidden');
+                data.mediaUrl = await window.uploadFile(file, 'home_slider/', (progress) => {
+                    const percent = Math.round(progress * 100);
+                    progressBar.style.width = `${percent}%`;
+                    progressBar.textContent = `${percent}%`;
+                });
+                data.mediaTipo = file.type.startsWith('video/') ? 'video' : 'imagem';
+            }
+
+            if (!data.mediaUrl) {
+                throw new Error("É necessário selecionar uma imagem ou vídeo para o slide.");
+            }
+
+            const id = document.getElementById(`${entity}-id`).value;
+            const path = `/artifacts/${appId}/public/data/${entity}`;
+            await (id ? updateDoc(doc(db, path, id), data) : addDoc(collection(db, path), data));
+
+            window.showNotification('Slide guardado com sucesso!');
+            clearForm();
         } catch (error) {
-            console.error("Erro ao guardar dados da home:", error);
-            window.showNotification('Erro ao guardar dados.', true);
+            console.error("Erro ao guardar slide:", error);
+            window.showNotification(error.message || 'Erro ao guardar os dados.', true);
         } finally {
             submitButton.disabled = false;
+            progressContainer.classList.add('hidden');
         }
     });
 
-    // Event listener para o botão de carregar
-    loadButton.addEventListener('click', loadHomeData);
+    // --- LISTENERS E INICIALIZAÇÃO ---
+    onSnapshot(query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem", "asc")), (snapshot) => {
+        listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhum slide registado.</p>' : '';
+        snapshot.docs.forEach(doc => {
+            const data = doc.data();
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+            itemDiv.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <span class="font-bold text-gray-400 w-6 text-center">${data.ordem}</span>
+                    <img src="${data.mediaTipo === 'imagem' ? data.mediaUrl : 'https://placehold.co/100x56/1f2937/ffffff?text=Video'}" class="w-24 h-14 object-cover rounded-md bg-gray-200">
+                    <div>
+                        <p class="font-semibold text-sm truncate">${data.titulo || 'Slide sem título'}</p>
+                        <p class="text-xs text-gray-500">Link: ${data.linkTipo !== 'nenhum' ? `${data.linkTipo}` : 'Nenhum'}</p>
+                    </div>
+                </div>
+                <div class="flex-shrink-0 flex gap-2">
+                    <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${doc.id}">Editar</button>
+                    <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${doc.id}">Eliminar</button>
+                </div>`;
+            listContainer.appendChild(itemDiv);
+        });
+    });
 
-    // Carrega os dados iniciais ao abrir a aba
-    loadHomeData();
+    listContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
+        if (e.target.classList.contains('delete-btn')) performDeleteDoc(e.target.dataset.id);
+    });
+    
+    document.getElementById(`cancel-${entity}-edit`).addEventListener('click', clearForm);
+    
+    // --- LÓGICA PARA POPULAR SELECTS DE LINK ---
+    const fetchLinkableData = async () => {
+        const noticiasSnap = await getDocs(query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("titulo")));
+        linkableData.noticia = noticiasSnap.docs.map(d => ({ id: d.id, nome: d.data().titulo }));
+
+        const acervosSnap = await getDocs(query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome")));
+        linkableData.acervo = acervosSnap.docs.map(d => ({ id: d.id, nome: d.data().nome }));
+    };
+
+    document.getElementById(`${entity}-linkTipo`).addEventListener('change', (e) => {
+        const linkIdSelect = document.getElementById(`${entity}-linkId`);
+        const tipo = e.target.value;
+        
+        linkIdSelect.innerHTML = '';
+        linkIdSelect.disabled = true;
+
+        if (tipo === 'nenhum') {
+            linkIdSelect.innerHTML = '<option value="">Primeiro selecione o tipo de link</option>';
+            return;
+        }
+
+        const options = linkableData[tipo];
+        if (options && options.length > 0) {
+            linkIdSelect.innerHTML = '<option value="">Selecione um item...</option>';
+            options.forEach(item => {
+                linkIdSelect.innerHTML += `<option value="${item.id}">${item.nome}</option>`;
+            });
+            linkIdSelect.disabled = false;
+        } else {
+            linkIdSelect.innerHTML = `<option value="">Nenhum item de '${tipo}' encontrado</option>`;
+        }
+    });
+    
+    // --- SETUP INICIAL DA ABA ---
+    window.setupUploadComponent(document.querySelector(`[data-upload-container="${entity}-media"]`), {
+        onFileSelect: (file, container) => {
+            const previewImg = container.querySelector('.upload-preview[data-media-type="imagem"]');
+            const previewVideo = container.querySelector('.upload-preview[data-media-type="video"]');
+            previewImg.style.display = 'none';
+            previewVideo.style.display = 'none';
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (file.type.startsWith('video/')) {
+                    previewVideo.src = e.target.result;
+                    previewVideo.style.display = 'block';
+                } else {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    fetchLinkableData();
 }
 </script>
