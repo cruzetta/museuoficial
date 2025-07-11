@@ -98,70 +98,6 @@
             width: auto;
         }
         
-        /* ESTILOS DO NOVO CARROSSEL */
-        #home {
-            height: 100vh;
-        }
-        .swiper-slide {
-            position: relative;
-            overflow: hidden;
-            background-size: cover;
-            background-position: center;
-            color: white;
-        }
-        .swiper-slide .slide-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.7) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-        }
-        .swiper-slide .slide-content {
-            max-width: 800px;
-        }
-        .swiper-slide .slide-title {
-            font-size: 3rem; /* text-5xl */
-            font-weight: 900; /* font-black */
-            text-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            line-height: 1.1;
-        }
-        @media (min-width: 768px) {
-            .swiper-slide .slide-title {
-                font-size: 5rem; /* ~text-7xl */
-            }
-        }
-        .swiper-slide video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            transform: translateX(-50%) translateY(-50%);
-            z-index: -1;
-            object-fit: cover;
-        }
-        .swiper-pagination-bullet {
-            background: rgba(255, 255, 255, 0.5);
-            width: 12px;
-            height: 12px;
-            opacity: 1;
-        }
-        .swiper-pagination-bullet-active {
-            background: var(--primary-color);
-        }
-        .swiper-button-next, .swiper-button-prev {
-            color: white;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-        }
-
         /* Estilo para a Timeline */
         .timeline-item::before {
             content: '';
@@ -183,12 +119,11 @@
     <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="flex justify-between items-center h-24">
-                <a href="#home" class="flex-shrink-0">
+                <a href="#noticias" class="flex-shrink-0">
                     <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
                 </a>
                 <nav id="desktop-nav" class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm">
-                    <a href="#home" class="nav-link active">Home</a>
-                    <a href="#noticias" class="nav-link">Notícias</a>
+                    <a href="#noticias" class="nav-link active">Notícias</a>
                     <a href="galeria.html" class="nav-link">Acervos</a>
                     <a href="#onde-estamos" class="nav-link">Onde Estamos</a>
                     <a href="#loja" class="nav-link">Loja</a>
@@ -211,7 +146,6 @@
     </header>
     
     <div id="mobile-menu" class="hidden fixed top-24 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--dark-header);">
-        <a href="#home" class="block text-center py-3 text-lg nav-link">Home</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
         <a href="galeria.html" class="block text-center py-3 text-lg nav-link">Acervos</a>
         <a href="#onde-estamos" class="block text-center py-3 text-lg nav-link">Onde Estamos</a>
@@ -225,27 +159,6 @@
     </div>
 
     <main>
-        <!-- Seção Home com Carrossel -->
-        <section id="home" class="relative w-full bg-black">
-            <div id="home-slider-container" class="swiper h-full w-full">
-                <div class="swiper-wrapper" id="home-slider-wrapper">
-                    <!-- Slides serão injetados aqui -->
-                    <div class="swiper-slide" style="background-image:url(https://placehold.co/1920x1080/111827/7caeff?text=A+Carregar...&font=inter)">
-                        <div class="slide-overlay">
-                            <div class="slide-content">
-                                <h1 class="slide-title">A carregar conteúdo...</h1>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Paginação -->
-                <div class="swiper-pagination"></div>
-                <!-- Botões de Navegação -->
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-            </div>
-        </section>
-
         <!-- Seção Notícias -->
         <section id="noticias" class="section-padding bg-gray-50">
             <div class="container mx-auto">
@@ -488,38 +401,6 @@
             });
         };
         
-        const loadHomeSlider = () => {
-            const wrapper = document.getElementById('home-slider-wrapper');
-            const sliderQuery = query(collection(db, `/artifacts/${appId}/public/data/home_slider`), orderBy("ordem", "asc"));
-            onSnapshot(sliderQuery, (snapshot) => {
-                if (snapshot.empty) {
-                    wrapper.innerHTML = `<div class="swiper-slide" style="background-image:url(https://placehold.co/1920x1080/111827/ffffff?text=Bem-Vindo!&font=inter)"><div class="slide-overlay"><div class="slide-content"><h1 class="slide-title">Bem-Vindo ao Museu!</h1></div></div></div>`;
-                } else {
-                    wrapper.innerHTML = snapshot.docs.map(doc => {
-                        const data = doc.data();
-                        const link = data.linkId ? `${data.linkTipo}.html?id=${data.linkId}` : '#';
-                        const bgStyle = data.mediaTipo === 'imagem' ? `background-image: url('${data.mediaUrl}')` : '';
-                        const videoTag = data.mediaTipo === 'video' ? `<video src="${data.mediaUrl}" autoplay muted loop playsinline></video>` : '';
-                        return `
-                            <div class="swiper-slide" style="${bgStyle}">
-                                ${videoTag}
-                                <a href="${link}" class="slide-overlay">
-                                    <div class="slide-content">
-                                        ${data.titulo ? `<h1 class="slide-title">${data.titulo}</h1>` : ''}
-                                    </div>
-                                a/>
-                            </div>`;
-                    }).join('');
-                }
-                new Swiper('#home-slider-container', {
-                    loop: true, autoplay: { delay: 5000, disableOnInteraction: false },
-                    pagination: { el: '.swiper-pagination', clickable: true },
-                    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-                    effect: 'fade', fadeEffect: { crossFade: true },
-                });
-            });
-        };
-        
         function attachQuizListeners() {
             document.getElementById('quiz-container').addEventListener('click', (e) => {
                 if (e.target.classList.contains('quiz-option')) {
@@ -548,7 +429,6 @@
 
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadHomeSlider();
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
             loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), limit(4)));
             loadCollectionData('games', 'games-container', renderGame);
