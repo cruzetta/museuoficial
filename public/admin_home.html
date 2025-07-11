@@ -82,46 +82,12 @@
 <!-- Script Específico da Aba Home Slider -->
 <script data-tab-script="home-slider">
 {
-
-    
-    // ✅ CORREÇÃO 1: Desestruturação correta. Todas as funções vêm do objeto principal.
-    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, getDocs, query, orderBy, ref, deleteObject, uploadBytesResumable, getDownloadURL } = window.firebaseServices;
-    
-    // Assume que 'appId' é definido globalmente em 'window.appConfig.appId'
+    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, getDocs, query, orderBy, ref, deleteObject } = window.firebaseServices;
     const { appId } = window.appConfig;
 
     const entity = 'home-slider';
     const form = document.getElementById(`form-${entity}`);
     const listContainer = document.getElementById(`${entity}-lista`);
-
-    // --- Funções Globais ---
-    window.pendingFiles = window.pendingFiles || new Map();
-    if (!window.uploadFile) {
-        window.uploadFile = function(file, path, onProgress) {
-            // ✅ CORREÇÃO 2: As funções do Storage vêm do 'window.firebaseServices' principal, não de um 'storageModule'.
-            return new Promise((resolve, reject) => {
-                if (!file) return reject(new Error("Nenhum ficheiro fornecido."));
-                
-                const fileName = `${new Date().getTime()}-${file.name}`;
-                // 'storage' e 'ref' já foram desestruturados no início do script.
-                const storageRef = ref(storage, `${path}${fileName}`);
-                const uploadTask = uploadBytesResumable(storageRef, file);
-
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes);
-                        if (typeof onProgress === 'function') onProgress(progress);
-                    }, 
-                    (error) => reject(error),
-                    async () => {
-                        // 'getDownloadURL' também já foi desestruturado.
-                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                        resolve(downloadURL);
-                    }
-                );
-            });
-        };
-    }
 
     // --- State para Links ---
     const linkableData = { noticia: [], acervo: [] };
@@ -184,7 +150,34 @@
         }
     };
     
-    // ... (O resto do seu código continua aqui, ele já parecia correto) ...
+    // ✅ NOVO: Função para eliminar um slide
+    const performDeleteDoc = async (id) => {
+        if (!await window.showConfirmModal()) return;
+
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.mediaUrl) {
+                    // Tenta apagar o ficheiro do Storage. Continua mesmo que falhe.
+                    const fileRef = ref(storage, data.mediaUrl);
+                    await deleteObject(fileRef).catch(err => console.warn("Não foi possível apagar o ficheiro do Storage:", err));
+                }
+            }
+
+            // Apaga o documento do Firestore
+            await deleteDoc(docRef);
+
+            if (window.showNotification) window.showNotification("Slide eliminado com sucesso!");
+            clearForm(); // Limpa o formulário caso o item eliminado estivesse a ser editado
+
+        } catch (error) {
+            console.error(`Erro ao eliminar ${entity}:`, error);
+            if (window.showNotification) window.showNotification("Erro ao eliminar o slide.", true);
+        }
+    };
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -242,18 +235,29 @@
             const data = docSnap.data();
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+            // ✅ ATUALIZADO: Adicionado o botão de eliminar
             itemDiv.innerHTML = `
-                <p class="font-semibold text-gray-800 truncate pr-4">${data.titulo || 'Slide sem título'}</p>
-                <button class="edit-btn flex-shrink-0 px-3 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600" data-id="${docSnap.id}">Editar</button>
+                <div class="flex-grow flex items-center gap-4">
+                    <img src="${data.mediaTipo !== 'video' ? data.mediaUrl : 'https://placehold.co/100x60/e9ecef/6c757d?text=Video'}" alt="Preview" class="w-20 h-12 object-cover rounded-md bg-gray-200">
+                    <p class="font-semibold text-gray-800 truncate pr-4">${data.titulo || 'Slide sem título'}</p>
+                </div>
+                <div class="flex-shrink-0 flex gap-2">
+                    <button class="edit-btn px-3 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600" data-id="${docSnap.id}">Editar</button>
+                    <button class="delete-btn px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700" data-id="${docSnap.id}">Eliminar</button>
+                </div>
             `;
             listContainer.appendChild(itemDiv);
         });
     });
 
+    // ✅ ATUALIZADO: Adicionado listener para o botão de eliminar
     listContainer.addEventListener('click', (e) => {
-        const editButton = e.target.closest('.edit-btn');
-        if (editButton) {
-            editDoc(editButton.dataset.id);
+        const target = e.target;
+        if (target.classList.contains('edit-btn')) {
+            editDoc(target.dataset.id);
+        }
+        if (target.classList.contains('delete-btn')) {
+            performDeleteDoc(target.dataset.id);
         }
     });
     
@@ -295,20 +299,17 @@
     });
     
     if (window.setupUploadComponent) {
-      // ... seu código de setup de upload ...
+        window.setupUploadComponent(document.querySelector(`[data-upload-container="${entity}-media"]`));
     }
     
     const uploadContainer = document.querySelector(`[data-upload-container="${entity}-media"]`);
     if (uploadContainer) {
-        const dropZone = uploadContainer.querySelector('.upload-drop-zone');
         const fileInput = uploadContainer.querySelector('.upload-file-input');
-        if (dropZone && fileInput) {
-            dropZone.addEventListener('click', () => fileInput.click());
+        if (fileInput) {
             fileInput.addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
                     window.pendingFiles.set(`${entity}-media`, file);
-                    // Lógica de preview
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const previewImg = uploadContainer.querySelector('img.upload-preview');
