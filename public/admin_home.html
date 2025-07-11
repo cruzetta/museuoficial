@@ -220,34 +220,34 @@
         }
     });
 
-    // --- LISTENERS E INICIALIZAÇÃO ---
-    onSnapshot(query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem", "asc")), (snapshot) => {
-        listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhum slide registado.</p>' : '';
-        snapshot.docs.forEach(doc => {
-            const data = doc.data();
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
-            itemDiv.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <span class="font-bold text-gray-400 w-6 text-center">${data.ordem}</span>
-                    <img src="${data.mediaTipo === 'imagem' ? data.mediaUrl : 'https://placehold.co/100x56/1f2937/ffffff?text=Video'}" class="w-24 h-14 object-cover rounded-md bg-gray-200">
-                    <div>
-                        <p class="font-semibold text-sm truncate">${data.titulo || 'Slide sem título'}</p>
-                        <p class="text-xs text-gray-500">Link: ${data.linkTipo !== 'nenhum' ? `${data.linkTipo}` : 'Nenhum'}</p>
-                    </div>
-                </div>
-                <div class="flex-shrink-0 flex gap-2">
-                    <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${doc.id}">Editar</button>
-                    <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${doc.id}">Eliminar</button>
-                </div>`;
-            listContainer.appendChild(itemDiv);
-        });
-    });
+    // // --- LISTENERS E INICIALIZAÇÃO ---
+    // onSnapshot(query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem", "asc")), (snapshot) => {
+    //     listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhum slide registado.</p>' : '';
+    //     snapshot.docs.forEach(doc => {
+    //         const data = doc.data();
+    //         const itemDiv = document.createElement('div');
+    //         itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+    //         itemDiv.innerHTML = `
+    //             <div class="flex items-center gap-4">
+    //                 <span class="font-bold text-gray-400 w-6 text-center">${data.ordem}</span>
+    //                 <img src="${data.mediaTipo === 'imagem' ? data.mediaUrl : 'https://placehold.co/100x56/1f2937/ffffff?text=Video'}" class="w-24 h-14 object-cover rounded-md bg-gray-200">
+    //                 <div>
+    //                     <p class="font-semibold text-sm truncate">${data.titulo || 'Slide sem título'}</p>
+    //                     <p class="text-xs text-gray-500">Link: ${data.linkTipo !== 'nenhum' ? `${data.linkTipo}` : 'Nenhum'}</p>
+    //                 </div>
+    //             </div>
+    //             <div class="flex-shrink-0 flex gap-2">
+    //                 <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${doc.id}">Editar</button>
+    //                 <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${doc.id}">Eliminar</button>
+    //             </div>`;
+    //         listContainer.appendChild(itemDiv);
+    //     });
+    // });
 
-    listContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
-        if (e.target.classList.contains('delete-btn')) performDeleteDoc(e.target.dataset.id);
-    });
+    // listContainer.addEventListener('click', (e) => {
+    //     if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
+    //     if (e.target.classList.contains('delete-btn')) performDeleteDoc(e.target.dataset.id);
+    // });
     
     document.getElementById(`cancel-${entity}-edit`).addEventListener('click', clearForm);
     
@@ -305,6 +305,62 @@
             reader.readAsDataURL(file);
         }
     });
+
+    // Adiciona evento para abrir o seletor de arquivos ao clicar na área de upload
+    const uploadContainer = document.querySelector(`[data-upload-container="${entity}-media"]`);
+    if (uploadContainer) {
+        const dropZone = uploadContainer.querySelector('.upload-drop-zone');
+        const fileInput = uploadContainer.querySelector('.upload-file-input');
+        if (dropZone && fileInput) {
+            dropZone.addEventListener('click', () => fileInput.click());
+            // Adiciona evento para processar o arquivo selecionado
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    window.pendingFiles.set(`${entity}-media`, file);
+                    window.setupUploadComponent(uploadContainer, {
+                        onFileSelect: (file, container) => {
+                            const previewImg = container.querySelector('.upload-preview[data-media-type="imagem"]');
+                            const previewVideo = container.querySelector('.upload-preview[data-media-type="video"]');
+                            previewImg.style.display = 'none';
+                            previewVideo.style.display = 'none';
+                            
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                if (file.type.startsWith('video/')) {
+                                    previewVideo.src = e.target.result;
+                                    previewVideo.style.display = 'block';
+                                } else {
+                                    previewImg.src = e.target.result;
+                                    previewImg.style.display = 'block';
+                                }
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                    // Chama o onFileSelect manualmente para atualizar o preview
+                    const previewImg = uploadContainer.querySelector('.upload-preview[data-media-type="imagem"]');
+                    const previewVideo = uploadContainer.querySelector('.upload-preview[data-media-type="video"]');
+                    previewImg.style.display = 'none';
+                    previewVideo.style.display = 'none';
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        if (file.type.startsWith('video/')) {
+                            previewVideo.src = e.target.result;
+                            previewVideo.style.display = 'block';
+                        } else {
+                            previewImg.src = e.target.result;
+                            previewImg.style.display = 'block';
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                    uploadContainer.querySelector('.upload-preview-wrapper').classList.remove('hidden');
+                    uploadContainer.querySelector('.upload-drop-zone').classList.add('hidden');
+                }
+            });
+        }
+    }
+
     fetchLinkableData();
 }
 </script>
