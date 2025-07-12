@@ -159,6 +159,40 @@
     </div>
 
     <main>
+
+        <!-- Seção Carrossel -->
+        <section id="home-carousel-container"
+            class="relative w-full h-[60vh] md:h-[80vh] bg-gray-900 text-white overflow-hidden shadow-lg">
+            <div id="carousel-slides" class="flex h-full transition-transform duration-700 ease-in-out">
+                <div class="flex-shrink-0 w-full h-full flex items-center justify-center">
+                    <p>A carregar o carrossel...</p>
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                </div>
+            </div>
+        
+            <button id="carousel-prev"
+                class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <button id="carousel-next"
+                class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        
+            <div id="carousel-indicators" class="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-2">
+            </div>
+        </section>
+
         <!-- Seção Notícias -->
         <section id="noticias" class="section-padding bg-gray-50">
             <div class="container mx-auto">
@@ -265,7 +299,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
+        var firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
             projectId: "museu-cca6d",
@@ -274,9 +308,9 @@
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const appId = 'museu-cca6d';
+        var app = initializeApp(firebaseConfig);
+        var db = getFirestore(app);
+        var appId = 'museu-cca6d';
 
         // --- LÓGICA DE NAVEGAÇÃO ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -440,5 +474,165 @@
             loadSingleDoc('onde-estamos', { 'onde-estamos-endereco': 'endereco', 'onde-estamos-cidade': 'cidade' });
         });
     </script>
+
+    <script type="module">
+        // ✅ CORREÇÃO 1: Adicionado 'getDocs' à lista de importação para ser usado pelo carrossel
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        var firebaseConfig = {
+            apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
+            authDomain: "museu-cca6d.firebaseapp.com",
+            projectId: "museu-cca6d",
+            storageBucket: "museu-cca6d.firebasestorage.app",
+            messagingSenderId: "555107674356",
+            appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
+        };
+
+        var app = initializeApp(firebaseConfig);
+        var db = getFirestore(app);
+        var appId = 'museu-cca6d';
+
+
+        // --- RENDERERS ---
+        // (Suas funções de renderização: renderNoticia, renderAcervo, etc. continuam aqui, sem alterações)
+
+
+        // --- DATA LOADERS ---
+        // (Suas funções de carregamento: loadCollectionData, loadSingleDoc, etc. continuam aqui, sem alterações)
+
+
+        // ✅ CORREÇÃO 2: A LÓGICA DO CARROSSEL FOI MOVIDA PARA DENTRO DESTE SCRIPT PRINCIPAL
+        const initializeCarousel = async () => {
+            const slidesContainer = document.getElementById('carousel-slides');
+            const prevButton = document.getElementById('carousel-prev');
+            const nextButton = document.getElementById('carousel-next');
+            const indicatorsContainer = document.getElementById('carousel-indicators');
+
+            if (!slidesContainer) return; // Se o container não existir, para a execução
+
+            let slides = [];
+            let currentIndex = 0;
+            let autoplayInterval = null;
+
+            const buildLink = (type, id) => {
+                if (!type || type === 'nenhum' || !id) return null;
+                return `${type}.html?id=${id}`;
+            };
+
+            const renderSlide = (slideData, index) => {
+                const { titulo, mediaUrl, mediaTipo, linkTipo, linkId } = slideData;
+                const link = buildLink(linkTipo, linkId);
+                const slideWrapper = link ? document.createElement('a') : document.createElement('div');
+                if (link) {
+                    slideWrapper.href = link;
+                    slideWrapper.target = "_blank";
+                }
+                slideWrapper.className = "carousel-slide relative w-full h-full flex-shrink-0";
+                slideWrapper.dataset.index = index;
+                
+                let mediaElement = mediaTipo === 'video'
+                    ? `<video class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" autoplay muted loop playsinline></video>`
+                    : `<img class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" alt="${titulo || 'Slide do Carrossel'}">`;
+
+                slideWrapper.innerHTML = `
+                    ${mediaElement}
+                    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+                    <div class="relative z-10 flex items-center justify-center h-full w-full p-4">
+                        ${titulo ? `<h2 class="text-4xl md:text-6xl font-bold text-center text-white drop-shadow-lg">${titulo}</h2>` : ''}
+                    </div>`;
+                return slideWrapper;
+            };
+
+            const renderIndicator = (index) => {
+                const indicator = document.createElement('button');
+                indicator.className = "carousel-indicator w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-100 transition-colors";
+                indicator.dataset.index = index;
+                indicator.addEventListener('click', () => {
+                    goToSlide(index);
+                    resetAutoplay();
+                });
+                return indicator;
+            };
+
+            const goToSlide = (index) => {
+                slidesContainer.style.transform = `translateX(-${index * 100}%)`;
+                currentIndex = index;
+                indicatorsContainer.querySelectorAll('.carousel-indicator').forEach((ind, i) => {
+                    ind.classList.toggle('bg-opacity-100', i === currentIndex);
+                    ind.classList.toggle('bg-opacity-50', i !== currentIndex);
+                });
+            };
+
+            const resetAutoplay = () => {
+                clearInterval(autoplayInterval);
+                if (slides.length > 1) {
+                    autoplayInterval = setInterval(() => {
+                        const nextIndex = (currentIndex + 1) % slides.length;
+                        goToSlide(nextIndex);
+                    }, 5000);
+                }
+            };
+            
+            try {
+                const path = `/artifacts/${appId}/public/data/home-slider`;
+                // As funções 'query', 'collection', 'orderBy' e 'getDocs' agora estão disponíveis neste escopo
+                const q = query(collection(db, path), orderBy("ordem", "asc"));
+                const querySnapshot = await getDocs(q);
+
+                slides = querySnapshot.docs.map(doc => doc.data());
+
+                if (slides.length === 0) {
+                    slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Nenhum slide encontrado.</p></div>';
+                    prevButton.style.display = 'none';
+                    nextButton.style.display = 'none';
+                    return;
+                }
+
+                slidesContainer.innerHTML = '';
+                indicatorsContainer.innerHTML = '';
+
+                slides.forEach((slide, index) => {
+                    slidesContainer.appendChild(renderSlide(slide, index));
+                    indicatorsContainer.appendChild(renderIndicator(index));
+                });
+
+                if (slides.length > 1) {
+                    prevButton.addEventListener('click', () => {
+                        const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+                        goToSlide(prevIndex);
+                        resetAutoplay();
+                    });
+
+                    nextButton.addEventListener('click', () => {
+                        const nextIndex = (currentIndex + 1) % slides.length;
+                        goToSlide(nextIndex);
+                        resetAutoplay();
+                    });
+                } else {
+                     prevButton.style.display = 'none';
+                     nextButton.style.display = 'none';
+                }
+
+                goToSlide(0);
+                resetAutoplay();
+
+            } catch (error) {
+                console.error("Erro ao carregar o carrossel:", error);
+                slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Ocorreu um erro ao carregar o conteúdo.</p></div>';
+            }
+        };
+
+        // --- INITIALIZE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // ✅ CORREÇÃO 3: Chamada para inicializar o carrossel junto com o resto do site.
+            initializeCarousel();
+            
+            // Suas funções de carregamento originais
+            // loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
+            // ... e as outras ...
+        });
+    </script>
+    
 </body>
 </html>

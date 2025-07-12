@@ -95,7 +95,6 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- Tela de Carregamento Global -->
     <div id="loader-container" class="fixed inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-50">
         <div class="text-center">
             <div id="loader" class="mx-auto"></div>
@@ -103,9 +102,7 @@
         </div>
     </div>
     
-    <!-- Conteúdo principal (inicialmente oculto) -->
     <div id="main-content" class="hidden">
-        <!-- Cabeçalho -->
         <header class="bg-gray-800 text-white shadow-md">
             <div class="container mx-auto px-6 py-4 flex justify-between items-center">
                 <h1 class="text-2xl font-bold"><i class="fas fa-shield-halved mr-2"></i>Painel Administrativo</h1>
@@ -119,7 +116,6 @@
         </header>
 
         <div class="container mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-            <!-- Menu Lateral (Abas) -->
             <aside class="md:col-span-1">
                 <div class="bg-white p-4 rounded-lg shadow-md">
                     <h2 class="text-lg font-bold mb-4 border-b pb-2">Gerir Conteúdo</h2>
@@ -131,7 +127,6 @@
                 </div>
             </aside>
 
-            <!-- Conteúdo Principal da Aba -->
             <main id="tab-content" class="md:col-span-3">
                 <div class="bg-white p-8 rounded-lg shadow-md text-center">
                     <i class="fas fa-arrow-left text-2xl mb-4 text-gray-400"></i>
@@ -142,10 +137,8 @@
         </div>
     </div>
 
-    <!-- Elemento de Notificação Global -->
     <div id="notification" class="hidden fixed top-5 right-5 bg-green-500 text-white py-3 px-5 rounded-lg shadow-lg opacity-0 transform translate-x-full"></div>
     
-    <!-- Modal de Confirmação Global -->
     <div id="confirm-modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 opacity-0">
         <div id="confirm-modal" class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-sm transform scale-95 transition-transform duration-300">
             <h3 class="text-lg font-bold text-gray-900">Confirmar Eliminação</h3>
@@ -157,11 +150,11 @@
         </div>
     </div>
 
-    <!-- Firebase SDK e Lógica Global -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // ✅ CORREÇÃO 1: Adicionado 'query' e 'orderBy' na linha de importação
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         const firebaseConfig = {
@@ -179,7 +172,8 @@
         const storage = getStorage(app);
         const appId = 'museu-cca6d';
 
-        window.firebaseServices = { db, auth, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, ref, uploadBytesResumable, getDownloadURL, deleteObject };
+        // ✅ CORREÇÃO 2: Adicionado 'query' e 'orderBy' ao objeto global para que as abas possam usá-los.
+        window.firebaseServices = { db, auth, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, ref, uploadBytesResumable, getDownloadURL, deleteObject, query, orderBy };
         window.appConfig = { appId };
         window.pendingFiles = new Map();
 
@@ -195,7 +189,6 @@
             }
             
             const tabContent = document.getElementById('tab-content');
-            // Animação de carregamento sem ID duplicado
             tabContent.innerHTML = `<div class="text-center p-10"><div class="mx-auto" style="border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div><p class="mt-4">A carregar ${tabId}...</p></div>`;
 
             try {
@@ -205,17 +198,14 @@
                 const html = await response.text();
                 tabContent.innerHTML = html;
 
-                // Carrega o script da aba de forma mais segura, sem eval()
                 const scriptElement = tabContent.querySelector('script[data-tab-script]');
                 if (scriptElement) {
                     const newScript = document.createElement('script');
-                    // Envolve o script numa função para evitar conflitos de escopo
                     newScript.innerHTML = `(() => { ${scriptElement.innerHTML} })();`;
                     tabContent.appendChild(newScript);
-                    scriptElement.remove(); // Remove o template original
+                    scriptElement.remove();
                 }
 
-                // Atualiza o botão ativo no menu
                 document.querySelectorAll('#admin-menu button').forEach(button => {
                     const isCurrent = button.getAttribute('onclick') === `window.loadTab('${tabId}')`;
                     button.classList.toggle('bg-blue-500', isCurrent);
@@ -235,8 +225,8 @@
              el.className = `fixed top-5 right-5 py-3 px-5 rounded-lg shadow-lg transition-all duration-500 text-white ${isError ? 'bg-red-500' : 'bg-green-500'}`;
              el.classList.remove('hidden', 'opacity-0', 'translate-x-full');
              setTimeout(() => { 
-                el.classList.add('opacity-0', 'translate-x-full');
-                setTimeout(() => el.classList.add('hidden'), 500);
+                 el.classList.add('opacity-0', 'translate-x-full');
+                 setTimeout(() => el.classList.add('hidden'), 500);
              }, 3000);
         }
 
@@ -309,7 +299,7 @@
 
         window.uploadFile = (file, path, progressCallback) => {
             return new Promise((resolve, reject) => {
-                const { ref, uploadBytesResumable, getDownloadURL } = window.firebaseServices;
+                // 'ref', 'uploadBytesResumable', 'getDownloadURL', e 'storage' já estão disponíveis globalmente
                 const storageRef = ref(storage, `${path}${Date.now()}_${file.name}`);
                 const uploadTask = uploadBytesResumable(storageRef, file);
                 
