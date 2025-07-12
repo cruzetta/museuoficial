@@ -177,19 +177,19 @@
             </div>
         
             <button id="carousel-prev"
-                class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors">
+                class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors z-10">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
             <button id="carousel-next"
-                class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors">
+                class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors z-10">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </button>
         
-            <div id="carousel-indicators" class="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-2">
+            <div id="carousel-indicators" class="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
             </div>
         </section>
 
@@ -297,7 +297,7 @@
     <!-- Firebase e Lógica do Site -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, getDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         var firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
@@ -461,59 +461,30 @@
             });
         }
 
-        // --- INITIALIZE ---
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
-            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), limit(4)));
-            loadCollectionData('games', 'games-container', renderGame);
-            loadCollectionData('timeline', 'timeline-container', renderTimeline, query(collection(db, `/artifacts/${appId}/public/data/timeline`), orderBy("titulo")));
-            loadCollectionData('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
-            loadCollectionData('curiosidades', 'curiosidades-container', renderCuriosidade);
-            loadCollectionData('loja', 'loja-container', renderProdutoLoja);
-            loadSingleDoc('corporativo', { 'corporativo-missao': 'missao', 'corporativo-visao': 'visao' });
-            loadSingleDoc('onde-estamos', { 'onde-estamos-endereco': 'endereco', 'onde-estamos-cidade': 'cidade' });
-        });
-    </script>
-
-    <script type="module">
-        // ✅ CORREÇÃO 1: Adicionado 'getDocs' à lista de importação para ser usado pelo carrossel
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        var firebaseConfig = {
-            apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
-            authDomain: "museu-cca6d.firebaseapp.com",
-            projectId: "museu-cca6d",
-            storageBucket: "museu-cca6d.firebasestorage.app",
-            messagingSenderId: "555107674356",
-            appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
-        };
-
-        var app = initializeApp(firebaseConfig);
-        var db = getFirestore(app);
-        var appId = 'museu-cca6d';
-
-
-        // --- RENDERERS ---
-        // (Suas funções de renderização: renderNoticia, renderAcervo, etc. continuam aqui, sem alterações)
-
-
-        // --- DATA LOADERS ---
-        // (Suas funções de carregamento: loadCollectionData, loadSingleDoc, etc. continuam aqui, sem alterações)
-
-
-        // ✅ CORREÇÃO 2: A LÓGICA DO CARROSSEL FOI MOVIDA PARA DENTRO DESTE SCRIPT PRINCIPAL
+        // --- LÓGICA DO CARROSSEL (ATUALIZADA) ---
         const initializeCarousel = async () => {
             const slidesContainer = document.getElementById('carousel-slides');
             const prevButton = document.getElementById('carousel-prev');
             const nextButton = document.getElementById('carousel-next');
             const indicatorsContainer = document.getElementById('carousel-indicators');
 
-            if (!slidesContainer) return; // Se o container não existir, para a execução
+            if (!slidesContainer) return;
 
             let slides = [];
             let currentIndex = 0;
-            let autoplayInterval = null;
+            let autoplayTimer = null;
+            let slideDuration = 7000; // Duração padrão em ms
+
+            // 1. Buscar a configuração de duração
+            try {
+                const configDocRef = doc(db, `/artifacts/${appId}/public/data/configuracoes/carrossel`);
+                const configSnap = await getDoc(configDocRef);
+                if (configSnap.exists() && configSnap.data().duracaoSegundos > 0) {
+                    slideDuration = configSnap.data().duracaoSegundos * 1000;
+                }
+            } catch (error) {
+                console.warn("Não foi possível carregar configuração do carrossel, usando valor padrão.", error);
+            }
 
             const buildLink = (type, id) => {
                 if (!type || type === 'nenhum' || !id) return null;
@@ -531,8 +502,9 @@
                 slideWrapper.className = "carousel-slide relative w-full h-full flex-shrink-0";
                 slideWrapper.dataset.index = index;
                 
+                // ✅ CORREÇÃO: Removido o atributo 'loop' do vídeo
                 let mediaElement = mediaTipo === 'video'
-                    ? `<video class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" autoplay muted loop playsinline></video>`
+                    ? `<video id="video-${index}" class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" muted playsinline></video>`
                     : `<img class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" alt="${titulo || 'Slide do Carrossel'}">`;
 
                 slideWrapper.innerHTML = `
@@ -550,33 +522,54 @@
                 indicator.dataset.index = index;
                 indicator.addEventListener('click', () => {
                     goToSlide(index);
-                    resetAutoplay();
                 });
                 return indicator;
             };
 
-            const goToSlide = (index) => {
+            const goToSlide = (index, playVideo = true) => {
+                if (index < 0 || index >= slides.length) return;
+                
                 slidesContainer.style.transform = `translateX(-${index * 100}%)`;
                 currentIndex = index;
+                
                 indicatorsContainer.querySelectorAll('.carousel-indicator').forEach((ind, i) => {
                     ind.classList.toggle('bg-opacity-100', i === currentIndex);
                     ind.classList.toggle('bg-opacity-50', i !== currentIndex);
                 });
+
+                const videoElement = document.getElementById(`video-${currentIndex}`);
+                if (videoElement && playVideo) {
+                    videoElement.currentTime = 0;
+                    videoElement.play().catch(e => console.warn("O browser impediu a reprodução automática do vídeo."));
+                }
+                
+                resetAutoplay();
+            };
+            
+            const advanceAndReset = () => {
+                const nextIndex = (currentIndex + 1) % slides.length;
+                goToSlide(nextIndex);
             };
 
             const resetAutoplay = () => {
-                clearInterval(autoplayInterval);
-                if (slides.length > 1) {
-                    autoplayInterval = setInterval(() => {
-                        const nextIndex = (currentIndex + 1) % slides.length;
-                        goToSlide(nextIndex);
-                    }, 5000);
+                clearTimeout(autoplayTimer);
+                const currentSlideData = slides[currentIndex];
+
+                if (slides.length <= 1) return;
+
+                if (currentSlideData.mediaTipo === 'video') {
+                    const videoElement = document.getElementById(`video-${currentIndex}`);
+                    if (videoElement) {
+                        videoElement.removeEventListener('ended', advanceAndReset);
+                        videoElement.addEventListener('ended', advanceAndReset, { once: true });
+                    }
+                } else {
+                    autoplayTimer = setTimeout(advanceAndReset, slideDuration);
                 }
             };
             
             try {
                 const path = `/artifacts/${appId}/public/data/home-slider`;
-                // As funções 'query', 'collection', 'orderBy' e 'getDocs' agora estão disponíveis neste escopo
                 const q = query(collection(db, path), orderBy("ordem", "asc"));
                 const querySnapshot = await getDocs(q);
 
@@ -601,13 +594,11 @@
                     prevButton.addEventListener('click', () => {
                         const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
                         goToSlide(prevIndex);
-                        resetAutoplay();
                     });
 
                     nextButton.addEventListener('click', () => {
                         const nextIndex = (currentIndex + 1) % slides.length;
                         goToSlide(nextIndex);
-                        resetAutoplay();
                     });
                 } else {
                      prevButton.style.display = 'none';
@@ -615,7 +606,6 @@
                 }
 
                 goToSlide(0);
-                resetAutoplay();
 
             } catch (error) {
                 console.error("Erro ao carregar o carrossel:", error);
@@ -625,12 +615,16 @@
 
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
-            // ✅ CORREÇÃO 3: Chamada para inicializar o carrossel junto com o resto do site.
             initializeCarousel();
-            
-            // Suas funções de carregamento originais
-            // loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
-            // ... e as outras ...
+            loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
+            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), limit(4)));
+            loadCollectionData('games', 'games-container', renderGame);
+            loadCollectionData('timeline', 'timeline-container', renderTimeline, query(collection(db, `/artifacts/${appId}/public/data/timeline`), orderBy("titulo")));
+            loadCollectionData('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
+            loadCollectionData('curiosidades', 'curiosidades-container', renderCuriosidade);
+            loadCollectionData('loja', 'loja-container', renderProdutoLoja);
+            loadSingleDoc('corporativo', { 'corporativo-missao': 'missao', 'corporativo-visao': 'visao' });
+            loadSingleDoc('onde-estamos', { 'onde-estamos-endereco': 'endereco', 'onde-estamos-cidade': 'cidade' });
         });
     </script>
     

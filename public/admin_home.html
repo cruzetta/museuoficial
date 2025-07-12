@@ -1,7 +1,24 @@
 <!-- Conteúdo da Aba Home (Gestor de Carrossel) -->
 <div id="home-slider-manager" class="space-y-8">
+
+    <!-- NOVO: Seção de Configurações -->
     <div class="form-section bg-white p-8 rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold mb-6">Gerir Carrossel da Página Inicial</h2>
+        <h2 class="text-2xl font-bold mb-6">Configurações Gerais do Carrossel</h2>
+        <form id="form-home-config" class="space-y-4">
+            <div class="max-w-sm">
+                <label for="home-config-duracao" class="block text-sm font-medium text-gray-700">Duração Padrão do Slide (segundos)</label>
+                <input type="number" id="home-config-duracao" min="1" placeholder="Ex: 7" class="mt-1">
+                <p class="text-xs text-gray-500 mt-1">Define quanto tempo cada slide de IMAGEM fica visível. Vídeos tocarão até o fim automaticamente.</p>
+            </div>
+            <div class="flex gap-4 pt-2">
+                <button type="submit">Guardar Configuração</button>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="form-section bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6">Gerir Slides do Carrossel</h2>
         <form id="form-home-slider" class="space-y-6">
             <input type="hidden" id="home-slider-id">
             
@@ -82,12 +99,17 @@
 <!-- Script Específico da Aba Home Slider -->
 <script data-tab-script="home-slider">
 {
-    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, getDocs, query, orderBy, ref, deleteObject } = window.firebaseServices;
+    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, getDocs, query, orderBy, ref, deleteObject } = window.firebaseServices;
     const { appId } = window.appConfig;
 
     const entity = 'home-slider';
     const form = document.getElementById(`form-${entity}`);
     const listContainer = document.getElementById(`${entity}-lista`);
+    
+    // NOVO: Elementos do formulário de configuração
+    const configForm = document.getElementById('form-home-config');
+    const duracaoInput = document.getElementById('home-config-duracao');
+    const configDocRef = doc(db, `/artifacts/${appId}/public/data/configuracoes/carrossel`);
 
     // --- State para Links ---
     const linkableData = { noticia: [], acervo: [] };
@@ -150,7 +172,6 @@
         }
     };
     
-    // ✅ NOVO: Função para eliminar um slide
     const performDeleteDoc = async (id) => {
         if (!await window.showConfirmModal()) return;
 
@@ -161,17 +182,15 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 if (data.mediaUrl) {
-                    // Tenta apagar o ficheiro do Storage. Continua mesmo que falhe.
                     const fileRef = ref(storage, data.mediaUrl);
                     await deleteObject(fileRef).catch(err => console.warn("Não foi possível apagar o ficheiro do Storage:", err));
                 }
             }
 
-            // Apaga o documento do Firestore
             await deleteDoc(docRef);
 
             if (window.showNotification) window.showNotification("Slide eliminado com sucesso!");
-            clearForm(); // Limpa o formulário caso o item eliminado estivesse a ser editado
+            clearForm();
 
         } catch (error) {
             console.error(`Erro ao eliminar ${entity}:`, error);
@@ -235,7 +254,6 @@
             const data = docSnap.data();
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
-            // ✅ ATUALIZADO: Adicionado o botão de eliminar
             itemDiv.innerHTML = `
                 <div class="flex-grow flex items-center gap-4">
                     <img src="${data.mediaTipo !== 'video' ? data.mediaUrl : 'https://placehold.co/100x60/e9ecef/6c757d?text=Video'}" alt="Preview" class="w-20 h-12 object-cover rounded-md bg-gray-200">
@@ -250,7 +268,6 @@
         });
     });
 
-    // ✅ ATUALIZADO: Adicionado listener para o botão de eliminar
     listContainer.addEventListener('click', (e) => {
         const target = e.target;
         if (target.classList.contains('edit-btn')) {
@@ -332,7 +349,43 @@
             });
         }
     }
+    
+    // --- LÓGICA DE CONFIGURAÇÃO ---
+    const loadConfig = async () => {
+        try {
+            const docSnap = await getDoc(configDocRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                duracaoInput.value = data.duracaoSegundos || 7;
+            } else {
+                duracaoInput.value = 7; // Valor padrão
+            }
+        } catch (error) {
+            console.error("Erro ao carregar configuração:", error);
+            if(window.showNotification) window.showNotification('Erro ao carregar configurações.', true);
+        }
+    };
 
+    configForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const duracao = Number(duracaoInput.value);
+        if (duracao > 0) {
+            try {
+                // Usamos setDoc com merge: true para criar o documento se não existir, ou atualizar se existir.
+                await setDoc(configDocRef, { duracaoSegundos: duracao }, { merge: true });
+                if(window.showNotification) window.showNotification('Configuração guardada com sucesso!');
+            } catch (error) {
+                console.error("Erro ao guardar configuração:", error);
+                if(window.showNotification) window.showNotification('Erro ao guardar a configuração.', true);
+            }
+        } else {
+            if(window.showNotification) window.showNotification('Por favor, insira um número válido maior que zero.', true);
+        }
+    });
+
+
+    // --- INICIALIZAÇÃO GERAL ---
     fetchLinkableData();
+    loadConfig();
 }
 </script>
