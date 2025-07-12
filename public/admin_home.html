@@ -1,7 +1,7 @@
 <!-- Conteúdo da Aba Home (Gestor de Carrossel) -->
 <div id="home-slider-manager" class="space-y-8">
 
-    <!-- NOVO: Seção de Configurações -->
+    <!-- Seção de Configurações -->
     <div class="form-section bg-white p-8 rounded-lg shadow-md">
         <h2 class="text-2xl font-bold mb-6">Configurações Gerais do Carrossel</h2>
         <form id="form-home-config" class="space-y-4">
@@ -23,33 +23,67 @@
             <input type="hidden" id="home-slider-id">
             
             <fieldset class="border p-4 rounded-md">
-                <legend class="text-lg font-semibold px-2">Conteúdo do Slide</legend>
+                <legend class="text-lg font-semibold px-2">Mídia e Pré-visualização</legend>
+                
+                <div data-upload-container="home-slider-media" class="pt-2">
+                    <input type="hidden" id="home-slider-media-url">
+                    <input type="hidden" id="home-slider-media-tipo">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mídia de Fundo (Imagem ou Vídeo)</label>
+                    
+                    <div id="interactive-preview-wrapper" class="upload-preview-wrapper hidden mb-4">
+                        <div id="positioning-container" class="upload-preview-container relative rounded-lg overflow-hidden bg-gray-900 group">
+                            <img src="#" alt="Preview da imagem" class="upload-preview" data-media-type="imagem">
+                            <video src="#" alt="Preview do vídeo" class="upload-preview" data-media-type="video" controls muted></video>
+                            <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 transition-all"></div>
+                            <div id="draggable-title-preview" class="absolute text-white font-bold p-2 cursor-move select-none text-center" style="left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 36px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); white-space: nowrap;">
+                                Título de Exemplo
+                            </div>
+                        </div>
+                        <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover mídia</button>
+                    </div>
+
+                    <div class="upload-drop-zone">
+                        <input type="file" class="upload-file-input hidden" accept="image/*,video/*">
+                        <div class="text-gray-500">
+                            <i class="fas fa-photo-video text-3xl mb-2"></i>
+                            <p><strong>Arraste e solte</strong> ou <strong>clique para selecionar</strong></p>
+                            <p class="text-xs mt-1">Imagens (JPG, PNG, WEBP) ou Vídeos (MP4)</p>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="border p-4 rounded-md">
+                <legend class="text-lg font-semibold px-2">Conteúdo e Estilo do Título</legend>
                 <div class="space-y-4 pt-2">
                     <div>
-                        <label for="home-slider-titulo" class="block text-sm font-medium text-gray-700">Título (Opcional)</label>
-                        <input type="text" id="home-slider-titulo" placeholder="Ex: A Era de Ouro dos Arcades">
+                        <label for="home-slider-titulo" class="block text-sm font-medium text-gray-700">Texto do Título</label>
+                        <textarea id="home-slider-titulo" placeholder="Ex: A Era de Ouro dos Arcades" rows="2" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                         <p class="text-xs text-gray-500 mt-1">Use a tecla Enter para criar quebras de linha manuais.</p>
                     </div>
-                    
-                    <div data-upload-container="home-slider-media">
-                        <input type="hidden" id="home-slider-media-url">
-                        <input type="hidden" id="home-slider-media-tipo">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Mídia de Fundo (Imagem ou Vídeo)</label>
-                        <div class="upload-preview-wrapper hidden mb-4">
-                            <div class="upload-preview-container rounded-lg overflow-hidden bg-gray-900">
-                                <img src="#" alt="Preview da imagem" class="upload-preview rounded-lg" data-media-type="imagem">
-                                <video src="#" alt="Preview do vídeo" class="upload-preview rounded-lg" data-media-type="video" controls muted></video>
-                            </div>
-                            <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover mídia</button>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="titulo-font-family" class="block text-sm font-medium text-gray-700">Fonte</label>
+                            <select id="titulo-font-family" class="mt-1">
+                                <option value="Inter, sans-serif">Inter (Padrão)</option>
+                                <option value="'Lora', serif">Lora (Serifado)</option>
+                                <option value="'Press Start 2P', cursive">Press Start 2P (Pixel)</option>
+                                <option value="'Bungee', cursive">Bungee (Impacto)</option>
+                                <option value="'Orbitron', sans-serif">Orbitron (Futurista)</option>
+                            </select>
                         </div>
-                        <div class="upload-drop-zone">
-                            <input type="file" class="upload-file-input hidden" accept="image/*,video/*">
-                            <div class="text-gray-500">
-                                <i class="fas fa-photo-video text-3xl mb-2"></i>
-                                <p><strong>Arraste e solte</strong> ou <strong>clique para selecionar</strong></p>
-                                <p class="text-xs mt-1">Imagens (JPG, PNG, WEBP) ou Vídeos (MP4)</p>
-                            </div>
+                        <div>
+                            <label for="titulo-font-size" class="block text-sm font-medium text-gray-700">Tamanho (px)</label>
+                            <input type="number" id="titulo-font-size" value="36" class="mt-1">
+                        </div>
+                         <div>
+                            <label for="titulo-color" class="block text-sm font-medium text-gray-700">Cor</label>
+                            <input type="color" id="titulo-color" value="#FFFFFF" class="mt-1 h-10">
                         </div>
                     </div>
+                    <input type="hidden" id="titulo-pos-x" value="50">
+                    <input type="hidden" id="titulo-pos-y" value="50">
                 </div>
             </fieldset>
 
@@ -94,9 +128,12 @@
              <p class="text-sm text-gray-500">A carregar slides...</p>
         </div>
     </div>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@700&family=Lora:wght@700&family=Orbitron:wght@700&family=Press+Start+2P&display=swap" rel="stylesheet">
 </div>
 
-<!-- Script Específico da Aba Home Slider -->
 <script data-tab-script="home-slider">
 {
     const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, getDocs, query, orderBy, ref, deleteObject } = window.firebaseServices;
@@ -106,15 +143,93 @@
     const form = document.getElementById(`form-${entity}`);
     const listContainer = document.getElementById(`${entity}-lista`);
     
-    // NOVO: Elementos do formulário de configuração
     const configForm = document.getElementById('form-home-config');
     const duracaoInput = document.getElementById('home-config-duracao');
     const configDocRef = doc(db, `/artifacts/${appId}/public/data/configuracoes/carrossel`);
 
-    // --- State para Links ---
     const linkableData = { noticia: [], acervo: [] };
+    
+    const tituloInput = document.getElementById('home-slider-titulo');
+    const fontFamilySelect = document.getElementById('titulo-font-family');
+    const fontSizeInput = document.getElementById('titulo-font-size');
+    const colorInput = document.getElementById('titulo-color');
+    const posXInput = document.getElementById('titulo-pos-x');
+    const posYInput = document.getElementById('titulo-pos-y');
+    const draggableTitle = document.getElementById('draggable-title-preview');
+    const positioningContainer = document.getElementById('positioning-container');
 
-    // --- Funções do Formulário (CRUD) ---
+    const updateTitlePreview = () => {
+        const titleText = tituloInput.value || "Título de Exemplo";
+        draggableTitle.innerHTML = titleText.replace(/\n/g, '<br>');
+        draggableTitle.style.fontFamily = fontFamilySelect.value;
+        draggableTitle.style.fontSize = `${fontSizeInput.value || 36}px`;
+        draggableTitle.style.color = colorInput.value;
+    };
+
+    tituloInput.addEventListener('input', updateTitlePreview);
+    fontFamilySelect.addEventListener('change', updateTitlePreview);
+    fontSizeInput.addEventListener('input', updateTitlePreview);
+    colorInput.addEventListener('input', updateTitlePreview);
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    const onDragStart = (e) => {
+        isDragging = true;
+        draggableTitle.style.transition = 'none';
+        
+        const rect = draggableTitle.getBoundingClientRect();
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        offsetX = clientX - rect.left;
+        offsetY = clientY - rect.top;
+
+        document.addEventListener('mousemove', onDragMove);
+        document.addEventListener('mouseup', onDragEnd);
+        document.addEventListener('touchmove', onDragMove, { passive: false });
+        document.addEventListener('touchend', onDragEnd);
+        e.preventDefault();
+    };
+
+    const onDragMove = (e) => {
+        if (!isDragging) return;
+        
+        const containerRect = positioningContainer.getBoundingClientRect();
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+
+        let newX = clientX - containerRect.left - offsetX;
+        let newY = clientY - containerRect.top - offsetY;
+        
+        // ✅ CORREÇÃO: Limites de movimento removidos para permitir posicionamento livre.
+        // O texto agora pode ser arrastado para fora das bordas do container.
+        // newX = Math.max(0, Math.min(newX, containerRect.width - draggableTitle.offsetWidth));
+        // newY = Math.max(0, Math.min(newY, containerRect.height - draggableTitle.offsetHeight));
+
+        const xPercent = (newX + draggableTitle.offsetWidth / 2) / containerRect.width * 100;
+        const yPercent = (newY + draggableTitle.offsetHeight / 2) / containerRect.height * 100;
+
+        draggableTitle.style.left = `${xPercent}%`;
+        draggableTitle.style.top = `${yPercent}%`;
+        
+        posXInput.value = xPercent.toFixed(2);
+        posYInput.value = yPercent.toFixed(2);
+
+        e.preventDefault();
+    };
+
+    const onDragEnd = () => {
+        isDragging = false;
+        draggableTitle.style.transition = '';
+        document.removeEventListener('mousemove', onDragMove);
+        document.removeEventListener('mouseup', onDragEnd);
+        document.removeEventListener('touchmove', onDragMove);
+        document.removeEventListener('touchend', onDragEnd);
+    };
+
+    draggableTitle.addEventListener('mousedown', onDragStart);
+    draggableTitle.addEventListener('touchstart', onDragStart, { passive: false });
+
     const clearForm = () => {
         form.reset();
         document.getElementById(`${entity}-id`).value = '';
@@ -122,6 +237,15 @@
         linkIdSelect.innerHTML = '<option value="">Primeiro selecione o tipo de link</option>';
         linkIdSelect.disabled = true;
         if (window.resetUploadUI) window.resetUploadUI(`${entity}-media`);
+        
+        posXInput.value = "50";
+        posYInput.value = "50";
+        fontSizeInput.value = "36";
+        fontFamilySelect.value = "Inter, sans-serif";
+        colorInput.value = "#FFFFFF";
+        draggableTitle.style.left = '50%';
+        draggableTitle.style.top = '50%';
+        updateTitlePreview();
     };
 
     const editDoc = async (id) => {
@@ -132,9 +256,23 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 document.getElementById(`${entity}-id`).value = docSnap.id;
-                document.getElementById(`${entity}-titulo`).value = data.titulo || '';
+                tituloInput.value = data.titulo || '';
                 document.getElementById(`${entity}-ordem`).value = data.ordem || 0;
                 
+                if (data.tituloEstilo) {
+                    fontFamilySelect.value = data.tituloEstilo.fontFamily || "Inter, sans-serif";
+                    fontSizeInput.value = data.tituloEstilo.fontSize || 36;
+                    colorInput.value = data.tituloEstilo.color || "#FFFFFF";
+                }
+                
+                if (data.tituloPosicao) {
+                    posXInput.value = data.tituloPosicao.x || 50;
+                    posYInput.value = data.tituloPosicao.y || 50;
+                    draggableTitle.style.left = `${data.tituloPosicao.x || 50}%`;
+                    draggableTitle.style.top = `${data.tituloPosicao.y || 50}%`;
+                }
+                updateTitlePreview();
+
                 const linkTipoSelect = document.getElementById(`${entity}-linkTipo`);
                 linkTipoSelect.value = data.linkTipo || 'nenhum';
                 linkTipoSelect.dispatchEvent(new Event('change'));
@@ -159,7 +297,7 @@
                         previewImg.style.display = 'block';
                     }
 
-                    container.querySelector('.upload-preview-wrapper').classList.remove('hidden');
+                    document.getElementById('interactive-preview-wrapper').classList.remove('hidden');
                     container.querySelector('.upload-drop-zone').classList.add('hidden');
                     document.getElementById(`${entity}-media-url`).value = data.mediaUrl;
                     document.getElementById(`${entity}-media-tipo`).value = data.mediaTipo;
@@ -206,12 +344,21 @@
         submitButton.disabled = true;
 
         const data = {
-            titulo: document.getElementById(`${entity}-titulo`).value.trim(),
+            titulo: tituloInput.value,
             linkTipo: document.getElementById(`${entity}-linkTipo`).value,
             linkId: document.getElementById(`${entity}-linkId`).value,
             ordem: Number(document.getElementById(`${entity}-ordem`).value) || 0,
             mediaUrl: document.getElementById(`${entity}-media-url`).value,
             mediaTipo: document.getElementById(`${entity}-media-tipo`).value,
+            tituloEstilo: {
+                fontFamily: fontFamilySelect.value,
+                fontSize: fontSizeInput.value,
+                color: colorInput.value
+            },
+            tituloPosicao: {
+                x: posXInput.value,
+                y: posYInput.value
+            }
         };
 
         try {
@@ -246,7 +393,6 @@
         }
     });
 
-    // --- LISTENERS E INICIALIZAÇÃO ---
     const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem", "asc"));
     onSnapshot(q, (snapshot) => {
         listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhum slide registado.</p>' : '';
@@ -343,14 +489,13 @@
                         }
                     };
                     reader.readAsDataURL(file);
-                    uploadContainer.querySelector('.upload-preview-wrapper').classList.remove('hidden');
+                    document.getElementById('interactive-preview-wrapper').classList.remove('hidden');
                     uploadContainer.querySelector('.upload-drop-zone').classList.add('hidden');
                 }
             });
         }
     }
     
-    // --- LÓGICA DE CONFIGURAÇÃO ---
     const loadConfig = async () => {
         try {
             const docSnap = await getDoc(configDocRef);
@@ -358,7 +503,7 @@
                 const data = docSnap.data();
                 duracaoInput.value = data.duracaoSegundos || 7;
             } else {
-                duracaoInput.value = 7; // Valor padrão
+                duracaoInput.value = 7;
             }
         } catch (error) {
             console.error("Erro ao carregar configuração:", error);
@@ -371,7 +516,6 @@
         const duracao = Number(duracaoInput.value);
         if (duracao > 0) {
             try {
-                // Usamos setDoc com merge: true para criar o documento se não existir, ou atualizar se existir.
                 await setDoc(configDocRef, { duracaoSegundos: duracao }, { merge: true });
                 if(window.showNotification) window.showNotification('Configuração guardada com sucesso!');
             } catch (error) {
@@ -383,9 +527,8 @@
         }
     });
 
-
-    // --- INICIALIZAÇÃO GERAL ---
     fetchLinkableData();
     loadConfig();
+    updateTitlePreview();
 }
 </script>
