@@ -38,79 +38,76 @@
         .placeholder-card { text-align: center; color: #6c757d; padding: 2rem; border: 2px dashed #e9ecef; border-radius: 0.5rem; background-color: #f8f9fa; }
         
         /* Estilos do Carrossel Arrastável */
-        #media-display-container {
-            overflow: hidden;
-            cursor: grab;
-        }
-        #media-display-container.dragging {
-            cursor: grabbing;
-        }
-        #media-track {
-            display: flex;
-        }
-        .media-slide {
+        #media-display-container { overflow: hidden; cursor: grab; }
+        #media-display-container.dragging { cursor: grabbing; }
+        #media-track { display: flex; }
+        .media-slide { width: 100%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .media-slide img { pointer-events: none; }
+        .media-slide img, .media-slide video { width: 100%; height: auto; max-height: 75vh; object-fit: contain; display: block; margin: 0 auto; user-select: none; }
+        .control-btn { background-color: #e9ecef; color: var(--text-dark); border: 1px solid #ced4da; border-radius: 50%; width: 3rem; height: 3rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .control-btn:hover:not(:disabled) { background-color: var(--primary-color); color: white; border-color: var(--primary-hover); }
+        .control-btn:disabled { background-color: #f8f9fa; color: #adb5bd; cursor: not-allowed; border-color: #dee2e6; }
+        #media-counter { min-width: 50px; text-align: center; }
+
+        /* ESTILOS PARA A BARRA DE PESQUISA */
+        .form-input {
             width: 100%;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .media-slide img {
-            pointer-events: none; /* Impede que a imagem capture eventos do rato */
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
         }
-        .media-slide img, .media-slide video {
-            width: 100%;
-            height: auto;
-            max-height: 75vh;
-            object-fit: contain;
-            display: block;
-            margin: 0 auto;
-            user-select: none; /* Impede a seleção do conteúdo ao arrastar */
+        #autocomplete-results {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
         }
-        .control-btn {
-            background-color: #e9ecef;
-            color: var(--text-dark);
-            border: 1px solid #ced4da;
-            border-radius: 50%;
-            width: 3rem;
-            height: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .autocomplete-item {
+            padding: 0.75rem 1rem;
             cursor: pointer;
-            transition: all 0.2s;
+            color: var(--text-dark);
         }
-        .control-btn:hover:not(:disabled) {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-hover);
-        }
-        .control-btn:disabled {
-            background-color: #f8f9fa;
-            color: #adb5bd;
-            cursor: not-allowed;
-            border-color: #dee2e6;
-        }
-        #media-counter {
-            min-width: 50px;
-            text-align: center;
+        .autocomplete-item:hover {
+            background-color: var(--bg-light);
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <header class="sticky top-0 z-50" style="background-color: var(--dark-header); border-bottom: 1px solid #374151;">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <a href="index.html">
-                    <img src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videojogo" class="h-32 w-auto">
-                </a>
-                <a href="galeria.html" class="btn btn-secondary text-sm bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Voltar à Galeria</span>
-                </a>
+    <!-- CABEÇALHO ATUALIZADO COM BARRA DE PESQUISA -->
+    <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
+        <nav class="container mx-auto px-4 sm:px-6 h-24 flex justify-between items-center gap-4">
+            <!-- Logo do Museu -->
+            <a href="index.html" class="flex-shrink-0">
+                <img src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videojogo" class="h-32 w-auto">
+            </a>
+            
+            <!-- Container para Pesquisa -->
+            <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
+                <!-- Barra de Pesquisa -->
+                <div id="search-container" class="relative w-full max-w-lg">
+                    <!-- ✅ CORREÇÃO: Removidas as classes de cor de fundo para usar o estilo padrão .form-input -->
+                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="form-input w-full py-2 pl-10 pr-4">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 z-50 hidden"></div>
+                </div>
             </div>
-        </div>
+
+            <a href="galeria.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                <i class="fas fa-arrow-left"></i>
+                <span class="hidden lg:inline ml-2">Voltar à Galeria</span>
+            </a>
+        </nav>
     </header>
 
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16">
@@ -139,7 +136,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
@@ -154,7 +151,7 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // --- STATE MANAGEMENT ---
+        // --- STATE MANAGEMENT (PÁGINA E BUSCA) ---
         let mediaGallery = [];
         let currentIndex = 0;
         let isDragging = false;
@@ -162,6 +159,7 @@
         let currentTranslate = 0;
         let prevTranslate = 0;
         let animationID;
+        const searchState = { items: [] }; // Estado para a busca
 
         // --- DOM ELEMENTS ---
         const itemContainer = document.getElementById('item-container');
@@ -169,8 +167,10 @@
         const loader = document.getElementById('loader');
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
+        const searchInput = document.getElementById('searchInput');
+        const autocompleteResults = document.getElementById('autocomplete-results');
         
-        // --- FUNÇÕES DO CARROSSEL ---
+        // --- FUNÇÕES DO CARROSSEL (sem alterações) ---
         function setPositionByIndex() {
             const track = document.getElementById('media-track');
             if (!track) return;
@@ -194,18 +194,14 @@
             if (mediaCounter) mediaCounter.textContent = `${currentIndex + 1} / ${mediaGallery.length}`;
         }
 
-        // --- LÓGICA DE ARRASTAR (DRAG/SWIPE) ---
         function dragStart(index) {
             return function(event) {
-                // Impede o início do arraste se o alvo for um controlo de vídeo/áudio
                 if (event.target.nodeName === 'VIDEO' || event.target.nodeName === 'AUDIO' || event.target.closest('video, audio')) {
                     const mediaElement = event.target.closest('video, audio');
-                    // Permite o clique nos controlos nativos
-                    if (event.offsetY > mediaElement.offsetHeight - 40) { // Heurística para a barra de controlos
+                    if (event.offsetY > mediaElement.offsetHeight - 40) {
                          return;
                     }
                 }
-
                 isDragging = true;
                 startPos = getPositionX(event);
                 const track = document.getElementById('media-track');
@@ -259,7 +255,6 @@
             container.addEventListener('touchstart', dragStart(currentIndex), { passive: true });
             container.addEventListener('touchmove', dragMove, { passive: true });
             container.addEventListener('touchend', dragEnd);
-
             container.addEventListener('mousedown', dragStart(currentIndex));
             container.addEventListener('mousemove', dragMove);
             container.addEventListener('mouseup', dragEnd);
@@ -268,7 +263,7 @@
             });
         }
 
-        // --- FUNÇÕES AUXILIARES ---
+        // --- FUNÇÕES AUXILIARES (PÁGINA) ---
         window.sharePage = () => {
             navigator.clipboard.writeText(window.location.href).then(() => {
                 const toast = document.getElementById('notification-toast');
@@ -285,7 +280,7 @@
             errorText.textContent = message;
         };
 
-        // --- FUNÇÃO PRINCIPAL DE CARREGAMENTO ---
+        // --- FUNÇÃO PRINCIPAL DE CARREGAMENTO (PÁGINA) ---
         async function carregarItem() {
             const itemId = new URLSearchParams(window.location.search).get('id');
             if (!itemId) {
@@ -394,7 +389,61 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', carregarItem);
+        // --- LÓGICA DE BUSCA ---
+        function updateAutocomplete(query) {
+             autocompleteResults.innerHTML = '';
+             if (query.length < 1) {
+                 autocompleteResults.classList.add('hidden');
+                 return;
+             }
+
+             const searchRegex = new RegExp('\\b' + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
+             const matchedItems = searchState.items
+                .filter(item => item.nome && searchRegex.test(item.nome))
+                .slice(0, 5); // Limita a 5 sugestões
+
+             if (matchedItems.length > 0) {
+                 matchedItems.forEach(item => {
+                     const suggestionDiv = document.createElement('div');
+                     suggestionDiv.className = 'autocomplete-item';
+                     suggestionDiv.textContent = item.nome;
+                     suggestionDiv.onclick = () => {
+                         window.location.href = `item_detalhe.html?id=${item.id}`;
+                     };
+                     autocompleteResults.appendChild(suggestionDiv);
+                 });
+                 autocompleteResults.classList.remove('hidden');
+             } else {
+                 autocompleteResults.classList.add('hidden');
+             }
+        }
+        
+        function carregarAcervoParaBusca() {
+            try {
+                const acervosRef = collection(db, `/artifacts/${appId}/public/data/acervos`);
+                onSnapshot(query(acervosRef), (querySnapshot) => {
+                    searchState.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                }, (error) => {
+                    console.error("Erro ao carregar o acervo para busca:", error);
+                });
+            } catch (error) {
+                console.error("Erro ao configurar o listener do acervo para busca:", error);
+            }
+        }
+
+        // --- INICIALIZAÇÃO GERAL ---
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarItem();
+            carregarAcervoParaBusca();
+            
+            searchInput.addEventListener('input', () => updateAutocomplete(searchInput.value));
+
+            document.addEventListener('click', (e) => {
+                if (!document.getElementById('search-container').contains(e.target)) {
+                    autocompleteResults.classList.add('hidden');
+                }
+            });
+        });
     </script>
 </body>
 </html>
