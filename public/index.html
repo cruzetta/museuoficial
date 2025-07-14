@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Swiper.js CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Google Fonts para o Carrossel -->
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Lora&family=Orbitron&family=Press+Start+2P&display=swap" rel="stylesheet">
+
 
     <style>
         :root {
@@ -164,26 +167,24 @@
         <section id="home-carousel-container"
             class="relative w-full h-[60vh] md:h-[80vh] bg-gray-900 text-white overflow-hidden shadow-lg">
             <div id="carousel-slides" class="flex h-full transition-transform duration-700 ease-in-out">
+                <!-- Estado de carregamento inicial -->
                 <div class="flex-shrink-0 w-full h-full flex items-center justify-center">
-                    <p>A carregar o carrossel...</p>
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24">
+                    <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                        </path>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
+                    <p class="ml-3">A carregar o carrossel...</p>
                 </div>
             </div>
         
             <button id="carousel-prev"
-                class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors z-10">
+                class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors z-10 hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
             <button id="carousel-next"
-                class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors z-10">
+                class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-colors z-10 hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -488,30 +489,62 @@
 
             const buildLink = (type, id) => {
                 if (!type || type === 'nenhum' || !id) return null;
-                return `${type}.html?id=${id}`;
+                // ✅ CORREÇÃO: O link para acervo deve apontar para item_detalhe.html
+                const page = type === 'acervo' ? 'item_detalhe' : type;
+                return `${page}.html?id=${id}`;
             };
 
+            // ✅ ATUALIZAÇÃO: Função de renderização para aplicar estilos e posicionamento
             const renderSlide = (slideData, index) => {
-                const { titulo, mediaUrl, mediaTipo, linkTipo, linkId } = slideData;
+                const { titulo, mediaUrl, mediaTipo, linkTipo, linkId, tituloEstilo, tituloPosicao } = slideData;
                 const link = buildLink(linkTipo, linkId);
+                
                 const slideWrapper = link ? document.createElement('a') : document.createElement('div');
                 if (link) {
                     slideWrapper.href = link;
-                    slideWrapper.target = "_blank";
                 }
                 slideWrapper.className = "carousel-slide relative w-full h-full flex-shrink-0";
                 slideWrapper.dataset.index = index;
                 
-                // ✅ CORREÇÃO: Removido o atributo 'loop' do vídeo
                 let mediaElement = mediaTipo === 'video'
                     ? `<video id="video-${index}" class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" muted playsinline></video>`
                     : `<img class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" alt="${titulo || 'Slide do Carrossel'}">`;
 
+                // Aplica estilos ao título
+                let titleStyles = '';
+                if (tituloEstilo) {
+                    titleStyles += `font-family: ${tituloEstilo.fontFamily || 'Inter, sans-serif'};`;
+                    titleStyles += `font-size: ${tituloEstilo.fontSize || 36}px;`;
+                    titleStyles += `color: ${tituloEstilo.color || '#FFFFFF'};`;
+                    titleStyles += `font-weight: ${tituloEstilo.fontWeight || 'normal'};`;
+                    titleStyles += `line-height: ${tituloEstilo.lineHeight || 1.2};`;
+                    titleStyles += `letter-spacing: ${tituloEstilo.letterSpacing || 0}px;`;
+                    titleStyles += `text-transform: ${tituloEstilo.textTransform || 'none'};`;
+                    if (tituloEstilo.textShadow && tituloEstilo.textShadow !== 'none') {
+                        titleStyles += `text-shadow: ${tituloEstilo.textShadow};`;
+                    }
+                }
+
+                // Aplica posicionamento ao título
+                let titleContainerStyles = 'position: absolute; transform: translate(-50%, -50%);';
+                if (tituloPosicao) {
+                    titleContainerStyles += `left: ${tituloPosicao.x || 50}%;`;
+                    titleContainerStyles += `top: ${tituloPosicao.y || 50}%;`;
+                } else {
+                    titleContainerStyles += 'left: 50%; top: 50%;';
+                }
+
                 slideWrapper.innerHTML = `
                     ${mediaElement}
                     <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-                    <div class="relative z-10 flex items-center justify-center h-full w-full p-4">
-                        ${titulo ? `<h2 class="text-4xl md:text-6xl font-bold text-center text-white drop-shadow-lg">${titulo}</h2>` : ''}
+                    <div class="relative z-10 h-full w-full overflow-hidden">
+                        ${titulo ? `
+                            <div style="${titleContainerStyles}">
+                                <h2 class="text-center" style="${titleStyles}">
+                                    ${titulo.replace(/\n/g, '<br>')}
+                                </h2>
+                            </div>
+                        ` : ''}
                     </div>`;
                 return slideWrapper;
             };
@@ -551,19 +584,21 @@
                 goToSlide(nextIndex);
             };
 
+            // ✅ ATUALIZAÇÃO: Lógica de autoplay para lidar com vídeos
             const resetAutoplay = () => {
                 clearTimeout(autoplayTimer);
-                const currentSlideData = slides[currentIndex];
-
                 if (slides.length <= 1) return;
 
+                const currentSlideData = slides[currentIndex];
                 if (currentSlideData.mediaTipo === 'video') {
                     const videoElement = document.getElementById(`video-${currentIndex}`);
                     if (videoElement) {
+                        // Garante que o listener só é adicionado uma vez
                         videoElement.removeEventListener('ended', advanceAndReset);
                         videoElement.addEventListener('ended', advanceAndReset, { once: true });
                     }
                 } else {
+                    // Autoplay para imagens
                     autoplayTimer = setTimeout(advanceAndReset, slideDuration);
                 }
             };
@@ -577,8 +612,6 @@
 
                 if (slides.length === 0) {
                     slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Nenhum slide encontrado.</p></div>';
-                    prevButton.style.display = 'none';
-                    nextButton.style.display = 'none';
                     return;
                 }
 
@@ -591,6 +624,8 @@
                 });
 
                 if (slides.length > 1) {
+                    prevButton.classList.remove('hidden');
+                    nextButton.classList.remove('hidden');
                     prevButton.addEventListener('click', () => {
                         const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
                         goToSlide(prevIndex);
@@ -600,9 +635,6 @@
                         const nextIndex = (currentIndex + 1) % slides.length;
                         goToSlide(nextIndex);
                     });
-                } else {
-                     prevButton.style.display = 'none';
-                     nextButton.style.display = 'none';
                 }
 
                 goToSlide(0);
