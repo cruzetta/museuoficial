@@ -53,16 +53,18 @@
                 </div>
             </fieldset>
 
+            <!-- NOVO: Seção de Estilo do Título Expandida -->
             <fieldset class="border p-4 rounded-md">
                 <legend class="text-lg font-semibold px-2">Conteúdo e Estilo do Título</legend>
-                <div class="space-y-4 pt-2">
+                <div class="space-y-6 pt-2">
                     <div>
                         <label for="home-slider-titulo" class="block text-sm font-medium text-gray-700">Texto do Título</label>
                         <textarea id="home-slider-titulo" placeholder="Ex: A Era de Ouro dos Arcades" rows="2" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                          <p class="text-xs text-gray-500 mt-1">Use a tecla Enter para criar quebras de linha manuais.</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Controles de Fonte e Cor -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                             <label for="titulo-font-family" class="block text-sm font-medium text-gray-700">Fonte</label>
                             <select id="titulo-font-family" class="mt-1">
@@ -79,9 +81,65 @@
                         </div>
                          <div>
                             <label for="titulo-color" class="block text-sm font-medium text-gray-700">Cor</label>
-                            <input type="color" id="titulo-color" value="#FFFFFF" class="mt-1 h-10">
+                            <input type="color" id="titulo-color" value="#FFFFFF" class="mt-1 h-10 w-full">
+                        </div>
+                        <div class="flex items-end">
+                             <label for="titulo-font-weight" class="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+                                <input type="checkbox" id="titulo-font-weight" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                Negrito
+                            </label>
                         </div>
                     </div>
+
+                    <!-- Controles de Espaçamento e Transformação -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 border-t pt-4">
+                        <div>
+                            <label for="titulo-line-height" class="block text-sm font-medium text-gray-700">Espaç. Linhas</label>
+                            <input type="number" id="titulo-line-height" value="1.2" step="0.1" class="mt-1">
+                             <p class="text-xs text-gray-500 mt-1">Ex: 1.2, 1.5</p>
+                        </div>
+                        <div>
+                            <label for="titulo-letter-spacing" class="block text-sm font-medium text-gray-700">Espaç. Letras (px)</label>
+                            <input type="number" id="titulo-letter-spacing" value="0" class="mt-1">
+                            <p class="text-xs text-gray-500 mt-1">Pode ser negativo</p>
+                        </div>
+                        <div>
+                            <label for="titulo-text-transform" class="block text-sm font-medium text-gray-700">Transformação</label>
+                             <select id="titulo-text-transform" class="mt-1">
+                                <option value="none">Nenhuma</option>
+                                <option value="uppercase">MAIÚSCULAS</option>
+                                <option value="lowercase">minúsculas</option>
+                                <option value="capitalize">Capitalizado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Controles de Sombra -->
+                    <div class="space-y-4 border-t pt-4">
+                        <label class="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+                            <input type="checkbox" id="titulo-text-shadow-enable" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            Ativar Sombra no Texto
+                        </label>
+                        <div id="text-shadow-controls" class="hidden grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2">
+                             <div>
+                                <label for="titulo-text-shadow-color" class="block text-xs font-medium text-gray-500">Cor Sombra</label>
+                                <input type="color" id="titulo-text-shadow-color" value="#000000" class="mt-1 h-10 w-full">
+                            </div>
+                            <div>
+                                <label for="titulo-text-shadow-blur" class="block text-xs font-medium text-gray-500">Borrão (px)</label>
+                                <input type="range" id="titulo-text-shadow-blur" min="0" max="20" value="4" class="mt-1 w-full">
+                            </div>
+                            <div>
+                                <label for="titulo-text-shadow-offset-x" class="block text-xs font-medium text-gray-500">Offset X (px)</label>
+                                <input type="range" id="titulo-text-shadow-offset-x" min="-10" max="10" value="2" class="mt-1 w-full">
+                            </div>
+                            <div>
+                                <label for="titulo-text-shadow-offset-y" class="block text-xs font-medium text-gray-500">Offset Y (px)</label>
+                                <input type="range" id="titulo-text-shadow-offset-y" min="-10" max="10" value="2" class="mt-1 w-full">
+                            </div>
+                        </div>
+                    </div>
+
                     <input type="hidden" id="titulo-pos-x" value="50">
                     <input type="hidden" id="titulo-pos-y" value="50">
                 </div>
@@ -131,7 +189,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@700&family=Lora:wght@700&family=Orbitron:wght@700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;700&family=Lora:wght@400;700&family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 </div>
 
 <script data-tab-script="home-slider">
@@ -149,10 +207,25 @@
 
     const linkableData = { noticia: [], acervo: [] };
     
+    // --- Elementos do Título ---
     const tituloInput = document.getElementById('home-slider-titulo');
     const fontFamilySelect = document.getElementById('titulo-font-family');
     const fontSizeInput = document.getElementById('titulo-font-size');
     const colorInput = document.getElementById('titulo-color');
+    const fontWeightCheckbox = document.getElementById('titulo-font-weight');
+    const lineHeightInput = document.getElementById('titulo-line-height');
+    const letterSpacingInput = document.getElementById('titulo-letter-spacing');
+    const textTransformSelect = document.getElementById('titulo-text-transform');
+    
+    // --- Elementos da Sombra ---
+    const shadowEnableCheckbox = document.getElementById('titulo-text-shadow-enable');
+    const shadowControlsContainer = document.getElementById('text-shadow-controls');
+    const shadowColorInput = document.getElementById('titulo-text-shadow-color');
+    const shadowBlurInput = document.getElementById('titulo-text-shadow-blur');
+    const shadowOffsetXInput = document.getElementById('titulo-text-shadow-offset-x');
+    const shadowOffsetYInput = document.getElementById('titulo-text-shadow-offset-y');
+
+    // --- Elementos da Pré-visualização ---
     const posXInput = document.getElementById('titulo-pos-x');
     const posYInput = document.getElementById('titulo-pos-y');
     const draggableTitle = document.getElementById('draggable-title-preview');
@@ -161,29 +234,56 @@
     const updateTitlePreview = () => {
         const titleText = tituloInput.value || "Título de Exemplo";
         draggableTitle.innerHTML = titleText.replace(/\n/g, '<br>');
+        
+        // Aplica todos os estilos
         draggableTitle.style.fontFamily = fontFamilySelect.value;
         draggableTitle.style.fontSize = `${fontSizeInput.value || 36}px`;
         draggableTitle.style.color = colorInput.value;
+        draggableTitle.style.fontWeight = fontWeightCheckbox.checked ? 'bold' : 'normal';
+        draggableTitle.style.lineHeight = lineHeightInput.value || '1.2';
+        draggableTitle.style.letterSpacing = `${letterSpacingInput.value || 0}px`;
+        draggableTitle.style.textTransform = textTransformSelect.value || 'none';
+
+        // Aplica a sombra
+        if (shadowEnableCheckbox.checked) {
+            const x = shadowOffsetXInput.value;
+            const y = shadowOffsetYInput.value;
+            const blur = shadowBlurInput.value;
+            const color = shadowColorInput.value;
+            draggableTitle.style.textShadow = `${x}px ${y}px ${blur}px ${color}`;
+        } else {
+            draggableTitle.style.textShadow = 'none';
+        }
     };
+    
+    // Adiciona listeners para todos os novos controles
+    const allControls = [
+        tituloInput, fontFamilySelect, fontSizeInput, colorInput, fontWeightCheckbox,
+        lineHeightInput, letterSpacingInput, textTransformSelect, shadowEnableCheckbox,
+        shadowColorInput, shadowBlurInput, shadowOffsetXInput, shadowOffsetYInput
+    ];
+    allControls.forEach(control => {
+        control.addEventListener('input', updateTitlePreview);
+        control.addEventListener('change', updateTitlePreview); // Para selects e checkboxes
+    });
 
-    tituloInput.addEventListener('input', updateTitlePreview);
-    fontFamilySelect.addEventListener('change', updateTitlePreview);
-    fontSizeInput.addEventListener('input', updateTitlePreview);
-    colorInput.addEventListener('input', updateTitlePreview);
+    // Listener para mostrar/esconder controles de sombra
+    shadowEnableCheckbox.addEventListener('change', () => {
+        shadowControlsContainer.classList.toggle('hidden', !shadowEnableCheckbox.checked);
+    });
 
+    // --- Lógica de Arrastar Título (sem alterações) ---
     let isDragging = false;
     let offsetX, offsetY;
 
     const onDragStart = (e) => {
         isDragging = true;
         draggableTitle.style.transition = 'none';
-        
         const rect = draggableTitle.getBoundingClientRect();
         const clientX = e.clientX || e.touches[0].clientX;
         const clientY = e.clientY || e.touches[0].clientY;
         offsetX = clientX - rect.left;
         offsetY = clientY - rect.top;
-
         document.addEventListener('mousemove', onDragMove);
         document.addEventListener('mouseup', onDragEnd);
         document.addEventListener('touchmove', onDragMove, { passive: false });
@@ -193,28 +293,17 @@
 
     const onDragMove = (e) => {
         if (!isDragging) return;
-        
         const containerRect = positioningContainer.getBoundingClientRect();
         const clientX = e.clientX || e.touches[0].clientX;
         const clientY = e.clientY || e.touches[0].clientY;
-
         let newX = clientX - containerRect.left - offsetX;
         let newY = clientY - containerRect.top - offsetY;
-        
-        // ✅ CORREÇÃO: Limites de movimento removidos para permitir posicionamento livre.
-        // O texto agora pode ser arrastado para fora das bordas do container.
-        // newX = Math.max(0, Math.min(newX, containerRect.width - draggableTitle.offsetWidth));
-        // newY = Math.max(0, Math.min(newY, containerRect.height - draggableTitle.offsetHeight));
-
         const xPercent = (newX + draggableTitle.offsetWidth / 2) / containerRect.width * 100;
         const yPercent = (newY + draggableTitle.offsetHeight / 2) / containerRect.height * 100;
-
         draggableTitle.style.left = `${xPercent}%`;
         draggableTitle.style.top = `${yPercent}%`;
-        
         posXInput.value = xPercent.toFixed(2);
         posYInput.value = yPercent.toFixed(2);
-
         e.preventDefault();
     };
 
@@ -230,6 +319,7 @@
     draggableTitle.addEventListener('mousedown', onDragStart);
     draggableTitle.addEventListener('touchstart', onDragStart, { passive: false });
 
+    // --- Funções do Formulário (CRUD) ---
     const clearForm = () => {
         form.reset();
         document.getElementById(`${entity}-id`).value = '';
@@ -238,11 +328,24 @@
         linkIdSelect.disabled = true;
         if (window.resetUploadUI) window.resetUploadUI(`${entity}-media`);
         
+        // Reseta os novos valores para o padrão
         posXInput.value = "50";
         posYInput.value = "50";
         fontSizeInput.value = "36";
         fontFamilySelect.value = "Inter, sans-serif";
         colorInput.value = "#FFFFFF";
+        fontWeightCheckbox.checked = false;
+        lineHeightInput.value = "1.2";
+        letterSpacingInput.value = "0";
+        textTransformSelect.value = "none";
+        
+        shadowEnableCheckbox.checked = false;
+        shadowControlsContainer.classList.add('hidden');
+        shadowColorInput.value = "#000000";
+        shadowBlurInput.value = "4";
+        shadowOffsetXInput.value = "2";
+        shadowOffsetYInput.value = "2";
+
         draggableTitle.style.left = '50%';
         draggableTitle.style.top = '50%';
         updateTitlePreview();
@@ -260,9 +363,29 @@
                 document.getElementById(`${entity}-ordem`).value = data.ordem || 0;
                 
                 if (data.tituloEstilo) {
-                    fontFamilySelect.value = data.tituloEstilo.fontFamily || "Inter, sans-serif";
-                    fontSizeInput.value = data.tituloEstilo.fontSize || 36;
-                    colorInput.value = data.tituloEstilo.color || "#FFFFFF";
+                    const estilo = data.tituloEstilo;
+                    fontFamilySelect.value = estilo.fontFamily || "Inter, sans-serif";
+                    fontSizeInput.value = estilo.fontSize || 36;
+                    colorInput.value = estilo.color || "#FFFFFF";
+                    fontWeightCheckbox.checked = estilo.fontWeight === 'bold';
+                    lineHeightInput.value = estilo.lineHeight || 1.2;
+                    letterSpacingInput.value = estilo.letterSpacing || 0;
+                    textTransformSelect.value = estilo.textTransform || 'none';
+                    
+                    if (estilo.textShadow && estilo.textShadow !== 'none') {
+                        shadowEnableCheckbox.checked = true;
+                        shadowControlsContainer.classList.remove('hidden');
+                        const shadowParts = estilo.textShadow.match(/-?\d+(\.\d+)?px|#\w{3,6}|\w+/g) || [];
+                        if (shadowParts.length >= 4) {
+                            shadowOffsetXInput.value = parseFloat(shadowParts[0]);
+                            shadowOffsetYInput.value = parseFloat(shadowParts[1]);
+                            shadowBlurInput.value = parseFloat(shadowParts[2]);
+                            shadowColorInput.value = shadowParts[3];
+                        }
+                    } else {
+                         shadowEnableCheckbox.checked = false;
+                         shadowControlsContainer.classList.add('hidden');
+                    }
                 }
                 
                 if (data.tituloPosicao) {
@@ -312,11 +435,9 @@
     
     const performDeleteDoc = async (id) => {
         if (!await window.showConfirmModal()) return;
-
         try {
             const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
             const docSnap = await getDoc(docRef);
-
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 if (data.mediaUrl) {
@@ -324,12 +445,9 @@
                     await deleteObject(fileRef).catch(err => console.warn("Não foi possível apagar o ficheiro do Storage:", err));
                 }
             }
-
             await deleteDoc(docRef);
-
             if (window.showNotification) window.showNotification("Slide eliminado com sucesso!");
             clearForm();
-
         } catch (error) {
             console.error(`Erro ao eliminar ${entity}:`, error);
             if (window.showNotification) window.showNotification("Erro ao eliminar o slide.", true);
@@ -343,6 +461,10 @@
         const progressBar = document.getElementById(`${entity}-upload-progress-bar`);
         submitButton.disabled = true;
 
+        const textShadowValue = shadowEnableCheckbox.checked
+            ? `${shadowOffsetXInput.value}px ${shadowOffsetYInput.value}px ${shadowBlurInput.value}px ${shadowColorInput.value}`
+            : 'none';
+
         const data = {
             titulo: tituloInput.value,
             linkTipo: document.getElementById(`${entity}-linkTipo`).value,
@@ -353,7 +475,12 @@
             tituloEstilo: {
                 fontFamily: fontFamilySelect.value,
                 fontSize: fontSizeInput.value,
-                color: colorInput.value
+                color: colorInput.value,
+                fontWeight: fontWeightCheckbox.checked ? 'bold' : 'normal',
+                lineHeight: lineHeightInput.value,
+                letterSpacing: letterSpacingInput.value,
+                textTransform: textTransformSelect.value,
+                textShadow: textShadowValue
             },
             tituloPosicao: {
                 x: posXInput.value,
@@ -393,6 +520,7 @@
         }
     });
 
+    // --- Listeners e Carregamento de Dados (sem alterações) ---
     const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem", "asc"));
     onSnapshot(q, (snapshot) => {
         listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhum slide registado.</p>' : '';
@@ -416,12 +544,8 @@
 
     listContainer.addEventListener('click', (e) => {
         const target = e.target;
-        if (target.classList.contains('edit-btn')) {
-            editDoc(target.dataset.id);
-        }
-        if (target.classList.contains('delete-btn')) {
-            performDeleteDoc(target.dataset.id);
-        }
+        if (target.classList.contains('edit-btn')) editDoc(target.dataset.id);
+        if (target.classList.contains('delete-btn')) performDeleteDoc(target.dataset.id);
     });
     
     document.getElementById(`cancel-${entity}-edit`).addEventListener('click', clearForm);
@@ -430,7 +554,6 @@
         try {
             const noticiasSnap = await getDocs(query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("titulo")));
             linkableData.noticia = noticiasSnap.docs.map(d => ({ id: d.id, nome: d.data().titulo }));
-
             const acervosSnap = await getDocs(query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome")));
             linkableData.acervo = acervosSnap.docs.map(d => ({ id: d.id, nome: d.data().nome }));
         } catch (error) {
@@ -443,12 +566,10 @@
         const tipo = e.target.value;
         linkIdSelect.innerHTML = '';
         linkIdSelect.disabled = true;
-
         if (tipo === 'nenhum') {
             linkIdSelect.innerHTML = '<option value="">Primeiro selecione o tipo de link</option>';
             return;
         }
-
         const options = linkableData[tipo];
         if (options && options.length > 0) {
             linkIdSelect.innerHTML = '<option value="">Selecione um item...</option>';
@@ -479,7 +600,6 @@
                         const previewVideo = uploadContainer.querySelector('video.upload-preview');
                         previewImg.style.display = 'none';
                         previewVideo.style.display = 'none';
-
                         if (file.type.startsWith('video/')) {
                             previewVideo.src = e.target.result;
                             previewVideo.style.display = 'block';
@@ -500,8 +620,7 @@
         try {
             const docSnap = await getDoc(configDocRef);
             if (docSnap.exists()) {
-                const data = docSnap.data();
-                duracaoInput.value = data.duracaoSegundos || 7;
+                duracaoInput.value = docSnap.data().duracaoSegundos || 7;
             } else {
                 duracaoInput.value = 7;
             }
