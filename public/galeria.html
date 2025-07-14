@@ -137,7 +137,8 @@
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                         <i class="fa-solid fa-search"></i>
                     </span>
-                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 z-10 overflow-hidden hidden"></div>
+                    <!-- ✅ CORREÇÃO 1: Aumentado o z-index de z-10 para z-50 para garantir que a lista apareça sobre todo o conteúdo. -->
+                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 z-50 overflow-hidden hidden"></div>
                 </div>
             </div>
 
@@ -226,7 +227,6 @@
             state.filteredItems.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'gallery-card';
-                // ATUALIZAÇÃO: Removido o fabricante e a classe flex-grow do container de texto para melhor distribuição.
                 card.innerHTML = `
                     <div class="p-4 bg-gray-100">
                         <a href="item_detalhe.html?id=${item.id}" class="block">
@@ -249,19 +249,25 @@
         }
 
         // --- DATA PROCESSING FUNCTIONS ---
+        // ✅ CORREÇÃO 2: Lógica de filtragem e ordenação atualizada.
         function applyFiltersAndSort() {
-            const searchTerm = searchInput.value.toLowerCase();
+            const searchTerm = searchInput.value.trim(); // Remove espaços em branco
             const sortValue = sortSelect.value;
             
             let tempItems = state.items;
 
+            // Filtra os itens com base na nova lógica de busca
             if (searchTerm) {
+                // Cria uma expressão regular para encontrar itens que começam com o termo de busca.
+                // '\b' garante que estamos a verificar o início de uma palavra.
+                // 'i' torna a busca insensível a maiúsculas/minúsculas.
+                const searchRegex = new RegExp('\\b' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
                 tempItems = tempItems.filter(item => 
-                    (item.nome && item.nome.toLowerCase().includes(searchTerm)) ||
-                    (item.fabricante && item.fabricante.toLowerCase().includes(searchTerm)) // Lógica de busca mantida conforme solicitado
+                    item.nome && searchRegex.test(item.nome)
                 );
             }
 
+            // Ordena os itens filtrados
             tempItems.sort((a, b) => {
                 const [field, direction] = sortValue.split('-');
                 let valA = a[field];
@@ -287,15 +293,20 @@
             updateAutocomplete(searchTerm);
         }
         
+        // ✅ CORREÇÃO 3: Lógica do autocomplete atualizada para ser imediata e usar a nova busca.
         function updateAutocomplete(query) {
              autocompleteResults.innerHTML = '';
-             if (query.length < 2) {
+             // Mostra resultados a partir da primeira letra digitada.
+             if (query.length < 1) {
                  autocompleteResults.classList.add('hidden');
                  return;
              }
+
+             // Usa a mesma lógica de regex da filtragem principal.
+             const searchRegex = new RegExp('\\b' + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
              const matchedItems = state.items
-                .filter(item => item.nome && item.nome.toLowerCase().includes(query))
-                .slice(0, 5);
+                .filter(item => item.nome && searchRegex.test(item.nome))
+                .slice(0, 5); // Limita a 5 sugestões
 
              if (matchedItems.length > 0) {
                  matchedItems.forEach(item => {
@@ -305,7 +316,7 @@
                      suggestionDiv.onclick = () => {
                          searchInput.value = item.nome;
                          autocompleteResults.classList.add('hidden');
-                         applyFiltersAndSort();
+                         applyFiltersAndSort(); // Re-filtra a galeria principal com o item selecionado
                      };
                      autocompleteResults.appendChild(suggestionDiv);
                  });
@@ -340,6 +351,7 @@
             searchInput.addEventListener('input', () => applyFiltersAndSort());
             sortSelect.addEventListener('change', applyFiltersAndSort);
 
+            // Esconde a lista de sugestões se o utilizador clicar fora da área de pesquisa.
             document.addEventListener('click', (e) => {
                 if (!document.getElementById('search-container').contains(e.target)) {
                     autocompleteResults.classList.add('hidden');
