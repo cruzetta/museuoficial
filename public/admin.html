@@ -153,7 +153,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // ✅ CORREÇÃO 1: Adicionado 'query' e 'orderBy' na linha de importação
         import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
@@ -172,12 +171,11 @@
         const storage = getStorage(app);
         const appId = 'museu-cca6d';
 
-        // ✅ CORREÇÃO 2: Adicionado 'query' e 'orderBy' ao objeto global para que as abas possam usá-los.
         window.firebaseServices = { db, auth, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, ref, uploadBytesResumable, getDownloadURL, deleteObject, query, orderBy };
         window.appConfig = { appId };
         window.pendingFiles = new Map();
 
-        // --- LÓGICA DE CARREGAMENTO DE ABAS (CORRIGIDA) ---
+        // --- LÓGICA DE CARREGAMENTO DE ABAS ---
         window.loadTab = async (tabId) => {
             if (window.currentEditor) {
                 try {
@@ -299,7 +297,6 @@
 
         window.uploadFile = (file, path, progressCallback) => {
             return new Promise((resolve, reject) => {
-                // 'ref', 'uploadBytesResumable', 'getDownloadURL', e 'storage' já estão disponíveis globalmente
                 const storageRef = ref(storage, `${path}${Date.now()}_${file.name}`);
                 const uploadTask = uploadBytesResumable(storageRef, file);
                 
@@ -329,7 +326,8 @@
                 mainContent.style.display = 'block';
                 window.loadTab('admin_home');
             } else {
-                window.location.assign('/public/login.html');
+                // CORREÇÃO: Removido '/public' do caminho do redirecionamento.
+                window.location.assign('/login.html');
             }
         });
     </script>

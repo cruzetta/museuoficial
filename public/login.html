@@ -79,7 +79,8 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // Se já estiver logado, redireciona para o painel de admin
-                window.location.href = '/public/admin.html';
+                // CORREÇÃO: Removido '/public' do caminho do redirecionamento.
+                window.location.href = '/admin.html';
             }
         });
 
