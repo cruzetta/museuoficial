@@ -108,7 +108,7 @@
         const loader = document.getElementById('loader');
         const noticiaContentEl = document.getElementById('noticia-content');
 
-        // --- FUNÇÕES DO CARROSSEL (COPIADAS DE item_detalhe.html) ---
+        // --- FUNÇÕES DO CARROSSEL ---
         function setPositionByIndex() {
             const track = document.getElementById('media-track');
             if (!track) return;
@@ -204,7 +204,6 @@
                     const data = docSnap.data();
                     document.title = `${data.titulo || 'Notícia'} - MIV`;
                     
-                    // Constrói a galeria de mídias
                     mediaGallery = [];
                     if (data.imagem_principal) {
                         mediaGallery.push({ tipo: 'imagem', url: data.imagem_principal, nome: 'Imagem Principal' });
@@ -247,11 +246,13 @@
                             </div>`;
                     }
 
+                    // ✅ CORREÇÃO: Adicionado o subtítulo abaixo do título principal.
                     noticiaContentEl.innerHTML = `
                         <div class="p-0 md:p-2">
                             <div class="mb-8 text-center">
                                 <h1 class="text-3xl md:text-5xl font-bold mb-4">${data.titulo || 'Notícia sem Título'}</h1>
-                                <div class="text-md">${metaHTML}</div>
+                                ${data.subtitulo ? `<p class="text-xl text-gray-500 mt-2 max-w-3xl mx-auto">${data.subtitulo}</p>` : ''}
+                                <div class="text-md mt-4">${metaHTML}</div>
                             </div>
                             ${mediaSectionHTML}
                             <div class="content-card p-6 md:p-8">

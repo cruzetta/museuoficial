@@ -123,7 +123,7 @@
         </div>
     </footer>
 
-    <!-- Firebase e Lógica da Página (LÓGICA INALTERADA, APENAS RENDER ATUALIZADO) -->
+    <!-- Firebase e Lógica da Página -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -141,17 +141,18 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // Função que renderiza o HTML de uma notícia com o novo design
+        // Função que renderiza o HTML de uma notícia
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = '';
             if (data.data_publicacao && data.data_publicacao.toDate) {
                 dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
             }
+            // ✅ CORREÇÃO: Alterado de 'data.imagem' para 'data.imagem_principal'
             return `
                 <a href="noticia.html?id=${doc.id}" class="content-card block">
                     <div class="card-image-wrapper">
-                        <img src="${data.imagem || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo || 'Notícia'}" class="w-full h-48 object-cover">
+                        <img src="${data.imagem_principal || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo || 'Notícia'}" class="w-full h-48 object-cover">
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
                         <div class="mb-2">
