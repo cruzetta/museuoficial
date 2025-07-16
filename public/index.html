@@ -338,15 +338,21 @@
         });
 
         // --- RENDERERS ---
+        // ✅ CORREÇÃO: Função atualizada para incluir o subtítulo e ajustar o layout.
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
             return `
             <div class="content-card">
-                <a href="noticia.html?id=${doc.id}" class="block h-48 overflow-hidden"><img src="${data.imagem_principal || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo}" class="w-full h-full object-cover"></a>
+                <a href="noticia.html?id=${doc.id}" class="block h-48 overflow-hidden">
+                    <img src="${data.imagem_principal || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="${data.titulo}" class="w-full h-full object-cover">
+                </a>
                 <div class="p-4 flex flex-col flex-grow">
-                     <h3 class="text-lg font-semibold mb-2 text-gray-800 flex-grow"><a href="noticia.html?id=${doc.id}" class="hover:text-amber-600 transition">${data.titulo}</a></h3>
-                     <p class="text-xs text-gray-500">${dataFormatada}</p>
+                     <h3 class="text-lg font-semibold mb-2 text-gray-800">
+                        <a href="noticia.html?id=${doc.id}" class="hover:text-amber-600 transition">${data.titulo}</a>
+                     </h3>
+                     <p class="text-sm text-gray-600 mb-2 flex-grow">${data.subtitulo || ''}</p>
+                     <p class="text-xs text-gray-500 mt-auto">${dataFormatada}</p>
                 </div>
             </div>`;
         }
@@ -489,12 +495,10 @@
 
             const buildLink = (type, id) => {
                 if (!type || type === 'nenhum' || !id) return null;
-                // ✅ CORREÇÃO: O link para acervo deve apontar para item_detalhe.html
                 const page = type === 'acervo' ? 'item_detalhe' : type;
                 return `${page}.html?id=${id}`;
             };
 
-            // ✅ ATUALIZAÇÃO: Função de renderização para aplicar estilos e posicionamento
             const renderSlide = (slideData, index) => {
                 const { titulo, mediaUrl, mediaTipo, linkTipo, linkId, tituloEstilo, tituloPosicao } = slideData;
                 const link = buildLink(linkTipo, linkId);
@@ -510,7 +514,6 @@
                     ? `<video id="video-${index}" class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" muted playsinline></video>`
                     : `<img class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" alt="${titulo || 'Slide do Carrossel'}">`;
 
-                // Aplica estilos ao título
                 let titleStyles = '';
                 if (tituloEstilo) {
                     titleStyles += `font-family: ${tituloEstilo.fontFamily || 'Inter, sans-serif'};`;
@@ -525,7 +528,6 @@
                     }
                 }
 
-                // Aplica posicionamento ao título
                 let titleContainerStyles = 'position: absolute; transform: translate(-50%, -50%);';
                 if (tituloPosicao) {
                     titleContainerStyles += `left: ${tituloPosicao.x || 50}%;`;
@@ -584,7 +586,6 @@
                 goToSlide(nextIndex);
             };
 
-            // ✅ ATUALIZAÇÃO: Lógica de autoplay para lidar com vídeos
             const resetAutoplay = () => {
                 clearTimeout(autoplayTimer);
                 if (slides.length <= 1) return;
@@ -593,12 +594,10 @@
                 if (currentSlideData.mediaTipo === 'video') {
                     const videoElement = document.getElementById(`video-${currentIndex}`);
                     if (videoElement) {
-                        // Garante que o listener só é adicionado uma vez
                         videoElement.removeEventListener('ended', advanceAndReset);
                         videoElement.addEventListener('ended', advanceAndReset, { once: true });
                     }
                 } else {
-                    // Autoplay para imagens
                     autoplayTimer = setTimeout(advanceAndReset, slideDuration);
                 }
             };
