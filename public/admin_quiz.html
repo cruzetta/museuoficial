@@ -1,0 +1,234 @@
+<div id="quiz-form-container" class="form-section bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Gerir Perguntas do Quiz</h2>
+    <form id="form-quiz" class="space-y-6">
+        <input type="hidden" id="quiz-id">
+
+        <fieldset class="border p-4 rounded-md">
+            <legend class="text-lg font-semibold px-2">Pergunta</legend>
+            <div class="space-y-4 pt-2">
+                <div>
+                    <label for="quiz-pergunta_texto" class="block text-sm font-medium text-gray-700 mb-2">Texto da Pergunta</label>
+                    <textarea id="quiz-pergunta_texto"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="border p-4 rounded-md">
+            <legend class="text-lg font-semibold px-2">Opções de Resposta</legend>
+            <div class="space-y-4 pt-2">
+                <p class="text-xs text-gray-500">Adicione as opções de resposta e marque a que for correta. Pelo menos duas opções são necessárias.</p>
+                <div id="quiz-opcoes-container" class="space-y-3 mt-2"></div>
+                <button type="button" data-repeater-add="opcoes" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors">
+                    <i class="fas fa-plus mr-1"></i> Adicionar Opção
+                </button>
+            </div>
+        </fieldset>
+        
+        <div class="flex gap-4 pt-4">
+            <button type="submit">Guardar Pergunta</button>
+            <button type="button" id="cancel-quiz-edit" class="w-auto">Cancelar</button>
+        </div>
+    </form>
+    
+    <div class="mt-8">
+        <h3 class="text-xl font-bold mb-4">Perguntas Registadas</h3>
+        <div id="quiz-lista" class="space-y-4"></div>
+    </div>
+</div>
+
+<script data-tab-script="quiz">
+{
+    // --- SETUP INICIAL E VERIFICAÇÃO DE ELEMENTOS ---
+    const { db, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc } = window.firebaseServices;
+    const { appId } = window.appConfig;
+
+    const entity = 'quiz';
+    const formContainer = document.getElementById('quiz-form-container');
+    const form = document.getElementById(`form-${entity}`);
+    const listContainer = document.getElementById(`${entity}-lista`);
+    const editorId = `${entity}-pergunta_texto`;
+
+    if (!formContainer || !form || !listContainer) {
+        console.error("Erro Crítico: Elementos essenciais da aba 'Quiz' não foram encontrados. A inicialização foi interrompida.");
+        return;
+    }
+
+    // --- INICIALIZAÇÃO DO EDITOR DE TEXTO ---
+    tinymce.init({
+        selector: `#${editorId}`,
+        height: 250,
+        plugins: 'link lists',
+        toolbar: 'undo redo | blocks | bold italic | bullist numlist | link removeformat',
+        menubar: false,
+    }).then(() => {
+        window.currentEditor = `#${editorId}`;
+    }).catch(err => console.error("Falha ao inicializar o TinyMCE:", err));
+
+    // --- LÓGICA DO REPETIDOR DE OPÇÕES ---
+    let currentRadioGroupName = `resposta-correta-${crypto.randomUUID()}`;
+
+    const repeaterTemplates = {
+        opcoes: (groupName) => `
+            <div class="flex-grow flex items-center gap-3">
+                <input type="radio" name="${groupName}" class="repeater-input-radio" data-field="correta">
+                <input type="text" class="repeater-input" data-field="texto" placeholder="Texto da opção de resposta" required>
+            </div>
+        `
+    };
+
+    const addRepeaterItem = (type, data = {}) => {
+        const container = document.getElementById(`quiz-${type}-container`);
+        if (!container) return;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'repeater-item flex items-center gap-2 p-2 border rounded-md bg-gray-50';
+        itemDiv.setAttribute('data-repeater-type', type);
+        itemDiv.innerHTML = `${repeaterTemplates[type](currentRadioGroupName)}<button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>`;
+        container.appendChild(itemDiv);
+
+        const removeButton = itemDiv.querySelector('.remove-item-btn');
+        removeButton.addEventListener('click', () => itemDiv.remove());
+
+        if (data && typeof data === 'object') {
+            if (data.texto) itemDiv.querySelector('input[data-field="texto"]').value = data.texto;
+            if (data.correta) itemDiv.querySelector('input[data-field="correta"]').checked = true;
+        }
+    };
+    
+    // --- FUNÇÕES DE GESTÃO DO FORMULÁRIO (CRUD) ---
+    const clearForm = () => {
+        form.reset();
+        document.getElementById(`${entity}-id`).value = '';
+        tinymce.get(editorId)?.setContent('');
+        document.getElementById('quiz-opcoes-container').innerHTML = '';
+        currentRadioGroupName = `resposta-correta-${crypto.randomUUID()}`; // Gera novo nome para o grupo de rádio
+    };
+
+    const editDoc = async (id) => {
+        clearForm();
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById(`${entity}-id`).value = docSnap.id;
+                
+                tinymce.get(editorId)?.setContent(data.pergunta_texto || '');
+
+                if (data.opcoes && Array.isArray(data.opcoes)) {
+                    data.opcoes.forEach(itemData => addRepeaterItem('opcoes', itemData));
+                }
+                window.scrollTo(0, 0);
+            }
+        } catch (error) {
+            console.error(`Erro ao carregar ${entity}:`, error);
+            window.showNotification('Erro ao carregar dados da pergunta.', true);
+        }
+    };
+    
+    const performDeleteDoc = async (id) => {
+        if (!await window.showConfirmModal("Tem a certeza que deseja eliminar esta pergunta?")) return;
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            await deleteDoc(docRef);
+            window.showNotification("Pergunta eliminada com sucesso!");
+            clearForm();
+        } catch (error) {
+            console.error(`Erro ao eliminar ${entity}:`, error);
+            window.showNotification("Erro ao eliminar a pergunta.", true);
+        }
+    };
+    
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
+        const data = {
+            pergunta_texto: tinymce.get(editorId)?.getContent() || '',
+            opcoes: []
+        };
+        
+        document.querySelectorAll('#quiz-opcoes-container .repeater-item').forEach(itemDiv => {
+            const textoOpcao = itemDiv.querySelector('[data-field="texto"]').value.trim();
+            if (textoOpcao) { // Apenas adiciona se o texto não estiver vazio
+                data.opcoes.push({
+                    texto: textoOpcao,
+                    correta: itemDiv.querySelector('[data-field="correta"]').checked
+                });
+            }
+        });
+
+        Validação
+        if (!data.pergunta_texto.trim()) {
+            window.showNotification("O texto da pergunta não pode estar vazio.", true);
+            submitButton.disabled = false;
+            return;
+        }
+        if (data.opcoes.length < 2) {
+            window.showNotification("São necessárias pelo menos duas opções de resposta.", true);
+            submitButton.disabled = false;
+            return;
+        }
+        if (!data.opcoes.some(opt => opt.correta)) {
+            window.showNotification("Deve marcar uma resposta como correta.", true);
+            submitButton.disabled = false;
+            return;
+        }
+
+        try {
+            const id = document.getElementById(`${entity}-id`).value;
+            const path = `/artifacts/${appId}/public/data/${entity}`;
+            
+            if (id) {
+                await updateDoc(doc(db, path, id), data);
+            } else {
+                await addDoc(collection(db, path), data);
+            }
+
+            window.showNotification('Pergunta guardada com sucesso!');
+            clearForm();
+        } catch (error) {
+            console.error("Erro ao guardar pergunta:", error);
+            window.showNotification('Erro ao guardar os dados.', true);
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+
+    // --- LISTENERS E INICIALIZAÇÃO FINAL ---
+    onSnapshot(collection(db, `/artifacts/${appId}/public/data/${entity}`), (snapshot) => {
+        listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhuma pergunta registada.</p>' : '';
+        const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        docs.forEach(data => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+            const cleanText = (data.pergunta_texto || 'Pergunta sem texto').replace(/<[^>]+>/g, ' ').trim();
+            itemDiv.innerHTML = `
+                <p class="font-semibold text-sm truncate pr-4" title="${cleanText}">${cleanText}</p>
+                <div class="flex-shrink-0 flex gap-2">
+                    <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${data.id}">Editar</button>
+                    <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${data.id}">Eliminar</button>
+                </div>`;
+            listContainer.appendChild(itemDiv);
+        });
+    });
+
+    formContainer.addEventListener('click', (e) => {
+        if (e.target.matches('[data-repeater-add]')) {
+             addRepeaterItem(e.target.dataset.repeaterAdd);
+        }
+        const editBtn = e.target.closest('.edit-btn');
+        if (editBtn) {
+            editDoc(editBtn.dataset.id);
+        }
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (deleteBtn) {
+            performDeleteDoc(deleteBtn.dataset.id);
+        }
+    });
+    
+    document.getElementById('cancel-quiz-edit').addEventListener('click', clearForm);
+}
+</script>
