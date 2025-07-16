@@ -114,6 +114,19 @@
             background-color: var(--primary-color);
             border: 3px solid #fff;
         }
+
+        /* Estilos para o feedback do quiz */
+        .quiz-option.correct-answer {
+            background-color: #d1fae5; /* Verde claro */
+            border-left-color: #10b981; /* Verde escuro */
+            font-weight: bold;
+        }
+
+        .quiz-option.wrong-answer {
+            background-color: #fee2e2; /* Vermelho claro */
+            border-left-color: #ef4444; /* Vermelho escuro */
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -227,10 +240,21 @@
             </div>
         </section>
 
-        <section id="quiz" class="section-padding bg-gray-50">
-            <div class="container mx-auto">
-                <h2 class="section-title">Teste os seus Conhecimentos</h2>
-                <div id="quiz-container" class="max-w-2xl mx-auto p-8 border rounded-lg bg-white"></div>
+        <section id="secao-quiz" class="py-12 bg-gray-100">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold mb-8">Teste seus conhecimentos</h2>
+                
+                <div id="quiz-render-container" class="max-w-3xl mx-auto text-left space-y-8">
+                    <p id="quiz-loading-message" class="text-gray-600">A carregar o quiz...</p>
+                </div>
+
+                <div id="quiz-results-area" class="mt-8" style="display: none;">
+                    <button id="quiz-check-answers-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+                        Verificar Respostas
+                    </button>
+                    <p id="quiz-score" class="mt-4 text-xl font-bold"></p>
+                </div>
+
             </div>
         </section>
 
@@ -643,6 +667,150 @@
                 slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Ocorreu um erro ao carregar o conteúdo.</p></div>';
             }
         };
+
+            document.addEventListener('DOMContentLoaded', () => {
+
+            // --- SETUP INICIAL E VERIFICAÇÃO DE ELEMENTOS ---
+
+            const quizContainer = document.getElementById('quiz-render-container');
+            const loadingMessage = document.getElementById('quiz-loading-message');
+            const resultsArea = document.getElementById('quiz-results-area');
+            const checkButton = document.getElementById('quiz-check-answers-btn');
+            const scoreElement = document.getElementById('quiz-score');
+
+            if (!quizContainer) {
+                console.error("Container do Quiz não encontrado.");
+                return;
+            }
+
+            let questionsData = []; // Armazena os dados das perguntas para verificação
+
+            /**
+             * Busca as perguntas no Firestore e as renderiza na página.
+             */
+            const loadQuiz = async () => {
+                try {
+                    const quizCollectionRef = collection(db, `/artifacts/${appId}/public/data/quiz`);
+                    const snapshot = await getDocs(quizCollectionRef);
+
+                    if (snapshot.empty) {
+                        loadingMessage.textContent = 'Nenhuma pergunta de quiz disponível no momento.';
+                        return;
+                    }
+
+                    let allQuestions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                    // ======================================================
+                    //  INÍCIO DA LÓGICA DE SELEÇÃO ALEATÓRIA
+                    // ======================================================
+
+                    // 1. Embaralha a lista completa de perguntas (algoritmo Fisher-Yates)
+                    for (let i = allQuestions.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
+                    }
+
+                    // 2. Seleciona as primeiras 5 perguntas do array embaralhado
+                    //    e atribui à variável `questionsData` que será usada no resto do script.
+                    questionsData = allQuestions.slice(0, 5);
+                    
+                    // ======================================================
+                    //  FIM DA LÓGICA DE SELEÇÃO ALEATÓRIA
+                    // ======================================================
+
+
+                    // Limpa a mensagem de carregamento
+                    quizContainer.innerHTML = ''; 
+                    
+                    // Renderiza cada uma das 5 perguntas selecionadas
+                    questionsData.forEach((question, index) => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.className = 'quiz-question bg-white p-6 rounded-lg shadow-md';
+                        questionDiv.setAttribute('data-question-id', question.id);
+
+                        const questionText = document.createElement('div');
+                        questionText.className = 'text-lg font-semibold mb-4';
+                        questionText.innerHTML = `<strong>${index + 1}.</strong> ${question.pergunta_texto}`;
+                        
+                        const optionsDiv = document.createElement('div');
+                        optionsDiv.className = 'space-y-3';
+
+                        question.opcoes.forEach(option => {
+                            const optionLabel = document.createElement('label');
+                            optionLabel.className = 'quiz-option flex items-center p-3 border-l-4 border-gray-200 rounded-r-md bg-gray-50 cursor-pointer hover:bg-gray-200 transition-colors';
+                            
+                            const radioInput = document.createElement('input');
+                            radioInput.type = 'radio';
+                            radioInput.name = `question-${question.id}`;
+                            radioInput.value = option.texto;
+                            radioInput.className = 'mr-3';
+
+                            optionLabel.appendChild(radioInput);
+                            optionLabel.append(option.texto);
+                            optionsDiv.appendChild(optionLabel);
+                        });
+
+                        questionDiv.appendChild(questionText);
+                        questionDiv.appendChild(optionsDiv);
+                        quizContainer.appendChild(questionDiv);
+                    });
+                    
+                    resultsArea.style.display = 'block';
+
+                } catch (error) {
+                    console.error("Erro ao carregar o quiz:", error);
+                    loadingMessage.textContent = 'Ocorreu um erro ao carregar o quiz. Tente novamente mais tarde.';
+                }
+            };
+
+            /**
+             * Verifica as respostas, calcula a pontuação e fornece feedback visual.
+             */
+            const checkAnswers = () => {
+                let score = 0;
+                
+                // Desabilita o botão para evitar múltiplas verificações
+                checkButton.disabled = true;
+                checkButton.textContent = 'Resultados...';
+                checkButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+                questionsData.forEach(question => {
+                    const correctAnswerText = question.opcoes.find(opt => opt.correta).texto;
+                    
+                    const questionDiv = document.querySelector(`.quiz-question[data-question-id="${question.id}"]`);
+                    const selectedRadio = questionDiv.querySelector('input[type="radio"]:checked');
+
+                    // Itera sobre todas as opções para dar feedback
+                    const allOptionLabels = questionDiv.querySelectorAll('.quiz-option');
+                    allOptionLabels.forEach(label => {
+                        const input = label.querySelector('input');
+                        // Destaca a resposta correta em verde
+                        if (input.value === correctAnswerText) {
+                            label.classList.add('correct-answer');
+                        }
+                        // Se o usuário selecionou esta e ela está errada, destaca em vermelho
+                        if (selectedRadio && selectedRadio.value === input.value && input.value !== correctAnswerText) {
+                            label.classList.add('wrong-answer');
+                        }
+                    });
+                    
+                    // Incrementa a pontuação se a resposta estiver correta
+                    if (selectedRadio && selectedRadio.value === correctAnswerText) {
+                        score++;
+                    }
+                });
+
+                // Exibe o resultado final
+                scoreElement.textContent = `Você acertou ${score} de ${questionsData.length} perguntas!`;
+            };
+
+            // --- EVENT LISTENERS ---
+            checkButton.addEventListener('click', checkAnswers);
+            
+            // Inicia o carregamento do quiz
+            loadQuiz();
+        });
+        
 
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
