@@ -152,19 +152,144 @@
             transform: translateY(0);
         }
 
-        /* Estilo para a Timeline */
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -31px; /* Ajustado para alinhar com a borda */
-            top: 50%;
-            transform: translateY(-50%);
-            width: 22px;
-            height: 22px;
+        /* Estilos para a Nova Timeline Horizontal */
+        #timeline-interactive-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .timeline-viewport {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .timeline-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .timeline-generation-card {
+            flex: 0 0 100%; /* Each card takes full width of the viewport */
+            max-width: 100%;
+            padding: 1rem;
+            opacity: 0.5;
+            transform: scale(0.85);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .timeline-generation-card.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .timeline-card-content {
+            background-color: var(--color-dark-gray);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        @media (min-width: 768px) {
+            .timeline-card-content {
+                grid-template-columns: 40% 60%;
+                max-height: 450px;
+            }
+        }
+
+        .timeline-image {
+            width: 100%;
+            height: 250px; /* Fixed height for mobile */
+            object-fit: cover;
+        }
+
+        @media (min-width: 768px) {
+            .timeline-image {
+                height: 100%; /* Full height on desktop */
+            }
+        }
+
+        .timeline-text-content {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .timeline-generation-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .timeline-generation-name {
+            font-size: 2rem; /* text-3xl */
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-generation-description {
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #d1d5db; /* gray-300 */
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-generation-consoles {
+            font-size: 0.875rem;
+            color: #9ca3af; /* gray-400 */
+        }
+
+        .timeline-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .timeline-nav-button {
+            background-color: transparent;
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary);
+            width: 3rem;
+            height: 3rem;
             border-radius: 50%;
+            font-size: 1.25rem;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .timeline-nav-button:hover:not(:disabled) {
             background-color: var(--color-primary);
-            border: 4px solid #fff;
-            box-shadow: 0 0 10px rgba(192, 154, 88, 0.5);
+            color: var(--color-dark);
+        }
+
+        .timeline-nav-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .timeline-dots {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4b5563; /* gray-600 */
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .timeline-dot.active {
+            background-color: var(--color-primary);
+            transform: scale(1.25);
         }
     </style>
 </head>
@@ -188,7 +313,7 @@
                         </button>
                         <div class="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-200 ease-in-out">
                             <a href="#games" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Games</a>
-                            <a href="#timeline" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Timeline</a>
+                            <a href="#timeline-geracoes" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Gerações</a>
                             <a href="#quiz" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Quiz</a>
                             <a href="#curiosidades" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Curiosidades</a>
                             <a href="#corporativo" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Corporativo</a>
@@ -207,7 +332,7 @@
         <a href="#loja" class="block text-center py-3 text-lg nav-link">Loja</a>
         <hr class="border-gray-700 my-2">
         <a href="#games" class="block text-center py-3 text-lg nav-link">Games</a>
-        <a href="#timeline" class="block text-center py-3 text-lg nav-link">Timeline</a>
+        <a href="#timeline-geracoes" class="block text-center py-3 text-lg nav-link">Gerações</a>
         <a href="#quiz" class="block text-center py-3 text-lg nav-link">Quiz</a>
         <a href="#curiosidades" class="block text-center py-3 text-lg nav-link">Curiosidades</a>
         <a href="#corporativo" class="block text-center py-3 text-lg nav-link">Corporativo</a>
@@ -256,6 +381,16 @@
             </div>
         </section>
 
+        <!-- NOVA Seção Timeline Interativa de Gerações -->
+        <section id="timeline-geracoes" class="section-padding bg-gray-900 text-white fade-in-section">
+            <div class="container mx-auto">
+                <h2 class="section-title !text-white">Uma Viagem Pelas Gerações</h2>
+                <div id="timeline-interactive-container" class="relative">
+                    <!-- O conteúdo da timeline será injetado aqui pelo JavaScript -->
+                </div>
+            </div>
+        </section>
+
         <!-- SEÇÕES RESTAURADAS -->
         <section id="games" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
@@ -264,32 +399,25 @@
             </div>
         </section>
 
-        <section id="timeline" class="section-padding bg-light-gray fade-in-section">
-            <div class="container mx-auto">
-                <h2 class="section-title">Linha do Tempo dos Games</h2>
-                <div id="timeline-container" class="relative max-w-3xl mx-auto border-l-4 border-gray-200 pl-8"></div>
-            </div>
-        </section>
-
-        <section id="quiz" class="section-padding bg-white fade-in-section">
+        <section id="quiz" class="section-padding bg-light-gray fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Teste os seus Conhecimentos</h2>
-                <div id="quiz-container" class="max-w-2xl mx-auto p-8 border rounded-lg bg-light-gray shadow-inner"></div>
+                <div id="quiz-container" class="max-w-2xl mx-auto p-8 border rounded-lg bg-white shadow-inner"></div>
             </div>
         </section>
 
-        <section id="curiosidades" class="section-padding bg-light-gray fade-in-section">
+        <section id="curiosidades" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Sabia que?</h2>
                 <div id="curiosidades-container" class="space-y-6 max-w-3xl mx-auto"></div>
             </div>
         </section>
 
-        <section id="onde-estamos" class="section-padding bg-white fade-in-section">
+        <section id="onde-estamos" class="section-padding bg-light-gray fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Onde Estamos</h2>
                 <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <div class="p-8 border rounded-lg bg-light-gray">
+                    <div class="p-8 border rounded-lg bg-white">
                         <h3 class="text-2xl font-bold mb-6">O Nosso Endereço</h3>
                         <p id="onde-estamos-endereco" class="mb-4 text-lg text-text-light"><i class="fas fa-map-marker-alt w-6 text-primary-color"></i> Carregando...</p>
                         <p id="onde-estamos-cidade" class="text-lg text-text-light"><i class="fas fa-city w-6 text-primary-color"></i> Carregando...</p>
@@ -301,10 +429,10 @@
             </div>
         </section>
 
-        <section id="corporativo" class="section-padding bg-light-gray fade-in-section">
+        <section id="corporativo" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Sobre o Museu</h2>
-                <div class="max-w-4xl mx-auto p-10 border rounded-lg bg-white">
+                <div class="max-w-4xl mx-auto p-10 border rounded-lg bg-light-gray">
                     <div id="corporativo-missao-container" class="mb-8">
                         <h3 class="text-2xl font-bold mb-4 text-primary-color">A Nossa Missão</h3>
                         <p id="corporativo-missao" class="text-text-light leading-relaxed text-lg"></p>
@@ -317,7 +445,7 @@
             </div>
         </section>
 
-        <section id="loja" class="section-padding bg-white fade-in-section">
+        <section id="loja" class="section-padding bg-light-gray fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Loja do Museu</h2>
                 <div id="loja-container" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
@@ -424,15 +552,6 @@
                 <h3 class="text-md font-bold">${data.nome}</h3>
                 <p class="text-gray-500 text-xs">${data.ano}</p>
             </div>`;
-        };
-        const renderTimeline = (doc, index) => {
-            const data = doc.data();
-            if (!data.titulo && !data.descricao) return '';
-            return `
-                <div class="relative mb-10 timeline-item pl-8">
-                    <h3 class="font-bold text-xl text-primary-color">${data.titulo}</h3>
-                    <p class="text-md text-text-light">${data.descricao}</p>
-                </div>`;
         };
         const renderCuriosidade = (doc) => {
             const data = doc.data();
@@ -639,6 +758,165 @@
                 slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Ocorreu um erro ao carregar o conteúdo.</p></div>';
             }
         };
+        
+        // --- LÓGICA DA TIMELINE INTERATIVA DE GERAÇÕES ---
+        const initializeInteractiveTimeline = () => {
+            const container = document.getElementById('timeline-interactive-container');
+            if (!container) return;
+
+            const generationsData = [
+                {
+                    gen: '1ª Geração',
+                    name: 'O Início de Tudo',
+                    years: '1972-1980',
+                    description: 'O nascimento dos videojogos domésticos. Simples, mas revolucionários, os primeiros consoles levaram o entretenimento eletrônico das salas de arcade para as salas de estar.',
+                    consoles: 'Marcado por: Magnavox Odyssey, Atari Home Pong',
+                    image: 'https://images.unsplash.com/photo-1580234810443-74161592e604?q=80&w=1932&auto=format&fit=crop'
+                },
+                {
+                    gen: '2ª Geração',
+                    name: 'A Era dos Cartuchos',
+                    years: '1976-1984',
+                    description: 'A introdução de cartuchos intercambiáveis permitiu uma biblioteca de jogos muito maior. Foi uma era de ouro para a criatividade, mas que terminou com o infame "crash" dos videojogos de 1983.',
+                    consoles: 'Marcado por: Atari 2600, ColecoVision, Intellivision',
+                    image: 'https://images.unsplash.com/photo-1612404459571-ccef41c48abe?q=80&w=2070&auto=format&fit=crop'
+                },
+                {
+                    gen: '3ª Geração',
+                    name: 'A Revolução Japonesa',
+                    years: '1983-1992',
+                    description: 'Após o crash, a indústria foi salva por empresas japonesas. Esta era de 8-bits definiu muitos gêneros de jogos e criou mascotes icônicos que são amados até hoje.',
+                    consoles: 'Marcado por: Nintendo Entertainment System (NES), Sega Master System',
+                    image: 'https://images.unsplash.com/photo-1555864424-46c6f14b3346?q=80&w=1974&auto=format&fit=crop'
+                },
+                {
+                    gen: '4ª Geração',
+                    name: 'A Guerra dos 16-Bits',
+                    years: '1987-1996',
+                    description: 'A lendária "Guerra dos Consoles" entre a Nintendo e a Sega. Gráficos mais coloridos, som estéreo e jogos mais complexos marcaram esta era competitiva e inovadora.',
+                    consoles: 'Marcado por: Super Nintendo (SNES), Sega Mega Drive / Genesis',
+                    image: 'https://images.unsplash.com/photo-1627843444283-1b63483a033b?q=80&w=2070&auto=format&fit=crop'
+                },
+                {
+                    gen: '5ª Geração',
+                    name: 'A Revolução 3D',
+                    years: '1993-2002',
+                    description: 'A transição para gráficos 3D poligonais e o uso de CDs mudaram para sempre o design dos jogos. Mundos vastos e narrativas cinematográficas tornaram-se possíveis.',
+                    consoles: 'Marcado por: PlayStation, Nintendo 64, Sega Saturn',
+                    image: 'https://images.unsplash.com/photo-1511882150382-421059c8143f?q=80&w=2070&auto=format&fit=crop'
+                },
+                {
+                    gen: '6ª Geração',
+                    name: 'O Jogo Online Começa',
+                    years: '1998-2006',
+                    description: 'O jogo online tornou-se uma realidade nos consoles. Esta geração foi dominada pelo PlayStation 2, o console mais vendido de todos os tempos, e viu a entrada da Microsoft no mercado.',
+                    consoles: 'Marcado por: PlayStation 2, Xbox, Nintendo GameCube, Dreamcast',
+                    image: 'https://images.unsplash.com/photo-1626968361222-291e74711449?q=80&w=2070&auto=format&fit=crop'
+                },
+                {
+                    gen: '7ª Geração',
+                    name: 'Alta Definição e Movimento',
+                    years: '2005-2013',
+                    description: 'Gráficos em alta definição (HD) tornaram-se o padrão. A Nintendo inovou com controles de movimento, atraindo um novo público massivo para os videojogos.',
+                    consoles: 'Marcado por: Xbox 360, PlayStation 3, Nintendo Wii',
+                    image: 'https://images.unsplash.com/photo-1507457379470-08b800bebc67?q=80&w=2109&auto=format&fit=crop'
+                },
+                {
+                    gen: '8ª Geração',
+                    name: 'Mundos Conectados',
+                    years: '2012-2020',
+                    description: 'Foco total na conectividade, redes sociais e streaming de jogos. O sucesso do modelo híbrido do Nintendo Switch mostrou que a inovação no hardware ainda era possível.',
+                    consoles: 'Marcado por: PlayStation 4, Xbox One, Nintendo Switch',
+                    image: 'https://images.unsplash.com/photo-1605901309584-818e5236a2a2?q=80&w=1932&auto=format&fit=crop'
+                },
+                {
+                    gen: '9ª Geração',
+                    name: 'Velocidade e Imersão',
+                    years: '2020-Presente',
+                    description: 'SSDs ultrarrápidos eliminam os tempos de carregamento, enquanto tecnologias como o Ray Tracing e o feedback tátil criam níveis de imersão sem precedentes.',
+                    consoles: 'Marcado por: PlayStation 5, Xbox Series X/S',
+                    image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=2070&auto=format&fit=crop'
+                }
+            ];
+
+            let currentIndex = 0;
+
+            const render = () => {
+                container.innerHTML = `
+                    <div class="timeline-viewport">
+                        <div class="timeline-track">
+                            ${generationsData.map(gen => `
+                                <div class="timeline-generation-card">
+                                    <div class="timeline-card-content">
+                                        <img src="${gen.image}" alt="Imagem representativa da ${gen.gen}" class="timeline-image" onerror="this.onerror=null;this.src='https://placehold.co/600x450/2c2c2c/f4f4f4?text=Imagem+N%C3%A3o+Dispon%C3%ADvel';">
+                                        <div class="timeline-text-content">
+                                            <p class="timeline-generation-title">${gen.gen} (${gen.years})</p>
+                                            <h3 class="timeline-generation-name">${gen.name}</h3>
+                                            <p class="timeline-generation-description">${gen.description}</p>
+                                            <p class="timeline-generation-consoles">${gen.consoles}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="timeline-navigation">
+                        <button id="timeline-prev" class="timeline-nav-button"><i class="fas fa-arrow-left"></i></button>
+                        <div class="timeline-dots">
+                            ${generationsData.map((_, index) => `<div class="timeline-dot ${index === currentIndex ? 'active' : ''}" data-index="${index}"></div>`).join('')}
+                        </div>
+                        <button id="timeline-next" class="timeline-nav-button"><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                `;
+                
+                // Re-add event listeners
+                document.getElementById('timeline-prev').addEventListener('click', () => updateTimeline(-1));
+                document.getElementById('timeline-next').addEventListener('click', () => updateTimeline(1));
+                document.querySelectorAll('.timeline-dot').forEach(dot => {
+                    dot.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index, 10);
+                        goToGeneration(index);
+                    });
+                });
+
+                updateButtons();
+            };
+
+            const goToGeneration = (index) => {
+                currentIndex = index;
+                const track = document.querySelector('.timeline-track');
+                const dots = document.querySelectorAll('.timeline-dot');
+                const cards = document.querySelectorAll('.timeline-generation-card');
+
+                if (track) track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+                cards.forEach((card, i) => card.classList.toggle('active', i === currentIndex));
+
+                updateButtons();
+            };
+
+            const updateTimeline = (direction) => {
+                const newIndex = currentIndex + direction;
+                if (newIndex >= 0 && newIndex < generationsData.length) {
+                    goToGeneration(newIndex);
+                }
+            };
+
+            const updateButtons = () => {
+                const prevBtn = document.getElementById('timeline-prev');
+                const nextBtn = document.getElementById('timeline-next');
+                if (prevBtn) prevBtn.disabled = currentIndex === 0;
+                if (nextBtn) nextBtn.disabled = currentIndex === generationsData.length - 1;
+            };
+
+            render();
+            // Set initial active card after a short delay to ensure rendering
+            setTimeout(() => {
+                const initialCard = document.querySelector('.timeline-generation-card');
+                if(initialCard) initialCard.classList.add('active');
+            }, 50);
+        };
 
         // --- Animação de Scroll ---
         const setupScrollAnimation = () => {
@@ -657,11 +935,11 @@
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
             initializeCarousel();
+            initializeInteractiveTimeline(); // <-- NOVA FUNÇÃO CHAMADA AQUI
             setupScrollAnimation();
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
             loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), limit(4)));
             loadCollectionData('games', 'games-container', renderGame);
-            loadCollectionData('timeline', 'timeline-container', renderTimeline, query(collection(db, `/artifacts/${appId}/public/data/timeline`), orderBy("titulo")));
             loadCollectionData('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
             loadCollectionData('curiosidades', 'curiosidades-container', renderCuriosidade);
             loadCollectionData('loja', 'loja-container', renderProdutoLoja);
