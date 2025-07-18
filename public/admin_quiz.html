@@ -1,234 +1,265 @@
-<div id="quiz-form-container" class="form-section bg-white p-8 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-6">Gerir Perguntas do Quiz</h2>
-    <form id="form-quiz" class="space-y-6">
-        <input type="hidden" id="quiz-id">
+<div id="quiz-manager-container" class="form-section bg-white p-8 rounded-lg shadow-md">
 
-        <fieldset class="border p-4 rounded-md">
-            <legend class="text-lg font-semibold px-2">Pergunta</legend>
-            <div class="space-y-4 pt-2">
-                <div>
-                    <label for="quiz-pergunta_texto" class="block text-sm font-medium text-gray-700 mb-2">Texto da Pergunta</label>
-                    <textarea id="quiz-pergunta_texto"></textarea>
-                </div>
-            </div>
-        </fieldset>
-
-        <fieldset class="border p-4 rounded-md">
-            <legend class="text-lg font-semibold px-2">Opções de Resposta</legend>
-            <div class="space-y-4 pt-2">
-                <p class="text-xs text-gray-500">Adicione as opções de resposta e marque a que for correta. Pelo menos duas opções são necessárias.</p>
-                <div id="quiz-opcoes-container" class="space-y-3 mt-2"></div>
-                <button type="button" data-repeater-add="opcoes" class="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md transition-colors">
-                    <i class="fas fa-plus mr-1"></i> Adicionar Opção
-                </button>
-            </div>
-        </fieldset>
-        
-        <div class="flex gap-4 pt-4">
-            <button type="submit">Guardar Pergunta</button>
-            <button type="button" id="cancel-quiz-edit" class="w-auto">Cancelar</button>
+    <div id="quiz-list-view">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Gerir Quizzes Temáticos</h2>
+            <button id="show-quiz-editor-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition-colors">
+                <i class="fas fa-plus mr-2"></i>Criar Novo Quiz
+            </button>
         </div>
-    </form>
-    
-    <div class="mt-8">
-        <h3 class="text-xl font-bold mb-4">Perguntas Registadas</h3>
-        <div id="quiz-lista" class="space-y-4"></div>
+        <div id="quizzes-list" class="space-y-4">
+            <p class="text-gray-500">A carregar quizzes...</p>
+        </div>
+    </div>
+
+    <div id="quiz-editor-view" class="hidden">
+        <h2 id="editor-title" class="text-2xl font-bold mb-6">Criar Novo Quiz</h2>
+        <form id="form-quiz-editor" class="space-y-6">
+            <input type="hidden" id="quiz-editor-id">
+
+            <fieldset class="border p-4 rounded-md">
+                <legend class="text-lg font-semibold px-2">Informação Principal</legend>
+                <div class="pt-2">
+                    <label for="quiz-editor-tema" class="block text-sm font-medium text-gray-700">Tema do Quiz</label>
+                    <input type="text" id="quiz-editor-tema" placeholder="Ex: Nintendo, Cultura Pop, Anos 90" required>
+                </div>
+            </fieldset>
+
+            <fieldset class="border p-4 rounded-md">
+                <legend class="text-lg font-semibold px-2">Perguntas</legend>
+                <div id="perguntas-repeater-container" class="space-y-6 pt-2">
+                    </div>
+                <button type="button" id="add-pergunta-btn" class="mt-4 text-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-md transition-colors">
+                    <i class="fas fa-plus mr-1"></i> Adicionar Pergunta
+                </button>
+            </fieldset>
+            
+            <div class="flex gap-4 pt-4 border-t">
+                <button type="submit">Guardar Quiz Completo</button>
+                <button type="button" id="cancel-quiz-edit" class="w-auto">Cancelar</button>
+            </div>
+        </form>
     </div>
 </div>
 
-<script data-tab-script="quiz">
+
+<script data-tab-script="quizzes">
 {
-    // --- SETUP INICIAL E VERIFICAÇÃO DE ELEMENTOS ---
+    // --- SETUP E ELEMENTOS DO DOM ---
     const { db, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc } = window.firebaseServices;
     const { appId } = window.appConfig;
 
-    const entity = 'quiz';
-    const formContainer = document.getElementById('quiz-form-container');
-    const form = document.getElementById(`form-${entity}`);
-    const listContainer = document.getElementById(`${entity}-lista`);
-    const editorId = `${entity}-pergunta_texto`;
+    const entity = 'quizzes'; // A coleção agora é 'quizzes'
+    const listView = document.getElementById('quiz-list-view');
+    const editorView = document.getElementById('quiz-editor-view');
+    const listContainer = document.getElementById('quizzes-list');
+    const form = document.getElementById('form-quiz-editor');
 
-    if (!formContainer || !form || !listContainer) {
-        console.error("Erro Crítico: Elementos essenciais da aba 'Quiz' não foram encontrados. A inicialização foi interrompida.");
-        return;
-    }
-
-    // --- INICIALIZAÇÃO DO EDITOR DE TEXTO ---
-    tinymce.init({
-        selector: `#${editorId}`,
-        height: 250,
-        plugins: 'link lists',
-        toolbar: 'undo redo | blocks | bold italic | bullist numlist | link removeformat',
-        menubar: false,
-    }).then(() => {
-        window.currentEditor = `#${editorId}`;
-    }).catch(err => console.error("Falha ao inicializar o TinyMCE:", err));
-
-    // --- LÓGICA DO REPETIDOR DE OPÇÕES ---
-    let currentRadioGroupName = `resposta-correta-${crypto.randomUUID()}`;
-
-    const repeaterTemplates = {
-        opcoes: (groupName) => `
-            <div class="flex-grow flex items-center gap-3">
-                <input type="radio" name="${groupName}" class="repeater-input-radio" data-field="correta">
-                <input type="text" class="repeater-input" data-field="texto" placeholder="Texto da opção de resposta" required>
-            </div>
-        `
+    // --- LÓGICA DE NAVEGAÇÃO ENTRE TELAS ---
+    const showListView = () => {
+        listView.classList.remove('hidden');
+        editorView.classList.add('hidden');
+        form.reset();
+        document.getElementById('perguntas-repeater-container').innerHTML = '';
+        document.getElementById('quiz-editor-id').value = '';
     };
 
-    const addRepeaterItem = (type, data = {}) => {
-        const container = document.getElementById(`quiz-${type}-container`);
-        if (!container) return;
+    const showEditorView = (quizData = null) => {
+        listView.classList.add('hidden');
+        editorView.classList.remove('hidden');
+        
+        const editorTitle = document.getElementById('editor-title');
+        const temaInput = document.getElementById('quiz-editor-tema');
+        const idInput = document.getElementById('quiz-editor-id');
+        const perguntasContainer = document.getElementById('perguntas-repeater-container');
 
+        if (quizData) {
+            // Editando um quiz existente
+            editorTitle.textContent = `Editar Quiz: ${quizData.tema}`;
+            temaInput.value = quizData.tema;
+            idInput.value = quizData.id;
+            // Popula as perguntas existentes
+            quizData.perguntas.forEach(pergunta => addPerguntaItem(pergunta));
+        } else {
+            // Criando um novo quiz
+            editorTitle.textContent = 'Criar Novo Quiz';
+            // Adiciona uma pergunta em branco para começar
+            addPerguntaItem();
+        }
+    };
+
+    // --- LÓGICA DO REPETIDOR ANINHADO (PERGUNTAS E OPÇÕES) ---
+    const addOpcaoItem = (container, groupName, data = {}) => {
         const itemDiv = document.createElement('div');
-        itemDiv.className = 'repeater-item flex items-center gap-2 p-2 border rounded-md bg-gray-50';
-        itemDiv.setAttribute('data-repeater-type', type);
-        itemDiv.innerHTML = `${repeaterTemplates[type](currentRadioGroupName)}<button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>`;
+        itemDiv.className = 'repeater-item-opcao flex items-center gap-2 pl-4';
+        itemDiv.innerHTML = `
+            <input type="radio" name="${groupName}" class="repeater-input-radio shrink-0" data-field="correta" ${data.correta ? 'checked' : ''}>
+            <input type="text" class="repeater-input" data-field="texto" placeholder="Texto da opção" value="${data.texto || ''}" required>
+            <button type="button" class="remove-item-btn text-red-500 text-xs hover:text-red-700"><i class="fas fa-times-circle"></i></button>
+        `;
+        container.appendChild(itemDiv);
+        itemDiv.querySelector('.remove-item-btn').addEventListener('click', () => itemDiv.remove());
+    };
+
+    const addPerguntaItem = (data = {}) => {
+        const container = document.getElementById('perguntas-repeater-container');
+        const perguntaId = `pergunta-${crypto.randomUUID()}`;
+        
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'repeater-item-pergunta bg-gray-50 border p-4 rounded-md space-y-3';
+        itemDiv.setAttribute('data-pergunta-id', perguntaId);
+        
+        itemDiv.innerHTML = `
+            <div class="flex justify-between items-start">
+                <textarea class="repeater-input" data-field="pergunta_texto" placeholder="Texto da pergunta" rows="2" required>${data.pergunta_texto || ''}</textarea>
+                <button type="button" class="remove-pergunta-btn ml-4 bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="opcoes-container space-y-2 border-t pt-3">
+                <p class="text-xs font-semibold text-gray-600">Opções de Resposta (marque a correta):</p>
+            </div>
+            <button type="button" class="add-opcao-btn text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded">Adicionar Opção</button>
+        `;
         container.appendChild(itemDiv);
 
-        const removeButton = itemDiv.querySelector('.remove-item-btn');
-        removeButton.addEventListener('click', () => itemDiv.remove());
+        const opcoesContainer = itemDiv.querySelector('.opcoes-container');
+        const radioGroupName = `resposta-correta-${perguntaId}`;
 
-        if (data && typeof data === 'object') {
-            if (data.texto) itemDiv.querySelector('input[data-field="texto"]').value = data.texto;
-            if (data.correta) itemDiv.querySelector('input[data-field="correta"]').checked = true;
+        // Adiciona as opções existentes ou 2 em branco
+        if (data.opcoes && data.opcoes.length > 0) {
+            data.opcoes.forEach(opcao => addOpcaoItem(opcoesContainer, radioGroupName, opcao));
+        } else {
+            addOpcaoItem(opcoesContainer, radioGroupName);
+            addOpcaoItem(opcoesContainer, radioGroupName);
+        }
+
+        // Listeners dos botões da pergunta
+        itemDiv.querySelector('.remove-pergunta-btn').addEventListener('click', () => itemDiv.remove());
+        itemDiv.querySelector('.add-opcao-btn').addEventListener('click', () => addOpcaoItem(opcoesContainer, radioGroupName));
+    };
+
+    // --- OPERAÇÕES CRUD (CREATE, READ, UPDATE, DELETE) ---
+    const performDeleteQuiz = async (id) => {
+        if (!await window.showConfirmModal("Tem certeza que deseja eliminar este quiz e todas as suas perguntas?")) return;
+        try {
+            await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
+            window.showNotification("Quiz eliminado com sucesso!");
+        } catch (error) {
+            console.error("Erro ao eliminar quiz:", error);
+            window.showNotification("Erro ao eliminar o quiz.", true);
         }
     };
     
-    // --- FUNÇÕES DE GESTÃO DO FORMULÁRIO (CRUD) ---
-    const clearForm = () => {
-        form.reset();
-        document.getElementById(`${entity}-id`).value = '';
-        tinymce.get(editorId)?.setContent('');
-        document.getElementById('quiz-opcoes-container').innerHTML = '';
-        currentRadioGroupName = `resposta-correta-${crypto.randomUUID()}`; // Gera novo nome para o grupo de rádio
-    };
-
-    const editDoc = async (id) => {
-        clearForm();
+    const performEditQuiz = async (id) => {
         try {
             const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                const data = docSnap.data();
-                document.getElementById(`${entity}-id`).value = docSnap.id;
-                
-                tinymce.get(editorId)?.setContent(data.pergunta_texto || '');
-
-                if (data.opcoes && Array.isArray(data.opcoes)) {
-                    data.opcoes.forEach(itemData => addRepeaterItem('opcoes', itemData));
-                }
-                window.scrollTo(0, 0);
+                showEditorView({ id: docSnap.id, ...docSnap.data() });
+            } else {
+                window.showNotification("Quiz não encontrado.", true);
             }
-        } catch (error) {
-            console.error(`Erro ao carregar ${entity}:`, error);
-            window.showNotification('Erro ao carregar dados da pergunta.', true);
+        } catch(error) {
+            console.error("Erro ao carregar quiz para edição:", error);
+            window.showNotification("Erro ao carregar o quiz.", true);
         }
     };
-    
-    const performDeleteDoc = async (id) => {
-        if (!await window.showConfirmModal("Tem a certeza que deseja eliminar esta pergunta?")) return;
-        try {
-            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
-            await deleteDoc(docRef);
-            window.showNotification("Pergunta eliminada com sucesso!");
-            clearForm();
-        } catch (error) {
-            console.error(`Erro ao eliminar ${entity}:`, error);
-            window.showNotification("Erro ao eliminar a pergunta.", true);
-        }
-    };
-    
+
+    onSnapshot(collection(db, `/artifacts/${appId}/public/data/${entity}`), (snapshot) => {
+        listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhum quiz temático registado.</p>' : '';
+        const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (a.tema || '').localeCompare(b.tema || ''));
+        
+        docs.forEach(data => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+            itemDiv.innerHTML = `
+                <div>
+                    <p class="font-semibold text-sm truncate pr-4">${data.tema || 'Quiz sem tema'}</p>
+                    <p class="text-xs text-gray-500">${data.perguntas?.length || 0} perguntas</p>
+                </div>
+                <div class="flex-shrink-0 flex gap-2">
+                    <button class="edit-btn px-3 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${data.id}">Editar</button>
+                    <button class="delete-btn px-3 py-1 bg-red-600 text-white rounded text-xs" data-id="${data.id}">Eliminar</button>
+                </div>`;
+            
+            itemDiv.querySelector('.edit-btn').addEventListener('click', () => performEditQuiz(data.id));
+            itemDiv.querySelector('.delete-btn').addEventListener('click', () => performDeleteQuiz(data.id));
+            listContainer.appendChild(itemDiv);
+        });
+    });
+
+    // --- LISTENERS DE FORMULÁRIO E BOTÕES PRINCIPAIS ---
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = form.querySelector('button[type="submit"]');
         submitButton.disabled = true;
 
-        const data = {
-            pergunta_texto: tinymce.get(editorId)?.getContent() || '',
-            opcoes: []
+        const quizData = {
+            tema: document.getElementById('quiz-editor-tema').value.trim(),
+            perguntas: []
         };
-        
-        document.querySelectorAll('#quiz-opcoes-container .repeater-item').forEach(itemDiv => {
-            const textoOpcao = itemDiv.querySelector('[data-field="texto"]').value.trim();
-            if (textoOpcao) { // Apenas adiciona se o texto não estiver vazio
-                data.opcoes.push({
-                    texto: textoOpcao,
-                    correta: itemDiv.querySelector('[data-field="correta"]').checked
+
+        // Coleta os dados de cada pergunta
+        document.querySelectorAll('.repeater-item-pergunta').forEach(pItem => {
+            const perguntaTexto = pItem.querySelector('[data-field="pergunta_texto"]').value.trim();
+            if (!perguntaTexto) return; // Ignora perguntas sem texto
+
+            const pergunta = {
+                pergunta_texto: perguntaTexto,
+                opcoes: []
+            };
+
+            // Coleta os dados de cada opção dentro da pergunta
+            pItem.querySelectorAll('.repeater-item-opcao').forEach(oItem => {
+                const opcaoTexto = oItem.querySelector('[data-field="texto"]').value.trim();
+                if (!opcaoTexto) return; // Ignora opções sem texto
+                
+                pergunta.opcoes.push({
+                    texto: opcaoTexto,
+                    correta: oItem.querySelector('[data-field="correta"]').checked
                 });
+            });
+
+            // Valida se a pergunta tem opções e uma resposta correta
+            if (pergunta.opcoes.length >= 2 && pergunta.opcoes.some(o => o.correta)) {
+                quizData.perguntas.push(pergunta);
             }
         });
 
-        Validação
-        if (!data.pergunta_texto.trim()) {
-            window.showNotification("O texto da pergunta não pode estar vazio.", true);
+        // Validação final do Quiz
+        if (!quizData.tema) {
+            window.showNotification("O tema do quiz não pode estar vazio.", true);
             submitButton.disabled = false;
             return;
         }
-        if (data.opcoes.length < 2) {
-            window.showNotification("São necessárias pelo menos duas opções de resposta.", true);
-            submitButton.disabled = false;
-            return;
-        }
-        if (!data.opcoes.some(opt => opt.correta)) {
-            window.showNotification("Deve marcar uma resposta como correta.", true);
+        if (quizData.perguntas.length === 0) {
+            window.showNotification("O quiz deve ter pelo menos uma pergunta válida (com texto, 2+ opções e uma resposta correta).", true);
             submitButton.disabled = false;
             return;
         }
 
         try {
-            const id = document.getElementById(`${entity}-id`).value;
+            const id = document.getElementById('quiz-editor-id').value;
             const path = `/artifacts/${appId}/public/data/${entity}`;
             
             if (id) {
-                await updateDoc(doc(db, path, id), data);
+                await updateDoc(doc(db, path, id), quizData);
             } else {
-                await addDoc(collection(db, path), data);
+                await addDoc(collection(db, path), quizData);
             }
-
-            window.showNotification('Pergunta guardada com sucesso!');
-            clearForm();
+            window.showNotification('Quiz guardado com sucesso!');
+            showListView();
         } catch (error) {
-            console.error("Erro ao guardar pergunta:", error);
+            console.error("Erro ao guardar quiz:", error);
             window.showNotification('Erro ao guardar os dados.', true);
         } finally {
             submitButton.disabled = false;
         }
     });
 
-    // --- LISTENERS E INICIALIZAÇÃO FINAL ---
-    onSnapshot(collection(db, `/artifacts/${appId}/public/data/${entity}`), (snapshot) => {
-        listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhuma pergunta registada.</p>' : '';
-        const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        
-        docs.forEach(data => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
-            const cleanText = (data.pergunta_texto || 'Pergunta sem texto').replace(/<[^>]+>/g, ' ').trim();
-            itemDiv.innerHTML = `
-                <p class="font-semibold text-sm truncate pr-4" title="${cleanText}">${cleanText}</p>
-                <div class="flex-shrink-0 flex gap-2">
-                    <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${data.id}">Editar</button>
-                    <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${data.id}">Eliminar</button>
-                </div>`;
-            listContainer.appendChild(itemDiv);
-        });
-    });
+    document.getElementById('show-quiz-editor-btn').addEventListener('click', () => showEditorView());
+    document.getElementById('cancel-quiz-edit').addEventListener('click', showListView);
+    document.getElementById('add-pergunta-btn').addEventListener('click', () => addPerguntaItem());
 
-    formContainer.addEventListener('click', (e) => {
-        if (e.target.matches('[data-repeater-add]')) {
-             addRepeaterItem(e.target.dataset.repeaterAdd);
-        }
-        const editBtn = e.target.closest('.edit-btn');
-        if (editBtn) {
-            editDoc(editBtn.dataset.id);
-        }
-        const deleteBtn = e.target.closest('.delete-btn');
-        if (deleteBtn) {
-            performDeleteDoc(deleteBtn.dataset.id);
-        }
-    });
-    
-    document.getElementById('cancel-quiz-edit').addEventListener('click', clearForm);
+    showListView(); // Inicia na tela de listagem
 }
 </script>
