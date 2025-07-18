@@ -111,7 +111,7 @@
         
         itemDiv.innerHTML = `
             <div class="flex justify-between items-start">
-                <textarea class="repeater-input" data-field="pergunta_texto" placeholder="Texto da pergunta" rows="2" required>${data.pergunta_texto || ''}</textarea>
+                <textarea class="repeater-input flex-grow" data-field="pergunta_texto" placeholder="Texto da pergunta" rows="2" required>${data.pergunta_texto || ''}</textarea>
                 <button type="button" class="remove-pergunta-btn ml-4 bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>
             </div>
             <div class="opcoes-container space-y-2 border-t pt-3">

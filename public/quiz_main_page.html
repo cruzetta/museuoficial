@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossos Quizzes - Museu do Videojogo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #f59e0b; /* Amarelo/Dourado vibrante (Tailwind amber-500) */
+            --primary-hover: #d97706; /* Tom mais escuro para hover (Tailwind amber-600) */
+            --dark-header: #111827; /* Cinza escuro para o cabeçalho (Tailwind gray-900) */
+            --text-dark: #212529;
+            --text-light: #495057;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
+        h1, h2, h3 { font-family: 'Inter', sans-serif; font-weight: 600; color: var(--text-dark); }
+        .gallery-card { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .gallery-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; text-align: center; transition: all 0.2s ease-in-out; cursor: pointer; border: 1px solid transparent; }
+        .btn-primary { background-color: var(--primary-color); color: #ffffff; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .form-input, .form-select { width: 100%; border-radius: 0.375rem; border: 1px solid var(--border-color); padding: 0.5rem 0.75rem; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3); }
+        #autocomplete-results { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .autocomplete-item { padding: 0.75rem 1rem; cursor: pointer; color: var(--text-dark); }
+        .autocomplete-item:hover { background-color: var(--bg-light); }
+        #header-logo { height: 120px; width: auto; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
+        <nav class="container mx-auto px-4 sm:px-6 h-24 flex justify-between items-center gap-4">
+            <a href="index.html" class="flex-shrink-0">
+                <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+            </a>
+            <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
+                <div id="search-container" class="relative w-full max-w-lg">
+                    <input type="text" id="searchInput" placeholder="Pesquisar por tema do quiz..." class="form-input w-full py-2 pl-10 pr-4">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><i class="fa-solid fa-search"></i></span>
+                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 z-50 hidden"></div>
+                </div>
+            </div>
+            <a href="index.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                <i class="fa-solid fa-arrow-left"></i><span>Voltar ao Início</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="pt-12 pb-16">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl md:text-5xl font-bold text-center mb-8">Nossos Quizzes</h1>
+            
+            <div class="flex justify-end mb-8">
+                <div class="w-full max-w-xs">
+                    <label for="sort-select" class="block text-sm font-medium mb-1">Ordenar por</label>
+                    <select id="sort-select" class="form-select">
+                        <option value="tema-asc">Ordem Alfabética (A-Z)</option>
+                        <option value="tema-desc">Ordem Alfabética (Z-A)</option>
+                        <option value="perguntas-desc">Mais Perguntas</option>
+                        <option value="perguntas-asc">Menos Perguntas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="quizzes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <div id="quizzes-loader" class="col-span-full text-center py-20">
+                     <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
+                     <p class="mt-4 text-xl text-gray-600">A carregar quizzes...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="py-8 mt-16 bg-gray-200 border-t border-gray-300">
+        <div class="container mx-auto text-center text-gray-600">
+            <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Sua configuração do Firebase (a mesma do outro arquivo)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
+            authDomain: "museu-cca6d.firebaseapp.com",
+            projectId: "museu-cca6d",
+            storageBucket: "museu-cca6d.firebasestorage.app",
+            messagingSenderId: "555107674356",
+            appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const appId = 'museu-cca6d';
+
+        // --- STATE & DOM ELEMENTS ---
+        const state = { items: [], filteredItems: [] };
+        const quizzesGrid = document.getElementById('quizzes-grid');
+        const quizzesLoader = document.getElementById('quizzes-loader');
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sort-select');
+        const autocompleteResults = document.getElementById('autocomplete-results');
+
+        // --- FUNÇÃO DE RENDERIZAÇÃO ATUALIZADA PARA QUIZZES ---
+        function renderQuizzes() {
+            quizzesGrid.innerHTML = '';
+            if (state.filteredItems.length === 0 && quizzesLoader.style.display === 'none') {
+                quizzesGrid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-search-minus text-4xl text-gray-400"></i><p class="mt-4 text-xl text-gray-600">Nenhum quiz encontrado.</p></div>`;
+                return;
+            }
+
+            state.filteredItems.forEach(item => {
+                const cardLink = document.createElement('a');
+                cardLink.href = `play-quiz.html?id=${item.id}`; // Link para a página de jogar
+                cardLink.className = 'gallery-card';
+                cardLink.innerHTML = `
+                    <div class="h-48 flex items-center justify-center bg-gray-800 text-amber-400">
+                        <i class="fas fa-brain text-6xl"></i>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800">${item.tema || 'Quiz sem tema'}</h3>
+                        <div class="text-sm text-gray-600 mb-4">
+                            <p><i class="fa-solid fa-list-check w-5 text-gray-400"></i> ${item.perguntas?.length || 0} perguntas</p>
+                        </div>
+                        <div class="btn btn-primary w-full mt-auto">
+                            Jogar Quiz
+                            <i class="fas fa-play ml-2"></i>
+                        </div>
+                    </div>
+                `;
+                quizzesGrid.appendChild(cardLink);
+            });
+        }
+
+        // --- FUNÇÕES DE PROCESSAMENTO DE DADOS ATUALIZADAS ---
+        function applyFiltersAndSort() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            const sortValue = sortSelect.value;
+            
+            let tempItems = state.items;
+
+            // Filtra por tema do quiz
+            if (searchTerm) {
+                tempItems = tempItems.filter(item => item.tema && item.tema.toLowerCase().includes(searchTerm));
+            }
+
+            // Ordena os quizzes
+            tempItems.sort((a, b) => {
+                const [field, direction] = sortValue.split('-');
+                
+                if (field === 'tema') {
+                    const valA = a.tema || '';
+                    const valB = b.tema || '';
+                    return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
+                
+                if (field === 'perguntas') {
+                    const valA = a.perguntas?.length || 0;
+                    const valB = b.perguntas?.length || 0;
+                    return direction === 'asc' ? valA - valB : valB - valA;
+                }
+                
+                return 0;
+            });
+
+            state.filteredItems = tempItems;
+            renderQuizzes();
+            updateAutocomplete(searchTerm);
+        }
+        
+        function updateAutocomplete(query) {
+             autocompleteResults.innerHTML = '';
+             if (query.length < 1) {
+                 autocompleteResults.classList.add('hidden');
+                 return;
+             }
+
+             const matchedItems = state.items
+                 .filter(item => item.tema && item.tema.toLowerCase().includes(query))
+                 .slice(0, 5);
+
+             if (matchedItems.length > 0) {
+                 matchedItems.forEach(item => {
+                     const suggestionDiv = document.createElement('div');
+                     suggestionDiv.className = 'autocomplete-item';
+                     suggestionDiv.textContent = item.tema;
+                     suggestionDiv.onclick = () => {
+                         searchInput.value = item.tema;
+                         autocompleteResults.classList.add('hidden');
+                         applyFiltersAndSort();
+                     };
+                     autocompleteResults.appendChild(suggestionDiv);
+                 });
+                 autocompleteResults.classList.remove('hidden');
+             } else {
+                 autocompleteResults.classList.add('hidden');
+             }
+        }
+        
+        // --- FUNÇÃO DE CARREGAMENTO DE DADOS ATUALIZADA ---
+        function carregarQuizzes() {
+            try {
+                // Caminho atualizado para a coleção 'quizzes'
+                const quizzesRef = collection(db, `/artifacts/${appId}/public/data/quizzes`);
+                onSnapshot(query(quizzesRef), (querySnapshot) => {
+                    state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    if (quizzesLoader) quizzesLoader.style.display = 'none';
+                    applyFiltersAndSort(); 
+                }, (error) => {
+                    console.error("Erro ao carregar os quizzes:", error);
+                    quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar os quizzes.</p>`;
+                });
+            } catch (error) {
+                console.error("Erro ao configurar o listener dos quizzes:", error);
+                if (quizzesLoader) quizzesLoader.style.display = 'none';
+                quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Ocorreu um erro inesperado.</p>`;
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarQuizzes();
+            
+            searchInput.addEventListener('input', () => applyFiltersAndSort());
+            sortSelect.addEventListener('change', applyFiltersAndSort);
+
+            document.addEventListener('click', (e) => {
+                if (!document.getElementById('search-container').contains(e.target)) {
+                    autocompleteResults.classList.add('hidden');
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
