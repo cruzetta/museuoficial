@@ -27,7 +27,6 @@ const injectMetaTags = (html, meta) => {
 // Função principal que serve a página dinâmica
 const serveDynamicPage = async (req, res, collectionName, htmlFileName) => {
   const itemId = req.query.id;
-  // OBTÉM O ID DO PROJETO AUTOMATICAMENTE DO AMBIENTE DO FIREBASE
   const projectId = process.env.GCLOUD_PROJECT || 'museu-cca6d';
 
   functions.logger.info(`Request for collection '${collectionName}' with ID: '${itemId}' on project '${projectId}'`);
@@ -36,7 +35,6 @@ const serveDynamicPage = async (req, res, collectionName, htmlFileName) => {
   const defaultImageUrl = `https://${req.hostname}/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png`;
 
   try {
-    // Lê o arquivo HTML estático da pasta 'public'
     const htmlPath = path.join(__dirname, '..', 'public', htmlFileName);
     let html = fs.readFileSync(htmlPath, "utf8");
 
@@ -45,10 +43,15 @@ const serveDynamicPage = async (req, res, collectionName, htmlFileName) => {
       return;
     }
 
-    // CONSTRÓI O CAMINHO PARA O DOCUMENTO USANDO O ID DO PROJETO AUTOMÁTICO
-    const docPath = `artifacts/${projectId}/public/data/${collectionName}/${itemId}`;
-    functions.logger.info(`Attempting to fetch document from path: ${docPath}`);
-    const docRef = db.doc(docPath);
+    // --- CORREÇÃO PRINCIPAL: Forma mais robusta de aceder ao documento ---
+    const docRef = db.collection('artifacts')
+                     .doc(projectId)
+                     .collection('public')
+                     .doc('data')
+                     .collection(collectionName)
+                     .doc(itemId);
+    
+    functions.logger.info(`Attempting to fetch document from path: ${docRef.path}`);
     const docSnap = await docRef.get();
 
     if (docSnap.exists) {
@@ -72,7 +75,7 @@ const serveDynamicPage = async (req, res, collectionName, htmlFileName) => {
       const dynamicHtml = injectMetaTags(html, meta);
       res.status(200).send(dynamicHtml);
     } else {
-      functions.logger.error(`Document NOT found at path: ${docPath}`);
+      functions.logger.error(`Document NOT found at path: ${docRef.path}`);
       const meta = {
         title: "Conteúdo não encontrado",
         description: "O conteúdo que você procura não foi encontrado no nosso acervo.",

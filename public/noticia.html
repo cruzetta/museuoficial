@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notícia - Museu Itinerante do Videojogo</title>
+    
+    <!-- Meta Tags para Compartilhamento (serão substituídas pela Cloud Function) -->
+    <meta property="og:title" content="Museu do Videojogo">
+    <meta property="og:description" content="Fique por dentro das últimas notícias e eventos do mundo dos games.">
+    <meta property="og:image" content="https://museu-cca6d.web.app/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png">
+    <meta property="og:url" content="">
+    <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,8 +44,13 @@
         .prose-custom ul { list-style-type: disc; }
         .prose-custom ol { list-style-type: decimal; }
         .prose-custom blockquote { border-left: 4px solid var(--primary-color); padding-left: 1rem; margin-left: 0; font-style: italic; color: var(--text-light); }
-        
-        /* Estilos do Carrossel Arrastável (COPIADO DE item_detalhe.html) */
+        .share-btn { background-color: #fff; color: #495057; border: 1px solid #ced4da; height: 2.5rem; width: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .share-btn:hover { background-color: #f8f9fa; color: var(--primary-color); border-color: var(--primary-color); transform: scale(1.1); }
+        .share-btn.whatsapp:hover { color: #25D366; border-color: #25D366; }
+        .share-btn.facebook:hover { color: #1877F2; border-color: #1877F2; }
+        .share-btn.twitter-x:hover { color: #000000; border-color: #000000; }
+        #notification-toast { position: fixed; bottom: 1.25rem; right: 1.25rem; background-color: #28a745; color: white; padding: 1rem 1.5rem; border-radius: 0.375rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.4s ease-in-out; transform: translateY(200%); opacity: 0; z-index: 100; }
+        #notification-toast.show { transform: translateY(0); opacity: 1; }
         #media-display-container { overflow: hidden; cursor: grab; }
         #media-display-container.dragging { cursor: grabbing; }
         #media-track { display: flex; }
@@ -70,11 +84,11 @@
                 <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
                 <p class="mt-4 text-xl text-gray-600">A carregar notícia...</p>
             </div>
-            <article id="noticia-content" class="hidden opacity-0 transition-opacity duration-500">
-                <!-- O conteúdo será injetado aqui -->
-            </article>
+            <article id="noticia-content" class="hidden opacity-0 transition-opacity duration-500"></article>
         </div>
     </main>
+    
+    <div id="notification-toast">Link copiado para a área de transferência!</div>
 
     <footer class="py-10 mt-16 bg-gray-800">
         <div class="container mx-auto text-center text-gray-400">
@@ -99,96 +113,97 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
         
-        // --- STATE MANAGEMENT E DOM (ATUALIZADO) ---
-        let mediaGallery = [];
-        let currentIndex = 0;
-        let isDragging = false, startPos = 0, currentTranslate = 0, prevTranslate = 0, animationID;
+        let mediaGallery = [], currentIndex = 0, isDragging = false, startPos = 0, currentTranslate = 0, prevTranslate = 0, animationID;
 
         const contentWrapper = document.getElementById('content-wrapper');
         const loader = document.getElementById('loader');
         const noticiaContentEl = document.getElementById('noticia-content');
 
-        // --- FUNÇÕES DO CARROSSEL ---
         function setPositionByIndex() {
             const track = document.getElementById('media-track');
             if (!track) return;
             currentTranslate = currentIndex * -track.clientWidth;
             prevTranslate = currentTranslate;
-            setSliderPosition(track);
-            updateControls();
-        }
-
-        function setSliderPosition(track) {
             track.style.transform = `translateX(${currentTranslate}px)`;
+            updateControls();
         }
         
         function updateControls() {
             const prevBtn = document.getElementById('prev-media-btn');
             const nextBtn = document.getElementById('next-media-btn');
             const mediaCounter = document.getElementById('media-counter');
-
             if (prevBtn) prevBtn.disabled = currentIndex === 0;
             if (nextBtn) nextBtn.disabled = currentIndex === mediaGallery.length - 1;
             if (mediaCounter) mediaCounter.textContent = `${currentIndex + 1} / ${mediaGallery.length}`;
         }
 
-        function dragStart(index) {
-            return function(event) {
-                if (event.target.nodeName === 'VIDEO' || event.target.nodeName === 'AUDIO' || event.target.closest('video, audio')) {
-                    const mediaElement = event.target.closest('video, audio');
-                    if (event.offsetY > mediaElement.offsetHeight - 40) return;
-                }
-                isDragging = true;
-                startPos = getPositionX(event);
-                const track = document.getElementById('media-track');
-                track.style.transition = 'none';
-                animationID = requestAnimationFrame(animation);
-                document.getElementById('media-display-container').classList.add('dragging');
+        function dragStart(event) {
+            if (event.target.closest('video, audio')) return;
+            isDragging = true;
+            startPos = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+            const track = document.getElementById('media-track');
+            track.style.transition = 'none';
+            animationID = requestAnimationFrame(animation);
+            document.getElementById('media-display-container').classList.add('dragging');
+        }
+
+        function dragMove(event) {
+            if (isDragging) {
+                const currentPosition = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+                currentTranslate = prevTranslate + currentPosition - startPos;
             }
         }
 
-        function dragMove(event) { if (isDragging) { currentTranslate = prevTranslate + getPositionX(event) - startPos; } }
-
-        function dragEnd(event) {
+        function dragEnd() {
             if (!isDragging) return;
             isDragging = false;
             cancelAnimationFrame(animationID);
             const movedBy = currentTranslate - prevTranslate;
+            if (movedBy < -50 && currentIndex < mediaGallery.length - 1) currentIndex++;
+            if (movedBy > 50 && currentIndex > 0) currentIndex--;
             const track = document.getElementById('media-track');
-            if (movedBy < -50 && currentIndex < mediaGallery.length - 1) currentIndex += 1;
-            if (movedBy > 50 && currentIndex > 0) currentIndex -= 1;
             track.style.transition = 'transform 0.4s ease-in-out';
             setPositionByIndex();
             document.getElementById('media-display-container').classList.remove('dragging');
         }
 
-        function getPositionX(event) { return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX; }
-        function animation() { if(isDragging) { setSliderPosition(document.getElementById('media-track')); requestAnimationFrame(animation); } }
+        function animation() {
+            const track = document.getElementById('media-track');
+            if(track) track.style.transform = `translateX(${currentTranslate}px)`;
+            if(isDragging) requestAnimationFrame(animation);
+        }
 
         function setupDragListeners() {
             const container = document.getElementById('media-display-container');
             if (!container) return;
-            container.addEventListener('touchstart', dragStart(currentIndex), { passive: true });
+            container.addEventListener('touchstart', dragStart, { passive: true });
             container.addEventListener('touchmove', dragMove, { passive: true });
             container.addEventListener('touchend', dragEnd);
-            container.addEventListener('mousedown', dragStart(currentIndex));
+            container.addEventListener('mousedown', dragStart);
             container.addEventListener('mousemove', dragMove);
             container.addEventListener('mouseup', dragEnd);
-            container.addEventListener('mouseleave', (e) => { if(isDragging) dragEnd(e); });
+            container.addEventListener('mouseleave', dragEnd);
         }
 
+        function setupShareButtons(data) {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(data.titulo);
+            document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${title}%20${url}`;
+            document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+            document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+            document.getElementById('share-copy').addEventListener('click', () => {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    const toast = document.getElementById('notification-toast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                });
+            });
+        }
 
         function displayError(message) {
-            contentWrapper.innerHTML = `
-                <div class="content-card text-center p-8">
-                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-                    <h1 class="text-2xl font-bold text-red-700">Ocorreu um Erro</h1>
-                    <p class="text-gray-600 mt-2">${message}</p>
-                </div>
-            `;
+            contentWrapper.innerHTML = `<div class="content-card text-center p-8"><i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i><h1 class="text-2xl font-bold text-red-700">Ocorreu um Erro</h1><p class="text-gray-600 mt-2">${message}</p></div>`;
         }
 
-        // --- FUNÇÃO DE CARREGAMENTO PRINCIPAL (ATUALIZADA) ---
         async function carregarNoticia() {
             try {
                 const noticiaId = new URLSearchParams(window.location.search).get('id');
@@ -197,20 +212,14 @@
                     return;
                 }
 
-                const docRef = doc(db, `/artifacts/${appId}/public/data/noticias`, noticiaId);
+                const docRef = doc(db, `artifacts/${appId}/public/data/noticias`, noticiaId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    document.title = `${data.titulo || 'Notícia'} - MIV`;
-                    
                     mediaGallery = [];
-                    if (data.imagem_principal) {
-                        mediaGallery.push({ tipo: 'imagem', url: data.imagem_principal, nome: 'Imagem Principal' });
-                    }
-                    if (data.galeria_midia && Array.isArray(data.galeria_midia)) {
-                        mediaGallery.push(...data.galeria_midia.filter(m => m.url));
-                    }
+                    if (data.imagem_principal) mediaGallery.push({ tipo: 'imagem', url: data.imagem_principal, nome: 'Imagem Principal' });
+                    if (data.galeria_midia) mediaGallery.push(...data.galeria_midia.filter(m => m.url));
 
                     let metaHTML = '';
                     if (data.categoria) metaHTML += `<span class="font-bold text-amber-600">${data.categoria}</span>`;
@@ -220,61 +229,33 @@
                         metaHTML += `<span class="text-gray-500">${dataFormatada}</span>`;
                     }
 
+                    const shareBlockHTML = `<div class="flex items-center justify-center md:justify-start gap-2 mt-4"><span class="text-sm font-semibold text-gray-600 mr-2">Partilhar:</span><a id="share-whatsapp" href="#" target="_blank" class="share-btn whatsapp" title="Partilhar no WhatsApp"><i class="fab fa-whatsapp text-lg"></i></a><a id="share-facebook" href="#" target="_blank" class="share-btn facebook" title="Partilhar no Facebook"><i class="fab fa-facebook-f text-lg"></i></a><a id="share-twitter" href="#" target="_blank" class="share-btn twitter-x" title="Partilhar no X"><i class="fa-brands fa-x-twitter text-lg"></i></a><button id="share-copy" class="share-btn" title="Copiar Link"><i class="fas fa-link text-base"></i></button></div>`;
+                    
                     let mediaSectionHTML = '';
                     if (mediaGallery.length > 0) {
                         const mediaSlidesHTML = mediaGallery.map(media => {
-                            let slideContent = '';
                             switch (media.tipo) {
-                                case 'video': slideContent = `<video src="${media.url}" controls muted loop></video>`; break;
-                                case 'audio': slideContent = `<div class="w-full h-64 flex flex-col items-center justify-center text-gray-700 bg-gray-100 p-4 rounded-lg"><i class="fas fa-music text-6xl mb-4 text-gray-400"></i><p class="mb-4 text-lg">${media.nome || 'Faixa de áudio'}</p><audio src="${media.url}" controls></audio></div>`; break;
-                                default: slideContent = `<img src="${media.url}" alt="${media.nome || 'Imagem da notícia'}">`;
+                                case 'video': return `<div class="media-slide"><video src="${media.url}" controls muted loop></video></div>`;
+                                case 'audio': return `<div class="media-slide"><div class="w-full h-64 flex flex-col items-center justify-center text-gray-700 bg-gray-100 p-4 rounded-lg"><i class="fas fa-music text-6xl mb-4 text-gray-400"></i><p class="mb-4 text-lg">${media.nome || 'Faixa de áudio'}</p><audio src="${media.url}" controls></audio></div></div>`;
+                                default: return `<div class="media-slide"><img src="${media.url}" alt="${media.nome || 'Imagem da notícia'}"></div>`;
                             }
-                            return `<div class="media-slide">${slideContent}</div>`;
                         }).join('');
-
-                        mediaSectionHTML = `
-                            <div class="content-card p-4 mb-8">
-                                <div id="media-display-container" class="rounded-lg mb-4">
-                                    <div id="media-track">${mediaSlidesHTML}</div>
-                                </div>
-                                ${mediaGallery.length > 1 ? `
-                                <div id="media-controls" class="flex items-center justify-center gap-4">
-                                    <button id="prev-media-btn" class="control-btn"><i class="fas fa-arrow-left"></i></button>
-                                    <span id="media-counter" class="text-lg font-semibold text-gray-700"></span>
-                                    <button id="next-media-btn" class="control-btn"><i class="fas fa-arrow-right"></i></button>
-                                </div>` : ''}
-                            </div>`;
+                        mediaSectionHTML = `<div class="content-card p-4 mb-8"><div id="media-display-container" class="rounded-lg mb-4"><div id="media-track">${mediaSlidesHTML}</div></div>${mediaGallery.length > 1 ? `<div id="media-controls" class="flex items-center justify-center gap-4"><button id="prev-media-btn" class="control-btn"><i class="fas fa-arrow-left"></i></button><span id="media-counter" class="text-lg font-semibold text-gray-700"></span><button id="next-media-btn" class="control-btn"><i class="fas fa-arrow-right"></i></button></div>` : ''}</div>`;
                     }
 
-                    // ✅ CORREÇÃO: Adicionado o subtítulo abaixo do título principal.
-                    noticiaContentEl.innerHTML = `
-                        <div class="p-0 md:p-2">
-                            <div class="mb-8 text-center">
-                                <h1 class="text-3xl md:text-5xl font-bold mb-4">${data.titulo || 'Notícia sem Título'}</h1>
-                                ${data.subtitulo ? `<p class="text-xl text-gray-500 mt-2 max-w-3xl mx-auto">${data.subtitulo}</p>` : ''}
-                                <div class="text-md mt-4">${metaHTML}</div>
-                            </div>
-                            ${mediaSectionHTML}
-                            <div class="content-card p-6 md:p-8">
-                                <div class="prose-custom max-w-none">
-                                    ${data.descricao || '<p>O conteúdo desta notícia não está disponível.</p>'}
-                                </div>
-                            </div>
-                        </div>`;
+                    noticiaContentEl.innerHTML = `<div class="p-0 md:p-2"><div class="mb-8 text-center"><h1 class="text-3xl md:text-5xl font-bold mb-4">${data.titulo || 'Notícia sem Título'}</h1>${data.subtitulo ? `<p class="text-xl text-gray-500 mt-2 max-w-3xl mx-auto">${data.subtitulo}</p>` : ''}<div class="text-md mt-4">${metaHTML}</div>${shareBlockHTML}</div>${mediaSectionHTML}<div class="content-card p-6 md:p-8"><div class="prose-custom max-w-none">${data.descricao || '<p>O conteúdo desta notícia não está disponível.</p>'}</div></div></div>`;
                     
                     loader.style.display = 'none';
                     noticiaContentEl.classList.remove('hidden');
                     setTimeout(() => noticiaContentEl.classList.remove('opacity-0'), 50);
 
+                    setupShareButtons(data);
                     if (mediaGallery.length > 0) {
                         setPositionByIndex();
-                        const prevBtn = document.getElementById('prev-media-btn');
-                        const nextBtn = document.getElementById('next-media-btn');
-                        if (prevBtn) prevBtn.addEventListener('click', () => { if(currentIndex > 0) { currentIndex -= 1; setPositionByIndex(); } });
-                        if (nextBtn) nextBtn.addEventListener('click', () => { if(currentIndex < mediaGallery.length - 1) { currentIndex += 1; setPositionByIndex(); } });
+                        document.getElementById('prev-media-btn')?.addEventListener('click', () => { if(currentIndex > 0) { currentIndex--; setPositionByIndex(); } });
+                        document.getElementById('next-media-btn')?.addEventListener('click', () => { if(currentIndex < mediaGallery.length - 1) { currentIndex++; setPositionByIndex(); } });
                         setupDragListeners();
                     }
-
                 } else {
                     displayError("A notícia que procura não existe ou foi removida.");
                 }
