@@ -16,6 +16,19 @@
           }
         ]
       }
+    ],
+    "rewrites": [
+      {
+        "source": "/item_detalhe.html",
+        "function": "app"
+      },
+      {
+        "source": "/noticia.html",
+        "function": "app"
+      }
     ]
+  },
+  "functions": {
+    "source": "functions"
   }
 }
