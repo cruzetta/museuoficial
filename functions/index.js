@@ -27,6 +27,11 @@ const injectMetaTags = (html, meta) => {
 // Função principal que serve a página dinâmica
 const serveDynamicPage = async (req, res, collectionName, htmlFileName) => {
   const itemId = req.query.id;
+  // OBTÉM O ID DO PROJETO AUTOMATICAMENTE DO AMBIENTE DO FIREBASE
+  const projectId = process.env.GCLOUD_PROJECT || 'museu-cca6d';
+
+  functions.logger.info(`Request for collection '${collectionName}' with ID: '${itemId}' on project '${projectId}'`);
+
   const pageUrl = `https://${req.hostname}${req.originalUrl}`;
   const defaultImageUrl = `https://${req.hostname}/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png`;
 
@@ -36,36 +41,38 @@ const serveDynamicPage = async (req, res, collectionName, htmlFileName) => {
     let html = fs.readFileSync(htmlPath, "utf8");
 
     if (!itemId) {
-      // Se não houver ID, serve a página com as tags padrão
       res.send(html);
       return;
     }
 
-    // Busca os dados do item/notícia específico no Firestore
-    const docRef = db.collection(`artifacts/museu-cca6d/public/data/${collectionName}`).doc(itemId);
+    // CONSTRÓI O CAMINHO PARA O DOCUMENTO USANDO O ID DO PROJETO AUTOMÁTICO
+    const docPath = `artifacts/${projectId}/public/data/${collectionName}/${itemId}`;
+    functions.logger.info(`Attempting to fetch document from path: ${docPath}`);
+    const docRef = db.doc(docPath);
     const docSnap = await docRef.get();
 
     if (docSnap.exists) {
+      functions.logger.info(`Document found! ID: ${itemId}`);
       const data = docSnap.data();
       const title = data.nome || data.titulo || "Conteúdo do Museu";
       
-      // Lógica de descrição refinada
       let description = (data.subtitulo || (data.detalhes || data.descricao || ""));
-      description = description.replace(/<[^>]+>/g, "").trim(); // Remove HTML e espaços
+      description = description.replace(/<[^>]+>/g, "").trim();
       if (description.length > 150) {
         description = description.substring(0, 150) + "...";
       }
-      if (!description) { // Garante que nunca fica vazio
+      if (!description) {
         description = `Veja mais sobre ${title} no Museu do Videojogo.`;
       }
 
       const image = data.imagem_principal || defaultImageUrl;
+      functions.logger.info(`Image URL for sharing: ${image}`);
 
       const meta = { title, description, image, url: pageUrl };
       const dynamicHtml = injectMetaTags(html, meta);
       res.status(200).send(dynamicHtml);
     } else {
-      // Se não encontrar o item, serve a página com tags de "não encontrado"
+      functions.logger.error(`Document NOT found at path: ${docPath}`);
       const meta = {
         title: "Conteúdo não encontrado",
         description: "O conteúdo que você procura não foi encontrado no nosso acervo.",
@@ -75,7 +82,7 @@ const serveDynamicPage = async (req, res, collectionName, htmlFileName) => {
       res.status(404).send(injectMetaTags(html, meta));
     }
   } catch (error) {
-    functions.logger.error("Erro ao servir a página dinâmica:", error);
+    functions.logger.error("Critical error in serveDynamicPage:", error);
     res.status(500).send("Ocorreu um erro interno ao carregar esta página.");
   }
 };
