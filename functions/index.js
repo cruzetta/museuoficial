@@ -37,7 +37,7 @@ const serveDynamicPage = async (req, res, collectionName, htmlFileName) => {
 
     if (!itemId) {
       // Se não houver ID, serve a página com as tags padrão
-      res.send(html); // O HTML já tem as tags padrão
+      res.send(html);
       return;
     }
 
@@ -48,7 +48,17 @@ const serveDynamicPage = async (req, res, collectionName, htmlFileName) => {
     if (docSnap.exists) {
       const data = docSnap.data();
       const title = data.nome || data.titulo || "Conteúdo do Museu";
-      const description = (data.subtitulo || (data.detalhes || data.descricao || "")).replace(/<[^>]+>/g, "").substring(0, 150) + "...";
+      
+      // Lógica de descrição refinada
+      let description = (data.subtitulo || (data.detalhes || data.descricao || ""));
+      description = description.replace(/<[^>]+>/g, "").trim(); // Remove HTML e espaços
+      if (description.length > 150) {
+        description = description.substring(0, 150) + "...";
+      }
+      if (!description) { // Garante que nunca fica vazio
+        description = `Veja mais sobre ${title} no Museu do Videojogo.`;
+      }
+
       const image = data.imagem_principal || defaultImageUrl;
 
       const meta = { title, description, image, url: pageUrl };
