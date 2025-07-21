@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes do Item - Museu do Videojogo</title>
+    
+    <!-- Meta Tags para Compartilhamento (serão preenchidas via JS) -->
+    <meta property="og:title" content="Museu do Videojogo">
+    <meta property="og:description" content="Explore a história dos videogames em nosso acervo.">
+    <meta property="og:image" content="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png">
+    <meta property="og:url" content="">
+    <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,8 +40,14 @@
         .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
         .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
         .section-title { font-size: 1.875rem; font-weight: 600; padding-bottom: 0.75rem; border-bottom: 2px solid #e9ecef; margin-bottom: 2rem; }
+        
+        /* NOVO: Estilos para botões de compartilhamento */
         .share-btn { background-color: #fff; color: #495057; border: 1px solid #ced4da; height: 3rem; width: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .share-btn:hover { background-color: #f8f9fa; color: var(--primary-color); border-color: var(--primary-color); transform: scale(1.1); }
+        .share-btn.whatsapp:hover { color: #25D366; border-color: #25D366; }
+        .share-btn.facebook:hover { color: #1877F2; border-color: #1877F2; }
+        .share-btn.twitter-x:hover { color: #000000; border-color: #000000; }
+
         #notification-toast { position: fixed; bottom: 1.25rem; right: 1.25rem; background-color: #28a745; color: white; padding: 1rem 1.5rem; border-radius: 0.375rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.4s ease-in-out; transform: translateY(200%); opacity: 0; z-index: 100; }
         #notification-toast.show { transform: translateY(0); opacity: 1; }
         .placeholder-card { text-align: center; color: #6c757d; padding: 2rem; border: 2px dashed #e9ecef; border-radius: 0.5rem; background-color: #f8f9fa; }
@@ -94,7 +109,6 @@
             <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
                 <!-- Barra de Pesquisa -->
                 <div id="search-container" class="relative w-full max-w-lg">
-                    <!-- ✅ CORREÇÃO: Removidas as classes de cor de fundo para usar o estilo padrão .form-input -->
                     <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="form-input w-full py-2 pl-10 pr-4">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                         <i class="fa-solid fa-search"></i>
@@ -170,7 +184,7 @@
         const searchInput = document.getElementById('searchInput');
         const autocompleteResults = document.getElementById('autocomplete-results');
         
-        // --- FUNÇÕES DO CARROSSEL (sem alterações) ---
+        // --- FUNÇÕES DO CARROSSEL ---
         function setPositionByIndex() {
             const track = document.getElementById('media-track');
             if (!track) return;
@@ -264,13 +278,32 @@
         }
 
         // --- FUNÇÕES AUXILIARES (PÁGINA) ---
-        window.sharePage = () => {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                const toast = document.getElementById('notification-toast');
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
+        function updateMetaTags(item) {
+            const pageUrl = window.location.href;
+            const description = item.detalhes ? item.detalhes.replace(/<[^>]+>/g, '').substring(0, 150) + '...' : 'Explore este item do acervo do Museu do Videojogo.';
+            
+            document.querySelector('meta[property="og:title"]').setAttribute('content', item.nome || 'Item do Acervo');
+            document.querySelector('meta[property="og:description"]').setAttribute('content', description);
+            document.querySelector('meta[property="og:image"]').setAttribute('content', item.imagem_principal || 'imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png');
+            document.querySelector('meta[property="og:url"]').setAttribute('content', pageUrl);
+        }
+        
+        function setupShareButtons(item) {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(item.nome);
+
+            document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${title}%20${url}`;
+            document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+            document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+            
+            document.getElementById('share-copy').addEventListener('click', () => {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    const toast = document.getElementById('notification-toast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                });
             });
-        };
+        }
 
         const createPlaceholder = (icon, text) => `<div class="placeholder-card"><i class="fas ${icon} text-2xl mb-2"></i><p>${text}</p></div>`;
 
@@ -295,6 +328,7 @@
                 if (docSnap.exists()) {
                     const item = docSnap.data();
                     document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
+                    updateMetaTags(item); // Atualiza as meta tags
                     
                     mediaGallery = [];
                     if (item.imagem_principal) {
@@ -304,6 +338,17 @@
                         mediaGallery.push(...item.galeria_midia.filter(m => m.url));
                     }
 
+                    // NOVO: Bloco de compartilhamento
+                    const shareBlockHTML = `
+                        <div class="flex items-center justify-center md:justify-end gap-2">
+                            <span class="text-sm font-semibold text-gray-600 mr-2">Partilhar:</span>
+                            <a id="share-whatsapp" href="#" target="_blank" class="share-btn whatsapp" title="Partilhar no WhatsApp"><i class="fab fa-whatsapp text-xl"></i></a>
+                            <a id="share-facebook" href="#" target="_blank" class="share-btn facebook" title="Partilhar no Facebook"><i class="fab fa-facebook-f text-xl"></i></a>
+                            <a id="share-twitter" href="#" target="_blank" class="share-btn twitter-x" title="Partilhar no X"><i class="fa-brands fa-x-twitter text-xl"></i></a>
+                            <button id="share-copy" class="share-btn" title="Copiar Link"><i class="fas fa-link text-lg"></i></button>
+                        </div>
+                    `;
+
                     const headerHTML = `
                         <div class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 mb-8">
                             <div class="hidden md:block"></div>
@@ -312,9 +357,7 @@
                                 ${item.lancamento ? `<p class="text-xl text-gray-600 mt-2">${item.lancamento}</p>` : ''}
                             </div>
                             <div class="flex justify-center md:justify-end">
-                                <button onclick="sharePage()" class="share-btn" title="Partilhar esta página">
-                                    <i class="fas fa-share-alt text-lg"></i>
-                                </button>
+                                ${shareBlockHTML}
                             </div>
                         </div>
                     `;
@@ -369,6 +412,8 @@
                     statusContainer.style.display = 'none';
                     itemContainer.classList.remove('opacity-0');
                     
+                    setupShareButtons(item); // Configura os links de compartilhamento
+
                     if (mediaGallery.length > 0) {
                         setPositionByIndex();
 
