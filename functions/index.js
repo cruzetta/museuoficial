@@ -14,7 +14,6 @@ const db = admin.firestore();
  * @return {string} O HTML com as tags substituídas.
  */
 const replaceMetaTags = (html, data) => {
-    // Define valores padrão para o caso de alguma informação não ser encontrada
     const defaults = {
         title: "Museu Itinerante do Videojogo",
         description: "Explore a história e a evolução dos videogames em nosso acervo completo.",
@@ -27,7 +26,6 @@ const replaceMetaTags = (html, data) => {
     const image = data.image || defaults.image;
     const url = data.url || defaults.url;
 
-    // Limpa a descrição para remover tags HTML e garantir que não seja muito longa
     const cleanDescription = description.replace(/<[^>]+>/g, '').substring(0, 160);
 
     return html
@@ -42,12 +40,12 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
     const itemId = req.query.id;
     const userAgent = req.headers['user-agent'] || '';
     const fullUrl = `https://museu-cca6d.web.app${req.originalUrl}`;
+    const appId = 'museu-cca6d'; // O ID da sua aplicação
 
-    // Configurações para cada tipo de página dinâmica
     let config;
     if (requestPath.startsWith("/item_detalhe.html")) {
         config = {
-            collection: "acervos",
+            collectionName: "acervos",
             htmlFile: "item_detalhe.html",
             titleField: "nome",
             descriptionField: "detalhes",
@@ -55,7 +53,7 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
         };
     } else if (requestPath.startsWith("/noticia.html")) {
         config = {
-            collection: "noticias",
+            collectionName: "noticias",
             htmlFile: "noticia.html",
             titleField: "titulo",
             descriptionField: "subtitulo",
@@ -63,7 +61,6 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
         };
     }
 
-    // Se o caminho não for de uma página dinâmica, encerra a execução.
     if (!config) {
         res.status(404).send("Página não configurada para renderização dinâmica.");
         return;
@@ -72,25 +69,18 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
     const htmlFilePath = path.resolve(__dirname, `../public/${config.htmlFile}`);
 
     try {
-        // Lê o arquivo HTML base
         let html = fs.readFileSync(htmlFilePath, "utf8");
-
-        // Lista de robôs de redes sociais conhecidos
         const botUserAgents = ['facebookexternalhit', 'Twitterbot', 'WhatsApp', 'LinkedInBot', 'Pinterest', 'Discordbot'];
         const isBot = botUserAgents.some(bot => userAgent.toLowerCase().includes(bot.toLowerCase()));
 
-        // Se NÃO for um robô, envia o arquivo HTML original e para a execução.
-        // Isso permite que o JavaScript do lado do cliente funcione para utilizadores normais.
         if (!isBot) {
             res.set("Content-Type", "text/html");
             res.status(200).send(html);
             return;
         }
 
-        // --- Caminho de execução apenas para Robôs ---
-        console.log(`Bot detectado: ${userAgent}. A renderizar a página para: ${requestPath}`);
+        console.log(`Bot detectado: ${userAgent}. Renderizando página para: ${requestPath}`);
         
-        // Se não houver ID na URL, serve a página com as tags padrão
         if (!itemId) {
             const finalHtml = replaceMetaTags(html, { url: fullUrl });
             res.set("Content-Type", "text/html");
@@ -98,15 +88,17 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
             return;
         }
 
-        // Busca o item específico no Firestore
-        const docRef = db.collection(config.collection).doc(itemId);
+        // --- CORREÇÃO PRINCIPAL: Caminho completo para a coleção no Firestore ---
+        const collectionPath = `artifacts/${appId}/public/data/${config.collectionName}`;
+        const docRef = db.collection(collectionPath).doc(itemId);
+        // --- FIM DA CORREÇÃO ---
+        
         const docSnap = await docRef.get();
-
         let metaData = { url: fullUrl };
 
         if (docSnap.exists) {
             const itemData = docSnap.data();
-            console.log(`Documento encontrado com ID: ${itemId}`);
+            console.log(`Documento encontrado em '${collectionPath}' com ID: ${itemId}`);
             metaData = {
                 ...metaData,
                 title: itemData[config.titleField],
@@ -114,8 +106,7 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
                 image: itemData[config.imageField]
             };
         } else {
-            console.log(`Documento com ID: ${itemId} não encontrado na coleção ${config.collection}.`);
-            // Se o item não for encontrado, usa textos específicos de "Não Encontrado"
+            console.log(`Documento com ID: ${itemId} não encontrado em '${collectionPath}'.`);
             metaData = {
                 ...metaData,
                 title: "Conteúdo não encontrado",
@@ -123,7 +114,6 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
             };
         }
 
-        // Substitui os placeholders e envia o HTML final para o robô
         const finalHtml = replaceMetaTags(html, metaData);
         res.set("Content-Type", "text/html");
         res.status(200).send(finalHtml);
