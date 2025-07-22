@@ -3,25 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Item - Museu do Videojogo</title>
     
-    <!-- 
-      Meta Tags para compartilhamento (Open Graph e Twitter Cards).
-      Estes valores são preenchidos dinamicamente via JavaScript.
-      ATENÇÃO: A maioria das plataformas sociais (WhatsApp, Facebook, Twitter) NÃO executa JavaScript
-      ao buscar a pré-visualização de um link. Portanto, esta abordagem client-side pode não funcionar
-      para gerar a pré-visualização correta. A solução mais robusta envolve renderização no lado do servidor (SSR).
-    -->
-    <meta property="og:title" content="Museu do Videojogo">
+    <!-- Placeholders para Open Graph e Twitter Cards (para a Firebase Function) -->
+    <title>__OG_TITLE__</title>
+    <meta property="og:title" content="__OG_TITLE__">
+    <meta property="og:description" content="__OG_DESCRIPTION__">
+    <meta property="og:image" content="__OG_IMAGE__">
+    <meta property="og:url" content="__OG_URL__">
     <meta property="og:type" content="article">
-    <meta property="og:url" content="">
-    <meta property="og:image" content="https://museu-cca6d.web.app/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png">
-    <meta property="og:description" content="Explore a história dos videogames em nosso acervo.">
-    
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Museu do Videojogo">
-    <meta name="twitter:description" content="Explore a história dos videogames em nosso acervo.">
-    <meta name="twitter:image" content="https://museu-cca6d.web.app/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png">
+    <meta name="twitter:title" content="__OG_TITLE__">
+    <meta name="twitter:description" content="__OG_DESCRIPTION__">
+    <meta name="twitter:image" content="__OG_IMAGE__">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,19 +43,14 @@
         .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
         .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
         .section-title { font-size: 1.875rem; font-weight: 600; padding-bottom: 0.75rem; border-bottom: 2px solid #e9ecef; margin-bottom: 2rem; }
-        
-        /* Estilos para botões de compartilhamento */
         .share-btn { background-color: #fff; color: #495057; border: 1px solid #ced4da; height: 3rem; width: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .share-btn:hover { background-color: #f8f9fa; color: var(--primary-color); border-color: var(--primary-color); transform: scale(1.1); }
         .share-btn.whatsapp:hover { color: #25D366; border-color: #25D366; }
         .share-btn.facebook:hover { color: #1877F2; border-color: #1877F2; }
         .share-btn.twitter-x:hover { color: #000000; border-color: #000000; }
-
         #notification-toast { position: fixed; bottom: 1.25rem; right: 1.25rem; background-color: #28a745; color: white; padding: 1rem 1.5rem; border-radius: 0.375rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.4s ease-in-out; transform: translateY(200%); opacity: 0; z-index: 100; }
         #notification-toast.show { transform: translateY(0); opacity: 1; }
         .placeholder-card { text-align: center; color: #6c757d; padding: 2rem; border: 2px dashed #e9ecef; border-radius: 0.5rem; background-color: #f8f9fa; }
-        
-        /* Estilos do Carrossel Arrastável */
         #media-display-container { overflow: hidden; cursor: grab; }
         #media-display-container.dragging { cursor: grabbing; }
         #media-track { display: flex; }
@@ -73,60 +61,27 @@
         .control-btn:hover:not(:disabled) { background-color: var(--primary-color); color: white; border-color: var(--primary-hover); }
         .control-btn:disabled { background-color: #f8f9fa; color: #adb5bd; cursor: not-allowed; border-color: #dee2e6; }
         #media-counter { min-width: 50px; text-align: center; }
-
-        /* ESTILOS PARA A BARRA DE PESQUISA */
-        .form-input {
-            width: 100%;
-            border-radius: 0.375rem;
-            border: 1px solid var(--border-color);
-            padding: 0.5rem 0.75rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
-        }
-        #autocomplete-results {
-            background-color: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-        }
-        .autocomplete-item {
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            color: var(--text-dark);
-        }
-        .autocomplete-item:hover {
-            background-color: var(--bg-light);
-        }
+        .form-input { width: 100%; border-radius: 0.375rem; border: 1px solid var(--border-color); padding: 0.5rem 0.75rem; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3); }
+        #autocomplete-results { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .autocomplete-item { padding: 0.75rem 1rem; cursor: pointer; color: var(--text-dark); }
+        .autocomplete-item:hover { background-color: var(--bg-light); }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- CABEÇALHO ATUALIZADO COM BARRA DE PESQUISA -->
     <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
         <nav class="container mx-auto px-4 sm:px-6 h-24 flex justify-between items-center gap-4">
-            <!-- Logo do Museu -->
             <a href="index.html" class="flex-shrink-0">
                 <img src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videojogo" class="h-32 w-auto">
             </a>
-            
-            <!-- Container para Pesquisa -->
-            <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
-                <!-- Barra de Pesquisa -->
-                <div id="search-container" class="relative w-full max-w-lg">
-                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="form-input w-full py-2 pl-10 pr-4">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 z-50 hidden"></div>
-                </div>
+            <div id="search-container" class="relative w-full max-w-lg">
+                <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="form-input w-full py-2 pl-10 pr-4">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <i class="fa-solid fa-search"></i>
+                </span>
+                <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 z-50 hidden"></div>
             </div>
-
             <a href="galeria.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
                 <i class="fas fa-arrow-left"></i>
                 <span class="hidden lg:inline ml-2">Voltar à Galeria</span>
@@ -175,7 +130,6 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // --- STATE MANAGEMENT (PÁGINA E BUSCA) ---
         let mediaGallery = [];
         let currentIndex = 0;
         let isDragging = false;
@@ -183,9 +137,8 @@
         let currentTranslate = 0;
         let prevTranslate = 0;
         let animationID;
-        const searchState = { items: [] }; // Estado para a busca
+        const searchState = { items: [] };
 
-        // --- DOM ELEMENTS ---
         const itemContainer = document.getElementById('item-container');
         const statusContainer = document.getElementById('status-container');
         const loader = document.getElementById('loader');
@@ -194,7 +147,6 @@
         const searchInput = document.getElementById('searchInput');
         const autocompleteResults = document.getElementById('autocomplete-results');
         
-        // --- FUNÇÕES DO CARROSSEL ---
         function setPositionByIndex() {
             const track = document.getElementById('media-track');
             if (!track) return;
@@ -287,28 +239,6 @@
             });
         }
 
-        // --- FUNÇÕES AUXILIARES (PÁGINA) ---
-        function updateMetaTags(item) {
-            const pageUrl = window.location.href;
-            const description = item.detalhes ? item.detalhes.replace(/<[^>]+>/g, '').substring(0, 150) + '...' : 'Explore este item do acervo do Museu do Videojogo.';
-            
-            // Define a imagem de pré-visualização. A prioridade é a imagem principal do item.
-            // O URL da imagem deve ser absoluto para funcionar corretamente nas plataformas.
-            const fallbackImage = 'https://museu-cca6d.web.app/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png';
-            const imageUrl = item.imagem_principal || fallbackImage;
-
-            // Atualiza as tags Open Graph (usadas pelo WhatsApp, Facebook, etc.)
-            document.querySelector('meta[property="og:title"]').setAttribute('content', item.nome || 'Item do Acervo');
-            document.querySelector('meta[property="og:description"]').setAttribute('content', description);
-            document.querySelector('meta[property="og:image"]').setAttribute('content', imageUrl);
-            document.querySelector('meta[property="og:url"]').setAttribute('content', pageUrl);
-
-            // Atualiza as tags Twitter Card
-            document.querySelector('meta[name="twitter:title"]').setAttribute('content', item.nome || 'Item do Acervo');
-            document.querySelector('meta[name="twitter:description"]').setAttribute('content', description);
-            document.querySelector('meta[name="twitter:image"]').setAttribute('content', imageUrl);
-        }
-        
         function setupShareButtons(item) {
             const url = encodeURIComponent(window.location.href);
             const title = encodeURIComponent(item.nome);
@@ -334,7 +264,6 @@
             errorText.textContent = message;
         };
 
-        // --- FUNÇÃO PRINCIPAL DE CARREGAMENTO (PÁGINA) ---
         async function carregarItem() {
             const itemId = new URLSearchParams(window.location.search).get('id');
             if (!itemId) {
@@ -348,8 +277,9 @@
 
                 if (docSnap.exists()) {
                     const item = docSnap.data();
-                    document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
-                    updateMetaTags(item); // Atualiza as meta tags
+                    
+                    // Não definimos o título aqui, pois ele já foi preenchido pela função
+                    // document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
                     
                     mediaGallery = [];
                     if (item.imagem_principal) {
@@ -432,7 +362,7 @@
                     statusContainer.style.display = 'none';
                     itemContainer.classList.remove('opacity-0');
                     
-                    setupShareButtons(item); // Configura os links de compartilhamento
+                    setupShareButtons(item);
 
                     if (mediaGallery.length > 0) {
                         setPositionByIndex();
@@ -454,7 +384,6 @@
             }
         }
 
-        // --- LÓGICA DE BUSCA ---
         function updateAutocomplete(query) {
              autocompleteResults.innerHTML = '';
              if (query.length < 1) {
@@ -465,7 +394,7 @@
              const searchRegex = new RegExp('\\b' + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
              const matchedItems = searchState.items
                 .filter(item => item.nome && searchRegex.test(item.nome))
-                .slice(0, 5); // Limita a 5 sugestões
+                .slice(0, 5);
 
              if (matchedItems.length > 0) {
                  matchedItems.forEach(item => {
@@ -496,7 +425,6 @@
             }
         }
 
-        // --- INICIALIZAÇÃO GERAL ---
         document.addEventListener('DOMContentLoaded', () => {
             carregarItem();
             carregarAcervoParaBusca();

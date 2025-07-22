@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notícia - Museu Itinerante do Videojogo</title>
+
+    <!-- Placeholders para Open Graph e Twitter Cards (para a Firebase Function) -->
+    <title>__OG_TITLE__</title>
+    <meta property="og:title" content="__OG_TITLE__">
+    <meta property="og:description" content="__OG_DESCRIPTION__">
+    <meta property="og:image" content="__OG_IMAGE__">
+    <meta property="og:url" content="__OG_URL__">
+    <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="__OG_TITLE__">
+    <meta name="twitter:description" content="__OG_DESCRIPTION__">
+    <meta name="twitter:image" content="__OG_IMAGE__">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,8 +47,6 @@
         .prose-custom ul { list-style-type: disc; }
         .prose-custom ol { list-style-type: decimal; }
         .prose-custom blockquote { border-left: 4px solid var(--primary-color); padding-left: 1rem; margin-left: 0; font-style: italic; color: var(--text-light); }
-        
-        /* Estilos do Carrossel Arrastável (COPIADO DE item_detalhe.html) */
         #media-display-container { overflow: hidden; cursor: grab; }
         #media-display-container.dragging { cursor: grabbing; }
         #media-track { display: flex; }
@@ -99,7 +109,6 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
         
-        // --- STATE MANAGEMENT E DOM (ATUALIZADO) ---
         let mediaGallery = [];
         let currentIndex = 0;
         let isDragging = false, startPos = 0, currentTranslate = 0, prevTranslate = 0, animationID;
@@ -108,7 +117,6 @@
         const loader = document.getElementById('loader');
         const noticiaContentEl = document.getElementById('noticia-content');
 
-        // --- FUNÇÕES DO CARROSSEL ---
         function setPositionByIndex() {
             const track = document.getElementById('media-track');
             if (!track) return;
@@ -188,7 +196,6 @@
             `;
         }
 
-        // --- FUNÇÃO DE CARREGAMENTO PRINCIPAL (ATUALIZADA) ---
         async function carregarNoticia() {
             try {
                 const noticiaId = new URLSearchParams(window.location.search).get('id');
@@ -202,7 +209,6 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    document.title = `${data.titulo || 'Notícia'} - MIV`;
                     
                     mediaGallery = [];
                     if (data.imagem_principal) {
@@ -246,7 +252,6 @@
                             </div>`;
                     }
 
-                    // ✅ CORREÇÃO: Adicionado o subtítulo abaixo do título principal.
                     noticiaContentEl.innerHTML = `
                         <div class="p-0 md:p-2">
                             <div class="mb-8 text-center">
