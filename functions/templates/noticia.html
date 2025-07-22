@@ -210,9 +210,6 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    // --- CORREÇÃO PARA O TÍTULO DA ABA DO NAVEGADOR ---
-                    document.title = `${data.titulo || 'Notícia'} - Museu do Videojogo`;
-                    
                     mediaGallery = [];
                     if (data.imagem_principal) {
                         mediaGallery.push({ tipo: 'imagem', url: data.imagem_principal, nome: 'Imagem Principal' });

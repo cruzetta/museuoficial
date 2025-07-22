@@ -43,11 +43,9 @@ exports.dynamicRenderer = functions.runWith({ memory: '1GB' }).https.onRequest(a
     const fullUrl = `https://museu-cca6d.web.app${req.originalUrl}`;
     const appId = 'museu-cca6d';
 
-    // Lista mais completa de robôs
     const botUserAgents = ['facebookexternalhit', 'Twitterbot', 'WhatsApp', 'LinkedInBot', 'Pinterest', 'Discordbot', 'Googlebot'];
     const isBot = botUserAgents.some(bot => userAgent.toLowerCase().includes(bot.toLowerCase()));
 
-    // Configuração das páginas dinâmicas
     let config;
     if (requestPath.startsWith("/item_detalhe.html")) {
         config = {
@@ -67,18 +65,17 @@ exports.dynamicRenderer = functions.runWith({ memory: '1GB' }).https.onRequest(a
         };
     }
 
-    // Se não for uma página dinâmica, não faz nada.
     if (!config) {
         res.status(404).send("Página não configurada.");
         return;
     }
 
-    const htmlFilePath = path.resolve(__dirname, `../public/${config.htmlFile}`);
+    // --- CORREÇÃO CRÍTICA: O caminho agora aponta para a pasta 'templates' DENTRO da pasta 'functions' ---
+    const htmlFilePath = path.resolve(__dirname, `./templates/${config.htmlFile}`);
 
     try {
         const html = fs.readFileSync(htmlFilePath, "utf8");
 
-        // --- CAMINHO PARA UTILIZADORES NORMAIS ---
         // Se NÃO for um robô, envia o HTML original para que o JS do cliente funcione.
         if (!isBot) {
             res.set("Content-Type", "text/html");
@@ -86,22 +83,17 @@ exports.dynamicRenderer = functions.runWith({ memory: '1GB' }).https.onRequest(a
             return;
         }
 
-        // --- CAMINHO APENAS PARA ROBÔS ---
+        // --- Caminho Apenas para Robôs ---
         console.log(`[LOG] Bot detectado: ${userAgent}. A renderizar: ${fullUrl}`);
 
-        // Se o robô aceder sem um ID, serve as tags padrão.
         if (!itemId) {
-            console.log("[LOG] Nenhum ID de item encontrado. A servir tags padrão.");
             const finalHtml = replaceMetaTags(html, { url: fullUrl });
             res.set("Content-Type", "text/html");
             res.status(200).send(finalHtml);
             return;
         }
         
-        // Caminho completo para a coleção no Firestore
         const collectionPath = `artifacts/${appId}/public/data/${config.collectionName}`;
-        console.log(`[LOG] A consultar Firestore. Caminho: ${collectionPath}, ID: ${itemId}`);
-        
         const docRef = db.collection(collectionPath).doc(itemId);
         const docSnap = await docRef.get();
         
@@ -118,20 +110,15 @@ exports.dynamicRenderer = functions.runWith({ memory: '1GB' }).https.onRequest(a
             };
         } else {
             console.log(`[LOG] ALERTA: Documento com ID '${itemId}' não foi encontrado em '${collectionPath}'.`);
-            metaData = {
-                ...metaData,
-                title: "Conteúdo não encontrado",
-                description: "O conteúdo que você está procurando não foi encontrado em nosso site."
-            };
+            metaData = { ...metaData, title: "Conteúdo não encontrado" };
         }
 
         const finalHtml = replaceMetaTags(html, metaData);
-        console.log("[LOG] HTML final enviado para o bot.");
         res.set("Content-Type", "text/html");
         res.status(200).send(finalHtml);
 
     } catch (error) {
-        console.error(`[ERRO CRÍTICO] Falha ao renderizar a página. Erro:`, error);
+        console.error(`[ERRO CRÍTICO] Falha ao ler o template ou ao executar a função. Caminho: ${htmlFilePath}`, error);
         res.status(500).send("Ocorreu um erro interno ao processar a sua solicitação.");
     }
 });

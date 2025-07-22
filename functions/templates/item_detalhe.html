@@ -278,8 +278,8 @@
                 if (docSnap.exists()) {
                     const item = docSnap.data();
                     
-                    // --- CORREÇÃO PARA O TÍTULO DA ABA DO NAVEGADOR ---
-                    document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
+                    // Não definimos o título aqui, pois ele já foi preenchido pela função
+                    // document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
                     
                     mediaGallery = [];
                     if (item.imagem_principal) {
