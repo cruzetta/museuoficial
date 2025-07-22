@@ -35,12 +35,11 @@ const replaceMetaTags = (html, data) => {
         .replace(/__OG_URL__/g, url);
 };
 
-exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
+exports.dynamicRenderer = functions.runWith({ memory: '1GB' }).https.onRequest(async (req, res) => {
     const requestPath = req.path;
     const itemId = req.query.id;
-    const userAgent = req.headers['user-agent'] || '';
     const fullUrl = `https://museu-cca6d.web.app${req.originalUrl}`;
-    const appId = 'museu-cca6d'; // O ID da sua aplicação
+    const appId = 'museu-cca6d';
 
     let config;
     if (requestPath.startsWith("/item_detalhe.html")) {
@@ -70,17 +69,8 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
 
     try {
         let html = fs.readFileSync(htmlFilePath, "utf8");
-        const botUserAgents = ['facebookexternalhit', 'Twitterbot', 'WhatsApp', 'LinkedInBot', 'Pinterest', 'Discordbot'];
-        const isBot = botUserAgents.some(bot => userAgent.toLowerCase().includes(bot.toLowerCase()));
-
-        if (!isBot) {
-            res.set("Content-Type", "text/html");
-            res.status(200).send(html);
-            return;
-        }
-
-        console.log(`Bot detectado: ${userAgent}. Renderizando página para: ${requestPath}`);
         
+        // Se não houver ID na URL, serve a página com as tags padrão e encerra.
         if (!itemId) {
             const finalHtml = replaceMetaTags(html, { url: fullUrl });
             res.set("Content-Type", "text/html");
@@ -88,17 +78,15 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
             return;
         }
 
-        // --- CORREÇÃO PRINCIPAL: Caminho completo para a coleção no Firestore ---
+        // Caminho completo para a coleção no Firestore
         const collectionPath = `artifacts/${appId}/public/data/${config.collectionName}`;
         const docRef = db.collection(collectionPath).doc(itemId);
-        // --- FIM DA CORREÇÃO ---
         
         const docSnap = await docRef.get();
         let metaData = { url: fullUrl };
 
         if (docSnap.exists) {
             const itemData = docSnap.data();
-            console.log(`Documento encontrado em '${collectionPath}' com ID: ${itemId}`);
             metaData = {
                 ...metaData,
                 title: itemData[config.titleField],
@@ -106,7 +94,6 @@ exports.dynamicRenderer = functions.https.onRequest(async (req, res) => {
                 image: itemData[config.imageField]
             };
         } else {
-            console.log(`Documento com ID: ${itemId} não encontrado em '${collectionPath}'.`);
             metaData = {
                 ...metaData,
                 title: "Conteúdo não encontrado",
