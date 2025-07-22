@@ -5,13 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes do Item - Museu do Videojogo</title>
     
-    <!-- Meta Tags para Compartilhamento (serão preenchidas via JS) -->
+    <!-- 
+      Meta Tags para compartilhamento (Open Graph e Twitter Cards).
+      Estes valores são preenchidos dinamicamente via JavaScript.
+      ATENÇÃO: A maioria das plataformas sociais (WhatsApp, Facebook, Twitter) NÃO executa JavaScript
+      ao buscar a pré-visualização de um link. Portanto, esta abordagem client-side pode não funcionar
+      para gerar a pré-visualização correta. A solução mais robusta envolve renderização no lado do servidor (SSR).
+    -->
     <meta property="og:title" content="Museu do Videojogo">
-    <meta property="og:description" content="Explore a história dos videogames em nosso acervo.">
-    <meta property="og:image" content="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png">
-    <meta property="og:url" content="">
     <meta property="og:type" content="article">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="https://museu-cca6d.web.app/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png">
+    <meta property="og:description" content="Explore a história dos videogames em nosso acervo.">
+    
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Museu do Videojogo">
+    <meta name="twitter:description" content="Explore a história dos videogames em nosso acervo.">
+    <meta name="twitter:image" content="https://museu-cca6d.web.app/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +51,7 @@
         .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
         .section-title { font-size: 1.875rem; font-weight: 600; padding-bottom: 0.75rem; border-bottom: 2px solid #e9ecef; margin-bottom: 2rem; }
         
-        /* NOVO: Estilos para botões de compartilhamento */
+        /* Estilos para botões de compartilhamento */
         .share-btn { background-color: #fff; color: #495057; border: 1px solid #ced4da; height: 3rem; width: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .share-btn:hover { background-color: #f8f9fa; color: var(--primary-color); border-color: var(--primary-color); transform: scale(1.1); }
         .share-btn.whatsapp:hover { color: #25D366; border-color: #25D366; }
@@ -282,10 +292,21 @@
             const pageUrl = window.location.href;
             const description = item.detalhes ? item.detalhes.replace(/<[^>]+>/g, '').substring(0, 150) + '...' : 'Explore este item do acervo do Museu do Videojogo.';
             
+            // Define a imagem de pré-visualização. A prioridade é a imagem principal do item.
+            // O URL da imagem deve ser absoluto para funcionar corretamente nas plataformas.
+            const fallbackImage = 'https://museu-cca6d.web.app/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png';
+            const imageUrl = item.imagem_principal || fallbackImage;
+
+            // Atualiza as tags Open Graph (usadas pelo WhatsApp, Facebook, etc.)
             document.querySelector('meta[property="og:title"]').setAttribute('content', item.nome || 'Item do Acervo');
             document.querySelector('meta[property="og:description"]').setAttribute('content', description);
-            document.querySelector('meta[property="og:image"]').setAttribute('content', item.imagem_principal || 'imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png');
+            document.querySelector('meta[property="og:image"]').setAttribute('content', imageUrl);
             document.querySelector('meta[property="og:url"]').setAttribute('content', pageUrl);
+
+            // Atualiza as tags Twitter Card
+            document.querySelector('meta[name="twitter:title"]').setAttribute('content', item.nome || 'Item do Acervo');
+            document.querySelector('meta[name="twitter:description"]').setAttribute('content', description);
+            document.querySelector('meta[name="twitter:image"]').setAttribute('content', imageUrl);
         }
         
         function setupShareButtons(item) {
@@ -338,7 +359,6 @@
                         mediaGallery.push(...item.galeria_midia.filter(m => m.url));
                     }
 
-                    // NOVO: Bloco de compartilhamento
                     const shareBlockHTML = `
                         <div class="flex items-center justify-center md:justify-end gap-2">
                             <span class="text-sm font-semibold text-gray-600 mr-2">Partilhar:</span>
