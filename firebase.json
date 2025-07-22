@@ -19,11 +19,11 @@
     ],
     "rewrites": [
       {
-        "source": "/item_detalhe.html",
+        "source": "/item_detalhe**",
         "function": "dynamicRenderer"
       },
       {
-        "source": "/noticia.html",
+        "source": "/noticia**",
         "function": "dynamicRenderer"
       }
     ]
