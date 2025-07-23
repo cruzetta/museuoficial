@@ -35,7 +35,6 @@ const replaceMetaTags = (html, data) => {
         .replace(/__OG_URL__/g, url);
 };
 
-// Aumentamos a memória para prevenir timeouts em cold starts.
 exports.dynamicRenderer = functions.runWith({ memory: '1GB' }).https.onRequest(async (req, res) => {
     const requestPath = req.path;
     const itemId = req.query.id;
@@ -70,30 +69,38 @@ exports.dynamicRenderer = functions.runWith({ memory: '1GB' }).https.onRequest(a
         return;
     }
 
-    // --- CORREÇÃO CRÍTICA: O caminho agora aponta para a pasta 'templates' DENTRO da pasta 'functions' ---
     const htmlFilePath = path.resolve(__dirname, `./templates/${config.htmlFile}`);
+    console.log(`[LOG] A tentar ler o arquivo de template em: ${htmlFilePath}`);
 
     try {
-        const html = fs.readFileSync(htmlFilePath, "utf8");
+        const htmlTemplate = fs.readFileSync(htmlFilePath, "utf8");
+        console.log(`[LOG] Template HTML lido com sucesso. Comprimento: ${htmlTemplate.length} caracteres.`);
 
-        // Se NÃO for um robô, envia o HTML original para que o JS do cliente funcione.
+        if (!htmlTemplate.includes('__OG_TITLE__')) {
+            console.error("[ERRO] O placeholder '__OG_TITLE__' NÃO foi encontrado no template lido!");
+        } else {
+            console.log("[LOG] Placeholder '__OG_TITLE__' encontrado no template.");
+        }
+
         if (!isBot) {
-            res.set("Content-Type", "text/html");
-            res.status(200).send(html);
+            res.set("Content-Type", "text/html; charset=utf-8");
+            res.status(200).send(htmlTemplate);
             return;
         }
 
-        // --- Caminho Apenas para Robôs ---
         console.log(`[LOG] Bot detectado: ${userAgent}. A renderizar: ${fullUrl}`);
 
         if (!itemId) {
-            const finalHtml = replaceMetaTags(html, { url: fullUrl });
-            res.set("Content-Type", "text/html");
+            console.log("[LOG] Nenhum ID de item encontrado. A servir tags padrão.");
+            const finalHtml = replaceMetaTags(htmlTemplate, { url: fullUrl });
+            res.set("Content-Type", "text/html; charset=utf-8");
             res.status(200).send(finalHtml);
             return;
         }
         
         const collectionPath = `artifacts/${appId}/public/data/${config.collectionName}`;
+        console.log(`[LOG] A consultar Firestore. Caminho: ${collectionPath}, ID: ${itemId}`);
+        
         const docRef = db.collection(collectionPath).doc(itemId);
         const docSnap = await docRef.get();
         
@@ -101,20 +108,29 @@ exports.dynamicRenderer = functions.runWith({ memory: '1GB' }).https.onRequest(a
 
         if (docSnap.exists) {
             const itemData = docSnap.data();
-            console.log(`[LOG] Documento encontrado: ${itemData[config.titleField]}`);
-            metaData = {
-                ...metaData,
-                title: itemData[config.titleField],
-                description: itemData[config.descriptionField],
-                image: itemData[config.imageField]
-            };
+            console.log(`[LOG] Documento encontrado. Dados brutos:`, JSON.stringify(itemData));
+
+            const title = itemData[config.titleField] || '';
+            const description = itemData[config.descriptionField] || '';
+            const image = itemData[config.imageField] || '';
+            console.log(`[LOG] Dados extraídos para as meta tags: Title='${title}', Image='${image}'`);
+
+            metaData = { ...metaData, title, description, image };
         } else {
             console.log(`[LOG] ALERTA: Documento com ID '${itemId}' não foi encontrado em '${collectionPath}'.`);
             metaData = { ...metaData, title: "Conteúdo não encontrado" };
         }
 
-        const finalHtml = replaceMetaTags(html, metaData);
-        res.set("Content-Type", "text/html");
+        console.log("[LOG] A substituir as meta tags com os seguintes dados:", JSON.stringify(metaData));
+        const finalHtml = replaceMetaTags(htmlTemplate, metaData);
+        
+        if (finalHtml.includes('__OG_TITLE__')) {
+             console.error("[ERRO FINAL] Após a substituição, o placeholder '__OG_TITLE__' AINDA está presente no HTML final!");
+        } else {
+             console.log("[LOG] Substituição de placeholders parece ter sido bem-sucedida.");
+        }
+
+        res.set("Content-Type", "text/html; charset=utf-8");
         res.status(200).send(finalHtml);
 
     } catch (error) {
