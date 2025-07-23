@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    
     <!-- Placeholders para Open Graph e Twitter Cards -->
     <title>__OG_TITLE__</title>
     <meta property="og:title" content="__OG_TITLE__">
@@ -29,26 +29,36 @@
             --primary-hover: #d97706;
             --dark-header: #111827;
             --text-dark: #212529;
-            --text-light: #495057;
+            --text-light: #343a40;
             --bg-light: #f8f9fa;
             --border-color: #dee2e6;
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
         h1, h2, h3 { font-family: 'Inter', sans-serif; font-weight: 600; }
-        .content-card { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); }
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; text-align: center; transition: all 0.2s; cursor: pointer; border: 1px solid transparent; }
-        .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
-        .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
-        #header-logo { height: 120px; width: auto; }
+        .content-card { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 2rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); margin-bottom: 2rem; }
         .prose-custom { font-family: 'Lora', serif; color: var(--text-light); font-size: 1.125rem; line-height: 1.8; }
         .prose-custom p { margin-bottom: 1.5rem; }
         .prose-custom a { color: var(--primary-color); text-decoration: none; border-bottom: 1px solid var(--primary-color); }
         .prose-custom a:hover { color: var(--primary-hover); border-color: var(--primary-hover); }
-        .prose-custom h1, .prose-custom h2, .prose-custom h3, .prose-custom h4 { font-family: 'Inter', sans-serif; color: var(--text-dark); margin-top: 2.5rem; margin-bottom: 1rem; font-weight: 600; }
-        .prose-custom ul, .prose-custom ol { margin-left: 1.5rem; margin-bottom: 1.5rem; padding-left: 0.5rem; }
-        .prose-custom ul { list-style-type: disc; }
-        .prose-custom ol { list-style-type: decimal; }
-        .prose-custom blockquote { border-left: 4px solid var(--primary-color); padding-left: 1rem; margin-left: 0; font-style: italic; color: var(--text-light); }
+        .prose-custom h1, .prose-custom h2, .prose-custom h3 { font-family: 'Inter', sans-serif; color: var(--text-dark); margin-bottom: 1rem; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; text-align: center; transition: all 0.2s ease-in-out; cursor: pointer; border: 1px solid transparent; }
+        .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
+        .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
+        .section-title { font-size: 1.875rem; font-weight: 600; padding-bottom: 0.75rem; border-bottom: 2px solid #e9ecef; margin-bottom: 2rem; }
+        .share-btn { background-color: #fff; color: #495057; border: 1px solid #ced4da; height: 3rem; width: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .share-btn:hover { background-color: #f8f9fa; color: var(--primary-color); border-color: var(--primary-color); transform: scale(1.1); }
+        .share-btn.whatsapp:hover { color: #25D366; border-color: #25D366; }
+        .share-btn.facebook:hover { color: #1877F2; border-color: #1877F2; }
+        .share-btn.twitter-x:hover { color: #000000; border-color: #000000; }
+        
+        /* --- CORREÇÃO PARA OS ÍCONES NÃO CLICÁVEIS --- */
+        .share-btn i {
+            pointer-events: none;
+        }
+
+        #notification-toast { position: fixed; bottom: 1.25rem; right: 1.25rem; background-color: #28a745; color: white; padding: 1rem 1.5rem; border-radius: 0.375rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.4s ease-in-out; transform: translateY(200%); opacity: 0; z-index: 100; }
+        #notification-toast.show { transform: translateY(0); opacity: 1; }
+        .placeholder-card { text-align: center; color: #6c757d; padding: 2rem; border: 2px dashed #e9ecef; border-radius: 0.5rem; background-color: #f8f9fa; }
         #media-display-container { overflow: hidden; cursor: grab; }
         #media-display-container.dragging { cursor: grabbing; }
         #media-track { display: flex; }
@@ -59,6 +69,11 @@
         .control-btn:hover:not(:disabled) { background-color: var(--primary-color); color: white; border-color: var(--primary-hover); }
         .control-btn:disabled { background-color: #f8f9fa; color: #adb5bd; cursor: not-allowed; border-color: #dee2e6; }
         #media-counter { min-width: 50px; text-align: center; }
+        .form-input { width: 100%; border-radius: 0.375rem; border: 1px solid var(--border-color); padding: 0.5rem 0.75rem; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3); }
+        #autocomplete-results { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .autocomplete-item { padding: 0.75rem 1rem; cursor: pointer; color: var(--text-dark); }
+        .autocomplete-item:hover { background-color: var(--bg-light); }
     </style>
 </head>
 <body class="antialiased">
@@ -234,19 +249,33 @@
 
         function setupShareButtons(item) {
             const url = encodeURIComponent(window.location.href);
-            const title = encodeURIComponent(item.nome);
+            const title = encodeURIComponent(item.nome || 'Item do Acervo');
 
-            document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${title}%20${url}`;
-            document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-            document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+            const whatsappBtn = document.getElementById('share-whatsapp');
+            if (whatsappBtn) {
+                whatsappBtn.href = `https://api.whatsapp.com/send?text=${title}%20${url}`;
+            }
+
+            const facebookBtn = document.getElementById('share-facebook');
+            if (facebookBtn) {
+                facebookBtn.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+            }
+
+            const twitterBtn = document.getElementById('share-twitter');
+            if (twitterBtn) {
+                twitterBtn.href = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+            }
             
-            document.getElementById('share-copy').addEventListener('click', () => {
-                navigator.clipboard.writeText(window.location.href).then(() => {
-                    const toast = document.getElementById('notification-toast');
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 3000);
+            const copyBtn = document.getElementById('share-copy');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                        const toast = document.getElementById('notification-toast');
+                        toast.classList.add('show');
+                        setTimeout(() => toast.classList.remove('show'), 3000);
+                    });
                 });
-            });
+            }
         }
 
         const createPlaceholder = (icon, text) => `<div class="placeholder-card"><i class="fas ${icon} text-2xl mb-2"></i><p>${text}</p></div>`;
@@ -271,7 +300,6 @@
                 if (docSnap.exists()) {
                     const item = docSnap.data();
                     
-                    // --- CORREÇÃO PARA O TÍTULO DA ABA DO NAVEGADOR ---
                     document.title = `${item.nome || 'Item do Acervo'} - Museu do Videojogo`;
                     
                     mediaGallery = [];
