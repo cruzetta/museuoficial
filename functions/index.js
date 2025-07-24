@@ -40,26 +40,9 @@ const replaceMetaTags = (html, data) => {
 exports.dynamicRenderer = functions.runWith({ memory: "1GB" }).https.onRequest(async (req, res) => {
     const requestPath = req.path;
     const itemId = req.query.id;
-    const userAgent = req.headers["user-agent"] || "";
     const fullUrl = `https://museu-cca6d.web.app${req.originalUrl}`;
     
-    // CORREÇÃO: O ID do seu projeto já está disponível no ambiente do Firebase.
-    // Não é necessário defini-lo manualmente.
-    // const appId = 'museu-cca6d';
-
-    const botUserAgents = ["facebookexternalhit", "Twitterbot", "WhatsApp", "LinkedInBot", "Pinterest", "Discordbot", "Googlebot"];
-    const isBot = botUserAgents.some((bot) => userAgent.toLowerCase().includes(bot.toLowerCase()));
-
-    // Se não for um robô, não fazemos nada e deixamos o Firebase Hosting servir o arquivo estático.
-    // Isso economiza recursos da função.
-    if (!isBot) {
-        // O Firebase Hosting irá automaticamente servir o arquivo de /public
-        // Nós apenas encaminhamos a requisição.
-        res.status(200).send(fs.readFileSync(path.resolve(__dirname, `../public${requestPath}`), "utf8"));
-        return;
-    }
-    
-    console.log(`[LOG] Bot detectado: ${userAgent}. Renderizando URL: ${fullUrl}`);
+    console.log(`[LOG] Renderizando URL para todos os visitantes: ${fullUrl}`);
 
     let config;
     if (requestPath.startsWith("/item_detalhe")) {
@@ -99,8 +82,6 @@ exports.dynamicRenderer = functions.runWith({ memory: "1GB" }).https.onRequest(a
             return;
         }
         
-        // CORREÇÃO CRÍTICA: O caminho para os seus dados no Firestore estava incorreto.
-        // O caminho correto inclui "artifacts/{appId}/public/data/".
         const collectionPath = `artifacts/museu-cca6d/public/data/${config.collectionName}`;
         console.log(`[LOG] Consultando Firestore. Caminho: ${collectionPath}, ID: ${itemId}`);
         
