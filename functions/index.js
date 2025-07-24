@@ -10,16 +10,15 @@ const db = admin.firestore();
 /**
  * Substitui os placeholders de meta tags em uma string HTML.
  * @param {string} html O conteúdo do arquivo HTML.
- * @param {object} data Os dados para preencher as tags (title, description, image, url).
+ * @param {object} data Os dados para preencher as tags (title, image, description, url).
  * @return {string} O HTML com as tags substituídas.
  */
 const replaceMetaTags = (html, data) => {
-    // Valores padrão caso algo falhe
     const defaults = {
         title: "Museu Itinerante do Videojogo",
         description: "Explore a história e a evolução dos videogames em nosso acervo completo.",
         image: "https://museu-cca6d.web.app/imagens/LOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png",
-        url: "https://museu-cca6d.web.app",
+        url: "https://museu-cca6d.web.app"
     };
 
     const title = data.title || defaults.title;
@@ -27,8 +26,7 @@ const replaceMetaTags = (html, data) => {
     const image = data.image || defaults.image;
     const url = data.url || defaults.url;
 
-    // Limpa a descrição de qualquer tag HTML e limita o tamanho
-    const cleanDescription = (description || "").replace(/<[^>]+>/g, "").substring(0, 160);
+    const cleanDescription = description.replace(/<[^>]+>/g, '').substring(0, 160);
 
     return html
         .replace(/__OG_TITLE__/g, title)
@@ -37,53 +35,71 @@ const replaceMetaTags = (html, data) => {
         .replace(/__OG_URL__/g, url);
 };
 
-exports.dynamicRenderer = functions.runWith({ memory: "1GB" }).https.onRequest(async (req, res) => {
+exports.dynamicRenderer = functions.runWith({ memory: '1GB' }).https.onRequest(async (req, res) => {
     const requestPath = req.path;
     const itemId = req.query.id;
+    const userAgent = req.headers['user-agent'] || '';
     const fullUrl = `https://museu-cca6d.web.app${req.originalUrl}`;
-    
-    console.log(`[LOG] Renderizando URL para todos os visitantes: ${fullUrl}`);
+    const appId = 'museu-cca6d';
+
+    const botUserAgents = ['facebookexternalhit', 'Twitterbot', 'WhatsApp', 'LinkedInBot', 'Pinterest', 'Discordbot', 'Googlebot'];
+    const isBot = botUserAgents.some(bot => userAgent.toLowerCase().includes(bot.toLowerCase()));
 
     let config;
-    if (requestPath.startsWith("/item_detalhe")) {
+    if (requestPath.startsWith("/item_detalhe.html")) {
         config = {
             collectionName: "acervos",
-            templateFile: "item_detalhe.html",
+            htmlFile: "item_detalhe.html",
             titleField: "nome",
             descriptionField: "detalhes",
-            imageField: "imagem_principal",
+            imageField: "imagem_principal"
         };
-    } else if (requestPath.startsWith("/noticia")) {
+    } else if (requestPath.startsWith("/noticia.html")) {
         config = {
             collectionName: "noticias",
-            templateFile: "noticia.html",
+            htmlFile: "noticia.html",
             titleField: "titulo",
             descriptionField: "subtitulo",
-            imageField: "imagem_principal",
+            imageField: "imagem_principal"
         };
     }
 
     if (!config) {
-        console.error(`[ERRO] Nenhuma configuração encontrada para o caminho: ${requestPath}`);
-        res.status(404).send("Página não configurada para renderização dinâmica.");
+        res.status(404).send("Página não configurada.");
         return;
     }
 
-    const htmlFilePath = path.resolve(__dirname, `./templates/${config.templateFile}`);
-    
+    const htmlFilePath = path.resolve(__dirname, `./templates/${config.htmlFile}`);
+    console.log(`[LOG] A tentar ler o arquivo de template em: ${htmlFilePath}`);
+
     try {
         const htmlTemplate = fs.readFileSync(htmlFilePath, "utf8");
-        
+        console.log(`[LOG] Template HTML lido com sucesso. Comprimento: ${htmlTemplate.length} caracteres.`);
+
+        if (!htmlTemplate.includes('__OG_TITLE__')) {
+            console.error("[ERRO] O placeholder '__OG_TITLE__' NÃO foi encontrado no template lido!");
+        } else {
+            console.log("[LOG] Placeholder '__OG_TITLE__' encontrado no template.");
+        }
+
+        if (!isBot) {
+            res.set("Content-Type", "text/html; charset=utf-8");
+            res.status(200).send(htmlTemplate);
+            return;
+        }
+
+        console.log(`[LOG] Bot detectado: ${userAgent}. A renderizar: ${fullUrl}`);
+
         if (!itemId) {
-            console.log("[LOG] Nenhum ID de item encontrado. Servindo tags padrão.");
+            console.log("[LOG] Nenhum ID de item encontrado. A servir tags padrão.");
             const finalHtml = replaceMetaTags(htmlTemplate, { url: fullUrl });
             res.set("Content-Type", "text/html; charset=utf-8");
             res.status(200).send(finalHtml);
             return;
         }
         
-        const collectionPath = `artifacts/museu-cca6d/public/data/${config.collectionName}`;
-        console.log(`[LOG] Consultando Firestore. Caminho: ${collectionPath}, ID: ${itemId}`);
+        const collectionPath = `artifacts/${appId}/public/data/${config.collectionName}`;
+        console.log(`[LOG] A consultar Firestore. Caminho: ${collectionPath}, ID: ${itemId}`);
         
         const docRef = db.collection(collectionPath).doc(itemId);
         const docSnap = await docRef.get();
@@ -92,27 +108,33 @@ exports.dynamicRenderer = functions.runWith({ memory: "1GB" }).https.onRequest(a
 
         if (docSnap.exists) {
             const itemData = docSnap.data();
-            console.log(`[LOG] Documento encontrado. Dados:`, JSON.stringify(itemData));
+            console.log(`[LOG] Documento encontrado. Dados brutos:`, JSON.stringify(itemData));
 
-            metaData = {
-                ...metaData,
-                title: itemData[config.titleField] || "",
-                description: itemData[config.descriptionField] || "",
-                image: itemData[config.imageField] || "",
-            };
+            const title = itemData[config.titleField] || '';
+            const description = itemData[config.descriptionField] || '';
+            const image = itemData[config.imageField] || '';
+            console.log(`[LOG] Dados extraídos para as meta tags: Title='${title}', Image='${image}'`);
+
+            metaData = { ...metaData, title, description, image };
         } else {
-            console.warn(`[ALERTA] Documento com ID '${itemId}' não foi encontrado em '${collectionPath}'.`);
-            metaData = { ...metaData, title: "Conteúdo Não Encontrado" };
+            console.log(`[LOG] ALERTA: Documento com ID '${itemId}' não foi encontrado em '${collectionPath}'.`);
+            metaData = { ...metaData, title: "Conteúdo não encontrado" };
         }
 
-        console.log("[LOG] Substituindo meta tags com os dados:", JSON.stringify(metaData));
+        console.log("[LOG] A substituir as meta tags com os seguintes dados:", JSON.stringify(metaData));
         const finalHtml = replaceMetaTags(htmlTemplate, metaData);
         
+        if (finalHtml.includes('__OG_TITLE__')) {
+             console.error("[ERRO FINAL] Após a substituição, o placeholder '__OG_TITLE__' AINDA está presente no HTML final!");
+        } else {
+             console.log("[LOG] Substituição de placeholders parece ter sido bem-sucedida.");
+        }
+
         res.set("Content-Type", "text/html; charset=utf-8");
         res.status(200).send(finalHtml);
 
     } catch (error) {
-        console.error(`[ERRO CRÍTICO] Falha ao processar a requisição para ${fullUrl}. Erro:`, error);
-        res.status(500).send("Ocorreu um erro interno ao processar sua solicitação.");
+        console.error(`[ERRO CRÍTICO] Falha ao ler o template ou ao executar a função. Caminho: ${htmlFilePath}`, error);
+        res.status(500).send("Ocorreu um erro interno ao processar a sua solicitação.");
     }
 });
