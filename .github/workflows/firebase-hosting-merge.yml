@@ -1,5 +1,4 @@
-# Este arquivo foi atualizado para implantar tanto o Hosting quanto as Functions.
-# https://github.com/firebase/firebase-tools
+# Este é um script de implantação mais robusto que instala as ferramentas mais recentes.
 
 name: Deploy to Firebase Hosting and Functions on merge
 on:
@@ -23,12 +22,11 @@ jobs:
       - name: Install Function Dependencies
         run: npm --prefix functions install
 
-      # 4. Implanta TUDO (Hosting e Functions) usando a ação oficial do Firebase
-      # Esta é uma abordagem mais moderna e confiável
+      # 4. Força a instalação da versão mais recente das ferramentas do Firebase
+      - name: Install latest Firebase CLI
+        run: npm install -g firebase-tools
+
+      # 5. Implanta o Hosting e as Functions usando um comando direto
       - name: Deploy to Firebase
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MUSEU_CCA6D }}
-          channelId: live
-          projectId: museu-cca6d
+        run: firebase deploy --only hosting,functions --project museu-cca6d --token ${{ secrets.FIREBASE_TOKEN }} --non-interactive
+
