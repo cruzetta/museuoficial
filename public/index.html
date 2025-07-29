@@ -19,7 +19,8 @@
             --color-primary-hover: #a98447;
             --color-dark: #1a1a1a;
             --color-dark-gray: #2c2c2c;
-            --color-light-gray: #f4f4f4;
+            /* ALTERADO: Cor de fundo alternativo mais perceptível */
+            --color-light-gray: #f3f4f6; /* Tailwind gray-100 */
             --color-text: #333333;
             --color-text-light: #666666;
             --border-color: #e0e0e0;
@@ -43,12 +44,12 @@
         
         .section-title {
             font-size: 2.5rem; /* text-4xl */
-            font-weight: 700;
+            font-weight: 800; /* Mais peso para destaque */
             text-align: center;
-            margin-bottom: 3.5rem; /* mb-14 */
+            margin-bottom: 4rem; /* Mais espaço abaixo do título */
             position: relative;
             color: var(--color-dark);
-            padding-bottom: 1rem;
+            padding-bottom: 1.5rem;
         }
 
         .section-title::after {
@@ -59,12 +60,14 @@
             transform: translateX(-50%);
             width: 80px;
             height: 4px;
-            background-color: var(--color-primary);
+            /* Gradiente para um toque moderno */
+            background: linear-gradient(to right, var(--color-primary-hover), var(--color-primary));
             border-radius: 2px;
         }
         
+        /* ALTERADO: Padding vertical reduzido para uma rolagem mais confortável */
         .section-padding {
-            padding: 6rem 1rem;
+            padding: 5rem 1rem; /* Ajustado de 6rem */
         }
 
         .content-card {
@@ -88,7 +91,7 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            padding: 0.875rem 2rem; /* Aumenta o padding para um toque mais premium */
+            padding: 0.875rem 2rem;
             border-radius: 0.375rem;
             font-weight: 600;
             text-align: center;
@@ -133,7 +136,7 @@
         }
         
         #header-logo {
-            height: 100px; /* Reduzido para um visual mais limpo */
+            height: 100px;
             width: auto;
             transition: transform 0.3s ease;
         }
@@ -373,7 +376,7 @@
         </section>
 
         <!-- Seção Acervos -->
-        <section id="acervos" class="section-padding bg-light-gray fade-in-section">
+        <section id="acervos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Os Nossos Acervos</h2>
                 <div id="acervos-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
@@ -381,7 +384,7 @@
             </div>
         </section>
 
-        <!-- NOVA Seção Timeline Interativa de Gerações -->
+        <!-- Seção Timeline Interativa de Gerações -->
         <section id="timeline-geracoes" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title !text-white">Uma Viagem Pelas Gerações</h2>
@@ -391,7 +394,7 @@
             </div>
         </section>
 
-        <!-- SEÇÕES RESTAURADAS -->
+        <!-- Seção Games -->
         <section id="games" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Games Icónicos</h2>
@@ -399,13 +402,15 @@
             </div>
         </section>
 
-        <section id="quiz" class="section-padding bg-light-gray fade-in-section">
+        <!-- Seção Quiz -->
+        <section id="quiz" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Teste os seus Conhecimentos</h2>
                 <div id="quiz-container" class="max-w-2xl mx-auto p-8 border rounded-lg bg-white shadow-inner"></div>
             </div>
         </section>
 
+        <!-- Seção Curiosidades -->
         <section id="curiosidades" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Sabia que?</h2>
@@ -413,7 +418,8 @@
             </div>
         </section>
 
-        <section id="onde-estamos" class="section-padding bg-light-gray fade-in-section">
+        <!-- Seção Onde Estamos -->
+        <section id="onde-estamos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Onde Estamos</h2>
                 <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -429,10 +435,11 @@
             </div>
         </section>
 
+        <!-- Seção Corporativo -->
         <section id="corporativo" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Sobre o Museu</h2>
-                <div class="max-w-4xl mx-auto p-10 border rounded-lg bg-light-gray">
+                <div class="max-w-4xl mx-auto p-10 border rounded-lg" style="background-color: var(--color-light-gray);">
                     <div id="corporativo-missao-container" class="mb-8">
                         <h3 class="text-2xl font-bold mb-4 text-primary-color">A Nossa Missão</h3>
                         <p id="corporativo-missao" class="text-text-light leading-relaxed text-lg"></p>
@@ -445,7 +452,8 @@
             </div>
         </section>
 
-        <section id="loja" class="section-padding bg-light-gray fade-in-section">
+        <!-- Seção Loja -->
+        <section id="loja" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Loja do Museu</h2>
                 <div id="loja-container" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
@@ -935,7 +943,7 @@
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
             initializeCarousel();
-            initializeInteractiveTimeline(); // <-- NOVA FUNÇÃO CHAMADA AQUI
+            initializeInteractiveTimeline();
             setupScrollAnimation();
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
             loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), limit(4)));
