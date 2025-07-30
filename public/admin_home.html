@@ -53,7 +53,6 @@
                 </div>
             </fieldset>
 
-            <!-- NOVO: Seção de Estilo do Título Expandida -->
             <fieldset class="border p-4 rounded-md">
                 <legend class="text-lg font-semibold px-2">Conteúdo e Estilo do Título</legend>
                 <div class="space-y-6 pt-2">
@@ -63,7 +62,6 @@
                          <p class="text-xs text-gray-500 mt-1">Use a tecla Enter para criar quebras de linha manuais.</p>
                     </div>
 
-                    <!-- Controles de Fonte e Cor -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                             <label for="titulo-font-family" class="block text-sm font-medium text-gray-700">Fonte</label>
@@ -91,7 +89,6 @@
                         </div>
                     </div>
 
-                    <!-- Controles de Espaçamento e Transformação -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 border-t pt-4">
                         <div>
                             <label for="titulo-line-height" class="block text-sm font-medium text-gray-700">Espaç. Linhas</label>
@@ -114,7 +111,6 @@
                         </div>
                     </div>
 
-                    <!-- Controles de Sombra -->
                     <div class="space-y-4 border-t pt-4">
                         <label class="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
                             <input type="checkbox" id="titulo-text-shadow-enable" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
@@ -178,6 +174,27 @@
                 <button type="button" id="cancel-home-slider-edit" class="w-auto">Cancelar</button>
             </div>
         </form>
+    </div>
+
+    <!-- NOVA SEÇÃO PARA CONFIGURAR CAMINHOS -->
+    <div class="form-section bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6">Configurações de Caminho (Avançado)</h2>
+        <p class="text-sm text-gray-600 mb-4">Se as notícias ou acervos não carregarem na secção "Link", o caminho para a coleção no banco de dados pode estar incorreto. Verifique no seu painel Firebase qual é o caminho correto e insira-o abaixo.</p>
+        <div class="space-y-4">
+            <div>
+                <label for="path-noticias" class="block text-sm font-medium text-gray-700">Caminho da Coleção de Notícias</label>
+                <input type="text" id="path-noticias" value="noticias" class="mt-1">
+                <p class="text-xs text-gray-500 mt-1">Exemplo: <strong>noticias</strong> ou <strong>artifacts/id-do-app/public/data/noticias</strong></p>
+            </div>
+            <div>
+                <label for="path-acervos" class="block text-sm font-medium text-gray-700">Caminho da Coleção de Acervos</label>
+                <input type="text" id="path-acervos" value="acervos" class="mt-1">
+                 <p class="text-xs text-gray-500 mt-1">Exemplo: <strong>acervos</strong> ou <strong>artifacts/id-do-app/public/data/acervos</strong></p>
+            </div>
+            <div class="flex gap-4 pt-2">
+                <button type="button" id="reload-data-btn">Recarregar Notícias e Acervos</button>
+            </div>
+        </div>
     </div>
 
     <div class="bg-white p-8 rounded-lg shadow-md">
@@ -520,17 +537,20 @@
         }
     });
 
-    // --- Listeners e Carregamento de Dados (sem alterações) ---
-    const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem", "asc"));
+    // --- Listeners e Carregamento de Dados ---
+    const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`));
     onSnapshot(q, (snapshot) => {
         listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhum slide registado.</p>' : '';
-        snapshot.docs.forEach(docSnap => {
+        
+        const docs = snapshot.docs.sort((a, b) => (a.data().ordem || 0) - (b.data().ordem || 0));
+
+        docs.forEach(docSnap => {
             const data = docSnap.data();
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
             itemDiv.innerHTML = `
                 <div class="flex-grow flex items-center gap-4">
-                    <img src="${data.mediaTipo !== 'video' ? data.mediaUrl : 'https://placehold.co/100x60/e9ecef/6c757d?text=Video'}" alt="Preview" class="w-20 h-12 object-cover rounded-md bg-gray-200">
+                    <img src="${data.mediaTipo !== 'video' ? data.mediaUrl : 'https://placehold.co/100x60/e9ecef/6c757d?text=Video'}" alt="Preview" class="w-20 h-12 object-cover rounded-md bg-gray-200" onerror="this.onerror=null;this.src='https://placehold.co/100x60/e9ecef/6c757d?text=Media';">
                     <p class="font-semibold text-gray-800 truncate pr-4">${data.titulo || 'Slide sem título'}</p>
                 </div>
                 <div class="flex-shrink-0 flex gap-2">
@@ -551,13 +571,51 @@
     document.getElementById(`cancel-${entity}-edit`).addEventListener('click', clearForm);
     
     const fetchLinkableData = async () => {
+        console.log("Iniciando busca por notícias e acervos...");
+        
+        // Pega os caminhos dos inputs
+        const noticiasPath = document.getElementById('path-noticias').value.trim();
+        const acervosPath = document.getElementById('path-acervos').value.trim();
+
+        if (!noticiasPath || !acervosPath) {
+            if (window.showNotification) window.showNotification('Por favor, preencha os caminhos para as coleções.', true);
+            return;
+        }
+
         try {
-            const noticiasSnap = await getDocs(query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("titulo")));
-            linkableData.noticia = noticiasSnap.docs.map(d => ({ id: d.id, nome: d.data().titulo }));
-            const acervosSnap = await getDocs(query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome")));
-            linkableData.acervo = acervosSnap.docs.map(d => ({ id: d.id, nome: d.data().nome }));
+            // Tenta buscar as notícias
+            const noticiasQuery = query(collection(db, noticiasPath));
+            const noticiasSnap = await getDocs(noticiasQuery);
+            console.log(`Encontradas ${noticiasSnap.docs.length} notícias em '${noticiasPath}'.`);
+            
+            if (noticiasSnap.empty) {
+                console.warn(`A coleção de notícias está vazia ou não foi encontrada no caminho '${noticiasPath}'.`);
+            }
+
+            linkableData.noticia = noticiasSnap.docs
+                .map(d => ({ id: d.id, nome: d.data().titulo || 'Notícia sem título' }))
+                .sort((a, b) => a.nome.localeCompare(b.nome));
+            
+            // Tenta buscar os acervos
+            const acervosQuery = query(collection(db, acervosPath));
+            const acervosSnap = await getDocs(acervosQuery);
+            console.log(`Encontrados ${acervosSnap.docs.length} acervos em '${acervosPath}'.`);
+
+            if (acervosSnap.empty) {
+                console.warn(`A coleção de acervos está vazia ou não foi encontrada no caminho '${acervosPath}'.`);
+            }
+
+            linkableData.acervo = acervosSnap.docs
+                .map(d => ({ id: d.id, nome: d.data().nome || 'Acervo sem nome' }))
+                .sort((a, b) => a.nome.localeCompare(b.nome));
+
+            // Força a atualização do dropdown para garantir que ele reflita os dados carregados
+            document.getElementById(`${entity}-linkTipo`).dispatchEvent(new Event('change'));
+            if (window.showNotification) window.showNotification('Dados recarregados com sucesso!', false);
+
         } catch (error) {
-            console.error("Erro ao carregar dados para os links:", error);
+            console.error("Erro GERAL e inesperado em fetchLinkableData:", error);
+            if (window.showNotification) window.showNotification('Falha ao carregar. Verifique se os caminhos estão corretos e veja o console para erros.', true);
         }
     };
 
@@ -582,6 +640,9 @@
         }
     });
     
+    // Adiciona o listener para o novo botão de recarregar
+    document.getElementById('reload-data-btn').addEventListener('click', fetchLinkableData);
+
     if (window.setupUploadComponent) {
         window.setupUploadComponent(document.querySelector(`[data-upload-container="${entity}-media"]`));
     }
@@ -646,6 +707,7 @@
         }
     });
 
+    // Carrega os dados na primeira vez que a aba é aberta
     fetchLinkableData();
     loadConfig();
     updateTitlePreview();
