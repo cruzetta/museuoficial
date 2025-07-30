@@ -515,22 +515,26 @@
         });
 
         // --- RENDERERS ---
+        // =================================================================
+        // CORREÇÃO APLICADA AQUI
+        // =================================================================
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
             return `
-            <div class="content-card">
-                <a href="noticia.html?id=${doc.id}" class="block h-56 overflow-hidden rounded-t-lg">
-                    <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.titulo}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
-                </a>
-                <div class="p-5 flex flex-col flex-grow">
-                     <h3 class="text-lg font-bold mb-3 text-color-dark">
-                        <a href="noticia.html?id=${doc.id}" class="hover:text-primary-color transition-colors">${data.titulo}</a>
-                     </h3>
-                     <p class="text-sm text-text-light mb-4 flex-grow">${data.subtitulo || ''}</p>
-                     <p class="text-xs text-text-light mt-auto pt-4 border-t border-border-color">${dataFormatada}</p>
+            <a href="noticia.html?id=${doc.id}" class="content-card group">
+                <div class="block h-56 overflow-hidden rounded-t-lg">
+                    <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.titulo}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
                 </div>
-            </div>`;
+                <div class="p-5 flex flex-col flex-grow">
+                     <h3 class="text-lg font-bold mb-3 text-color-dark group-hover:text-primary-color transition-colors">${data.titulo}</h3>
+                     <p class="text-sm text-text-light mb-4 flex-grow">${data.subtitulo || ''}</p>
+                     <div class="mt-auto pt-4 border-t border-border-color flex justify-between items-center">
+                        <span class="text-xs text-text-light">${dataFormatada}</span>
+                        <span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span>
+                     </div>
+                </div>
+            </a>`;
         }
         const renderAcervo = (doc) => {
             const data = doc.data();
@@ -555,11 +559,11 @@
         const renderGame = (doc) => {
             const data = doc.data();
             return `
-             <div class="p-4 border rounded-lg text-center bg-white transition-shadow hover:shadow-md">
-                ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Jogo'}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-4 border-gray-100">` : ''}
-                <h3 class="text-md font-bold">${data.nome}</h3>
-                <p class="text-gray-500 text-xs">${data.ano}</p>
-            </div>`;
+                 <div class="p-4 border rounded-lg text-center bg-white transition-shadow hover:shadow-md">
+                    ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Jogo'}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-4 border-gray-100">` : ''}
+                    <h3 class="text-md font-bold">${data.nome}</h3>
+                    <p class="text-gray-500 text-xs">${data.ano}</p>
+                </div>`;
         };
         const renderCuriosidade = (doc) => {
             const data = doc.data();
@@ -580,9 +584,9 @@
                 `<button data-correct="${i == data.correta}" class="w-full text-left p-4 bg-white rounded-lg hover:bg-primary-color hover:text-white transition-colors quiz-option border border-border-color">${String.fromCharCode(65 + i)}) ${opt.trim()}</button>`
             ).join('');
             return `
-                <h3 class="text-2xl font-semibold mb-6">${data.pergunta}</h3>
-                <div class="space-y-4">${options}</div>
-                <p class="quiz-result text-center mt-6 hidden font-bold text-lg"></p>`;
+                 <h3 class="text-2xl font-semibold mb-6">${data.pergunta}</h3>
+                 <div class="space-y-4">${options}</div>
+                 <p class="quiz-result text-center mt-6 hidden font-bold text-lg"></p>`;
         };
 
         // --- DATA LOADERS ---
@@ -659,19 +663,10 @@
                 console.warn("Não foi possível carregar configuração do carrossel, usando valor padrão.", error);
             }
 
-            const buildLink = (type, id) => {
-                if (!type || type === 'nenhum' || !id) return null;
-                const page = type === 'acervo' ? 'item_detalhe' : type;
-                return `${page}.html?id=${id}`;
-            };
-
             const renderSlide = (slideData, index) => {
-                const { titulo, mediaUrl, mediaTipo, linkTipo, linkId, tituloEstilo, tituloPosicao } = slideData;
-                const link = buildLink(linkTipo, linkId);
+                const { titulo, mediaUrl, mediaTipo, linkTexto, linkUrl, tituloEstilo, tituloPosicao } = slideData;
                 
-                const slideWrapper = link ? document.createElement('a') : document.createElement('div');
-                if (link) slideWrapper.href = link;
-
+                const slideWrapper = document.createElement('div');
                 slideWrapper.className = "carousel-slide absolute inset-0 transition-opacity duration-1000 ease-in-out";
                 slideWrapper.style.opacity = index === 0 ? '1' : '0';
                 slideWrapper.dataset.index = index;
@@ -685,13 +680,21 @@
                     titleStyles += `text-shadow: ${tituloEstilo.textShadow};`;
                 }
 
-                let titleContainerStyles = `position: absolute; transform: translate(-50%, -50%); left: ${tituloPosicao?.x || 50}%; top: ${tituloPosicao?.y || 50}%;`;
+                let contentContainerStyles = `position: absolute; transform: translate(-50%, -50%); left: ${tituloPosicao?.x || 50}%; top: ${tituloPosicao?.y || 50}%; text-align: center;`;
+
+                let buttonHTML = '';
+                if (linkTexto && linkUrl) {
+                    buttonHTML = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary mt-4">${linkTexto}</a>`;
+                }
 
                 slideWrapper.innerHTML = `
                     ${mediaElement}
                     <div class="absolute inset-0 bg-black bg-opacity-40"></div>
                     <div class="relative z-10 h-full w-full overflow-hidden">
-                        ${titulo ? `<div style="${titleContainerStyles}"><h2 class="text-center" style="${titleStyles}">${titulo.replace(/\n/g, '<br>')}</h2></div>` : ''}
+                        <div style="${contentContainerStyles}">
+                            ${titulo ? `<h2 style="${titleStyles}">${titulo.replace(/\n/g, '<br>')}</h2>` : ''}
+                            ${buttonHTML}
+                        </div>
                     </div>`;
                 return slideWrapper;
             };

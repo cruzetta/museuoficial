@@ -38,6 +38,10 @@
                             <div id="draggable-title-preview" class="absolute text-white font-bold p-2 cursor-move select-none text-center" style="left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 36px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); white-space: nowrap;">
                                 Título de Exemplo
                             </div>
+                            <!-- BOTÃO DE PREVIEW ADICIONADO AQUI -->
+                            <div id="button-preview" class="absolute bottom-10 left-1/2 -translate-x-1/2 hidden">
+                                <button type="button" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg text-sm" style="pointer-events: none;">Ver Mais</button>
+                            </div>
                         </div>
                         <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover mídia</button>
                     </div>
@@ -145,22 +149,24 @@
                 <legend class="text-lg font-semibold px-2">Link e Ordem</legend>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     <div>
-                        <label for="home-slider-linkTipo" class="block text-sm font-medium text-gray-700">Link para (Opcional)</label>
-                        <select id="home-slider-linkTipo">
-                            <option value="nenhum">Nenhum Link</option>
-                            <option value="noticia">Notícia</option>
-                            <option value="acervo">Acervo</option>
+                        <label for="home-slider-linkTexto" class="block text-sm font-medium text-gray-700">Texto do Botão (Opcional)</label>
+                        <select id="home-slider-linkTexto" class="mt-1">
+                            <option value="">Sem Botão</option>
+                            <option value="Ver Mais">Ver Mais</option>
+                            <option value="Ler Notícia">Ler Notícia</option>
+                            <option value="Explorar Acervo">Explorar Acervo</option>
+                            <option value="Jogar Agora">Jogar Agora</option>
+                            <option value="Saiba Mais">Saiba Mais</option>
                         </select>
                     </div>
-                     <div>
-                        <label for="home-slider-linkId" class="block text-sm font-medium text-gray-700">Item Específico</label>
-                        <select id="home-slider-linkId" disabled>
-                            <option value="">Primeiro selecione o tipo de link</option>
-                        </select>
+                    <div>
+                        <label for="home-slider-linkUrl" class="block text-sm font-medium text-gray-700">URL do Link</label>
+                        <input type="url" id="home-slider-linkUrl" placeholder="Cole a URL completa aqui" class="mt-1" disabled>
+                        <p class="text-xs text-gray-500 mt-1">Obrigatório se um texto de botão for escolhido.</p>
                     </div>
                     <div class="md:col-span-2">
                         <label for="home-slider-ordem" class="block text-sm font-medium text-gray-700">Ordem de Exibição</label>
-                        <input type="number" id="home-slider-ordem" placeholder="Ex: 1, 2, 3... (menor aparece primeiro)" min="0">
+                        <input type="number" id="home-slider-ordem" placeholder="Ex: 1, 2, 3... (menor aparece primeiro)" min="0" class="mt-1">
                     </div>
                 </div>
             </fieldset>
@@ -190,7 +196,6 @@
 
 <script data-tab-script="home-slider">
 {
-    // CORREÇÃO: Removido 'getDocs' que não está disponível no seu ambiente
     const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, query, orderBy, ref, deleteObject } = window.firebaseServices;
     const { appId } = window.appConfig;
 
@@ -201,8 +206,6 @@
     const configForm = document.getElementById('form-home-config');
     const duracaoInput = document.getElementById('home-config-duracao');
     const configDocRef = doc(db, `/artifacts/${appId}/public/data/configuracoes/carrossel`);
-
-    const linkableData = { noticia: [], acervo: [] };
     
     // --- Elementos do Título ---
     const tituloInput = document.getElementById('home-slider-titulo');
@@ -227,12 +230,27 @@
     const posYInput = document.getElementById('titulo-pos-y');
     const draggableTitle = document.getElementById('draggable-title-preview');
     const positioningContainer = document.getElementById('positioning-container');
+    const buttonPreview = document.getElementById('button-preview'); // Pega o botão de preview
+    
+    // --- Elementos do Link ---
+    const linkTextoSelect = document.getElementById('home-slider-linkTexto');
+    const linkUrlInput = document.getElementById('home-slider-linkUrl');
+
+    // --- FUNÇÃO PARA ATUALIZAR O BOTÃO DE PREVIEW ---
+    const updateButtonPreview = () => {
+        const selectedText = linkTextoSelect.value;
+        if (selectedText) {
+            buttonPreview.querySelector('button').textContent = selectedText;
+            buttonPreview.classList.remove('hidden');
+        } else {
+            buttonPreview.classList.add('hidden');
+        }
+    };
 
     const updateTitlePreview = () => {
         const titleText = tituloInput.value || "Título de Exemplo";
         draggableTitle.innerHTML = titleText.replace(/\n/g, '<br>');
         
-        // Aplica todos os estilos
         draggableTitle.style.fontFamily = fontFamilySelect.value;
         draggableTitle.style.fontSize = `${fontSizeInput.value || 36}px`;
         draggableTitle.style.color = colorInput.value;
@@ -241,7 +259,6 @@
         draggableTitle.style.letterSpacing = `${letterSpacingInput.value || 0}px`;
         draggableTitle.style.textTransform = textTransformSelect.value || 'none';
 
-        // Aplica a sombra
         if (shadowEnableCheckbox.checked) {
             const x = shadowOffsetXInput.value;
             const y = shadowOffsetYInput.value;
@@ -253,7 +270,6 @@
         }
     };
     
-    // Adiciona listeners para todos os novos controles
     const allControls = [
         tituloInput, fontFamilySelect, fontSizeInput, colorInput, fontWeightCheckbox,
         lineHeightInput, letterSpacingInput, textTransformSelect, shadowEnableCheckbox,
@@ -261,15 +277,13 @@
     ];
     allControls.forEach(control => {
         control.addEventListener('input', updateTitlePreview);
-        control.addEventListener('change', updateTitlePreview); // Para selects e checkboxes
+        control.addEventListener('change', updateTitlePreview);
     });
 
-    // Listener para mostrar/esconder controles de sombra
     shadowEnableCheckbox.addEventListener('change', () => {
         shadowControlsContainer.classList.toggle('hidden', !shadowEnableCheckbox.checked);
     });
 
-    // --- Lógica de Arrastar Título (sem alterações) ---
     let isDragging = false;
     let offsetX, offsetY;
 
@@ -316,16 +330,14 @@
     draggableTitle.addEventListener('mousedown', onDragStart);
     draggableTitle.addEventListener('touchstart', onDragStart, { passive: false });
 
-    // --- Funções do Formulário (CRUD) ---
     const clearForm = () => {
         form.reset();
         document.getElementById(`${entity}-id`).value = '';
-        const linkIdSelect = document.getElementById(`${entity}-linkId`);
-        linkIdSelect.innerHTML = '<option value="">Primeiro selecione o tipo de link</option>';
-        linkIdSelect.disabled = true;
+        linkTextoSelect.value = '';
+        linkUrlInput.value = '';
+        linkUrlInput.disabled = true;
         if (window.resetUploadUI) window.resetUploadUI(`${entity}-media`);
         
-        // Reseta os novos valores para o padrão
         posXInput.value = "50";
         posYInput.value = "50";
         fontSizeInput.value = "36";
@@ -346,6 +358,7 @@
         draggableTitle.style.left = '50%';
         draggableTitle.style.top = '50%';
         updateTitlePreview();
+        updateButtonPreview(); // Reseta o botão no preview
     };
 
     const editDoc = async (id) => {
@@ -358,6 +371,10 @@
                 document.getElementById(`${entity}-id`).value = docSnap.id;
                 tituloInput.value = data.titulo || '';
                 document.getElementById(`${entity}-ordem`).value = data.ordem || 0;
+                
+                linkTextoSelect.value = data.linkTexto || '';
+                linkUrlInput.value = data.linkUrl || '';
+                linkUrlInput.disabled = !data.linkTexto;
                 
                 if (data.tituloEstilo) {
                     const estilo = data.tituloEstilo;
@@ -392,14 +409,7 @@
                     draggableTitle.style.top = `${data.tituloPosicao.y || 50}%`;
                 }
                 updateTitlePreview();
-
-                const linkTipoSelect = document.getElementById(`${entity}-linkTipo`);
-                linkTipoSelect.value = data.linkTipo || 'nenhum';
-                linkTipoSelect.dispatchEvent(new Event('change'));
-                
-                setTimeout(() => {
-                    document.getElementById(`${entity}-linkId`).value = data.linkId || '';
-                }, 100);
+                updateButtonPreview(); // Atualiza o botão no preview ao editar
 
                 if (data.mediaUrl) {
                     const container = document.querySelector(`[data-upload-container="${entity}-media"]`);
@@ -464,8 +474,8 @@
 
         const data = {
             titulo: tituloInput.value,
-            linkTipo: document.getElementById(`${entity}-linkTipo`).value,
-            linkId: document.getElementById(`${entity}-linkId`).value,
+            linkTexto: linkTextoSelect.value,
+            linkUrl: linkUrlInput.value,
             ordem: Number(document.getElementById(`${entity}-ordem`).value) || 0,
             mediaUrl: document.getElementById(`${entity}-media-url`).value,
             mediaTipo: document.getElementById(`${entity}-media-tipo`).value,
@@ -486,6 +496,10 @@
         };
 
         try {
+            if (data.linkTexto && !data.linkUrl) {
+                throw new Error("Se um texto de botão for escolhido, a URL do link é obrigatória.");
+            }
+            
             const file = window.pendingFiles.get(`${entity}-media`);
             if (file) {
                 progressContainer.classList.remove('hidden');
@@ -517,14 +531,11 @@
         }
     });
 
-    // --- Listeners e Carregamento de Dados ---
-    const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`));
+    const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem"));
     onSnapshot(q, (snapshot) => {
         listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhum slide registado.</p>' : '';
         
-        const docs = snapshot.docs.sort((a, b) => (a.data().ordem || 0) - (b.data().ordem || 0));
-
-        docs.forEach(docSnap => {
+        snapshot.docs.forEach(docSnap => {
             const data = docSnap.data();
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
@@ -550,67 +561,14 @@
     
     document.getElementById(`cancel-${entity}-edit`).addEventListener('click', clearForm);
     
-    const fetchLinkableData = async () => {
-        console.log("Iniciando busca com caminhos fixos...");
-        
-        const noticiasPath = "artifacts/museu-ca6d/public/data/noticias";
-        const acervosPath = "artifacts/museu-ca6d/public/data/acervos";
-
-        try {
-            console.log(`Tentando buscar notícias em: ${noticiasPath}`);
-            const noticiasQuery = query(collection(db, noticiasPath));
-            // CORREÇÃO: Usar a sintaxe .get() da v8 do Firebase
-            const noticiasSnap = await noticiasQuery.get();
-            
-            console.log(`Sucesso! Encontradas ${noticiasSnap.docs.length} notícias.`);
-            linkableData.noticia = noticiasSnap.docs
-                .map(d => ({ id: d.id, nome: d.data().titulo || 'Notícia sem título' }))
-                .sort((a, b) => a.nome.localeCompare(b.nome));
-            
-            console.log(`Tentando buscar acervos em: ${acervosPath}`);
-            const acervosQuery = query(collection(db, acervosPath));
-            // CORREÇÃO: Usar a sintaxe .get() da v8 do Firebase
-            const acervosSnap = await acervosQuery.get();
-
-            console.log(`Sucesso! Encontrados ${acervosSnap.docs.length} acervos.`);
-            linkableData.acervo = acervosSnap.docs
-                .map(d => ({ id: d.id, nome: d.data().nome || 'Acervo sem nome' }))
-                .sort((a, b) => a.nome.localeCompare(b.nome));
-
-            document.getElementById(`${entity}-linkTipo`).dispatchEvent(new Event('change'));
-            if (window.showNotification) window.showNotification('Dados carregados com sucesso!', false);
-
-        } catch (error) {
-            console.error("### ERRO AO BUSCAR DADOS ###", error);
-            let userMessage = `Falha ao carregar: ${error.message}. Verifique o console (F12) para detalhes.`;
-            if (error.code === 'permission-denied') {
-                userMessage = 'Falha ao carregar: Permissão negada. Verifique as Regras de Segurança do Firestore.';
-            }
-            if (window.showNotification) window.showNotification(userMessage, true);
+    linkTextoSelect.addEventListener('change', (e) => {
+        linkUrlInput.disabled = !e.target.value;
+        if (!e.target.value) {
+            linkUrlInput.value = '';
         }
-    };
-
-    document.getElementById(`${entity}-linkTipo`).addEventListener('change', (e) => {
-        const linkIdSelect = document.getElementById(`${entity}-linkId`);
-        const tipo = e.target.value;
-        linkIdSelect.innerHTML = '';
-        linkIdSelect.disabled = true;
-        if (tipo === 'nenhum') {
-            linkIdSelect.innerHTML = '<option value="">Primeiro selecione o tipo de link</option>';
-            return;
-        }
-        const options = linkableData[tipo];
-        if (options && options.length > 0) {
-            linkIdSelect.innerHTML = '<option value="">Selecione um item...</option>';
-            options.forEach(item => {
-                linkIdSelect.innerHTML += `<option value="${item.id}">${item.nome}</option>`;
-            });
-            linkIdSelect.disabled = false;
-        } else {
-            linkIdSelect.innerHTML = `<option value="">Nenhum item de '${tipo}' encontrado</option>`;
-        }
+        updateButtonPreview(); // Atualiza o botão no preview
     });
-
+    
     if (window.setupUploadComponent) {
         window.setupUploadComponent(document.querySelector(`[data-upload-container="${entity}-media"]`));
     }
@@ -675,9 +633,8 @@
         }
     });
 
-    // Carrega os dados na primeira vez que a aba é aberta
-    fetchLinkableData();
     loadConfig();
     updateTitlePreview();
+    updateButtonPreview(); // Garante que o estado inicial do botão esteja correto
 }
 </script>
