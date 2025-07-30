@@ -19,7 +19,6 @@
             --color-primary-hover: #a98447;
             --color-dark: #1a1a1a;
             --color-dark-gray: #2c2c2c;
-            /* ALTERADO: Cor de fundo alternativo mais perceptível */
             --color-light-gray: #f3f4f6; /* Tailwind gray-100 */
             --color-text: #333333;
             --color-text-light: #666666;
@@ -60,14 +59,12 @@
             transform: translateX(-50%);
             width: 80px;
             height: 4px;
-            /* Gradiente para um toque moderno */
             background: linear-gradient(to right, var(--color-primary-hover), var(--color-primary));
             border-radius: 2px;
         }
         
-        /* ALTERADO: Padding vertical reduzido para uma rolagem mais confortável */
         .section-padding {
-            padding: 5rem 1rem; /* Ajustado de 6rem */
+            padding: 5rem 1rem;
         }
 
         .content-card {
@@ -144,7 +141,6 @@
             transform: scale(1.05);
         }
 
-        /* Animação de Fade-in no Scroll */
         .fade-in-section {
             opacity: 0;
             transform: translateY(30px);
@@ -154,39 +150,119 @@
             opacity: 1;
             transform: translateY(0);
         }
+        
+        /* Estilos para a Timeline "Sobre Nós" */
+        .about-timeline-viewport {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+        }
+        .about-timeline-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .about-slide {
+            flex: 0 0 100%;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .about-slide-icon {
+            font-size: 3rem;
+            color: var(--color-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1;
+        }
+        .about-slide-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 1rem;
+        }
+        .about-slide-text {
+            font-family: 'Lora', serif;
+            font-size: 1.125rem;
+            color: var(--color-text-light);
+            max-width: 2xl;
+        }
+        .about-timeline-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+        .about-timeline-nav-button {
+            background-color: #fff;
+            border: 2px solid var(--border-color);
+            color: var(--color-text-light);
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .about-timeline-nav-button:hover:not(:disabled) {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        .about-timeline-nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .about-timeline-dots {
+            display: flex;
+            gap: 0.75rem;
+        }
+        .about-timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .about-timeline-dot.active {
+            background-color: var(--color-primary);
+            transform: scale(1.25);
+        }
 
-        /* Estilos para a Nova Timeline Horizontal */
+        /* Estilos para a Timeline de Gerações */
         #timeline-interactive-container {
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
         }
-
         .timeline-viewport {
             width: 100%;
             overflow: hidden;
         }
-
         .timeline-track {
             display: flex;
             transition: transform 0.5s ease-in-out;
         }
-
         .timeline-generation-card {
-            flex: 0 0 100%; /* Each card takes full width of the viewport */
+            flex: 0 0 100%;
             max-width: 100%;
             padding: 1rem;
             opacity: 0.5;
             transform: scale(0.85);
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
-
         .timeline-generation-card.active {
             opacity: 1;
             transform: scale(1);
         }
-
         .timeline-card-content {
             background-color: var(--color-dark-gray);
             border-radius: 0.75rem;
@@ -195,58 +271,49 @@
             grid-template-columns: 1fr;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
-
         @media (min-width: 768px) {
             .timeline-card-content {
                 grid-template-columns: 40% 60%;
                 max-height: 450px;
             }
         }
-
         .timeline-image {
             width: 100%;
-            height: 250px; /* Fixed height for mobile */
+            height: 250px;
             object-fit: cover;
         }
-
         @media (min-width: 768px) {
             .timeline-image {
-                height: 100%; /* Full height on desktop */
+                height: 100%;
             }
         }
-
         .timeline-text-content {
             padding: 2rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-
         .timeline-generation-title {
-            font-size: 1.125rem; /* text-lg */
+            font-size: 1.125rem;
             font-weight: 700;
             color: var(--color-primary);
         }
-
         .timeline-generation-name {
-            font-size: 2rem; /* text-3xl */
+            font-size: 2rem;
             font-weight: 900;
             margin-bottom: 1rem;
         }
-
         .timeline-generation-description {
             font-family: 'Lora', serif;
             font-size: 1rem;
             line-height: 1.7;
-            color: #d1d5db; /* gray-300 */
+            color: #d1d5db;
             margin-bottom: 1.5rem;
         }
-
         .timeline-generation-consoles {
             font-size: 0.875rem;
-            color: #9ca3af; /* gray-400 */
+            color: #9ca3af;
         }
-
         .timeline-navigation {
             display: flex;
             align-items: center;
@@ -254,7 +321,6 @@
             gap: 1rem;
             margin-top: 2.5rem;
         }
-
         .timeline-nav-button {
             background-color: transparent;
             border: 2px solid var(--color-primary);
@@ -265,22 +331,18 @@
             font-size: 1.25rem;
             transition: background-color 0.2s, color 0.2s;
         }
-
         .timeline-nav-button:hover:not(:disabled) {
             background-color: var(--color-primary);
             color: var(--color-dark);
         }
-
         .timeline-nav-button:disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
-
         .timeline-dots {
             display: flex;
             gap: 0.75rem;
         }
-
         .timeline-dot {
             width: 12px;
             height: 12px;
@@ -289,7 +351,6 @@
             cursor: pointer;
             transition: background-color 0.3s, transform 0.3s;
         }
-
         .timeline-dot.active {
             background-color: var(--color-primary);
             transform: scale(1.25);
@@ -302,10 +363,11 @@
     <header class="sticky top-0 z-50 shadow-lg" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="flex justify-between items-center h-24">
-                <a href="#noticias" class="flex-shrink-0">
+                <a href="#home-carousel-container" class="flex-shrink-0">
                     <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
                 </a>
                 <nav id="desktop-nav" class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm">
+                    <a href="#sobre-nos" class="nav-link">Sobre Nós</a>
                     <a href="#noticias" class="nav-link active">Notícias</a>
                     <a href="galeria.html" class="nav-link">Acervos</a>
                     <a href="#onde-estamos" class="nav-link">Onde Estamos</a>
@@ -329,6 +391,7 @@
     </header>
     
     <div id="mobile-menu" class="hidden fixed top-24 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--color-dark);">
+        <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Sobre Nós</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
         <a href="galeria.html" class="block text-center py-3 text-lg nav-link">Acervos</a>
         <a href="#onde-estamos" class="block text-center py-3 text-lg nav-link">Onde Estamos</a>
@@ -346,7 +409,6 @@
         <!-- Seção Carrossel com Efeito Fade -->
         <section id="home-carousel-container" class="relative w-full h-[60vh] md:h-[85vh] bg-gray-900 text-white overflow-hidden shadow-lg">
             <div id="carousel-slides" class="relative w-full h-full">
-                <!-- Slides serão inseridos aqui. O primeiro slide terá opacity-100, os outros opacity-0 -->
                 <div class="w-full h-full flex items-center justify-center">
                     <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -364,6 +426,16 @@
             </button>
         
             <div id="carousel-indicators" class="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-3 z-10"></div>
+        </section>
+
+        <!-- Seção Sobre Nós Interativa -->
+        <section id="sobre-nos" class="section-padding bg-gray-50 fade-in-section">
+            <div class="container mx-auto">
+                <h2 class="section-title">Nossa História</h2>
+                <div id="about-timeline-container" class="max-w-4xl mx-auto relative">
+                    <div class="text-center p-8">A carregar...</div>
+                </div>
+            </div>
         </section>
 
         <!-- Seção Notícias -->
@@ -389,7 +461,6 @@
             <div class="container mx-auto">
                 <h2 class="section-title !text-white">Uma Viagem Pelas Gerações</h2>
                 <div id="timeline-interactive-container" class="relative">
-                    <!-- O conteúdo da timeline será injetado aqui pelo JavaScript -->
                     <div class="text-center text-gray-400">
                         <svg class="animate-spin h-8 w-8 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -470,7 +541,7 @@
 
     <footer class="py-12 bg-dark-gray">
         <div class="container mx-auto text-center text-gray-400">
-            <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
+            <p>© 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
             <div class="mt-6 space-x-6">
                 <a href="#" class="hover:text-primary-color transition-colors"><i class="fa-brands fa-twitter text-2xl"></i></a>
                 <a href="#" class="hover:text-primary-color transition-colors"><i class="fa-brands fa-instagram text-2xl"></i></a>
@@ -479,7 +550,6 @@
         </div>
     </footer>
     
-    <!-- Firebase e Lógica do Site -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, getDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -782,8 +852,88 @@
                 slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Ocorreu um erro ao carregar o conteúdo.</p></div>';
             }
         };
+
+        // --- LÓGICA DA TIMELINE "SOBRE NÓS" ---
+        const initializeAboutTimeline = () => {
+            const container = document.getElementById('about-timeline-container');
+            if (!container) return;
+
+            let storyData = [];
+            let currentIndex = 0;
+
+            const render = () => {
+                if (storyData.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center">A história do museu será adicionada em breve.</p>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="about-timeline-viewport">
+                        <div class="about-timeline-track">
+                            ${storyData.map(slide => `
+                                <div class="about-slide">
+                                    <div class="about-slide-icon"><i class="${slide.icone || 'fa-solid fa-star'}"></i></div>
+                                    <h3 class="about-slide-title">${slide.titulo}</h3>
+                                    <p class="about-slide-text">${slide.texto}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="about-timeline-navigation">
+                        <button id="about-timeline-prev" class="about-timeline-nav-button"><i class="fas fa-arrow-left"></i></button>
+                        <div class="about-timeline-dots">
+                            ${storyData.map((_, index) => `<div class="about-timeline-dot ${index === 0 ? 'active' : ''}" data-index="${index}"></div>`).join('')}
+                        </div>
+                        <button id="about-timeline-next" class="about-timeline-nav-button"><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                `;
+                
+                document.getElementById('about-timeline-prev').addEventListener('click', () => updateTimeline(-1));
+                document.getElementById('about-timeline-next').addEventListener('click', () => updateTimeline(1));
+                document.querySelectorAll('.about-timeline-dot').forEach(dot => {
+                    dot.addEventListener('click', (e) => goToSlide(parseInt(e.target.dataset.index, 10)));
+                });
+                
+                updateButtons();
+            };
+
+            const goToSlide = (index) => {
+                currentIndex = index;
+                const track = container.querySelector('.about-timeline-track');
+                const dots = container.querySelectorAll('.about-timeline-dot');
+                
+                if (track) {
+                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                }
+                dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+                updateButtons();
+            };
+
+            const updateTimeline = (direction) => {
+                const newIndex = currentIndex + direction;
+                if (newIndex >= 0 && newIndex < storyData.length) {
+                    goToSlide(newIndex);
+                }
+            };
+
+            const updateButtons = () => {
+                const prevBtn = document.getElementById('about-timeline-prev');
+                const nextBtn = document.getElementById('about-timeline-next');
+                if (prevBtn) prevBtn.disabled = currentIndex === 0;
+                if (nextBtn) nextBtn.disabled = currentIndex === storyData.length - 1;
+            };
+
+            const q = query(collection(db, `/artifacts/${appId}/public/data/sobre-nos`), orderBy("ordem", "asc"));
+            onSnapshot(q, (snapshot) => {
+                storyData = snapshot.docs.map(doc => doc.data());
+                render();
+            }, (error) => {
+                console.error("Erro ao carregar a história:", error);
+                container.innerHTML = '<p class="text-red-500 text-center">Ocorreu um erro ao carregar a história.</p>';
+            });
+        };
         
-        // --- LÓGICA DA TIMELINE INTERATIVA DE GERAÇÕES (ATUALIZADO) ---
+        // --- LÓGICA DA TIMELINE INTERATIVA DE GERAÇÕES ---
         const initializeInteractiveTimeline = () => {
             const container = document.getElementById('timeline-interactive-container');
             if (!container) return;
@@ -834,7 +984,6 @@
                 });
 
                 updateButtons();
-                // Set initial active card after a short delay to ensure rendering
                 setTimeout(() => {
                     const initialCard = document.querySelector('.timeline-generation-card');
                     if(initialCard) initialCard.classList.add('active');
@@ -896,6 +1045,7 @@
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
             initializeCarousel();
+            initializeAboutTimeline();
             initializeInteractiveTimeline();
             setupScrollAnimation();
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));

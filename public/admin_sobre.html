@@ -1,0 +1,149 @@
+<!-- Conteúdo da Aba Sobre Nós -->
+<div id="sobre-nos-manager" class="form-section bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Gerir Slides da "Nossa História"</h2>
+    <form id="form-sobre-nos" class="space-y-6">
+        <input type="hidden" id="sobre-nos-id">
+
+        <fieldset class="border p-4 rounded-md">
+            <legend class="text-lg font-semibold px-2">Conteúdo do Slide</legend>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div>
+                    <label for="sobre-nos-titulo" class="block text-sm font-medium text-gray-700">Título do Passo</label>
+                    <input type="text" id="sobre-nos-titulo" placeholder="Ex: O Começo de Tudo" required>
+                </div>
+                <div>
+                    <label for="sobre-nos-icone" class="block text-sm font-medium text-gray-700">Ícone (Font Awesome)</label>
+                    <input type="text" id="sobre-nos-icone" placeholder="Ex: fa-solid fa-lightbulb">
+                     <p class="text-xs text-gray-500 mt-1">Procure ícones em <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" class="text-blue-600 hover:underline">Font Awesome</a>.</p>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="sobre-nos-texto" class="block text-sm font-medium text-gray-700">Texto Descritivo</label>
+                    <textarea id="sobre-nos-texto" rows="4" placeholder="Descreva este passo da história de forma concisa."></textarea>
+                </div>
+                 <div>
+                    <label for="sobre-nos-ordem" class="block text-sm font-medium text-gray-700">Ordem de Exibição</label>
+                    <input type="number" id="sobre-nos-ordem" placeholder="Ex: 1, 2, 3..." min="0">
+                </div>
+            </div>
+        </fieldset>
+        
+        <div class="flex gap-4 pt-4">
+            <button type="submit">Guardar Slide</button>
+            <button type="button" id="cancel-sobre-nos-edit" class="w-auto">Cancelar</button>
+        </div>
+    </form>
+    <div class="mt-8">
+        <h3 class="text-xl font-bold mb-4">Slides da História</h3>
+        <div id="sobre-nos-lista" class="space-y-4"></div>
+    </div>
+</div>
+
+<!-- Script Específico da Aba Sobre Nós -->
+<script data-tab-script="sobre-nos">
+{
+    const { db, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, query, orderBy } = window.firebaseServices;
+    const { appId } = window.appConfig;
+
+    const entity = 'sobre-nos';
+    const form = document.getElementById(`form-${entity}`);
+    const listContainer = document.getElementById(`${entity}-lista`);
+
+    const clearForm = () => {
+        form.reset();
+        document.getElementById(`${entity}-id`).value = '';
+    };
+
+    const editDoc = async (id) => {
+        clearForm();
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById(`${entity}-id`).value = docSnap.id;
+                
+                ['titulo', 'icone', 'texto', 'ordem'].forEach(field => {
+                    const element = document.getElementById(`${entity}-${field}`);
+                    if (element) element.value = data[field] || '';
+                });
+                window.scrollTo(0, 0);
+            }
+        } catch (error) {
+            console.error(`Erro ao carregar ${entity}:`, error);
+            window.showNotification('Erro ao carregar dados.', true);
+        }
+    };
+    
+    const performDeleteDoc = async (id) => {
+        if (!await window.showConfirmModal()) return;
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            await deleteDoc(docRef);
+            window.showNotification("Slide eliminado com sucesso!");
+            clearForm();
+        } catch (error) {
+            console.error(`Erro ao eliminar ${entity}:`, error);
+            window.showNotification("Erro ao eliminar o item.", true);
+        }
+    };
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
+        try {
+            const data = {
+                titulo: document.getElementById('sobre-nos-titulo').value,
+                icone: document.getElementById('sobre-nos-icone').value,
+                texto: document.getElementById('sobre-nos-texto').value,
+                ordem: Number(document.getElementById('sobre-nos-ordem').value) || 0,
+            };
+
+            const id = document.getElementById(`${entity}-id`).value;
+            const path = `/artifacts/${appId}/public/data/${entity}`;
+            
+            if (id) {
+                await updateDoc(doc(db, path, id), data);
+            } else {
+                await addDoc(collection(db, path), data);
+            }
+
+            window.showNotification('Slide guardado com sucesso!');
+            clearForm();
+        } catch (error) {
+            console.error("Erro ao guardar slide:", error);
+            window.showNotification('Erro ao guardar os dados.', true);
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+
+    const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem"));
+    onSnapshot(q, (snapshot) => {
+        listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhum slide registado.</p>' : '';
+        const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        docs.forEach(data => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+            itemDiv.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <i class="${data.icone || 'fa-solid fa-question'} fa-fw text-xl text-gray-500"></i>
+                    <p class="font-semibold text-sm truncate pr-4">${data.titulo || 'Slide sem título'}</p>
+                </div>
+                <div class="flex-shrink-0 flex gap-2">
+                    <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${data.id}">Editar</button>
+                    <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${data.id}">Eliminar</button>
+                </div>`;
+            listContainer.appendChild(itemDiv);
+        });
+    });
+
+    listContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
+        if (e.target.classList.contains('delete-btn')) performDeleteDoc(e.target.dataset.id);
+    });
+    
+    document.getElementById('cancel-sobre-nos-edit').addEventListener('click', clearForm);
+}
+</script>
