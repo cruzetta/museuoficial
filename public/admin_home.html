@@ -176,27 +176,6 @@
         </form>
     </div>
 
-    <!-- NOVA SEÇÃO PARA CONFIGURAR CAMINHOS -->
-    <div class="form-section bg-white p-8 rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold mb-6">Configurações de Caminho (Avançado)</h2>
-        <p class="text-sm text-gray-600 mb-4">Se as notícias ou acervos não carregarem na secção "Link", o caminho para a coleção no banco de dados pode estar incorreto. Verifique no seu painel Firebase qual é o caminho correto e insira-o abaixo.</p>
-        <div class="space-y-4">
-            <div>
-                <label for="path-noticias" class="block text-sm font-medium text-gray-700">Caminho da Coleção de Notícias</label>
-                <input type="text" id="path-noticias" value="noticias" class="mt-1">
-                <p class="text-xs text-gray-500 mt-1">Exemplo: <strong>noticias</strong> ou <strong>artifacts/id-do-app/public/data/noticias</strong></p>
-            </div>
-            <div>
-                <label for="path-acervos" class="block text-sm font-medium text-gray-700">Caminho da Coleção de Acervos</label>
-                <input type="text" id="path-acervos" value="acervos" class="mt-1">
-                 <p class="text-xs text-gray-500 mt-1">Exemplo: <strong>acervos</strong> ou <strong>artifacts/id-do-app/public/data/acervos</strong></p>
-            </div>
-            <div class="flex gap-4 pt-2">
-                <button type="button" id="reload-data-btn">Recarregar Notícias e Acervos</button>
-            </div>
-        </div>
-    </div>
-
     <div class="bg-white p-8 rounded-lg shadow-md">
         <h3 class="text-xl font-bold mb-4">Slides do Carrossel</h3>
         <div id="home-slider-lista" class="space-y-4">
@@ -571,51 +550,46 @@
     document.getElementById(`cancel-${entity}-edit`).addEventListener('click', clearForm);
     
     const fetchLinkableData = async () => {
-        console.log("Iniciando busca por notícias e acervos...");
+        console.log("Iniciando busca com caminhos fixos...");
         
-        // Pega os caminhos dos inputs
-        const noticiasPath = document.getElementById('path-noticias').value.trim();
-        const acervosPath = document.getElementById('path-acervos').value.trim();
-
-        if (!noticiasPath || !acervosPath) {
-            if (window.showNotification) window.showNotification('Por favor, preencha os caminhos para as coleções.', true);
-            return;
-        }
+        // CAMINHOS CORRIGIDOS E INSERIDOS DIRETAMENTE NO CÓDIGO
+        const noticiasPath = "artifacts/museu-ca6d/public/data/noticias";
+        const acervosPath = "artifacts/museu-ca6d/public/data/acervos";
 
         try {
-            // Tenta buscar as notícias
+            console.log(`Tentando buscar notícias em: ${noticiasPath}`);
             const noticiasQuery = query(collection(db, noticiasPath));
             const noticiasSnap = await getDocs(noticiasQuery);
-            console.log(`Encontradas ${noticiasSnap.docs.length} notícias em '${noticiasPath}'.`);
-            
-            if (noticiasSnap.empty) {
-                console.warn(`A coleção de notícias está vazia ou não foi encontrada no caminho '${noticiasPath}'.`);
-            }
-
+            console.log(`Sucesso! Encontradas ${noticiasSnap.docs.length} notícias.`);
             linkableData.noticia = noticiasSnap.docs
                 .map(d => ({ id: d.id, nome: d.data().titulo || 'Notícia sem título' }))
                 .sort((a, b) => a.nome.localeCompare(b.nome));
             
-            // Tenta buscar os acervos
+            console.log(`Tentando buscar acervos em: ${acervosPath}`);
             const acervosQuery = query(collection(db, acervosPath));
             const acervosSnap = await getDocs(acervosQuery);
-            console.log(`Encontrados ${acervosSnap.docs.length} acervos em '${acervosPath}'.`);
-
-            if (acervosSnap.empty) {
-                console.warn(`A coleção de acervos está vazia ou não foi encontrada no caminho '${acervosPath}'.`);
-            }
-
+            console.log(`Sucesso! Encontrados ${acervosSnap.docs.length} acervos.`);
             linkableData.acervo = acervosSnap.docs
                 .map(d => ({ id: d.id, nome: d.data().nome || 'Acervo sem nome' }))
                 .sort((a, b) => a.nome.localeCompare(b.nome));
 
-            // Força a atualização do dropdown para garantir que ele reflita os dados carregados
             document.getElementById(`${entity}-linkTipo`).dispatchEvent(new Event('change'));
-            if (window.showNotification) window.showNotification('Dados recarregados com sucesso!', false);
+            if (window.showNotification) window.showNotification('Dados carregados com sucesso!', false);
 
         } catch (error) {
-            console.error("Erro GERAL e inesperado em fetchLinkableData:", error);
-            if (window.showNotification) window.showNotification('Falha ao carregar. Verifique se os caminhos estão corretos e veja o console para erros.', true);
+            console.error("### ERRO AO BUSCAR DADOS ###");
+            console.error("Ocorreu um erro ao tentar ler as coleções do Firestore.");
+            console.error("Caminho da Notícia tentado:", noticiasPath);
+            console.error("Caminho do Acervo tentado:", acervosPath);
+            console.error("Mensagem de erro do Firebase:", error.message);
+            console.error("Código do erro:", error.code);
+            console.error("Isto geralmente é um problema de REGRAS DE SEGURANÇA (Security Rules) no seu painel Firebase. Verifique se as regras permitem a leitura destes caminhos.");
+            
+            let userMessage = `Falha ao carregar: ${error.message}. Verifique o console (F12) para detalhes técnicos.`;
+            if (error.code === 'permission-denied') {
+                userMessage = 'Falha ao carregar: Permissão negada. Verifique as Regras de Segurança do Firestore.';
+            }
+            if (window.showNotification) window.showNotification(userMessage, true);
         }
     };
 
@@ -639,9 +613,6 @@
             linkIdSelect.innerHTML = `<option value="">Nenhum item de '${tipo}' encontrado</option>`;
         }
     });
-    
-    // Adiciona o listener para o novo botão de recarregar
-    document.getElementById('reload-data-btn').addEventListener('click', fetchLinkableData);
 
     if (window.setupUploadComponent) {
         window.setupUploadComponent(document.querySelector(`[data-upload-container="${entity}-media"]`));
