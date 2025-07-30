@@ -216,7 +216,7 @@
     
     document.getElementById('cancel-geracao-edit').addEventListener('click', clearForm);
     
-    // *** NOVO SCRIPT PARA POPULAR DADOS INICIAIS ***
+    // *** SCRIPT PARA POPULAR DADOS INICIAIS ***
     const populateInitialData = async () => {
         const collectionRef = collection(db, `/artifacts/${appId}/public/data/${entity}`);
         const snapshot = await getDocs(collectionRef);
