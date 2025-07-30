@@ -36,20 +36,27 @@
 
         <fieldset class="border p-4 rounded-md">
             <legend class="text-lg font-semibold px-2">Imagem</legend>
-            <div class="pt-2" data-upload-container="geracoes-imagem">
-                <input type="hidden" id="geracoes-imagem-url">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Imagem de Fundo</label>
-                <div class="upload-preview-wrapper hidden mb-4">
-                    <div class="upload-preview-container rounded-lg overflow-hidden">
-                        <img src="#" alt="Preview da imagem" class="upload-preview rounded-lg">
-                    </div>
-                    <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover imagem</button>
+            <div class="space-y-4 pt-2">
+                 <div>
+                    <label for="geracoes-imagem-url" class="block text-sm font-medium text-gray-700">URL da Imagem de Fundo</label>
+                    <input type="url" id="geracoes-imagem-url" placeholder="Cole a URL da imagem aqui">
+                    <p class="text-xs text-gray-500 mt-1">Pode colar a URL diretamente do Canvas aqui.</p>
                 </div>
-                <div class="upload-drop-zone">
-                    <input type="file" class="upload-file-input hidden" accept="image/*">
-                    <div class="text-gray-500">
-                        <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
-                        <p><strong>Arraste e solte</strong> ou <strong>clique para selecionar</strong></p>
+                <div class="text-center text-sm text-gray-500">OU</div>
+                <div data-upload-container="geracoes-imagem-file">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Carregue um Ficheiro de Imagem</label>
+                    <div class="upload-preview-wrapper hidden mb-4">
+                        <div class="upload-preview-container rounded-lg overflow-hidden">
+                            <img src="#" alt="Preview da imagem" class="upload-preview rounded-lg">
+                        </div>
+                        <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover imagem</button>
+                    </div>
+                    <div class="upload-drop-zone">
+                        <input type="file" class="upload-file-input hidden" accept="image/*">
+                        <div class="text-gray-500">
+                            <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                            <p><strong>Arraste e solte</strong> ou <strong>clique para selecionar</strong></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -66,12 +73,6 @@
     </form>
     <div class="mt-8">
         <h3 class="text-xl font-bold mb-4">Gerações da Timeline</h3>
-        <div id="populate-container" class="hidden mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md text-center">
-            <p class="text-sm text-blue-800">Parece que a timeline está vazia. Deseja carregar os dados iniciais com as 9 gerações?</p>
-            <button id="populate-button" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors text-sm">
-                <i class="fas fa-download mr-2"></i>Carregar Dados Iniciais
-            </button>
-        </div>
         <div id="geracoes-lista" class="space-y-4"></div>
     </div>
 </div>
@@ -79,19 +80,18 @@
 <!-- Script Específico da Aba Gerações -->
 <script data-tab-script="geracoes">
 {
-    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, getDocs, ref, deleteObject, query, orderBy } = window.firebaseServices;
+    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, ref, deleteObject, query, orderBy } = window.firebaseServices;
     const { appId } = window.appConfig;
 
     const entity = 'geracoes';
     const form = document.getElementById(`form-${entity}`);
     const listContainer = document.getElementById(`${entity}-lista`);
-    const populateContainer = document.getElementById('populate-container');
-    const populateButton = document.getElementById('populate-button');
 
     const clearForm = () => {
         form.reset();
         document.getElementById(`${entity}-id`).value = '';
-        window.resetUploadUI('geracoes-imagem');
+        window.resetUploadUI('geracoes-imagem-file');
+        document.getElementById('geracoes-imagem-url').value = '';
     };
 
     const editDoc = async (id) => {
@@ -109,11 +109,12 @@
                 });
 
                 if (data.imagem) {
-                    const container = document.querySelector('[data-upload-container="geracoes-imagem"]');
-                    container.querySelector('.upload-preview').src = data.imagem;
+                    document.getElementById('geracoes-imagem-url').value = data.imagem;
+                    const container = document.querySelector('[data-upload-container="geracoes-imagem-file"]');
+                    const previewImg = container.querySelector('.upload-preview');
+                    previewImg.src = data.imagem;
                     container.querySelector('.upload-preview-wrapper').classList.remove('hidden');
                     container.querySelector('.upload-drop-zone').classList.add('hidden');
-                    document.getElementById('geracoes-imagem-url').value = data.imagem;
                 }
                 window.scrollTo(0, 0);
             }
@@ -130,8 +131,10 @@
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists() && docSnap.data().imagem) {
-                const fileRef = ref(storage, docSnap.data().imagem);
-                await deleteObject(fileRef).catch(err => console.warn("Falha ao apagar ficheiro do Storage:", err));
+                if (docSnap.data().imagem.includes('firebasestorage.googleapis.com')) {
+                    const fileRef = ref(storage, docSnap.data().imagem);
+                    await deleteObject(fileRef).catch(err => console.warn("Falha ao apagar ficheiro do Storage:", err));
+                }
             }
             
             await deleteDoc(docRef);
@@ -146,44 +149,48 @@
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = form.querySelector('button[type="submit"]');
-        const progressContainer = document.getElementById('geracoes-upload-progress-container');
-        const progressBar = document.getElementById('geracoes-upload-progress-bar');
         submitButton.disabled = true;
 
-        const data = {
-            titulo: document.getElementById('geracoes-titulo').value,
-            nome: document.getElementById('geracoes-nome').value,
-            anos: document.getElementById('geracoes-anos').value,
-            descricao: document.getElementById('geracoes-descricao').value,
-            consoles: document.getElementById('geracoes-consoles').value,
-            ordem: Number(document.getElementById('geracoes-ordem').value) || 0,
-            imagem: document.getElementById('geracoes-imagem-url').value || null,
-        };
+        const progressContainer = document.getElementById('geracoes-upload-progress-container');
+        const progressBar = document.getElementById('geracoes-upload-progress-bar');
+        
+        let imageUrl = document.getElementById('geracoes-imagem-url').value.trim();
 
         try {
-            const file = window.pendingFiles.get('geracoes-imagem');
+            const file = window.pendingFiles.get('geracoes-imagem-file');
             if (file) {
                 progressContainer.classList.remove('hidden');
-                data.imagem = await window.uploadFile(file, 'geracoes/', (progress) => {
+                imageUrl = await window.uploadFile(file, 'geracoes/', (progress) => {
                     const percent = Math.round(progress * 100);
                     progressBar.style.width = `${percent}%`;
                     progressBar.textContent = `${percent}%`;
                 });
             }
 
-            if (!data.imagem) {
-                const existingUrl = document.getElementById('geracoes-imagem-url').value;
-                if (!existingUrl) {
-                    window.showNotification('A imagem de fundo é obrigatória.', true);
-                    submitButton.disabled = false;
-                    return;
-                }
-                data.imagem = existingUrl;
+            if (!imageUrl) {
+                window.showNotification('É necessário fornecer uma URL de imagem ou carregar um ficheiro.', true);
+                submitButton.disabled = false;
+                return;
             }
+            
+            const data = {
+                titulo: document.getElementById('geracoes-titulo').value,
+                nome: document.getElementById('geracoes-nome').value,
+                anos: document.getElementById('geracoes-anos').value,
+                descricao: document.getElementById('geracoes-descricao').value,
+                consoles: document.getElementById('geracoes-consoles').value,
+                ordem: Number(document.getElementById('geracoes-ordem').value) || 0,
+                imagem: imageUrl,
+            };
 
             const id = document.getElementById(`${entity}-id`).value;
             const path = `/artifacts/${appId}/public/data/${entity}`;
-            await (id ? updateDoc(doc(db, path, id), data) : addDoc(collection(db, path), data));
+            
+            if (id) {
+                await updateDoc(doc(db, path, id), data);
+            } else {
+                await addDoc(collection(db, path), data);
+            }
 
             window.showNotification('Geração guardada com sucesso!');
             clearForm();
@@ -198,61 +205,23 @@
 
     const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem"));
     onSnapshot(q, (snapshot) => {
-        if (snapshot.empty) {
-            listContainer.innerHTML = '<p class="text-sm text-gray-500">Nenhuma geração registada.</p>';
-            populateContainer.classList.remove('hidden');
-        } else {
-            populateContainer.classList.add('hidden');
-            listContainer.innerHTML = ''; // Limpa a lista antes de renderizar
-            const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            docs.forEach(data => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
-                itemDiv.innerHTML = \`
-                    <div class="flex items-center gap-4">
-                        <img src="\${data.imagem || 'https://placehold.co/100x60/e9ecef/6c757d?text=Media'}" alt="Preview" class="w-20 h-12 object-cover rounded-md bg-gray-200">
-                        <p class="font-semibold text-sm truncate pr-4">\${data.titulo || 'Item sem título'}</p>
-                    </div>
-                    <div class="flex-shrink-0 flex gap-2">
-                        <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="\${data.id}">Editar</button>
-                        <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="\${data.id}">Eliminar</button>
-                    </div>
-                \`;
-                listContainer.appendChild(itemDiv);
-            });
-        }
+        listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhuma geração registada.</p>' : '';
+        const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        docs.forEach(data => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+            itemDiv.innerHTML =
+                '<div class="flex items-center gap-4">' +
+                    '<img src="' + (data.imagem || 'https://placehold.co/100x60/e9ecef/6c757d?text=Media') + '" alt="Preview" class="w-20 h-12 object-cover rounded-md bg-gray-200">' +
+                    '<p class="font-semibold text-sm truncate pr-4">' + (data.titulo || 'Item sem título') + '</p>' +
+                '</div>' +
+                '<div class="flex-shrink-0 flex gap-2">' +
+                    '<button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="' + data.id + '">Editar</button>' +
+                    '<button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="' + data.id + '">Eliminar</button>' +
+                '</div>';
+            listContainer.appendChild(itemDiv);
+        });
     });
-    
-    const populateInitialData = async () => {
-        populateButton.disabled = true;
-        populateButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>A carregar...';
-        window.showNotification('A carregar os dados iniciais. Por favor, aguarde...');
-
-        const generationsData = [
-            { ordem: 1, titulo: '1ª Geração', nome: 'O Início de Tudo', anos: '1972-1980', descricao: 'O nascimento dos videojogos domésticos. Simples, mas revolucionários, os primeiros consoles levaram o entretenimento eletrônico das salas de arcade para as salas de estar.', consoles: 'Magnavox Odyssey, Atari Home Pong', imagem: 'https://images.unsplash.com/photo-1580234810443-74161592e604?q=80&w=1932&auto=format&fit=crop' },
-            { ordem: 2, titulo: '2ª Geração', nome: 'A Era dos Cartuchos', anos: '1976-1984', descricao: 'A introdução de cartuchos intercambiáveis permitiu uma biblioteca de jogos muito maior. Foi uma era de ouro para a criatividade, mas que terminou com o infame "crash" dos videojogos de 1983.', consoles: 'Atari 2600, ColecoVision, Intellivision', imagem: 'https://images.unsplash.com/photo-1612404459571-ccef41c48abe?q=80&w=2070&auto=format&fit=crop' },
-            { ordem: 3, titulo: '3ª Geração', nome: 'A Revolução Japonesa', anos: '1983-1992', descricao: 'Após o crash, a indústria foi salva por empresas japonesas. Esta era de 8-bits definiu muitos gêneros de jogos e criou mascotes icônicos que são amados até hoje.', consoles: 'Nintendo Entertainment System (NES), Sega Master System', imagem: 'https://images.unsplash.com/photo-1555864424-46c6f14b3346?q=80&w=1974&auto=format&fit=crop' },
-            { ordem: 4, titulo: '4ª Geração', nome: 'A Guerra dos 16-Bits', anos: '1987-1996', descricao: 'A lendária "Guerra dos Consoles" entre a Nintendo e a Sega. Gráficos mais coloridos, som estéreo e jogos mais complexos marcaram esta era competitiva e inovadora.', consoles: 'Super Nintendo (SNES), Sega Mega Drive / Genesis', imagem: 'https://images.unsplash.com/photo-1627843444283-1b63483a033b?q=80&w=2070&auto=format&fit=crop' },
-            { ordem: 5, titulo: '5ª Geração', nome: 'A Revolução 3D', anos: '1993-2002', descricao: 'A transição para gráficos 3D poligonais e o uso de CDs mudaram para sempre o design dos jogos. Mundos vastos e narrativas cinematográficas tornaram-se possíveis.', consoles: 'PlayStation, Nintendo 64, Sega Saturn', imagem: 'https://images.unsplash.com/photo-1511882150382-421059c8143f?q=80&w=2070&auto=format&fit=crop' },
-            { ordem: 6, titulo: '6ª Geração', nome: 'O Jogo Online Começa', anos: '1998-2006', descricao: 'O jogo online tornou-se uma realidade nos consoles. Esta geração foi dominada pelo PlayStation 2, o console mais vendido de todos os tempos, e viu a entrada da Microsoft no mercado.', consoles: 'PlayStation 2, Xbox, Nintendo GameCube, Dreamcast', imagem: 'https://images.unsplash.com/photo-1626968361222-291e74711449?q=80&w=2070&auto=format&fit=crop' },
-            { ordem: 7, titulo: '7ª Geração', nome: 'Alta Definição e Movimento', anos: '2005-2013', descricao: 'Gráficos em alta definição (HD) tornaram-se o padrão. A Nintendo inovou com controles de movimento, atraindo um novo público massivo para os videojogos.', consoles: 'Xbox 360, PlayStation 3, Nintendo Wii', imagem: 'https://images.unsplash.com/photo-1507457379470-08b800bebc67?q=80&w=2109&auto=format&fit=crop' },
-            { ordem: 8, titulo: '8ª Geração', nome: 'Mundos Conectados', anos: '2012-2020', descricao: 'Foco total na conectividade, redes sociais e streaming de jogos. O sucesso do modelo híbrido do Nintendo Switch mostrou que a inovação no hardware ainda era possível.', consoles: 'PlayStation 4, Xbox One, Nintendo Switch', imagem: 'https://images.unsplash.com/photo-1605901309584-818e5236a2a2?q=80&w=1932&auto=format&fit=crop' },
-            { ordem: 9, titulo: '9ª Geração', nome: 'Velocidade e Imersão', anos: '2020-Presente', descricao: 'SSDs ultrarrápidos eliminam os tempos de carregamento, enquanto tecnologias como o Ray Tracing e o feedback tátil criam níveis de imersão sem precedentes.', consoles: 'PlayStation 5, Xbox Series X/S', imagem: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=2070&auto=format&fit=crop' }
-        ];
-
-        try {
-            const collectionRef = collection(db, `/artifacts/${appId}/public/data/${entity}`);
-            const writePromises = generationsData.map(gen => addDoc(collectionRef, gen));
-            await Promise.all(writePromises);
-            window.showNotification('Dados iniciais da timeline carregados com sucesso!');
-        } catch (error) {
-            console.error("Erro ao popular dados iniciais:", error);
-            window.showNotification('Erro ao carregar dados iniciais.', true);
-        } finally {
-            populateButton.disabled = false;
-            populateButton.innerHTML = '<i class="fas fa-download mr-2"></i>Carregar Dados Iniciais';
-        }
-    };
 
     listContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
@@ -260,7 +229,6 @@
     });
     
     document.getElementById('cancel-geracao-edit').addEventListener('click', clearForm);
-    populateButton.addEventListener('click', populateInitialData);
-    window.setupUploadComponent(document.querySelector('[data-upload-container="geracoes-imagem"]'));
+    window.setupUploadComponent(document.querySelector('[data-upload-container="geracoes-imagem-file"]'));
 }
 </script>
