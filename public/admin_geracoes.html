@@ -25,7 +25,7 @@
                 </div>
                 <div class="md:col-span-2">
                     <label for="geracoes-descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
-                    <textarea id="geracoes-descricao" rows="4" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <textarea id="geracoes-descricao" rows="4"></textarea>
                 </div>
                 <div class="md:col-span-2">
                     <label for="geracoes-consoles" class="block text-sm font-medium text-gray-700">Consoles Marcantes (separados por vírgula)</label>
@@ -66,6 +66,12 @@
     </form>
     <div class="mt-8">
         <h3 class="text-xl font-bold mb-4">Gerações da Timeline</h3>
+        <div id="populate-container" class="hidden mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md text-center">
+            <p class="text-sm text-blue-800">Parece que a timeline está vazia. Deseja carregar os dados iniciais com as 9 gerações?</p>
+            <button id="populate-button" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors text-sm">
+                <i class="fas fa-download mr-2"></i>Carregar Dados Iniciais
+            </button>
+        </div>
         <div id="geracoes-lista" class="space-y-4"></div>
     </div>
 </div>
@@ -79,6 +85,8 @@
     const entity = 'geracoes';
     const form = document.getElementById(`form-${entity}`);
     const listContainer = document.getElementById(`${entity}-lista`);
+    const populateContainer = document.getElementById('populate-container');
+    const populateButton = document.getElementById('populate-button');
 
     const clearForm = () => {
         form.reset();
@@ -190,24 +198,61 @@
 
     const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("ordem"));
     onSnapshot(q, (snapshot) => {
-        listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhuma geração registada.</p>' : '';
-        const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        docs.forEach(data => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
-            itemDiv.innerHTML = \`
-                <div class="flex items-center gap-4">
-                    <img src="\${data.imagem || 'https://placehold.co/100x60/e9ecef/6c757d?text=Media'}" alt="Preview" class="w-20 h-12 object-cover rounded-md bg-gray-200">
-                    <p class="font-semibold text-sm truncate pr-4">\${data.titulo || 'Item sem título'}</p>
-                </div>
-                <div class="flex-shrink-0 flex gap-2">
-                    <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="\${data.id}">Editar</button>
-                    <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="\${data.id}">Eliminar</button>
-                </div>
-            \`;
-            listContainer.appendChild(itemDiv);
-        });
+        if (snapshot.empty) {
+            listContainer.innerHTML = '<p class="text-sm text-gray-500">Nenhuma geração registada.</p>';
+            populateContainer.classList.remove('hidden');
+        } else {
+            populateContainer.classList.add('hidden');
+            listContainer.innerHTML = ''; // Limpa a lista antes de renderizar
+            const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            docs.forEach(data => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+                itemDiv.innerHTML = \`
+                    <div class="flex items-center gap-4">
+                        <img src="\${data.imagem || 'https://placehold.co/100x60/e9ecef/6c757d?text=Media'}" alt="Preview" class="w-20 h-12 object-cover rounded-md bg-gray-200">
+                        <p class="font-semibold text-sm truncate pr-4">\${data.titulo || 'Item sem título'}</p>
+                    </div>
+                    <div class="flex-shrink-0 flex gap-2">
+                        <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="\${data.id}">Editar</button>
+                        <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="\${data.id}">Eliminar</button>
+                    </div>
+                \`;
+                listContainer.appendChild(itemDiv);
+            });
+        }
     });
+    
+    const populateInitialData = async () => {
+        populateButton.disabled = true;
+        populateButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>A carregar...';
+        window.showNotification('A carregar os dados iniciais. Por favor, aguarde...');
+
+        const generationsData = [
+            { ordem: 1, titulo: '1ª Geração', nome: 'O Início de Tudo', anos: '1972-1980', descricao: 'O nascimento dos videojogos domésticos. Simples, mas revolucionários, os primeiros consoles levaram o entretenimento eletrônico das salas de arcade para as salas de estar.', consoles: 'Magnavox Odyssey, Atari Home Pong', imagem: 'https://images.unsplash.com/photo-1580234810443-74161592e604?q=80&w=1932&auto=format&fit=crop' },
+            { ordem: 2, titulo: '2ª Geração', nome: 'A Era dos Cartuchos', anos: '1976-1984', descricao: 'A introdução de cartuchos intercambiáveis permitiu uma biblioteca de jogos muito maior. Foi uma era de ouro para a criatividade, mas que terminou com o infame "crash" dos videojogos de 1983.', consoles: 'Atari 2600, ColecoVision, Intellivision', imagem: 'https://images.unsplash.com/photo-1612404459571-ccef41c48abe?q=80&w=2070&auto=format&fit=crop' },
+            { ordem: 3, titulo: '3ª Geração', nome: 'A Revolução Japonesa', anos: '1983-1992', descricao: 'Após o crash, a indústria foi salva por empresas japonesas. Esta era de 8-bits definiu muitos gêneros de jogos e criou mascotes icônicos que são amados até hoje.', consoles: 'Nintendo Entertainment System (NES), Sega Master System', imagem: 'https://images.unsplash.com/photo-1555864424-46c6f14b3346?q=80&w=1974&auto=format&fit=crop' },
+            { ordem: 4, titulo: '4ª Geração', nome: 'A Guerra dos 16-Bits', anos: '1987-1996', descricao: 'A lendária "Guerra dos Consoles" entre a Nintendo e a Sega. Gráficos mais coloridos, som estéreo e jogos mais complexos marcaram esta era competitiva e inovadora.', consoles: 'Super Nintendo (SNES), Sega Mega Drive / Genesis', imagem: 'https://images.unsplash.com/photo-1627843444283-1b63483a033b?q=80&w=2070&auto=format&fit=crop' },
+            { ordem: 5, titulo: '5ª Geração', nome: 'A Revolução 3D', anos: '1993-2002', descricao: 'A transição para gráficos 3D poligonais e o uso de CDs mudaram para sempre o design dos jogos. Mundos vastos e narrativas cinematográficas tornaram-se possíveis.', consoles: 'PlayStation, Nintendo 64, Sega Saturn', imagem: 'https://images.unsplash.com/photo-1511882150382-421059c8143f?q=80&w=2070&auto=format&fit=crop' },
+            { ordem: 6, titulo: '6ª Geração', nome: 'O Jogo Online Começa', anos: '1998-2006', descricao: 'O jogo online tornou-se uma realidade nos consoles. Esta geração foi dominada pelo PlayStation 2, o console mais vendido de todos os tempos, e viu a entrada da Microsoft no mercado.', consoles: 'PlayStation 2, Xbox, Nintendo GameCube, Dreamcast', imagem: 'https://images.unsplash.com/photo-1626968361222-291e74711449?q=80&w=2070&auto=format&fit=crop' },
+            { ordem: 7, titulo: '7ª Geração', nome: 'Alta Definição e Movimento', anos: '2005-2013', descricao: 'Gráficos em alta definição (HD) tornaram-se o padrão. A Nintendo inovou com controles de movimento, atraindo um novo público massivo para os videojogos.', consoles: 'Xbox 360, PlayStation 3, Nintendo Wii', imagem: 'https://images.unsplash.com/photo-1507457379470-08b800bebc67?q=80&w=2109&auto=format&fit=crop' },
+            { ordem: 8, titulo: '8ª Geração', nome: 'Mundos Conectados', anos: '2012-2020', descricao: 'Foco total na conectividade, redes sociais e streaming de jogos. O sucesso do modelo híbrido do Nintendo Switch mostrou que a inovação no hardware ainda era possível.', consoles: 'PlayStation 4, Xbox One, Nintendo Switch', imagem: 'https://images.unsplash.com/photo-1605901309584-818e5236a2a2?q=80&w=1932&auto=format&fit=crop' },
+            { ordem: 9, titulo: '9ª Geração', nome: 'Velocidade e Imersão', anos: '2020-Presente', descricao: 'SSDs ultrarrápidos eliminam os tempos de carregamento, enquanto tecnologias como o Ray Tracing e o feedback tátil criam níveis de imersão sem precedentes.', consoles: 'PlayStation 5, Xbox Series X/S', imagem: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=2070&auto=format&fit=crop' }
+        ];
+
+        try {
+            const collectionRef = collection(db, `/artifacts/${appId}/public/data/${entity}`);
+            const writePromises = generationsData.map(gen => addDoc(collectionRef, gen));
+            await Promise.all(writePromises);
+            window.showNotification('Dados iniciais da timeline carregados com sucesso!');
+        } catch (error) {
+            console.error("Erro ao popular dados iniciais:", error);
+            window.showNotification('Erro ao carregar dados iniciais.', true);
+        } finally {
+            populateButton.disabled = false;
+            populateButton.innerHTML = '<i class="fas fa-download mr-2"></i>Carregar Dados Iniciais';
+        }
+    };
 
     listContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
@@ -215,42 +260,7 @@
     });
     
     document.getElementById('cancel-geracao-edit').addEventListener('click', clearForm);
-    
-    // *** SCRIPT PARA POPULAR DADOS INICIAIS ***
-    const populateInitialData = async () => {
-        const collectionRef = collection(db, `/artifacts/${appId}/public/data/${entity}`);
-        const snapshot = await getDocs(collectionRef);
-
-        if (snapshot.empty) {
-            console.log('Coleção "geracoes" vazia. Populando com dados iniciais...');
-            window.showNotification('Populando a timeline com os dados iniciais. Aguarde...');
-
-            const generationsData = [
-                { ordem: 1, titulo: '1ª Geração', nome: 'O Início de Tudo', anos: '1972-1980', descricao: 'O nascimento dos videojogos domésticos. Simples, mas revolucionários, os primeiros consoles levaram o entretenimento eletrônico das salas de arcade para as salas de estar.', consoles: 'Magnavox Odyssey, Atari Home Pong', imagem: 'https://images.unsplash.com/photo-1580234810443-74161592e604?q=80&w=1932&auto=format&fit=crop' },
-                { ordem: 2, titulo: '2ª Geração', nome: 'A Era dos Cartuchos', anos: '1976-1984', descricao: 'A introdução de cartuchos intercambiáveis permitiu uma biblioteca de jogos muito maior. Foi uma era de ouro para a criatividade, mas que terminou com o infame "crash" dos videojogos de 1983.', consoles: 'Atari 2600, ColecoVision, Intellivision', imagem: 'https://images.unsplash.com/photo-1612404459571-ccef41c48abe?q=80&w=2070&auto=format&fit=crop' },
-                { ordem: 3, titulo: '3ª Geração', nome: 'A Revolução Japonesa', anos: '1983-1992', descricao: 'Após o crash, a indústria foi salva por empresas japonesas. Esta era de 8-bits definiu muitos gêneros de jogos e criou mascotes icônicos que são amados até hoje.', consoles: 'Nintendo Entertainment System (NES), Sega Master System', imagem: 'https://images.unsplash.com/photo-1555864424-46c6f14b3346?q=80&w=1974&auto=format&fit=crop' },
-                { ordem: 4, titulo: '4ª Geração', nome: 'A Guerra dos 16-Bits', anos: '1987-1996', descricao: 'A lendária "Guerra dos Consoles" entre a Nintendo e a Sega. Gráficos mais coloridos, som estéreo e jogos mais complexos marcaram esta era competitiva e inovadora.', consoles: 'Super Nintendo (SNES), Sega Mega Drive / Genesis', imagem: 'https://images.unsplash.com/photo-1627843444283-1b63483a033b?q=80&w=2070&auto=format&fit=crop' },
-                { ordem: 5, titulo: '5ª Geração', nome: 'A Revolução 3D', anos: '1993-2002', descricao: 'A transição para gráficos 3D poligonais e o uso de CDs mudaram para sempre o design dos jogos. Mundos vastos e narrativas cinematográficas tornaram-se possíveis.', consoles: 'PlayStation, Nintendo 64, Sega Saturn', imagem: 'https://images.unsplash.com/photo-1511882150382-421059c8143f?q=80&w=2070&auto=format&fit=crop' },
-                { ordem: 6, titulo: '6ª Geração', nome: 'O Jogo Online Começa', anos: '1998-2006', descricao: 'O jogo online tornou-se uma realidade nos consoles. Esta geração foi dominada pelo PlayStation 2, o console mais vendido de todos os tempos, e viu a entrada da Microsoft no mercado.', consoles: 'PlayStation 2, Xbox, Nintendo GameCube, Dreamcast', imagem: 'https://images.unsplash.com/photo-1626968361222-291e74711449?q=80&w=2070&auto=format&fit=crop' },
-                { ordem: 7, titulo: '7ª Geração', nome: 'Alta Definição e Movimento', anos: '2005-2013', descricao: 'Gráficos em alta definição (HD) tornaram-se o padrão. A Nintendo inovou com controles de movimento, atraindo um novo público massivo para os videojogos.', consoles: 'Xbox 360, PlayStation 3, Nintendo Wii', imagem: 'https://images.unsplash.com/photo-1507457379470-08b800bebc67?q=80&w=2109&auto=format&fit=crop' },
-                { ordem: 8, titulo: '8ª Geração', nome: 'Mundos Conectados', anos: '2012-2020', descricao: 'Foco total na conectividade, redes sociais e streaming de jogos. O sucesso do modelo híbrido do Nintendo Switch mostrou que a inovação no hardware ainda era possível.', consoles: 'PlayStation 4, Xbox One, Nintendo Switch', imagem: 'https://images.unsplash.com/photo-1605901309584-818e5236a2a2?q=80&w=1932&auto=format&fit=crop' },
-                { ordem: 9, titulo: '9ª Geração', nome: 'Velocidade e Imersão', anos: '2020-Presente', descricao: 'SSDs ultrarrápidos eliminam os tempos de carregamento, enquanto tecnologias como o Ray Tracing e o feedback tátil criam níveis de imersão sem precedentes.', consoles: 'PlayStation 5, Xbox Series X/S', imagem: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=2070&auto=format&fit=crop' }
-            ];
-
-            try {
-                const writePromises = generationsData.map(gen => addDoc(collectionRef, gen));
-                await Promise.all(writePromises);
-                window.showNotification('Dados iniciais da timeline carregados com sucesso!');
-            } catch (error) {
-                console.error("Erro ao popular dados iniciais:", error);
-                window.showNotification('Erro ao carregar dados iniciais.', true);
-            }
-        } else {
-            console.log('A coleção "geracoes" já contém dados.');
-        }
-    };
-
-    populateInitialData();
+    populateButton.addEventListener('click', populateInitialData);
     window.setupUploadComponent(document.querySelector('[data-upload-container="geracoes-imagem"]'));
 }
 </script>
