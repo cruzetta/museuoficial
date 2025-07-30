@@ -660,6 +660,9 @@
                 console.warn("Não foi possível carregar configuração do carrossel, usando valor padrão.", error);
             }
 
+            // =================================================================
+            // CORREÇÃO APLICADA AQUI
+            // =================================================================
             const renderSlide = (slideData, index) => {
                 const { titulo, mediaUrl, mediaTipo, linkTexto, linkUrl, tituloEstilo, tituloPosicao } = slideData;
                 
@@ -718,10 +721,7 @@
                 
                 slides[currentIndex].style.opacity = '1';
                 indicators[currentIndex].style.opacity = '1';
-
-                const videoElement = document.getElementById(`video-${currentIndex}`);
-                if (videoElement) videoElement.play().catch(e => {});
-
+                
                 resetAutoplay();
             };
 
@@ -730,7 +730,20 @@
             const resetAutoplay = () => {
                 clearTimeout(autoplayTimer);
                 if (slidesData.length <= 1) return;
-                autoplayTimer = setTimeout(advanceAndReset, slideDuration);
+
+                const currentSlideData = slidesData[currentIndex];
+                if (currentSlideData.mediaTipo === 'video') {
+                    const videoElement = document.getElementById(`video-${currentIndex}`);
+                    if (videoElement) {
+                        videoElement.currentTime = 0;
+                        videoElement.play().catch(e => console.warn("Video play failed:", e));
+                        // Remove any old listener before adding a new one
+                        videoElement.removeEventListener('ended', advanceAndReset);
+                        videoElement.addEventListener('ended', advanceAndReset, { once: true });
+                    }
+                } else {
+                    autoplayTimer = setTimeout(advanceAndReset, slideDuration);
+                }
             };
             
             try {
