@@ -123,7 +123,8 @@
                         <button onclick="window.loadTab('admin_home')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-home fa-fw"></i> Home</button>
                         <button onclick="window.loadTab('admin_noticias')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-newspaper fa-fw"></i> Notícias</button>
                         <button onclick="window.loadTab('admin_acervos')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Acervos</button>
-                        <button onclick="window.loadTab('admin_quiz')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-archive fa-fw"></i> Quiz</button>
+                        <button onclick="window.loadTab('admin_geracoes')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-history fa-fw"></i> Gerações</button>
+                        <button onclick="window.loadTab('admin_quiz')" class="w-full text-left flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-question-circle fa-fw"></i> Quiz</button>
                     </nav>
                 </div>
             </aside>
@@ -327,7 +328,6 @@
                 mainContent.style.display = 'block';
                 window.loadTab('admin_home');
             } else {
-                // CORREÇÃO: Removido '/public' do caminho do redirecionamento.
                 window.location.assign('/login.html');
             }
         });

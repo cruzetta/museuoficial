@@ -390,6 +390,13 @@
                 <h2 class="section-title !text-white">Uma Viagem Pelas Gerações</h2>
                 <div id="timeline-interactive-container" class="relative">
                     <!-- O conteúdo da timeline será injetado aqui pelo JavaScript -->
+                    <div class="text-center text-gray-400">
+                        <svg class="animate-spin h-8 w-8 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="mt-3">A carregar a linha do tempo...</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -660,9 +667,6 @@
                 console.warn("Não foi possível carregar configuração do carrossel, usando valor padrão.", error);
             }
 
-            // =================================================================
-            // CORREÇÃO APLICADA AQUI
-            // =================================================================
             const renderSlide = (slideData, index) => {
                 const { titulo, mediaUrl, mediaTipo, linkTexto, linkUrl, tituloEstilo, tituloPosicao } = slideData;
                 
@@ -737,7 +741,6 @@
                     if (videoElement) {
                         videoElement.currentTime = 0;
                         videoElement.play().catch(e => console.warn("Video play failed:", e));
-                        // Remove any old listener before adding a new one
                         videoElement.removeEventListener('ended', advanceAndReset);
                         videoElement.addEventListener('ended', advanceAndReset, { once: true });
                     }
@@ -772,7 +775,7 @@
                     nextButton.addEventListener('click', () => goToSlide((currentIndex + 1) % slidesData.length));
                 }
 
-                goToSlide(0); // Inicia o carrossel
+                goToSlide(0);
 
             } catch (error) {
                 console.error("Erro ao carregar o carrossel:", error);
@@ -780,101 +783,32 @@
             }
         };
         
-        // --- LÓGICA DA TIMELINE INTERATIVA DE GERAÇÕES ---
+        // --- LÓGICA DA TIMELINE INTERATIVA DE GERAÇÕES (ATUALIZADO) ---
         const initializeInteractiveTimeline = () => {
             const container = document.getElementById('timeline-interactive-container');
             if (!container) return;
 
-            const generationsData = [
-                {
-                    gen: '1ª Geração',
-                    name: 'O Início de Tudo',
-                    years: '1972-1980',
-                    description: 'O nascimento dos videojogos domésticos. Simples, mas revolucionários, os primeiros consoles levaram o entretenimento eletrônico das salas de arcade para as salas de estar.',
-                    consoles: 'Marcado por: Magnavox Odyssey, Atari Home Pong',
-                    image: 'https://images.unsplash.com/photo-1580234810443-74161592e604?q=80&w=1932&auto=format&fit=crop'
-                },
-                {
-                    gen: '2ª Geração',
-                    name: 'A Era dos Cartuchos',
-                    years: '1976-1984',
-                    description: 'A introdução de cartuchos intercambiáveis permitiu uma biblioteca de jogos muito maior. Foi uma era de ouro para a criatividade, mas que terminou com o infame "crash" dos videojogos de 1983.',
-                    consoles: 'Marcado por: Atari 2600, ColecoVision, Intellivision',
-                    image: 'https://images.unsplash.com/photo-1612404459571-ccef41c48abe?q=80&w=2070&auto=format&fit=crop'
-                },
-                {
-                    gen: '3ª Geração',
-                    name: 'A Revolução Japonesa',
-                    years: '1983-1992',
-                    description: 'Após o crash, a indústria foi salva por empresas japonesas. Esta era de 8-bits definiu muitos gêneros de jogos e criou mascotes icônicos que são amados até hoje.',
-                    consoles: 'Marcado por: Nintendo Entertainment System (NES), Sega Master System',
-                    image: 'https://images.unsplash.com/photo-1555864424-46c6f14b3346?q=80&w=1974&auto=format&fit=crop'
-                },
-                {
-                    gen: '4ª Geração',
-                    name: 'A Guerra dos 16-Bits',
-                    years: '1987-1996',
-                    description: 'A lendária "Guerra dos Consoles" entre a Nintendo e a Sega. Gráficos mais coloridos, som estéreo e jogos mais complexos marcaram esta era competitiva e inovadora.',
-                    consoles: 'Marcado por: Super Nintendo (SNES), Sega Mega Drive / Genesis',
-                    image: 'https://images.unsplash.com/photo-1627843444283-1b63483a033b?q=80&w=2070&auto=format&fit=crop'
-                },
-                {
-                    gen: '5ª Geração',
-                    name: 'A Revolução 3D',
-                    years: '1993-2002',
-                    description: 'A transição para gráficos 3D poligonais e o uso de CDs mudaram para sempre o design dos jogos. Mundos vastos e narrativas cinematográficas tornaram-se possíveis.',
-                    consoles: 'Marcado por: PlayStation, Nintendo 64, Sega Saturn',
-                    image: 'https://images.unsplash.com/photo-1511882150382-421059c8143f?q=80&w=2070&auto=format&fit=crop'
-                },
-                {
-                    gen: '6ª Geração',
-                    name: 'O Jogo Online Começa',
-                    years: '1998-2006',
-                    description: 'O jogo online tornou-se uma realidade nos consoles. Esta geração foi dominada pelo PlayStation 2, o console mais vendido de todos os tempos, e viu a entrada da Microsoft no mercado.',
-                    consoles: 'Marcado por: PlayStation 2, Xbox, Nintendo GameCube, Dreamcast',
-                    image: 'https://images.unsplash.com/photo-1626968361222-291e74711449?q=80&w=2070&auto=format&fit=crop'
-                },
-                {
-                    gen: '7ª Geração',
-                    name: 'Alta Definição e Movimento',
-                    years: '2005-2013',
-                    description: 'Gráficos em alta definição (HD) tornaram-se o padrão. A Nintendo inovou com controles de movimento, atraindo um novo público massivo para os videojogos.',
-                    consoles: 'Marcado por: Xbox 360, PlayStation 3, Nintendo Wii',
-                    image: 'https://images.unsplash.com/photo-1507457379470-08b800bebc67?q=80&w=2109&auto=format&fit=crop'
-                },
-                {
-                    gen: '8ª Geração',
-                    name: 'Mundos Conectados',
-                    years: '2012-2020',
-                    description: 'Foco total na conectividade, redes sociais e streaming de jogos. O sucesso do modelo híbrido do Nintendo Switch mostrou que a inovação no hardware ainda era possível.',
-                    consoles: 'Marcado por: PlayStation 4, Xbox One, Nintendo Switch',
-                    image: 'https://images.unsplash.com/photo-1605901309584-818e5236a2a2?q=80&w=1932&auto=format&fit=crop'
-                },
-                {
-                    gen: '9ª Geração',
-                    name: 'Velocidade e Imersão',
-                    years: '2020-Presente',
-                    description: 'SSDs ultrarrápidos eliminam os tempos de carregamento, enquanto tecnologias como o Ray Tracing e o feedback tátil criam níveis de imersão sem precedentes.',
-                    consoles: 'Marcado por: PlayStation 5, Xbox Series X/S',
-                    image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=2070&auto=format&fit=crop'
-                }
-            ];
-
+            let generationsData = [];
             let currentIndex = 0;
 
             const render = () => {
+                if (generationsData.length === 0) {
+                    container.innerHTML = '<p class="text-gray-400">Nenhuma geração encontrada.</p>';
+                    return;
+                }
+
                 container.innerHTML = `
                     <div class="timeline-viewport">
                         <div class="timeline-track">
                             ${generationsData.map(gen => `
                                 <div class="timeline-generation-card">
                                     <div class="timeline-card-content">
-                                        <img src="${gen.image}" alt="Imagem representativa da ${gen.gen}" class="timeline-image" onerror="this.onerror=null;this.src='https://placehold.co/600x450/2c2c2c/f4f4f4?text=Imagem+N%C3%A3o+Dispon%C3%ADvel';">
+                                        <img src="${gen.imagem || 'https://placehold.co/600x450/2c2c2c/f4f4f4?text=Sem+Imagem'}" alt="Imagem da ${gen.titulo}" class="timeline-image" onerror="this.onerror=null;this.src='https://placehold.co/600x450/2c2c2c/f4f4f4?text=Imagem+N%C3%A3o+Dispon%C3%ADvel';">
                                         <div class="timeline-text-content">
-                                            <p class="timeline-generation-title">${gen.gen} (${gen.years})</p>
-                                            <h3 class="timeline-generation-name">${gen.name}</h3>
-                                            <p class="timeline-generation-description">${gen.description}</p>
-                                            <p class="timeline-generation-consoles">${gen.consoles}</p>
+                                            <p class="timeline-generation-title">${gen.titulo} (${gen.anos})</p>
+                                            <h3 class="timeline-generation-name">${gen.nome}</h3>
+                                            <p class="timeline-generation-description">${gen.descricao}</p>
+                                            <p class="timeline-generation-consoles">Marcado por: ${gen.consoles}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -890,7 +824,6 @@
                     </div>
                 `;
                 
-                // Re-add event listeners
                 document.getElementById('timeline-prev').addEventListener('click', () => updateTimeline(-1));
                 document.getElementById('timeline-next').addEventListener('click', () => updateTimeline(1));
                 document.querySelectorAll('.timeline-dot').forEach(dot => {
@@ -901,6 +834,11 @@
                 });
 
                 updateButtons();
+                // Set initial active card after a short delay to ensure rendering
+                setTimeout(() => {
+                    const initialCard = document.querySelector('.timeline-generation-card');
+                    if(initialCard) initialCard.classList.add('active');
+                }, 50);
             };
 
             const goToGeneration = (index) => {
@@ -931,12 +869,14 @@
                 if (nextBtn) nextBtn.disabled = currentIndex === generationsData.length - 1;
             };
 
-            render();
-            // Set initial active card after a short delay to ensure rendering
-            setTimeout(() => {
-                const initialCard = document.querySelector('.timeline-generation-card');
-                if(initialCard) initialCard.classList.add('active');
-            }, 50);
+            const q = query(collection(db, `/artifacts/${appId}/public/data/geracoes`), orderBy("ordem", "asc"));
+            onSnapshot(q, (snapshot) => {
+                generationsData = snapshot.docs.map(doc => doc.data());
+                render();
+            }, (error) => {
+                console.error("Erro ao carregar gerações:", error);
+                container.innerHTML = '<p class="text-red-400">Ocorreu um erro ao carregar a linha do tempo.</p>';
+            });
         };
 
         // --- Animação de Scroll ---
