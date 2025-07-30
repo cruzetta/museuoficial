@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts para o Carrossel -->
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Lora&family=Orbitron&family=Press+Start+2P&display=swap" rel="stylesheet">
 
 
@@ -213,7 +212,7 @@
             align-items: center;
             justify-content: center;
             gap: 1.5rem;
-            margin-top: 2.5rem;
+            margin-top: 1.0rem;
         }
         .about-timeline-nav-button {
             background-color: #fff;
@@ -376,7 +375,6 @@
 </head>
 <body class="antialiased">
 
-    <!-- Header -->
     <header class="sticky top-0 z-50 shadow-lg" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="flex justify-between items-center h-24">
@@ -423,7 +421,6 @@
 
     <main>
 
-        <!-- Seção Carrossel com Efeito Fade -->
         <section id="home-carousel-container" class="relative w-full h-[60vh] md:h-[85vh] bg-gray-900 text-white overflow-hidden shadow-lg">
             <div id="carousel-slides" class="relative w-full h-full">
                 <div class="w-full h-full flex items-center justify-center">
@@ -445,17 +442,21 @@
             <div id="carousel-indicators" class="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-3 z-10"></div>
         </section>
 
-        <!-- Seção Sobre Nós Interativa -->
         <section id="sobre-nos" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title !text-white">Nossa História</h2>
+                <div class="max-w-2xl mx-auto -mt-10 mb-6">
+                    <audio controls class="w-full">
+                        <source src="https://firebasestorage.googleapis.com/v0/b/museu-cca6d.firebasestorage.app/o/Historia%20em%20audio%20do%20museu%20do%20vg.mp3?alt=media&token=61313841-215e-4080-bc2f-2514d02a5b5d" type="audio/mpeg">
+                        Seu navegador não suporta o elemento de áudio.
+                    </audio>
+                </div>
                 <div id="about-timeline-container" class="max-w-6xl mx-auto relative">
                     <div class="text-center p-8">A carregar...</div>
                 </div>
             </div>
         </section>
 
-        <!-- Seção Notícias -->
         <section id="noticias" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Notícias e Eventos</h2>
@@ -464,7 +465,6 @@
             </div>
         </section>
 
-        <!-- Seção Acervos -->
         <section id="acervos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Os Nossos Acervos</h2>
@@ -473,7 +473,6 @@
             </div>
         </section>
 
-        <!-- Seção Timeline Interativa de Gerações -->
         <section id="timeline-geracoes" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title !text-white">Uma Viagem Pelas Gerações</h2>
@@ -489,7 +488,6 @@
             </div>
         </section>
 
-        <!-- Seção Games -->
         <section id="games" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Games Icónicos</h2>
@@ -497,7 +495,6 @@
             </div>
         </section>
 
-        <!-- Seção Quiz -->
         <section id="quiz" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Teste os seus Conhecimentos</h2>
@@ -505,7 +502,6 @@
             </div>
         </section>
 
-        <!-- Seção Curiosidades -->
         <section id="curiosidades" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Sabia que?</h2>
@@ -513,7 +509,6 @@
             </div>
         </section>
 
-        <!-- Seção Onde Estamos -->
         <section id="onde-estamos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Onde Estamos</h2>
@@ -530,7 +525,6 @@
             </div>
         </section>
 
-        <!-- Seção Corporativo -->
         <section id="corporativo" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Sobre o Museu</h2>
@@ -547,7 +541,6 @@
             </div>
         </section>
 
-        <!-- Seção Loja -->
         <section id="loja" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Loja do Museu</h2>
