@@ -26,7 +26,32 @@
                 </div>
             </div>
         </fieldset>
+
+        <fieldset class="border p-4 rounded-md">
+            <legend class="text-lg font-semibold px-2">Imagem do Slide</legend>
+            <div data-upload-container="sobre-nos-imagem" class="pt-2">
+                <input type="hidden" id="sobre-nos-imagem-url">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Imagem (Opcional)</label>
+                <div class="upload-preview-wrapper hidden mb-4">
+                    <div class="upload-preview-container rounded-lg overflow-hidden">
+                        <img src="#" alt="Preview da imagem" class="upload-preview rounded-lg">
+                    </div>
+                    <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover imagem</button>
+                </div>
+                <div class="upload-drop-zone">
+                    <input type="file" class="upload-file-input hidden" accept="image/*">
+                    <div class="text-gray-500">
+                        <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                        <p><strong>Arraste e solte</strong> ou <strong>clique para selecionar</strong></p>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
         
+        <div id="sobre-nos-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4">
+            <div id="sobre-nos-upload-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">0%</div>
+        </div>
+
         <div class="flex gap-4 pt-4">
             <button type="submit">Guardar Slide</button>
             <button type="button" id="cancel-sobre-nos-edit" class="w-auto">Cancelar</button>
@@ -41,7 +66,7 @@
 <!-- Script Específico da Aba Sobre Nós -->
 <script data-tab-script="sobre-nos">
 {
-    const { db, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, query, orderBy } = window.firebaseServices;
+    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, query, orderBy, ref, deleteObject } = window.firebaseServices;
     const { appId } = window.appConfig;
 
     const entity = 'sobre-nos';
@@ -51,6 +76,7 @@
     const clearForm = () => {
         form.reset();
         document.getElementById(`${entity}-id`).value = '';
+        window.resetUploadUI('sobre-nos-imagem');
     };
 
     const editDoc = async (id) => {
@@ -66,6 +92,15 @@
                     const element = document.getElementById(`${entity}-${field}`);
                     if (element) element.value = data[field] || '';
                 });
+
+                if (data.imagem) {
+                    const container = document.querySelector('[data-upload-container="sobre-nos-imagem"]');
+                    container.querySelector('.upload-preview').src = data.imagem;
+                    container.querySelector('.upload-preview-wrapper').classList.remove('hidden');
+                    container.querySelector('.upload-drop-zone').classList.add('hidden');
+                    document.getElementById('sobre-nos-imagem-url').value = data.imagem;
+                }
+
                 window.scrollTo(0, 0);
             }
         } catch (error) {
@@ -78,6 +113,11 @@
         if (!await window.showConfirmModal()) return;
         try {
             const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists() && docSnap.data().imagem) {
+                 const fileRef = ref(storage, docSnap.data().imagem);
+                 await deleteObject(fileRef).catch(err => console.warn("Falha ao apagar ficheiro do Storage:", err));
+            }
             await deleteDoc(docRef);
             window.showNotification("Slide eliminado com sucesso!");
             clearForm();
@@ -90,6 +130,8 @@
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = form.querySelector('button[type="submit"]');
+        const progressContainer = document.getElementById('sobre-nos-upload-progress-container');
+        const progressBar = document.getElementById('sobre-nos-upload-progress-bar');
         submitButton.disabled = true;
 
         try {
@@ -98,7 +140,18 @@
                 icone: document.getElementById('sobre-nos-icone').value,
                 texto: document.getElementById('sobre-nos-texto').value,
                 ordem: Number(document.getElementById('sobre-nos-ordem').value) || 0,
+                imagem: document.getElementById('sobre-nos-imagem-url').value || null
             };
+
+            const file = window.pendingFiles.get('sobre-nos-imagem');
+            if (file) {
+                progressContainer.classList.remove('hidden');
+                data.imagem = await window.uploadFile(file, 'sobre_nos/', (progress) => {
+                    const percent = Math.round(progress * 100);
+                    progressBar.style.width = `${percent}%`;
+                    progressBar.textContent = `${percent}%`;
+                });
+            }
 
             const id = document.getElementById(`${entity}-id`).value;
             const path = `/artifacts/${appId}/public/data/${entity}`;
@@ -116,6 +169,7 @@
             window.showNotification('Erro ao guardar os dados.', true);
         } finally {
             submitButton.disabled = false;
+            progressContainer.classList.add('hidden');
         }
     });
 
@@ -128,7 +182,7 @@
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
             itemDiv.innerHTML = `
                 <div class="flex items-center gap-4">
-                    <i class="${data.icone || 'fa-solid fa-question'} fa-fw text-xl text-gray-500"></i>
+                     <img src="${data.imagem || 'https://placehold.co/100x60/e9ecef/6c757d?text=Icone'}" alt="Preview" class="w-16 h-10 object-cover rounded-md bg-gray-200">
                     <p class="font-semibold text-sm truncate pr-4">${data.titulo || 'Slide sem título'}</p>
                 </div>
                 <div class="flex-shrink-0 flex gap-2">
@@ -145,5 +199,6 @@
     });
     
     document.getElementById('cancel-sobre-nos-edit').addEventListener('click', clearForm);
+    window.setupUploadComponent(document.querySelector('[data-upload-container="sobre-nos-imagem"]'));
 }
 </script>
