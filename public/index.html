@@ -515,9 +515,6 @@
         });
 
         // --- RENDERERS ---
-        // =================================================================
-        // CORREÇÃO APLICADA AQUI
-        // =================================================================
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
@@ -680,21 +677,21 @@
                     titleStyles += `text-shadow: ${tituloEstilo.textShadow};`;
                 }
 
-                let contentContainerStyles = `position: absolute; transform: translate(-50%, -50%); left: ${tituloPosicao?.x || 50}%; top: ${tituloPosicao?.y || 50}%; text-align: center;`;
-
+                let titleContainerStyles = `position: absolute; transform: translate(-50%, -50%); left: ${tituloPosicao?.x || 50}%; top: ${tituloPosicao?.y || 50}%;`;
+                
                 let buttonHTML = '';
                 if (linkTexto && linkUrl) {
-                    buttonHTML = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary mt-4">${linkTexto}</a>`;
+                    buttonHTML = `<div class="absolute bottom-10 left-1/2 -translate-x-1/2"><a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">${linkTexto}</a></div>`;
                 }
 
                 slideWrapper.innerHTML = `
                     ${mediaElement}
                     <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-                    <div class="relative z-10 h-full w-full overflow-hidden">
-                        <div style="${contentContainerStyles}">
+                    <div class="relative z-10 h-full w-full">
+                        <div style="${titleContainerStyles}" class="text-center">
                             ${titulo ? `<h2 style="${titleStyles}">${titulo.replace(/\n/g, '<br>')}</h2>` : ''}
-                            ${buttonHTML}
                         </div>
+                        ${buttonHTML}
                     </div>`;
                 return slideWrapper;
             };
