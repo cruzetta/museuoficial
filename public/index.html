@@ -371,6 +371,31 @@
             background-color: var(--color-primary);
             transform: scale(1.25);
         }
+
+        /* ESTILOS ATUALIZADOS PARA O SLIDER DE ACERVOS */
+        #acervos-container::-webkit-scrollbar {
+            display: none; /* Oculta a barra de rolagem */
+        }
+        #acervos-container {
+            -ms-overflow-style: none;  /* IE e Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        #acervos-container > * {
+            scroll-snap-align: start;
+            flex-shrink: 0;
+            width: 50%; /* 2 itens visíveis em telas pequenas */
+            padding: 0 0.75rem;
+        }
+        @media (min-width: 640px) { /* sm */
+            #acervos-container > * {
+                width: 33.3333%;
+            }
+        }
+        @media (min-width: 1024px) { /* lg */
+            #acervos-container > * {
+                width: 25%;
+            }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -468,7 +493,16 @@
         <section id="acervos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Os Nossos Acervos</h2>
-                <div id="acervos-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+                <div id="acervos-slider-wrapper" class="relative">
+                    <button id="acervos-prev-btn" class="absolute top-1/2 -left-4 z-10 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full shadow-md w-12 h-12 flex items-center justify-center text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div id="acervos-container">
+                        </div>
+                    <button id="acervos-next-btn" class="absolute top-1/2 -right-4 z-10 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full shadow-md w-12 h-12 flex items-center justify-center text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
                  <div class="mt-16 text-center"><a href="galeria.html" class="btn btn-primary">Explorar Galeria Completa</a></div>
             </div>
         </section>
@@ -623,9 +657,13 @@
         const renderAcervo = (doc) => {
             const data = doc.data();
             return `
-            <a href="item_detalhe.html?id=${doc.id}" class="content-card text-center p-4">
-                <div class="block h-32 flex items-center justify-center mb-4"><img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain"></div>
-                <h3 class="text-md font-bold text-color-dark">${data.nome}</h3>
+            <a href="item_detalhe.html?id=${doc.id}" class="block h-full">
+                <div class="bg-white rounded-lg shadow-sm p-4 h-full flex flex-col items-center justify-center text-center transition-shadow hover:shadow-xl">
+                    <div class="h-48 flex items-center justify-center mb-4">
+                        <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain">
+                    </div>
+                    <h3 class="text-md font-bold text-gray-800">${data.nome}</h3>
+                </div>
             </a>`;
         };
         const renderProdutoLoja = (doc) => {
@@ -674,13 +712,17 @@
         };
 
         // --- DATA LOADERS ---
-        const loadCollectionData = (name, containerId, renderer, q) => {
+        const loadCollectionData = (name, containerId, renderer, q, onRender) => {
             const container = document.getElementById(containerId);
             if (!container) return;
             const collectionRef = q || collection(db, `/artifacts/${appId}/public/data/${name}`);
             onSnapshot(collectionRef, (snapshot) => {
+                if (name === 'acervos') {
+                    container.className = 'flex overflow-x-auto snap-x snap-mandatory scroll-smooth py-4';
+                }
                 container.innerHTML = snapshot.empty ? `<p class="text-gray-500 text-center col-span-full">Nenhum item encontrado.</p>` : snapshot.docs.map(renderer).join('');
                 if (name === 'quiz') attachQuizListeners();
+                if (onRender) onRender();
             });
         };
         const loadSingleDoc = (name, fieldMap) => {
@@ -1042,6 +1084,44 @@
             });
         };
 
+        // --- LÓGICA ATUALIZADA PARA O SLIDER DE ACERVOS ---
+        const initializeAcervosSlider = () => {
+            const container = document.getElementById('acervos-container');
+            const prevBtn = document.getElementById('acervos-prev-btn');
+            const nextBtn = document.getElementById('acervos-next-btn');
+            const wrapper = document.getElementById('acervos-slider-wrapper');
+
+            if (!container || !prevBtn || !nextBtn || container.children.length === 0) {
+                if(wrapper) {
+                    prevBtn.style.display = 'none';
+                    nextBtn.style.display = 'none';
+                }
+                return;
+            }
+
+            const updateArrowState = () => {
+                const tolerance = 1;
+                prevBtn.disabled = container.scrollLeft <= 0;
+                nextBtn.disabled = container.scrollLeft + container.clientWidth >= container.scrollWidth - tolerance;
+            };
+
+            container.addEventListener('scroll', updateArrowState, { passive: true });
+
+            prevBtn.addEventListener('click', () => {
+                const scrollAmount = container.clientWidth * 0.8;
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+
+            nextBtn.addEventListener('click', () => {
+                const scrollAmount = container.clientWidth * 0.8;
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            });
+            
+            new ResizeObserver(updateArrowState).observe(container);
+            
+            updateArrowState();
+        };
+
         // --- Animação de Scroll ---
         const setupScrollAnimation = () => {
             const sections = document.querySelectorAll('.fade-in-section');
@@ -1063,7 +1143,7 @@
             initializeInteractiveTimeline();
             setupScrollAnimation();
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
-            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), limit(4)));
+            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome")), initializeAcervosSlider);
             loadCollectionData('games', 'games-container', renderGame);
             loadCollectionData('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
             loadCollectionData('curiosidades', 'curiosidades-container', renderCuriosidade);
