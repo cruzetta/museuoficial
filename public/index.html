@@ -1097,13 +1097,20 @@
                 
                 if (eventos.proximo.length > 0) {
                     html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-yellow-600">Próximos Destinos</h3>';
-                    html += eventos.proximo.map(e => createEventHTML(e, 'fa-flag-checkered', 'bg-yellow-500')).join('<hr class="my-4">');
+                    // ATUALIZAÇÃO: Limita a 1 próximo destino
+                    html += eventos.proximo.slice(0, 1).map(e => createEventHTML(e, 'fa-flag-checkered', 'bg-yellow-500')).join('<hr class="my-4">');
                 }
 
                 if (eventos.passado.length > 0) {
-                    html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-gray-500">Locais Visitados</h3>';
-                    html += eventos.passado.slice(0, 3).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">');
+                    html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-gray-500">Último Local Visitado</h3>';
+                     // ATUALIZAÇÃO: Limita a 1 local visitado
+                    html += eventos.passado.slice(0, 1).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">');
                 }
+                
+                // ATUALIZAÇÃO: Adiciona o botão para ver o itinerário completo
+                html += `<div class="mt-8 text-center">
+                            <a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a>
+                         </div>`;
 
                 container.innerHTML = html;
 

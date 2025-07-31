@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itinerário Completo - Museu Itinerante do Videojogo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #f59e0b;
+            --dark-header: #111827;
+            --text-dark: #212529;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
+        h1, h2 { font-family: 'Inter', sans-serif; font-weight: 600; }
+        #header-logo { height: 120px; width: auto; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; text-align: center; transition: all 0.2s; cursor: pointer; border: 1px solid transparent; }
+        .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
+        .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-24">
+                <a href="index.html" class="flex-shrink-0">
+                    <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+                </a>
+                <a href="index.html" class="btn btn-secondary bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                    <i class="fas fa-home mr-2"></i>Voltar à Página Inicial
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-16">
+        <h1 class="text-4xl font-bold text-center mb-12 pb-6 border-b">Itinerário Completo</h1>
+
+        <div id="itinerario-completo-container" class="space-y-12">
+            <!-- As seções de eventos serão inseridas aqui pelo JavaScript -->
+            <div id="loader" class="text-center py-20">
+                <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
+                <p class="mt-4 text-xl text-gray-600">A carregar histórico de viagens...</p>
+           </div>
+        </div>
+    </main>
+
+    <footer class="py-10 mt-16 bg-gray-800">
+        <div class="container mx-auto text-center text-gray-400">
+            <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
+            authDomain: "museu-cca6d.firebaseapp.com",
+            projectId: "museu-cca6d",
+            storageBucket: "museu-cca6d.firebasestorage.app",
+            messagingSenderId: "555107674356",
+            appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const appId = 'museu-cca6d';
+
+        const container = document.getElementById('itinerario-completo-container');
+        const loader = document.getElementById('loader');
+
+        const q = query(collection(db, `/artifacts/${appId}/public/data/itinerario`), orderBy("data_inicio", "asc"));
+
+        onSnapshot(q, (snapshot) => {
+            loader.style.display = 'none';
+            if (snapshot.empty) {
+                container.innerHTML = '<p class="text-center text-gray-500">Nenhum evento no itinerário encontrado.</p>';
+                return;
+            }
+
+            const eventos = {
+                atual: [],
+                proximo: [],
+                passado: []
+            };
+
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                const inicio = data.data_inicio?.toDate();
+                const fim = data.data_fim?.toDate();
+
+                let statusCalculado = 'proximo';
+                if (inicio && fim) {
+                    const fimDoDia = new Date(fim);
+                    fimDoDia.setHours(23, 59, 59, 999);
+                    if (hoje >= inicio && hoje <= fimDoDia) {
+                        statusCalculado = 'atual';
+                    } else if (hoje > fimDoDia) {
+                        statusCalculado = 'passado';
+                    }
+                }
+                eventos[statusCalculado].push(data);
+            });
+
+            eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
+
+            const formatDate = (date) => date?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) || 'Data a definir';
+
+            const createEventHTML = (evento) => `
+                <div class="flex items-start gap-4 py-4 border-b">
+                    <div class="flex-shrink-0 text-center w-24">
+                        <p class="text-lg font-bold text-gray-800">${evento.data_inicio?.toDate().toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '')}</p>
+                        <p class="text-3xl font-bold text-primary-color">${String(evento.data_inicio?.toDate().getDate()).padStart(2, '0')}</p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl">${evento.cidade}, ${evento.estado}</h3>
+                        <p class="text-gray-600">${evento.local}</p>
+                        <p class="text-gray-500 text-sm mt-1">${formatDate(evento.data_inicio)} - ${formatDate(evento.data_fim)}</p>
+                    </div>
+                </div>
+            `;
+            
+            let html = '';
+
+            if (eventos.atual.length > 0) {
+                html += '<h2 class="text-3xl font-bold mb-6 text-green-600">Acontecendo Agora</h2>';
+                html += eventos.atual.map(createEventHTML).join('');
+            }
+            
+            if (eventos.proximo.length > 0) {
+                html += '<h2 class="text-3xl font-bold mt-12 mb-6 text-yellow-600">Próximos Destinos</h2>';
+                html += eventos.proximo.map(createEventHTML).join('');
+            }
+
+            if (eventos.passado.length > 0) {
+                html += '<h2 class="text-3xl font-bold mt-12 mb-6 text-gray-500">Itinerário Passado</h2>';
+                html += eventos.passado.map(createEventHTML).join('');
+            }
+
+            container.innerHTML = html;
+
+        }, (error) => {
+            console.error("Erro ao carregar itinerário:", error);
+            loader.style.display = 'none';
+            container.innerHTML = '<p class="text-center text-red-500">Não foi possível carregar o itinerário.</p>';
+        });
+    </script>
+</body>
+</html>
