@@ -411,7 +411,6 @@
                     <a href="#itinerario" class="nav-link">Itinerário</a>
                     <a href="#noticias" class="nav-link active">Notícias</a>
                     <a href="galeria.html" class="nav-link">Acervos</a>
-                    <a href="#onde-estamos" class="nav-link">Onde Estamos</a>
                     <a href="#loja" class="nav-link">Loja</a>
                     <div class="relative group">
                         <button class="nav-link px-2 py-2 flex items-center">
@@ -436,7 +435,6 @@
         <a href="#itinerario" class="block text-center py-3 text-lg nav-link">Itinerário</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
         <a href="galeria.html" class="block text-center py-3 text-lg nav-link">Acervos</a>
-        <a href="#onde-estamos" class="block text-center py-3 text-lg nav-link">Onde Estamos</a>
         <a href="#loja" class="block text-center py-3 text-lg nav-link">Loja</a>
         <hr class="border-gray-700 my-2">
         <a href="#games" class="block text-center py-3 text-lg nav-link">Games</a>
@@ -484,19 +482,26 @@
             </div>
         </section>
         
-        <!-- NOVA SEÇÃO ITINERÁRIO -->
         <section id="itinerario" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Nosso Itinerário pelo Brasil</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <!-- Coluna do Mapa -->
-                    <div class="lg:col-span-2 rounded-lg overflow-hidden shadow-lg h-full">
-                        <img src="https://firebasestorage.googleapis.com/v0/b/museu-cca6d.firebasestorage.app/o/mapa-brasil-placeholder.png?alt=media&token=a1b2c3d4-e5f6-7890-1234-567890abcdef" alt="Mapa do Brasil com os locais do Museu Itinerante do Videogame" class="w-full h-full object-cover">
+                    <div class="rounded-lg overflow-hidden shadow-lg h-[450px] lg:h-full">
+                        <iframe 
+                            id="itinerario-mapa"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15251425.13994353!2d-52.91093553125!3d-14.2400732!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9c5a2773a4a749%3A0x82782596c50b343!2sBrasil!5e0!3m2!1spt-BR!2sbr!4v1672857335917!5m2!1spt-BR!2sbr" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
                     </div>
 
                     <!-- Coluna de Informações -->
                     <div id="itinerario-lista" class="space-y-6">
-                        <!-- O conteúdo será carregado aqui pelo JavaScript -->
                         <div class="text-center p-8">
                             <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
                             <p class="mt-3 text-gray-600">A carregar próximos destinos...</p>
@@ -505,7 +510,6 @@
                 </div>
             </div>
         </section>
-        <!-- FIM DA NOVA SEÇÃO -->
 
         <section id="noticias" class="section-padding bg-gray-100 fade-in-section">
             <div class="container mx-auto">
@@ -565,22 +569,6 @@
             <div class="container mx-auto">
                 <h2 class="section-title">Sabia que?</h2>
                 <div id="curiosidades-container" class="space-y-6 max-w-3xl mx-auto"></div>
-            </div>
-        </section>
-
-        <section id="onde-estamos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
-            <div class="container mx-auto">
-                <h2 class="section-title">Onde Estamos</h2>
-                <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <div class="p-8 border rounded-lg bg-white">
-                        <h3 class="text-2xl font-bold mb-6">O Nosso Endereço</h3>
-                        <p id="onde-estamos-endereco" class="mb-4 text-lg text-text-light"><i class="fas fa-map-marker-alt w-6 text-primary-color"></i> Carregando...</p>
-                        <p id="onde-estamos-cidade" class="text-lg text-text-light"><i class="fas fa-city w-6 text-primary-color"></i> Carregando...</p>
-                    </div>
-                    <div class="h-96 overflow-hidden rounded-lg border-2 border-gray-200 shadow-lg">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.188330542973!2d-43.17930938451152!3d-22.90641318501239!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997f58a6a00001%3A0x7d1d9c4f8dfc1a63!2sMuseu%20do%20Amanh%C3%A3!5e0!3m2!1spt-BR!2sbr!4v1672857335917!5m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -1017,13 +1005,17 @@
         // --- LÓGICA DO ITINERÁRIO ---
         const initializeItinerario = () => {
             const container = document.getElementById('itinerario-lista');
-            if (!container) return;
+            const mapaIframe = document.getElementById('itinerario-mapa');
+            if (!container || !mapaIframe) return;
+
+            const defaultMapSrc = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15251425.13994353!2d-52.91093553125!3d-14.2400732!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9c5a2773a4a749%3A0x82782596c50b343!2sBrasil!5e0!3m2!1spt-BR!2sbr!4v1672857335917!5m2!1spt-BR!2sbr";
 
             const q = query(collection(db, `/artifacts/${appId}/public/data/itinerario`), orderBy("data_inicio", "asc"));
 
             onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) {
                     container.innerHTML = '<p class="text-center text-gray-500">Fique atento! Em breve divulgaremos nossos próximos destinos.</p>';
+                    mapaIframe.src = defaultMapSrc;
                     return;
                 }
 
@@ -1039,16 +1031,26 @@
                     eventos[status].push(data);
                 });
 
-                // Ordena os eventos passados para mostrar os mais recentes primeiro
                 eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
 
+                const eventoAtual = eventos.atual[0];
+                if (eventoAtual && eventoAtual.link_mapa_embed) {
+                    mapaIframe.src = eventoAtual.link_mapa_embed;
+                } else {
+                    mapaIframe.src = defaultMapSrc;
+                }
 
                 const formatDate = (date) => {
                     if (!date || !date.toDate) return 'Data a definir';
                     return date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 }
 
-                const createEventHTML = (evento, icon, colorClass) => `
+                const createEventHTML = (evento, icon, colorClass) => {
+                    let mapaLink = '';
+                    if (evento.link_mapa_embed) {
+                        mapaLink = `<a href="${evento.link_mapa_embed.replace('embed', 'maps')}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline mt-1 inline-block"><i class="fas fa-map-pin mr-1"></i>Ver no mapa</a>`;
+                    }
+                    return `
                     <div class="flex items-start gap-4">
                         <div class="flex-shrink-0 w-12 h-12 rounded-full ${colorClass} text-white flex items-center justify-center shadow-md">
                             <i class="fas ${icon} text-xl"></i>
@@ -1057,9 +1059,11 @@
                             <h4 class="font-bold text-lg">${evento.cidade}, ${evento.estado}</h4>
                             <p class="text-gray-600 text-sm">${evento.local}</p>
                             <p class="text-gray-500 text-xs font-semibold mt-1">${formatDate(evento.data_inicio)} - ${formatDate(evento.data_fim)}</p>
+                            ${mapaLink}
                         </div>
                     </div>
                 `;
+                }
 
                 let html = '';
 
@@ -1075,7 +1079,7 @@
 
                 if (eventos.passado.length > 0) {
                     html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-gray-500">Locais Visitados</h3>';
-                    html += eventos.passado.slice(0, 3).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">'); // Mostra os 3 últimos
+                    html += eventos.passado.slice(0, 3).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">');
                 }
 
                 container.innerHTML = html;
@@ -1247,7 +1251,6 @@
             loadCollectionData('curiosidades', 'curiosidades-container', renderCuriosidade);
             loadCollectionData('loja', 'loja-container', renderProdutoLoja);
             loadSingleDoc('corporativo', { 'corporativo-missao': 'missao', 'corporativo-visao': 'visao' });
-            loadSingleDoc('onde-estamos', { 'onde-estamos-endereco': 'endereco', 'onde-estamos-cidade': 'cidade' });
         });
     </script>
     

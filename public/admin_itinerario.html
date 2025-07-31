@@ -35,6 +35,11 @@
                         <option value="passado">Já Realizado</option>
                     </select>
                 </div>
+                <div class="md:col-span-2">
+                    <label for="itinerario-link_mapa_embed" class="block text-sm font-medium text-gray-700">Link de Incorporação do Google Maps</label>
+                    <input type="url" id="itinerario-link_mapa_embed" placeholder="Cole o link de incorporação aqui">
+                    <p class="text-xs text-gray-500 mt-1">No Google Maps, clique em "Partilhar", depois em "Incorporar um mapa" e copie o link (src).</p>
+                </div>
             </div>
         </fieldset>
 
@@ -72,7 +77,7 @@
                 const data = docSnap.data();
                 document.getElementById(`${entity}-id`).value = docSnap.id;
                 
-                ['cidade', 'estado', 'local', 'status'].forEach(field => {
+                ['cidade', 'estado', 'local', 'status', 'link_mapa_embed'].forEach(field => {
                     const element = document.getElementById(`${entity}-${field}`);
                     if (element) element.value = data[field] || '';
                 });
@@ -115,6 +120,7 @@
                 estado: document.getElementById('itinerario-estado').value,
                 local: document.getElementById('itinerario-local').value,
                 status: document.getElementById('itinerario-status').value,
+                link_mapa_embed: document.getElementById('itinerario-link_mapa_embed').value,
                 data_inicio: new Date(document.getElementById('itinerario-data_inicio').value + "T12:00:00"),
                 data_fim: new Date(document.getElementById('itinerario-data_fim').value + "T12:00:00")
             };
