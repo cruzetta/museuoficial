@@ -27,14 +27,6 @@
                     <label for="itinerario-data_fim" class="block text-sm font-medium text-gray-700">Data de Fim</label>
                     <input type="date" id="itinerario-data_fim" required>
                 </div>
-                 <div class="md:col-span-2">
-                    <label for="itinerario-status" class="block text-sm font-medium text-gray-700">Status</label>
-                    <select id="itinerario-status" required>
-                        <option value="proximo">Próximo</option>
-                        <option value="atual">Acontecendo Agora</option>
-                        <option value="passado">Já Realizado</option>
-                    </select>
-                </div>
                 <div class="md:col-span-2">
                     <label for="itinerario-link_mapa_embed" class="block text-sm font-medium text-gray-700">Link de Incorporação do Google Maps</label>
                     <input type="url" id="itinerario-link_mapa_embed" placeholder="Cole o link de incorporação aqui">
@@ -77,7 +69,8 @@
                 const data = docSnap.data();
                 document.getElementById(`${entity}-id`).value = docSnap.id;
                 
-                ['cidade', 'estado', 'local', 'status', 'link_mapa_embed'].forEach(field => {
+                // Removido 'status' do array
+                ['cidade', 'estado', 'local', 'link_mapa_embed'].forEach(field => {
                     const element = document.getElementById(`${entity}-${field}`);
                     if (element) element.value = data[field] || '';
                 });
@@ -115,11 +108,11 @@
         submitButton.disabled = true;
 
         try {
+             // Removido 'status' do objeto de dados
              const data = {
                 cidade: document.getElementById('itinerario-cidade').value,
                 estado: document.getElementById('itinerario-estado').value,
                 local: document.getElementById('itinerario-local').value,
-                status: document.getElementById('itinerario-status').value,
                 link_mapa_embed: document.getElementById('itinerario-link_mapa_embed').value,
                 data_inicio: new Date(document.getElementById('itinerario-data_inicio').value + "T12:00:00"),
                 data_fim: new Date(document.getElementById('itinerario-data_fim').value + "T12:00:00")
@@ -152,17 +145,31 @@
         docs.forEach(data => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+            
+            // Lógica para determinar o status dinamicamente para exibição no admin
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const inicio = data.data_inicio?.toDate();
+            const fim = data.data_fim?.toDate();
+            let status = { text: 'Próximo', class: 'bg-yellow-100 text-yellow-800' };
+
+            if (inicio && fim) {
+                const fimDoDia = new Date(fim);
+                fimDoDia.setHours(23, 59, 59, 999);
+                if (hoje >= inicio && hoje <= fimDoDia) {
+                    status = { text: 'Atual', class: 'bg-green-100 text-green-800' };
+                } else if (hoje > fimDoDia) {
+                    status = { text: 'Passado', class: 'bg-gray-200 text-gray-600' };
+                }
+            }
+
             itemDiv.innerHTML = `
                 <div class="flex-grow">
                     <p class="font-semibold text-sm">${data.cidade || 'Local sem nome'}, ${data.estado}</p>
                     <p class="text-xs text-gray-500">${data.local || ''}</p>
                 </div>
                 <div class="flex-shrink-0 flex items-center gap-4">
-                    <span class="text-xs font-bold uppercase px-2 py-1 rounded-full ${
-                        data.status === 'atual' ? 'bg-green-100 text-green-800' :
-                        data.status === 'proximo' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-200 text-gray-600'
-                    }">${data.status}</span>
+                    <span class="text-xs font-bold uppercase px-2 py-1 rounded-full ${status.class}">${status.text}</span>
                     <div class="flex gap-2">
                         <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${data.id}">Editar</button>
                         <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${data.id}">Eliminar</button>

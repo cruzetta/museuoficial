@@ -488,7 +488,6 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <!-- Coluna do Mapa -->
                     <div class="rounded-lg overflow-hidden shadow-lg h-[450px]">
-                        <!-- CÓDIGO ATUALIZADO AQUI -->
                         <iframe 
                             id="itinerario-mapa"
                             src="about:blank" 
@@ -1003,7 +1002,7 @@
             });
         };
         
-        // --- LÓGICA DO ITINERÁRIO ---
+        // --- LÓGICA DO ITINERÁRIO (ATUALIZADA) ---
         const initializeItinerario = () => {
             const container = document.getElementById('itinerario-lista');
             const mapaIframe = document.getElementById('itinerario-mapa');
@@ -1026,10 +1025,27 @@
                     passado: []
                 };
 
+                const hoje = new Date();
+                hoje.setHours(0, 0, 0, 0); // Normaliza para o início do dia
+
                 snapshot.docs.forEach(doc => {
                     const data = doc.data();
-                    const status = data.status || 'proximo';
-                    eventos[status].push(data);
+                    const inicio = data.data_inicio?.toDate();
+                    const fim = data.data_fim?.toDate();
+
+                    let statusCalculado = 'proximo'; // Status padrão
+
+                    if (inicio && fim) {
+                        const fimDoDia = new Date(fim);
+                        fimDoDia.setHours(23, 59, 59, 999); // Considera o dia inteiro
+
+                        if (hoje >= inicio && hoje <= fimDoDia) {
+                            statusCalculado = 'atual';
+                        } else if (hoje > fimDoDia) {
+                            statusCalculado = 'passado';
+                        }
+                    }
+                    eventos[statusCalculado].push(data);
                 });
 
                 eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
@@ -1049,7 +1065,6 @@
                 const createEventHTML = (evento, icon, colorClass) => {
                     let mapaLink = '';
                     if (evento.link_mapa_embed) {
-                         // Transforma o link 'embed' em um link de visualização direta
                         const viewUrl = evento.link_mapa_embed.replace('/embed', '/maps');
                         mapaLink = `<a href="${viewUrl}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline mt-1 inline-block"><i class="fas fa-map-pin mr-1"></i>Ver no mapa</a>`;
                     }
