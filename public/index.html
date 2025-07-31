@@ -408,6 +408,7 @@
                 </a>
                 <nav id="desktop-nav" class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm">
                     <a href="#sobre-nos" class="nav-link">Sobre Nós</a>
+                    <a href="#itinerario" class="nav-link">Itinerário</a>
                     <a href="#noticias" class="nav-link active">Notícias</a>
                     <a href="galeria.html" class="nav-link">Acervos</a>
                     <a href="#onde-estamos" class="nav-link">Onde Estamos</a>
@@ -432,6 +433,7 @@
     
     <div id="mobile-menu" class="hidden fixed top-24 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--color-dark);">
         <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Sobre Nós</a>
+        <a href="#itinerario" class="block text-center py-3 text-lg nav-link">Itinerário</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
         <a href="galeria.html" class="block text-center py-3 text-lg nav-link">Acervos</a>
         <a href="#onde-estamos" class="block text-center py-3 text-lg nav-link">Onde Estamos</a>
@@ -481,8 +483,31 @@
                 </div>
             </div>
         </section>
+        
+        <!-- NOVA SEÇÃO ITINERÁRIO -->
+        <section id="itinerario" class="section-padding bg-white fade-in-section">
+            <div class="container mx-auto">
+                <h2 class="section-title">Nosso Itinerário pelo Brasil</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+                    <!-- Coluna do Mapa -->
+                    <div class="lg:col-span-2 rounded-lg overflow-hidden shadow-lg h-full">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/museu-cca6d.firebasestorage.app/o/mapa-brasil-placeholder.png?alt=media&token=a1b2c3d4-e5f6-7890-1234-567890abcdef" alt="Mapa do Brasil com os locais do Museu Itinerante do Videogame" class="w-full h-full object-cover">
+                    </div>
 
-        <section id="noticias" class="section-padding bg-white fade-in-section">
+                    <!-- Coluna de Informações -->
+                    <div id="itinerario-lista" class="space-y-6">
+                        <!-- O conteúdo será carregado aqui pelo JavaScript -->
+                        <div class="text-center p-8">
+                            <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
+                            <p class="mt-3 text-gray-600">A carregar próximos destinos...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- FIM DA NOVA SEÇÃO -->
+
+        <section id="noticias" class="section-padding bg-gray-100 fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Notícias e Eventos</h2>
                 <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
@@ -989,6 +1014,78 @@
             });
         };
         
+        // --- LÓGICA DO ITINERÁRIO ---
+        const initializeItinerario = () => {
+            const container = document.getElementById('itinerario-lista');
+            if (!container) return;
+
+            const q = query(collection(db, `/artifacts/${appId}/public/data/itinerario`), orderBy("data_inicio", "asc"));
+
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="text-center text-gray-500">Fique atento! Em breve divulgaremos nossos próximos destinos.</p>';
+                    return;
+                }
+
+                const eventos = {
+                    atual: [],
+                    proximo: [],
+                    passado: []
+                };
+
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const status = data.status || 'proximo';
+                    eventos[status].push(data);
+                });
+
+                // Ordena os eventos passados para mostrar os mais recentes primeiro
+                eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
+
+
+                const formatDate = (date) => {
+                    if (!date || !date.toDate) return 'Data a definir';
+                    return date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                }
+
+                const createEventHTML = (evento, icon, colorClass) => `
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full ${colorClass} text-white flex items-center justify-center shadow-md">
+                            <i class="fas ${icon} text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">${evento.cidade}, ${evento.estado}</h4>
+                            <p class="text-gray-600 text-sm">${evento.local}</p>
+                            <p class="text-gray-500 text-xs font-semibold mt-1">${formatDate(evento.data_inicio)} - ${formatDate(evento.data_fim)}</p>
+                        </div>
+                    </div>
+                `;
+
+                let html = '';
+
+                if (eventos.atual.length > 0) {
+                    html += '<h3 class="text-xl font-bold border-b pb-2 mb-4 text-green-600">Acontecendo Agora</h3>';
+                    html += eventos.atual.map(e => createEventHTML(e, 'fa-map-marker-alt', 'bg-green-500')).join('<hr class="my-4">');
+                }
+                
+                if (eventos.proximo.length > 0) {
+                    html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-yellow-600">Próximos Destinos</h3>';
+                    html += eventos.proximo.map(e => createEventHTML(e, 'fa-flag-checkered', 'bg-yellow-500')).join('<hr class="my-4">');
+                }
+
+                if (eventos.passado.length > 0) {
+                    html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-gray-500">Locais Visitados</h3>';
+                    html += eventos.passado.slice(0, 3).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">'); // Mostra os 3 últimos
+                }
+
+                container.innerHTML = html;
+
+            }, (error) => {
+                console.error("Erro ao carregar itinerário:", error);
+                container.innerHTML = '<p class="text-center text-red-500">Não foi possível carregar o itinerário.</p>';
+            });
+        };
+
         // --- LÓGICA DA TIMELINE INTERATIVA DE GERAÇÕES ---
         const initializeInteractiveTimeline = () => {
             const container = document.getElementById('timeline-interactive-container');
@@ -1140,6 +1237,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeCarousel();
             initializeAboutTimeline();
+            initializeItinerario();
             initializeInteractiveTimeline();
             setupScrollAnimation();
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
