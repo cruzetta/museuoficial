@@ -1050,9 +1050,14 @@
 
                 eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
 
+                // LÓGICA DO MAPA ATUALIZADA
                 const eventoAtual = eventos.atual[0];
+                const proximoEvento = eventos.proximo[0];
+
                 if (eventoAtual && eventoAtual.link_mapa_embed) {
                     mapaIframe.src = eventoAtual.link_mapa_embed;
+                } else if (proximoEvento && proximoEvento.link_mapa_embed) {
+                    mapaIframe.src = proximoEvento.link_mapa_embed;
                 } else {
                     mapaIframe.src = defaultMapSrc;
                 }
