@@ -372,30 +372,44 @@
             transform: scale(1.25);
         }
 
-        /* ESTILOS ATUALIZADOS PARA O SLIDER DE ACERVOS */
-        #acervos-container::-webkit-scrollbar {
-            display: none; /* Oculta a barra de rolagem */
+        /* === NOVOS ESTILOS PARA O CARROSSEL DE ACERVOS AMBULANTE === */
+        .marquee-container {
+            overflow: hidden;
+            position: relative;
+            /* Efeito de fade nas laterais para suavizar a entrada e saída dos itens */
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
         }
-        #acervos-container {
-            -ms-overflow-style: none;  /* IE e Edge */
-            scrollbar-width: none;  /* Firefox */
+
+        .marquee-track {
+            display: flex;
+            width: fit-content; /* A largura se ajusta ao conteúdo */
+            /* A duração da animação pode ser ajustada (ex: 80s, 120s) */
+            animation: marquee-scroll 80s linear infinite;
         }
-        #acervos-container > * {
-            scroll-snap-align: start;
-            flex-shrink: 0;
-            width: 50%; /* 2 itens visíveis em telas pequenas */
-            padding: 0 0.75rem;
+
+        /* Pausa a animação quando o mouse está sobre o carrossel */
+        .marquee-container:hover .marquee-track {
+            animation-play-state: paused;
         }
-        @media (min-width: 640px) { /* sm */
-            #acervos-container > * {
-                width: 33.3333%;
+
+        @keyframes marquee-scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                /* Move exatamente metade da largura total, criando o loop perfeito */
+                transform: translateX(-50%); 
             }
         }
-        @media (min-width: 1024px) { /* lg */
-            #acervos-container > * {
-                width: 25%;
-            }
+
+        .marquee-item {
+            flex-shrink: 0; /* Impede que os itens sejam espremidos */
+            width: 300px; /* Largura fixa para cada card do acervo */
+            padding: 0 0.75rem; /* Espaçamento entre os itens */
         }
+        /* ============================================================= */
+
     </style>
 </head>
 <body class="antialiased">
@@ -519,22 +533,20 @@
             </div>
         </section>
 
+        <!-- === SEÇÃO DE ACERVOS ATUALIZADA === -->
         <section id="acervos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Os Nossos Acervos</h2>
-                <div id="acervos-slider-wrapper" class="relative">
-                    <button id="acervos-prev-btn" class="absolute top-1/2 -left-4 z-10 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full shadow-md w-12 h-12 flex items-center justify-center text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div id="acervos-container">
-                        </div>
-                    <button id="acervos-next-btn" class="absolute top-1/2 -right-4 z-10 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full shadow-md w-12 h-12 flex items-center justify-center text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+                <!-- Novo container para o carrossel ambulante -->
+                <div class="marquee-container">
+                    <div id="acervos-container" class="marquee-track py-4">
+                        <!-- Os acervos serão carregados aqui pelo JavaScript -->
+                    </div>
                 </div>
-                 <div class="mt-16 text-center"><a href="galeria.html" class="btn btn-primary">Explorar Acervos</a></div>
+                <div class="mt-16 text-center"><a href="galeria.html" class="btn btn-primary">Explorar Acervos</a></div>
             </div>
         </section>
+        <!-- ==================================== -->
 
         <section id="timeline-geracoes" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
@@ -659,14 +671,14 @@
     </div>
     <div class="p-5 flex flex-col flex-grow">
          <div class="mb-2">
-            ${data.categoria ? `<span class="text-xs font-bold uppercase" style="color: var(--color-primary-hover);">${data.categoria}</span>` : ''}
-            ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
-            ${dataFormatada ? `<span class="text-xs text-text-light">${dataFormatada}</span>` : ''}
+             ${data.categoria ? `<span class="text-xs font-bold uppercase" style="color: var(--color-primary-hover);">${data.categoria}</span>` : ''}
+             ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
+             ${dataFormatada ? `<span class="text-xs text-text-light">${dataFormatada}</span>` : ''}
          </div>
          <h3 class="text-2xl font-bold mb-3 text-color-dark group-hover:text-primary-color transition-colors">${data.titulo}</h3>
          <p class="text-sm text-text-light mb-4 flex-grow">${data.subtitulo || ''}</p>
          <div class="mt-auto pt-4 border-t border-border-color flex justify-end items-center">
-            <span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span>
+             <span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span>
          </div>
     </div>
 </a>`;
@@ -674,14 +686,16 @@
         const renderAcervo = (doc) => {
             const data = doc.data();
             return `
-            <a href="item_detalhe.html?id=${doc.id}" class="block h-full">
-                <div class="bg-white rounded-lg shadow-sm p-4 h-full flex flex-col items-center justify-center text-center transition-shadow hover:shadow-xl">
-                    <div class="h-48 flex items-center justify-center mb-4">
-                        <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain">
+            <div class="marquee-item">
+                <a href="item_detalhe.html?id=${doc.id}" class="block h-full group">
+                    <div class="bg-white rounded-lg shadow-md p-4 h-full flex flex-col items-center justify-center text-center transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-2">
+                        <div class="h-48 flex items-center justify-center mb-4">
+                            <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105">
+                        </div>
+                        <h3 class="text-md font-bold text-gray-800">${data.nome}</h3>
                     </div>
-                    <h3 class="text-md font-bold text-gray-800">${data.nome}</h3>
-                </div>
-            </a>`;
+                </a>
+            </div>`;
         };
         const renderProdutoLoja = (doc) => {
             const data = doc.data();
@@ -699,10 +713,10 @@
             const data = doc.data();
             return `
                  <div class="p-4 border rounded-lg text-center bg-white transition-shadow hover:shadow-md">
-                    ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Jogo'}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-4 border-gray-100">` : ''}
-                    <h3 class="text-md font-bold">${data.nome}</h3>
-                    <p class="text-gray-500 text-xs">${data.ano}</p>
-                </div>`;
+                     ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Jogo'}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-4 border-gray-100">` : ''}
+                     <h3 class="text-md font-bold">${data.nome}</h3>
+                     <p class="text-gray-500 text-xs">${data.ano}</p>
+                 </div>`;
         };
         const renderCuriosidade = (doc) => {
             const data = doc.data();
@@ -734,9 +748,6 @@
             if (!container) return;
             const collectionRef = q || collection(db, `/artifacts/${appId}/public/data/${name}`);
             onSnapshot(collectionRef, (snapshot) => {
-                if (name === 'acervos') {
-                    container.className = 'flex overflow-x-auto snap-x snap-mandatory scroll-smooth py-4';
-                }
                 container.innerHTML = snapshot.empty ? `<p class="text-gray-500 text-center col-span-full">Nenhum item encontrado.</p>` : snapshot.docs.map(renderer).join('');
                 if (name === 'quiz') attachQuizListeners();
                 if (onRender) onRender();
@@ -1113,8 +1124,8 @@
                 
                 // ATUALIZAÇÃO: Adiciona o botão para ver o itinerário completo
                 html += `<div class="mt-8 text-center">
-                            <a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a>
-                         </div>`;
+                             <a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a>
+                               </div>`;
 
                 container.innerHTML = html;
 
@@ -1219,42 +1230,14 @@
             });
         };
 
-        // --- LÓGICA ATUALIZADA PARA O SLIDER DE ACERVOS ---
-        const initializeAcervosSlider = () => {
+        // --- NOVA LÓGICA PARA O CARROSSEL AMBULANTE DE ACERVOS ---
+        const duplicateAcervosForMarquee = () => {
             const container = document.getElementById('acervos-container');
-            const prevBtn = document.getElementById('acervos-prev-btn');
-            const nextBtn = document.getElementById('acervos-next-btn');
-            const wrapper = document.getElementById('acervos-slider-wrapper');
-
-            if (!container || !prevBtn || !nextBtn || container.children.length === 0) {
-                if(wrapper) {
-                    prevBtn.style.display = 'none';
-                    nextBtn.style.display = 'none';
-                }
-                return;
+            // Garante que há itens antes de duplicar para evitar conteúdo vazio
+            if (container && container.children.length > 0) {
+                // Duplica o conteúdo para criar o efeito de loop infinito
+                container.innerHTML += container.innerHTML;
             }
-
-            const updateArrowState = () => {
-                const tolerance = 1;
-                prevBtn.disabled = container.scrollLeft <= 0;
-                nextBtn.disabled = container.scrollLeft + container.clientWidth >= container.scrollWidth - tolerance;
-            };
-
-            container.addEventListener('scroll', updateArrowState, { passive: true });
-
-            prevBtn.addEventListener('click', () => {
-                const scrollAmount = container.clientWidth * 0.8;
-                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-            });
-
-            nextBtn.addEventListener('click', () => {
-                const scrollAmount = container.clientWidth * 0.8;
-                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-            });
-            
-            new ResizeObserver(updateArrowState).observe(container);
-            
-            updateArrowState();
         };
 
         // --- Animação de Scroll ---
@@ -1279,7 +1262,10 @@
             initializeInteractiveTimeline();
             setupScrollAnimation();
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
-            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome")), initializeAcervosSlider);
+            
+            // ATUALIZADO: Carrega os acervos e depois chama a função para duplicá-los
+            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome"), limit(15)), duplicateAcervosForMarquee);
+
             loadCollectionData('games', 'games-container', renderGame);
             loadCollectionData('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
             loadCollectionData('curiosidades', 'curiosidades-container', renderCuriosidade);
