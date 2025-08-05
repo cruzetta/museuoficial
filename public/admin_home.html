@@ -35,7 +35,7 @@
                             <img src="#" alt="Preview da imagem" class="upload-preview" data-media-type="imagem">
                             <video src="#" alt="Preview do vídeo" class="upload-preview" data-media-type="video" controls muted></video>
                             <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 transition-all"></div>
-                            <div id="draggable-title-preview" class="absolute text-white font-bold p-2 cursor-move select-none text-center" style="left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 36px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); white-space: nowrap;">
+                            <div id="draggable-title-preview" class="absolute text-white p-2 cursor-move select-none text-center" style="left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 36px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); white-space: nowrap; font-weight: 400;">
                                 Título de Exemplo
                             </div>
                             <!-- BOTÃO DE PREVIEW ADICIONADO AQUI -->
@@ -85,11 +85,20 @@
                             <label for="titulo-color" class="block text-sm font-medium text-gray-700">Cor</label>
                             <input type="color" id="titulo-color" value="#FFFFFF" class="mt-1 h-10 w-full">
                         </div>
-                        <div class="flex items-end">
-                             <label for="titulo-font-weight" class="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
-                                <input type="checkbox" id="titulo-font-weight" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                Negrito
-                            </label>
+                        <!-- MODIFICADO: Checkbox de negrito substituído por um seletor de peso da fonte -->
+                        <div>
+                            <label for="titulo-font-weight" class="block text-sm font-medium text-gray-700">Peso da Fonte</label>
+                            <select id="titulo-font-weight" class="mt-1">
+                                <option value="100">100 (Fina)</option>
+                                <option value="200">200 (Extra Leve)</option>
+                                <option value="300">300 (Leve)</option>
+                                <option value="400" selected>400 (Normal)</option>
+                                <option value="500">500 (Média)</option>
+                                <option value="600">600 (Semi-negrito)</option>
+                                <option value="700">700 (Negrito)</option>
+                                <option value="800">800 (Extra Negrito)</option>
+                                <option value="900">900 (Preta)</option>
+                            </select>
                         </div>
                     </div>
 
@@ -107,11 +116,11 @@
                         <div>
                             <label for="titulo-text-transform" class="block text-sm font-medium text-gray-700">Transformação</label>
                              <select id="titulo-text-transform" class="mt-1">
-                                <option value="none">Nenhuma</option>
-                                <option value="uppercase">MAIÚSCULAS</option>
-                                <option value="lowercase">minúsculas</option>
-                                <option value="capitalize">Capitalizado</option>
-                            </select>
+                                 <option value="none">Nenhuma</option>
+                                 <option value="uppercase">MAIÚSCULAS</option>
+                                 <option value="lowercase">minúsculas</option>
+                                 <option value="capitalize">Capitalizado</option>
+                             </select>
                         </div>
                     </div>
 
@@ -122,9 +131,9 @@
                         </label>
                         <div id="text-shadow-controls" class="hidden grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2">
                              <div>
-                                <label for="titulo-text-shadow-color" class="block text-xs font-medium text-gray-500">Cor Sombra</label>
-                                <input type="color" id="titulo-text-shadow-color" value="#000000" class="mt-1 h-10 w-full">
-                            </div>
+                                 <label for="titulo-text-shadow-color" class="block text-xs font-medium text-gray-500">Cor Sombra</label>
+                                 <input type="color" id="titulo-text-shadow-color" value="#000000" class="mt-1 h-10 w-full">
+                             </div>
                             <div>
                                 <label for="titulo-text-shadow-blur" class="block text-xs font-medium text-gray-500">Borrão (px)</label>
                                 <input type="range" id="titulo-text-shadow-blur" min="0" max="20" value="4" class="mt-1 w-full">
@@ -191,7 +200,8 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;700&family=Lora:wght@400;700&family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- MODIFICADO: Link do Google Fonts atualizado para incluir uma gama de pesos de fonte -->
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@100..900&family=Lora:wght@400..700&family=Orbitron:wght@400..900&family=Press+Start+2P&display=swap" rel="stylesheet">
 </div>
 
 <script data-tab-script="home-slider">
@@ -212,7 +222,8 @@
     const fontFamilySelect = document.getElementById('titulo-font-family');
     const fontSizeInput = document.getElementById('titulo-font-size');
     const colorInput = document.getElementById('titulo-color');
-    const fontWeightCheckbox = document.getElementById('titulo-font-weight');
+    // MODIFICADO: A variável agora se refere ao <select> de peso da fonte
+    const fontWeightSelect = document.getElementById('titulo-font-weight');
     const lineHeightInput = document.getElementById('titulo-line-height');
     const letterSpacingInput = document.getElementById('titulo-letter-spacing');
     const textTransformSelect = document.getElementById('titulo-text-transform');
@@ -254,7 +265,8 @@
         draggableTitle.style.fontFamily = fontFamilySelect.value;
         draggableTitle.style.fontSize = `${fontSizeInput.value || 36}px`;
         draggableTitle.style.color = colorInput.value;
-        draggableTitle.style.fontWeight = fontWeightCheckbox.checked ? 'bold' : 'normal';
+        // MODIFICADO: Usa o valor do seletor para definir o peso da fonte
+        draggableTitle.style.fontWeight = fontWeightSelect.value || '400';
         draggableTitle.style.lineHeight = lineHeightInput.value || '1.2';
         draggableTitle.style.letterSpacing = `${letterSpacingInput.value || 0}px`;
         draggableTitle.style.textTransform = textTransformSelect.value || 'none';
@@ -271,7 +283,7 @@
     };
     
     const allControls = [
-        tituloInput, fontFamilySelect, fontSizeInput, colorInput, fontWeightCheckbox,
+        tituloInput, fontFamilySelect, fontSizeInput, colorInput, fontWeightSelect, // MODIFICADO: fontWeightCheckbox para fontWeightSelect
         lineHeightInput, letterSpacingInput, textTransformSelect, shadowEnableCheckbox,
         shadowColorInput, shadowBlurInput, shadowOffsetXInput, shadowOffsetYInput
     ];
@@ -343,7 +355,8 @@
         fontSizeInput.value = "36";
         fontFamilySelect.value = "Inter, sans-serif";
         colorInput.value = "#FFFFFF";
-        fontWeightCheckbox.checked = false;
+        // MODIFICADO: Reseta o seletor de peso da fonte para o valor padrão '400'
+        fontWeightSelect.value = "400";
         lineHeightInput.value = "1.2";
         letterSpacingInput.value = "0";
         textTransformSelect.value = "none";
@@ -381,7 +394,8 @@
                     fontFamilySelect.value = estilo.fontFamily || "Inter, sans-serif";
                     fontSizeInput.value = estilo.fontSize || 36;
                     colorInput.value = estilo.color || "#FFFFFF";
-                    fontWeightCheckbox.checked = estilo.fontWeight === 'bold';
+                    // MODIFICADO: Carrega o valor do peso da fonte do banco de dados
+                    fontWeightSelect.value = estilo.fontWeight || '400';
                     lineHeightInput.value = estilo.lineHeight || 1.2;
                     letterSpacingInput.value = estilo.letterSpacing || 0;
                     textTransformSelect.value = estilo.textTransform || 'none';
@@ -483,7 +497,8 @@
                 fontFamily: fontFamilySelect.value,
                 fontSize: fontSizeInput.value,
                 color: colorInput.value,
-                fontWeight: fontWeightCheckbox.checked ? 'bold' : 'normal',
+                // MODIFICADO: Salva o valor do peso da fonte no banco de dados
+                fontWeight: fontWeightSelect.value,
                 lineHeight: lineHeightInput.value,
                 letterSpacing: letterSpacingInput.value,
                 textTransform: textTransformSelect.value,
