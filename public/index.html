@@ -423,21 +423,9 @@
                 <nav id="desktop-nav" class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm">
                     <a href="#sobre-nos" class="nav-link">Sobre Nós</a>
                     <a href="#itinerario" class="nav-link">Itinerário</a>
-                    <a href="#noticias" class="nav-link active">Notícias</a>
-                    <a href="galeria.html" class="nav-link">Acervos</a>
-                    <a href="#loja" class="nav-link">Loja</a>
-                    <div class="relative group">
-                        <button class="nav-link px-2 py-2 flex items-center">
-                            Explorar <i class="fas fa-chevron-down ml-2 text-xs transition-transform group-hover:rotate-180"></i>
-                        </button>
-                        <div class="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-200 ease-in-out">
-                            <a href="#games" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Games</a>
-                            <a href="#timeline-geracoes" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Gerações</a>
-                            <a href="#quiz" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Quiz</a>
-                            <a href="#curiosidades" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Curiosidades</a>
-                            <a href="#corporativo" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-color">Corporativo</a>
-                        </div>
-                    </div>
+                    <a href="#noticias" class="nav-link">Notícias</a>
+                    <a href="#acervos" class="nav-link">Acervos</a>
+                    <a href="#timeline-geracoes" class="nav-link">Gerações</a>
                 </nav>
                 <button id="mobile-menu-button" class="text-2xl text-white md:hidden"><i class="fa-solid fa-bars"></i></button>
             </div>
@@ -448,14 +436,8 @@
         <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Sobre Nós</a>
         <a href="#itinerario" class="block text-center py-3 text-lg nav-link">Itinerário</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
-        <a href="galeria.html" class="block text-center py-3 text-lg nav-link">Acervos</a>
-        <a href="#loja" class="block text-center py-3 text-lg nav-link">Loja</a>
-        <hr class="border-gray-700 my-2">
-        <a href="#games" class="block text-center py-3 text-lg nav-link">Games</a>
+        <a href="#acervos" class="block text-center py-3 text-lg nav-link">Acervos</a>
         <a href="#timeline-geracoes" class="block text-center py-3 text-lg nav-link">Gerações</a>
-        <a href="#quiz" class="block text-center py-3 text-lg nav-link">Quiz</a>
-        <a href="#curiosidades" class="block text-center py-3 text-lg nav-link">Curiosidades</a>
-        <a href="#corporativo" class="block text-center py-3 text-lg nav-link">Corporativo</a>
     </div>
 
     <main>
@@ -563,49 +545,6 @@
             </div>
         </section>
 
-        <section id="games" class="section-padding bg-white fade-in-section">
-            <div class="container mx-auto">
-                <h2 class="section-title">Games Icónicos</h2>
-                <div id="games-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
-            </div>
-        </section>
-
-        <section id="quiz" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
-            <div class="container mx-auto">
-                <h2 class="section-title">Teste os seus Conhecimentos</h2>
-                <div id="quiz-container" class="max-w-2xl mx-auto p-8 border rounded-lg bg-white shadow-inner"></div>
-            </div>
-        </section>
-
-        <section id="curiosidades" class="section-padding bg-white fade-in-section">
-            <div class="container mx-auto">
-                <h2 class="section-title">Sabia que?</h2>
-                <div id="curiosidades-container" class="space-y-6 max-w-3xl mx-auto"></div>
-            </div>
-        </section>
-
-        <section id="corporativo" class="section-padding bg-white fade-in-section">
-            <div class="container mx-auto">
-                <h2 class="section-title">Sobre o Museu</h2>
-                <div class="max-w-4xl mx-auto p-10 border rounded-lg" style="background-color: var(--color-light-gray);">
-                    <div id="corporativo-missao-container" class="mb-8">
-                        <h3 class="text-2xl font-bold mb-4 text-primary-color">A Nossa Missão</h3>
-                        <p id="corporativo-missao" class="text-text-light leading-relaxed text-lg"></p>
-                    </div>
-                    <div id="corporativo-visao-container">
-                        <h3 class="text-2xl font-bold mb-4 text-primary-color">A Nossa Visão</h3>
-                        <p id="corporativo-visao" class="text-text-light leading-relaxed text-lg"></p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="loja" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
-            <div class="container mx-auto">
-                <h2 class="section-title">Loja do Museu</h2>
-                <div id="loja-container" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
-            </div>
-        </section>
     </main>
 
     <footer class="py-12 bg-dark-gray">
@@ -697,50 +636,6 @@
                 </a>
             </div>`;
         };
-        const renderProdutoLoja = (doc) => {
-            const data = doc.data();
-            return `
-            <div class="content-card text-center">
-                <div class="h-56 flex items-center justify-center p-2 bg-gray-100 rounded-t-lg"><img src="${data.imagem || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-cover"></div>
-                <div class="p-5 flex-grow flex flex-col">
-                    <h3 class="text-lg font-semibold flex-grow">${data.nome}</h3>
-                    <p class="text-primary-color font-bold text-2xl my-3">R$ ${data.preco}</p>
-                    <button class="btn btn-primary mt-2 w-full">Comprar</button>
-                </div>
-            </div>`;
-        };
-        const renderGame = (doc) => {
-            const data = doc.data();
-            return `
-                 <div class="p-4 border rounded-lg text-center bg-white transition-shadow hover:shadow-md">
-                     ${data.imagem ? `<img src="${data.imagem}" alt="${data.nome || 'Jogo'}" class="mx-auto mb-4 rounded-full w-24 h-24 object-cover border-4 border-gray-100">` : ''}
-                     <h3 class="text-md font-bold">${data.nome}</h3>
-                     <p class="text-gray-500 text-xs">${data.ano}</p>
-                 </div>`;
-        };
-        const renderCuriosidade = (doc) => {
-            const data = doc.data();
-            if (!data.titulo && !data.descricao) return '';
-            return `
-            <div class="p-6 flex items-start space-x-6 text-left border rounded-lg bg-white shadow-sm">
-                <i class="fas fa-lightbulb text-primary-color text-4xl mt-1"></i>
-                <div>
-                    <h3 class="font-bold text-lg">${data.titulo}</h3>
-                    <p class="text-text-light">${data.descricao}</p>
-                </div>
-            </div>`;
-        };
-        const renderQuiz = (doc) => {
-            const data = doc.data();
-            if (!data.pergunta || !data.opcoes) return '';
-            const options = data.opcoes.split(',').map((opt, i) =>
-                `<button data-correct="${i == data.correta}" class="w-full text-left p-4 bg-white rounded-lg hover:bg-primary-color hover:text-white transition-colors quiz-option border border-border-color">${String.fromCharCode(65 + i)}) ${opt.trim()}</button>`
-            ).join('');
-            return `
-                 <h3 class="text-2xl font-semibold mb-6">${data.pergunta}</h3>
-                 <div class="space-y-4">${options}</div>
-                 <p class="quiz-result text-center mt-6 hidden font-bold text-lg"></p>`;
-        };
 
         // --- DATA LOADERS ---
         const loadCollectionData = (name, containerId, renderer, q, onRender) => {
@@ -749,50 +644,10 @@
             const collectionRef = q || collection(db, `/artifacts/${appId}/public/data/${name}`);
             onSnapshot(collectionRef, (snapshot) => {
                 container.innerHTML = snapshot.empty ? `<p class="text-gray-500 text-center col-span-full">Nenhum item encontrado.</p>` : snapshot.docs.map(renderer).join('');
-                if (name === 'quiz') attachQuizListeners();
                 if (onRender) onRender();
             });
         };
-        const loadSingleDoc = (name, fieldMap) => {
-            const docRef = doc(db, `/artifacts/${appId}/public/data/${name}/info`);
-            onSnapshot(docRef, (docSnap) => {
-                const data = docSnap.exists() ? docSnap.data() : {};
-                Object.keys(fieldMap).forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        const iconHTML = el.querySelector('i') ? el.querySelector('i').outerHTML : '';
-                        el.innerHTML = `${iconHTML} ${data[fieldMap[id]] || 'Não disponível'}`;
-                    }
-                });
-            });
-        };
         
-        function attachQuizListeners() {
-            document.getElementById('quiz-container').addEventListener('click', (e) => {
-                if (e.target.classList.contains('quiz-option')) {
-                    const parent = e.target.parentElement;
-                    const resultP = parent.nextElementSibling;
-                    parent.querySelectorAll('.quiz-option').forEach(btn => {
-                        btn.disabled = true;
-                        if(btn.dataset.correct !== 'true') btn.classList.add('opacity-50');
-                    });
-                    if (e.target.dataset.correct === 'true') {
-                        e.target.classList.remove('bg-white', 'border-border-color');
-                        e.target.classList.add('bg-green-500', 'text-white', 'border-green-500');
-                        resultP.textContent = 'Resposta Correta!';
-                        resultP.classList.remove('hidden', 'text-red-600');
-                        resultP.classList.add('text-green-600');
-                    } else {
-                        e.target.classList.remove('bg-white', 'border-border-color');
-                        e.target.classList.add('bg-red-500', 'text-white', 'border-red-500');
-                        resultP.textContent = 'Resposta Incorreta.';
-                        resultP.classList.remove('hidden', 'text-green-600');
-                        resultP.classList.add('text-red-600');
-                    }
-                }
-            });
-        }
-
         // --- LÓGICA DO CARROSSEL (FADE) ---
         const initializeCarousel = async () => {
             const slidesContainer = document.getElementById('carousel-slides');
@@ -838,7 +693,9 @@
                 
                 let buttonHTML = '';
                 if (linkTexto && linkUrl) {
-                    buttonHTML = `<div class="absolute bottom-10 left-1/2 -translate-x-1/2"><a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">${linkTexto}</a></div>`;
+                    const isInternalLink = linkUrl.startsWith('#');
+                    const targetAttr = isInternalLink ? '' : 'target="_blank" rel="noopener noreferrer"';
+                    buttonHTML = `<div class="absolute bottom-10 left-1/2 -translate-x-1/2"><a href="${linkUrl}" ${targetAttr} class="btn btn-primary">${linkTexto}</a></div>`;
                 }
 
                 slideWrapper.innerHTML = `
@@ -904,6 +761,11 @@
                 const q = query(collection(db, path), orderBy("ordem", "asc"));
                 const querySnapshot = await getDocs(q);
                 slidesData = querySnapshot.docs.map(doc => doc.data());
+                
+                // FIX: If the first slide has an internal link, force it to #sobre-nos
+                if (slidesData.length > 0 && slidesData[0].linkUrl && slidesData[0].linkUrl.startsWith('#')) {
+                    slidesData[0].linkUrl = '#sobre-nos';
+                }
 
                 if (slidesData.length === 0) {
                     slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Nenhum slide encontrado.</p></div>';
@@ -1124,8 +986,8 @@
                 
                 // ATUALIZAÇÃO: Adiciona o botão para ver o itinerário completo
                 html += `<div class="mt-8 text-center">
-                             <a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a>
-                               </div>`;
+                                  <a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a>
+                                     </div>`;
 
                 container.innerHTML = html;
 
@@ -1254,6 +1116,42 @@
             sections.forEach(section => observer.observe(section));
         };
 
+        // --- LÓGICA DE NAVEGAÇÃO ATIVA COM SCROLL ---
+        const initializeActiveNavOnScroll = () => {
+            const sections = document.querySelectorAll('main > section[id]');
+            const navLinks = document.querySelectorAll('#desktop-nav a.nav-link, #mobile-menu a.nav-link');
+            
+            if (sections.length === 0 || navLinks.length === 0) return;
+
+            const observerOptions = {
+                root: null, // relativo ao viewport
+                rootMargin: "-40% 0px -60% 0px", // Uma margem para ativar quando a seção está mais centralizada
+                threshold: 0 // Aciona assim que qualquer parte da seção entra na margem
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            // Limpa a classe 'active' de todos os links internos
+                            if (link.getAttribute('href').startsWith('#')) {
+                                link.classList.remove('active');
+                            }
+                            // Adiciona 'active' ao link correspondente
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        };
+
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
             initializeCarousel();
@@ -1261,16 +1159,11 @@
             initializeItinerario();
             initializeInteractiveTimeline();
             setupScrollAnimation();
+            initializeActiveNavOnScroll(); // Adicionada a função para navegação dinâmica
+            
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
             
-            // ATUALIZADO: Carrega os acervos e depois chama a função para duplicá-los
             loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome"), limit(15)), duplicateAcervosForMarquee);
-
-            loadCollectionData('games', 'games-container', renderGame);
-            loadCollectionData('quiz', 'quiz-container', renderQuiz, query(collection(db, `/artifacts/${appId}/public/data/quiz`), limit(1)));
-            loadCollectionData('curiosidades', 'curiosidades-container', renderCuriosidade);
-            loadCollectionData('loja', 'loja-container', renderProdutoLoja);
-            loadSingleDoc('corporativo', { 'corporativo-missao': 'missao', 'corporativo-visao': 'visao' });
         });
     </script>
     
