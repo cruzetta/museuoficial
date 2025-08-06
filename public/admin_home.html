@@ -35,6 +35,11 @@
                             <img src="#" alt="Preview da imagem" class="upload-preview" data-media-type="imagem">
                             <video src="#" alt="Preview do vídeo" class="upload-preview" data-media-type="video" controls muted></video>
                             <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 transition-all"></div>
+                            
+                            <!-- ADICIONADO: Guias de centralização para o efeito de "imã" -->
+                            <div id="center-guide-y" class="absolute top-0 bottom-0 left-1/2 w-px bg-red-500 opacity-75 hidden" style="transform: translateX(-50%);"></div>
+                            <div id="center-guide-x" class="absolute left-0 right-0 top-1/2 h-px bg-red-500 opacity-75 hidden" style="transform: translateY(-50%);"></div>
+
                             <div id="draggable-title-preview" class="absolute text-white p-2 cursor-move select-none text-center" style="left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 36px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); white-space: nowrap; font-weight: 400;">
                                 Título de Exemplo
                             </div>
@@ -61,7 +66,11 @@
                 <legend class="text-lg font-semibold px-2">Conteúdo e Estilo do Título</legend>
                 <div class="space-y-6 pt-2">
                     <div>
-                        <label for="home-slider-titulo" class="block text-sm font-medium text-gray-700">Texto do Título</label>
+                        <!-- ADICIONADO: Botão para recentralizar o título -->
+                        <div class="flex justify-between items-center mb-1">
+                            <label for="home-slider-titulo" class="block text-sm font-medium text-gray-700">Texto do Título</label>
+                            <button type="button" id="recenter-title-btn" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-1 px-3 rounded-md">Centralizar</button>
+                        </div>
                         <textarea id="home-slider-titulo" placeholder="Ex: A Era de Ouro dos Arcades" rows="2" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                          <p class="text-xs text-gray-500 mt-1">Use a tecla Enter para criar quebras de linha manuais.</p>
                     </div>
@@ -85,7 +94,6 @@
                             <label for="titulo-color" class="block text-sm font-medium text-gray-700">Cor</label>
                             <input type="color" id="titulo-color" value="#FFFFFF" class="mt-1 h-10 w-full">
                         </div>
-                        <!-- MODIFICADO: Checkbox de negrito substituído por um seletor de peso da fonte -->
                         <div>
                             <label for="titulo-font-weight" class="block text-sm font-medium text-gray-700">Peso da Fonte</label>
                             <select id="titulo-font-weight" class="mt-1">
@@ -200,7 +208,6 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- MODIFICADO: Link do Google Fonts atualizado para incluir uma gama de pesos de fonte -->
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@100..900&family=Lora:wght@400..700&family=Orbitron:wght@400..900&family=Press+Start+2P&display=swap" rel="stylesheet">
 </div>
 
@@ -222,11 +229,11 @@
     const fontFamilySelect = document.getElementById('titulo-font-family');
     const fontSizeInput = document.getElementById('titulo-font-size');
     const colorInput = document.getElementById('titulo-color');
-    // MODIFICADO: A variável agora se refere ao <select> de peso da fonte
     const fontWeightSelect = document.getElementById('titulo-font-weight');
     const lineHeightInput = document.getElementById('titulo-line-height');
     const letterSpacingInput = document.getElementById('titulo-letter-spacing');
     const textTransformSelect = document.getElementById('titulo-text-transform');
+    const recenterBtn = document.getElementById('recenter-title-btn'); // Botão de centralizar
     
     // --- Elementos da Sombra ---
     const shadowEnableCheckbox = document.getElementById('titulo-text-shadow-enable');
@@ -241,13 +248,14 @@
     const posYInput = document.getElementById('titulo-pos-y');
     const draggableTitle = document.getElementById('draggable-title-preview');
     const positioningContainer = document.getElementById('positioning-container');
-    const buttonPreview = document.getElementById('button-preview'); // Pega o botão de preview
+    const buttonPreview = document.getElementById('button-preview');
+    const centerGuideX = document.getElementById('center-guide-x'); // Guia horizontal
+    const centerGuideY = document.getElementById('center-guide-y'); // Guia vertical
     
     // --- Elementos do Link ---
     const linkTextoSelect = document.getElementById('home-slider-linkTexto');
     const linkUrlInput = document.getElementById('home-slider-linkUrl');
 
-    // --- FUNÇÃO PARA ATUALIZAR O BOTÃO DE PREVIEW ---
     const updateButtonPreview = () => {
         const selectedText = linkTextoSelect.value;
         if (selectedText) {
@@ -265,7 +273,6 @@
         draggableTitle.style.fontFamily = fontFamilySelect.value;
         draggableTitle.style.fontSize = `${fontSizeInput.value || 36}px`;
         draggableTitle.style.color = colorInput.value;
-        // MODIFICADO: Usa o valor do seletor para definir o peso da fonte
         draggableTitle.style.fontWeight = fontWeightSelect.value || '400';
         draggableTitle.style.lineHeight = lineHeightInput.value || '1.2';
         draggableTitle.style.letterSpacing = `${letterSpacingInput.value || 0}px`;
@@ -283,7 +290,7 @@
     };
     
     const allControls = [
-        tituloInput, fontFamilySelect, fontSizeInput, colorInput, fontWeightSelect, // MODIFICADO: fontWeightCheckbox para fontWeightSelect
+        tituloInput, fontFamilySelect, fontSizeInput, colorInput, fontWeightSelect,
         lineHeightInput, letterSpacingInput, textTransformSelect, shadowEnableCheckbox,
         shadowColorInput, shadowBlurInput, shadowOffsetXInput, shadowOffsetYInput
     ];
@@ -314,25 +321,54 @@
         e.preventDefault();
     };
 
+    // MODIFICADO: Lógica de arrastar com "imã" de centralização
     const onDragMove = (e) => {
         if (!isDragging) return;
+        
+        centerGuideX.classList.add('hidden');
+        centerGuideY.classList.add('hidden');
+
         const containerRect = positioningContainer.getBoundingClientRect();
         const clientX = e.clientX || e.touches[0].clientX;
         const clientY = e.clientY || e.touches[0].clientY;
+        
         let newX = clientX - containerRect.left - offsetX;
         let newY = clientY - containerRect.top - offsetY;
-        const xPercent = (newX + draggableTitle.offsetWidth / 2) / containerRect.width * 100;
-        const yPercent = (newY + draggableTitle.offsetHeight / 2) / containerRect.height * 100;
+
+        let xPercent = (newX + draggableTitle.offsetWidth / 2) / containerRect.width * 100;
+        let yPercent = (newY + draggableTitle.offsetHeight / 2) / containerRect.height * 100;
+
+        const snapThreshold = 5; // Tolerância de 5% para o "imã"
+
+        // Snap para o centro horizontal (eixo Y)
+        if (Math.abs(xPercent - 50) < snapThreshold) {
+            xPercent = 50;
+            centerGuideY.classList.remove('hidden'); // Mostra guia vertical
+        }
+
+        // Snap para o centro vertical (eixo X)
+        if (Math.abs(yPercent - 50) < snapThreshold) {
+            yPercent = 50;
+            centerGuideX.classList.remove('hidden'); // Mostra guia horizontal
+        }
+
         draggableTitle.style.left = `${xPercent}%`;
         draggableTitle.style.top = `${yPercent}%`;
+        
         posXInput.value = xPercent.toFixed(2);
         posYInput.value = yPercent.toFixed(2);
+        
         e.preventDefault();
     };
 
     const onDragEnd = () => {
         isDragging = false;
         draggableTitle.style.transition = '';
+        
+        // Esconde as guias ao soltar o mouse
+        centerGuideX.classList.add('hidden');
+        centerGuideY.classList.add('hidden');
+
         document.removeEventListener('mousemove', onDragMove);
         document.removeEventListener('mouseup', onDragEnd);
         document.removeEventListener('touchmove', onDragMove);
@@ -341,6 +377,18 @@
 
     draggableTitle.addEventListener('mousedown', onDragStart);
     draggableTitle.addEventListener('touchstart', onDragStart, { passive: false });
+
+    // ADICIONADO: Evento do botão para centralizar
+    recenterBtn.addEventListener('click', () => {
+        posXInput.value = "50";
+        posYInput.value = "50";
+        draggableTitle.style.left = '50%';
+        draggableTitle.style.top = '50%';
+        draggableTitle.style.transition = 'top 0.3s ease, left 0.3s ease';
+        setTimeout(() => {
+            draggableTitle.style.transition = '';
+        }, 300);
+    });
 
     const clearForm = () => {
         form.reset();
@@ -355,7 +403,6 @@
         fontSizeInput.value = "36";
         fontFamilySelect.value = "Inter, sans-serif";
         colorInput.value = "#FFFFFF";
-        // MODIFICADO: Reseta o seletor de peso da fonte para o valor padrão '400'
         fontWeightSelect.value = "400";
         lineHeightInput.value = "1.2";
         letterSpacingInput.value = "0";
@@ -371,7 +418,7 @@
         draggableTitle.style.left = '50%';
         draggableTitle.style.top = '50%';
         updateTitlePreview();
-        updateButtonPreview(); // Reseta o botão no preview
+        updateButtonPreview();
     };
 
     const editDoc = async (id) => {
@@ -394,7 +441,6 @@
                     fontFamilySelect.value = estilo.fontFamily || "Inter, sans-serif";
                     fontSizeInput.value = estilo.fontSize || 36;
                     colorInput.value = estilo.color || "#FFFFFF";
-                    // MODIFICADO: Carrega o valor do peso da fonte do banco de dados
                     fontWeightSelect.value = estilo.fontWeight || '400';
                     lineHeightInput.value = estilo.lineHeight || 1.2;
                     letterSpacingInput.value = estilo.letterSpacing || 0;
@@ -423,7 +469,7 @@
                     draggableTitle.style.top = `${data.tituloPosicao.y || 50}%`;
                 }
                 updateTitlePreview();
-                updateButtonPreview(); // Atualiza o botão no preview ao editar
+                updateButtonPreview();
 
                 if (data.mediaUrl) {
                     const container = document.querySelector(`[data-upload-container="${entity}-media"]`);
@@ -497,7 +543,6 @@
                 fontFamily: fontFamilySelect.value,
                 fontSize: fontSizeInput.value,
                 color: colorInput.value,
-                // MODIFICADO: Salva o valor do peso da fonte no banco de dados
                 fontWeight: fontWeightSelect.value,
                 lineHeight: lineHeightInput.value,
                 letterSpacing: letterSpacingInput.value,
@@ -581,7 +626,7 @@
         if (!e.target.value) {
             linkUrlInput.value = '';
         }
-        updateButtonPreview(); // Atualiza o botão no preview
+        updateButtonPreview();
     });
     
     if (window.setupUploadComponent) {
@@ -650,6 +695,6 @@
 
     loadConfig();
     updateTitlePreview();
-    updateButtonPreview(); // Garante que o estado inicial do botão esteja correto
+    updateButtonPreview();
 }
 </script>
