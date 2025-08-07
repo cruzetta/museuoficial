@@ -426,6 +426,7 @@
                     <a href="#noticias" class="nav-link">Notícias</a>
                     <a href="#acervos" class="nav-link">Acervos</a>
                     <a href="#timeline-geracoes" class="nav-link">Gerações</a>
+                    <a href="#quizzes" class="nav-link">Quizzes</a>
                 </nav>
                 <button id="mobile-menu-button" class="text-2xl text-white md:hidden"><i class="fa-solid fa-bars"></i></button>
             </div>
@@ -438,6 +439,7 @@
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
         <a href="#acervos" class="block text-center py-3 text-lg nav-link">Acervos</a>
         <a href="#timeline-geracoes" class="block text-center py-3 text-lg nav-link">Gerações</a>
+        <a href="#quizzes" class="block text-center py-3 text-lg nav-link">Quizzes</a>
     </div>
 
     <main>
@@ -503,8 +505,6 @@
                             <p class="mt-3 text-gray-600">A carregar próximos destinos...</p>
                         </div>
                     </div>
-                </div>
-                <div class="mt-16 text-center"><a href="quiz_main_page.html" class="btn btn-primary">Mais Quizzes</a></div>
             </div>
         </section>
 
@@ -544,6 +544,36 @@
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- QUIZZES -->
+        <section id="quizzes" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
+        <div class="container mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold text-center mb-8">Nossos Quizzes</h1>
+            
+            <div class="flex justify-end mb-8">
+                <div id="search-container" class="w-full max-w-xs relative">
+                    <label for="searchInput" class="block text-sm font-medium mb-1">Buscar Quiz</label>
+                    <input id="searchInput" type="text" class="form-input mb-2 w-full" placeholder="Digite o tema do quiz...">
+                    <div id="autocomplete-results" class="absolute left-0 right-0 bg-white border border-gray-300 rounded shadow-lg z-10 hidden"></div>
+                    <label for="sort-select" class="block text-sm font-medium mb-1 mt-2">Ordenar por</label>
+                    <select id="sort-select" class="form-select">
+                        <option value="tema-asc">Ordem Alfabética (A-Z)</option>
+                        <option value="tema-desc">Ordem Alfabética (Z-A)</option>
+                        <option value="perguntas-desc">Mais Perguntas</option>
+                        <option value="perguntas-asc">Menos Perguntas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="quizzes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <div id="quizzes-loader" class="text-center py-20">
+                    <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
+                    <p class="mt-4 text-xl text-gray-600">A carregar quizzes...</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-16 text-center"><a href="quiz_main_page.html" class="btn btn-primary">Mais Quizzes</a></div>
         </section>
 
     </main>
@@ -1165,6 +1195,145 @@
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
             
             loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome"), limit(15)), duplicateAcervosForMarquee);
+        });
+
+        // --- LÓGICA DE CARREGAMENTO DOS QUIZZES ---
+         // --- STATE & DOM ELEMENTS ---
+        const state = { items: [], filteredItems: [] };
+        const quizzesGrid = document.getElementById('quizzes-grid');
+        const quizzesLoader = document.getElementById('quizzes-loader');
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sort-select');
+        const autocompleteResults = document.getElementById('autocomplete-results');
+
+        // --- FUNÇÃO DE RENDERIZAÇÃO ATUALIZADA PARA QUIZZES ---
+        function renderQuizzes() {
+            quizzesGrid.innerHTML = '';
+            if (state.filteredItems.length === 0 && quizzesLoader.style.display === 'none') {
+                quizzesGrid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-search-minus text-4xl text-gray-400"></i><p class="mt-4 text-xl text-gray-600">Nenhum quiz encontrado.</p></div>`;
+                return;
+            }
+
+            state.filteredItems.forEach(item => {
+                const cardLink = document.createElement('a');
+                cardLink.href = `play-quiz.html?id=${item.id}`; // Link para a página de jogar
+                cardLink.className = 'gallery-card';
+                cardLink.innerHTML = `
+                    <div class="h-48 flex items-center justify-center bg-gray-800 text-amber-400">
+                        <i class="fas fa-brain text-6xl"></i>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800">${item.tema || 'Quiz sem tema'}</h3>
+                        <div class="text-sm text-gray-600 mb-4">
+                            <p><i class="fa-solid fa-list-check w-5 text-gray-400"></i> ${item.perguntas?.length || 0} perguntas</p>
+                        </div>
+                        <div class="btn btn-primary w-full mt-auto">
+                            Jogar Quiz
+                            <i class="fas fa-play ml-2"></i>
+                        </div>
+                    </div>
+                `;
+                quizzesGrid.appendChild(cardLink);
+            });
+        }
+
+        // --- FUNÇÕES DE PROCESSAMENTO DE DADOS ATUALIZADAS ---
+        function applyFiltersAndSort() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            const sortValue = sortSelect.value;
+            
+            let tempItems = state.items;
+
+            // Filtra por tema do quiz
+            if (searchTerm) {
+                tempItems = tempItems.filter(item => item.tema && item.tema.toLowerCase().includes(searchTerm));
+            }
+
+            // Ordena os quizzes
+            tempItems.sort((a, b) => {
+                const [field, direction] = sortValue.split('-');
+                
+                if (field === 'tema') {
+                    const valA = a.tema || '';
+                    const valB = b.tema || '';
+                    return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
+                
+                if (field === 'perguntas') {
+                    const valA = a.perguntas?.length || 0;
+                    const valB = b.perguntas?.length || 0;
+                    return direction === 'asc' ? valA - valB : valB - valA;
+                }
+                
+                return 0;
+            });
+
+            state.filteredItems = tempItems;
+            renderQuizzes();
+            updateAutocomplete(searchTerm);
+        }
+        
+        function updateAutocomplete(query) {
+             autocompleteResults.innerHTML = '';
+             if (query.length < 1) {
+                 autocompleteResults.classList.add('hidden');
+                 return;
+             }
+
+             const matchedItems = state.items
+                 .filter(item => item.tema && item.tema.toLowerCase().includes(query))
+                 .slice(0, 5);
+
+             if (matchedItems.length > 0) {
+                 matchedItems.forEach(item => {
+                     const suggestionDiv = document.createElement('div');
+                     suggestionDiv.className = 'autocomplete-item';
+                     suggestionDiv.textContent = item.tema;
+                     suggestionDiv.onclick = () => {
+                         searchInput.value = item.tema;
+                         autocompleteResults.classList.add('hidden');
+                         applyFiltersAndSort();
+                     };
+                     autocompleteResults.appendChild(suggestionDiv);
+                 });
+                 autocompleteResults.classList.remove('hidden');
+             } else {
+                 autocompleteResults.classList.add('hidden');
+             }
+        }
+        
+        // --- FUNÇÃO DE CARREGAMENTO DE DADOS ATUALIZADA ---
+        function carregarQuizzes() {
+            try {
+                // Caminho atualizado para a coleção 'quizzes'
+                const quizzesRef = collection(db, `/artifacts/${appId}/public/data/quizzes`);
+                onSnapshot(query(quizzesRef), (querySnapshot) => {
+                    state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    if (quizzesLoader) quizzesLoader.style.display = 'none';
+                    applyFiltersAndSort(); 
+                }, (error) => {
+                    console.error("Erro ao carregar os quizzes:", error);
+                    quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar os quizzes.</p>`;
+                });
+            } catch (error) {
+                console.error("Erro ao configurar o listener dos quizzes:", error);
+                if (quizzesLoader) quizzesLoader.style.display = 'none';
+                quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Ocorreu um erro inesperado.</p>`;
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarQuizzes();
+            
+            searchInput.addEventListener('input', () => applyFiltersAndSort());
+            sortSelect.addEventListener('change', applyFiltersAndSort);
+
+            document.addEventListener('click', (e) => {
+                if (!document.getElementById('search-container').contains(e.target)) {
+                    autocompleteResults.classList.add('hidden');
+                }
+            });
         });
     </script>
     

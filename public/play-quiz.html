@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogar Quiz - Museu do Videojogo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #f59e0b;
+            --primary-hover: #d97706;
+            --dark-header: #111827;
+            --text-dark: #212529;
+            --text-light: #495057;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+            --correct-color: #10b981; /* green-500 */
+            --wrong-color: #ef4444;  /* red-500 */
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
+        h1, h2, h3 { font-family: 'Inter', sans-serif; font-weight: 600; color: var(--text-dark); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; text-align: center; transition: all 0.2s ease-in-out; cursor: pointer; border: 1px solid transparent; }
+        .btn-primary { background-color: var(--primary-color); color: #ffffff; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-primary:disabled { background-color: #fcd34d; cursor: not-allowed; }
+        #header-logo { height: 120px; width: auto; }
+
+        /* Estilos específicos do Quiz */
+        .option-btn {
+            width: 100%;
+            text-align: left;
+            background-color: #ffffff;
+            border: 2px solid var(--border-color);
+            padding: 1rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+        }
+        .option-btn:hover { background-color: #f1f5f9; }
+        .option-btn.selected { border-color: var(--primary-color); background-color: #fef3c7; }
+        .option-btn.correct { border-color: var(--correct-color); background-color: #d1fae5; color: #065f46; font-weight: 700; }
+        .option-btn.wrong { border-color: var(--wrong-color); background-color: #fee2e2; color: #991b1b; }
+        .option-btn:disabled { cursor: not-allowed; }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen">
+
+    <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
+        <nav class="container mx-auto px-4 sm:px-6 h-24 flex justify-between items-center gap-4">
+            <a href="index.html" class="flex-shrink-0">
+                <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+            </a>
+            <a href="quiz_main_page.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                <i class="fa-solid fa-gamepad"></i><span>Ver outros Quizzes</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="flex-grow pt-12 pb-16">
+        <div class="container mx-auto px-4 flex justify-center">
+
+            <div class="w-full max-w-3xl">
+                <div id="loader" class="text-center py-20">
+                    <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
+                    <p class="mt-4 text-xl text-gray-600">A carregar quiz...</p>
+                </div>
+
+                <div id="error-screen" class="hidden text-center py-20 bg-white rounded-lg shadow-md">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+                    <h2 class="mt-4 text-2xl font-bold">Quiz não encontrado</h2>
+                    <p class="text-gray-600 mt-2">O quiz que você está a tentar aceder não existe ou foi removido.</p>
+                    <a href="quiz_main_page.html" class="btn btn-primary mt-6">Voltar à lista de Quizzes</a>
+                </div>
+
+                <div id="quiz-start-screen" class="hidden text-center py-10 px-6 bg-white rounded-lg shadow-md">
+                    <h1 id="quiz-title" class="text-4xl font-bold"></h1>
+                    <p class="text-lg text-gray-600 mt-4">Prepare-se para testar seus conhecimentos! Clique abaixo para começar.</p>
+                    <button id="start-quiz-btn" class="btn btn-primary mt-8 text-lg">Começar Quiz!</button>
+                </div>
+
+                <div id="quiz-main-box" class="hidden bg-white rounded-lg shadow-md p-6 sm:p-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <p id="quiz-progress" class="text-sm font-semibold text-gray-500"></p>
+                        <p id="current-score" class="text-sm font-semibold text-gray-500"></p>
+                    </div>
+                    <div id="question-text" class="text-xl sm:text-2xl font-bold mb-6 min-h-[6rem]"></div>
+                    <div id="options-container" class="space-y-4 mb-6"></div>
+                    <div class="border-t pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <p id="feedback-text" class="h-6 text-lg font-bold"></p>
+                        <button id="action-btn" class="btn btn-primary w-full sm:w-auto">Confirmar Resposta</button>
+                    </div>
+                </div>
+
+                <div id="quiz-results-screen" class="hidden text-center py-10 px-6 bg-white rounded-lg shadow-md">
+                    <h2 class="text-3xl font-bold">Quiz Finalizado!</h2>
+                    <p id="final-score" class="text-5xl font-bold my-4"></p>
+                    <p id="results-message" class="text-xl text-gray-700"></p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+                        <button id="restart-quiz-btn" class="btn btn-primary">Jogar Novamente</button>
+                        <a href="quiz_main_page.html" class="btn btn-secondary">Ver Outros Quizzes</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    
+    <footer class="py-8 bg-gray-200 border-t border-gray-300">
+        <div class="container mx-auto text-center text-gray-600">
+            <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
+             authDomain: "museu-cca6d.firebaseapp.com",
+             projectId: "museu-cca6d",
+             storageBucket: "museu-cca6d.firebasestorage.app",
+             messagingSenderId: "555107674356",
+             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const appId = 'museu-cca6d';
+
+        // --- STATE & DOM ELEMENTS ---
+        let quizData = null;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOptionElement = null;
+
+        const loader = document.getElementById('loader');
+        const errorScreen = document.getElementById('error-screen');
+        const startScreen = document.getElementById('quiz-start-screen');
+        const mainBox = document.getElementById('quiz-main-box');
+        const resultsScreen = document.getElementById('quiz-results-screen');
+        // ... (resto dos elementos)
+        const quizTitle = document.getElementById('quiz-title');
+        const quizProgress = document.getElementById('quiz-progress');
+        const currentScore = document.getElementById('current-score');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackText = document.getElementById('feedback-text');
+        const actionBtn = document.getElementById('action-btn');
+        const finalScore = document.getElementById('final-score');
+        const resultsMessage = document.getElementById('results-message');
+
+
+        // --- FUNÇÕES DE CONTROLO DO JOGO ---
+
+        const showScreen = (screen) => {
+            loader.classList.add('hidden');
+            errorScreen.classList.add('hidden');
+            startScreen.classList.add('hidden');
+            mainBox.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            screen.classList.remove('hidden');
+        };
+
+        const displayQuestion = () => {
+            selectedOptionElement = null;
+            const question = quizData.perguntas[currentQuestionIndex];
+            
+            quizProgress.textContent = `Pergunta ${currentQuestionIndex + 1} de ${quizData.perguntas.length}`;
+            currentScore.textContent = `Pontuação: ${score}`;
+            questionText.innerHTML = question.pergunta_texto;
+            
+            optionsContainer.innerHTML = '';
+            question.opcoes.forEach(option => {
+                const button = document.createElement('button');
+                button.innerHTML = option.texto;
+                button.className = 'option-btn';
+                button.dataset.correct = option.correta; // Guarda se é correta
+                button.addEventListener('click', () => selectAnswer(button));
+                optionsContainer.appendChild(button);
+            });
+            
+            feedbackText.textContent = '';
+            actionBtn.textContent = 'Confirmar Resposta';
+            actionBtn.disabled = true;
+        };
+        
+        const selectAnswer = (button) => {
+            // Desmarca o botão anteriormente selecionado, se houver
+            if (selectedOptionElement) {
+                selectedOptionElement.classList.remove('selected');
+            }
+            // Marca o novo botão e guarda a referência
+            button.classList.add('selected');
+            selectedOptionElement = button;
+            actionBtn.disabled = false; // Habilita o botão de confirmação
+        };
+
+        const checkAnswer = () => {
+            actionBtn.disabled = true;
+            Array.from(optionsContainer.children).forEach(btn => btn.disabled = true); // Desabilita todas as opções
+            
+            const isCorrect = selectedOptionElement.dataset.correct === 'true';
+
+            if (isCorrect) {
+                score++;
+                selectedOptionElement.classList.add('correct');
+                feedbackText.textContent = 'Correto!';
+                feedbackText.style.color = 'var(--correct-color)';
+            } else {
+                selectedOptionElement.classList.add('wrong');
+                feedbackText.textContent = 'Incorreto!';
+                feedbackText.style.color = 'var(--wrong-color)';
+                // Mostra qual era a resposta correta
+                const correctButton = optionsContainer.querySelector('[data-correct="true"]');
+                correctButton.classList.add('correct');
+            }
+            
+            currentScore.textContent = `Pontuação: ${score}`;
+            
+            if (currentQuestionIndex < quizData.perguntas.length - 1) {
+                actionBtn.textContent = 'Próxima Pergunta';
+                actionBtn.disabled = false;
+            } else {
+                actionBtn.textContent = 'Ver Resultados';
+                actionBtn.disabled = false;
+            }
+        };
+
+        const showResults = () => {
+            finalScore.textContent = `${score} / ${quizData.perguntas.length}`;
+            const percentage = (score / quizData.perguntas.length) * 100;
+            if (percentage === 100) resultsMessage.textContent = "Impressionante! Você acertou todas!";
+            else if (percentage >= 70) resultsMessage.textContent = "Excelente trabalho! Você conhece bem o assunto.";
+            else if (percentage >= 40) resultsMessage.textContent = "Bom esforço! Continue a aprender.";
+            else resultsMessage.textContent = "Não desanime! Tente novamente para melhorar seu resultado.";
+            
+            showScreen(resultsScreen);
+        };
+
+        const startQuiz = () => {
+            currentQuestionIndex = 0;
+            score = 0;
+            showScreen(mainBox);
+            displayQuestion();
+        };
+
+        // --- LÓGICA DE INICIALIZAÇÃO ---
+        const init = async () => {
+            const params = new URLSearchParams(window.location.search);
+            const quizId = params.get('id');
+
+            if (!quizId) {
+                showScreen(errorScreen);
+                return;
+            }
+
+            try {
+                const docRef = doc(db, `/artifacts/${appId}/public/data/quizzes`, quizId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    quizData = { id: docSnap.id, ...docSnap.data() };
+                    quizData.perguntas = quizData.perguntas.sort(() => Math.random() - 0.5); // Embaralha as perguntas
+                    quizTitle.textContent = quizData.tema;
+                    showScreen(startScreen);
+                } else {
+                    showScreen(errorScreen);
+                }
+            } catch (err) {
+                console.error("Erro ao buscar quiz:", err);
+                showScreen(errorScreen);
+            }
+        };
+
+        // --- EVENT LISTENERS ---
+        document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+        document.getElementById('restart-quiz-btn').addEventListener('click', startQuiz);
+        actionBtn.addEventListener('click', () => {
+            if (actionBtn.textContent.includes('Confirmar')) {
+                checkAnswer();
+            } else if (actionBtn.textContent.includes('Próxima')) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
