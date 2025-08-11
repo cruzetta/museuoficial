@@ -752,7 +752,7 @@
             };
 
             const goToSlide = (index) => {
-                if (index < 0 || index >= slidesData.length || index === currentIndex) return;
+                if (index < 0 || index >= slidesData.length) return;
                 
                 const slides = slidesContainer.querySelectorAll('.carousel-slide');
                 const indicators = indicatorsContainer.querySelectorAll('.carousel-indicator');
