@@ -372,43 +372,38 @@
             transform: scale(1.25);
         }
 
-        /* === NOVOS ESTILOS PARA O CARROSSEL DE ACERVOS AMBULANTE === */
+        /* === ESTILOS ATUALIZADOS PARA CARROSSEL DE ACERVOS INTERATIVO === */
         .marquee-container {
             overflow: hidden;
             position: relative;
+            cursor: grab; /* Mão para indicar que é arrastável */
+            -webkit-user-select: none; /* Previne seleção de texto no Chrome/Safari */
+            -moz-user-select: none; /* Previne seleção de texto no Firefox */
+            -ms-user-select: none; /* Previne seleção de texto no IE */
+            user-select: none; /* Previne seleção de texto */
             /* Efeito de fade nas laterais para suavizar a entrada e saída dos itens */
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
             mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
         }
-
+        
+        /* Quando o usuário está arrastando */
+        .marquee-container.grabbing {
+            cursor: grabbing;
+        }
+        
         .marquee-track {
             display: flex;
-            width: fit-content; /* A largura se ajusta ao conteúdo */
-            /* A duração da animação pode ser ajustada (ex: 80s, 120s) */
-            animation: marquee-scroll 80s linear infinite;
+            width: fit-content;
+            will-change: transform; /* Otimização para a animação de transform */
+            /* A animação via @keyframes foi removida para dar lugar ao controle por JavaScript */
         }
-
-        /* Pausa a animação quando o mouse está sobre o carrossel */
-        .marquee-container:hover .marquee-track {
-            animation-play-state: paused;
-        }
-
-        @keyframes marquee-scroll {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                /* Move exatamente metade da largura total, criando o loop perfeito */
-                transform: translateX(-50%); 
-            }
-        }
-
+        
         .marquee-item {
-            flex-shrink: 0; /* Impede que os itens sejam espremidos */
-            width: 300px; /* Largura fixa para cada card do acervo */
-            padding: 0 0.75rem; /* Espaçamento entre os itens */
+            flex-shrink: 0;
+            width: 300px;
+            padding: 0 0.75rem;
         }
-        /* ============================================================= */
+        /* =================================================================== */
 
     </style>
 </head>
@@ -521,7 +516,7 @@
         <section id="acervos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Os Nossos Acervos</h2>
-                <!-- Novo container para o carrossel ambulante -->
+                <!-- Container para o carrossel ambulante e interativo -->
                 <div class="marquee-container">
                     <div id="acervos-container" class="marquee-track py-4">
                         <!-- Os acervos serão carregados aqui pelo JavaScript -->
@@ -658,10 +653,10 @@
             const data = doc.data();
             return `
             <div class="marquee-item">
-                <a href="item_detalhe.html?id=${doc.id}" class="block h-full group">
+                <a href="item_detalhe.html?id=${doc.id}" class="block h-full group" draggable="false">
                     <div class="bg-white rounded-lg shadow-md p-4 h-full flex flex-col items-center justify-center text-center transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-2">
                         <div class="h-48 flex items-center justify-center mb-4">
-                            <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105">
+                            <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" draggable="false">
                         </div>
                         <h3 class="text-md font-bold text-gray-800">${data.nome}</h3>
                     </div>
@@ -794,7 +789,6 @@
                 const querySnapshot = await getDocs(q);
                 slidesData = querySnapshot.docs.map(doc => doc.data());
                 
-                // FIX: If the first slide has an internal link, force it to #sobre-nos
                 if (slidesData.length > 0 && slidesData[0].linkUrl && slidesData[0].linkUrl.startsWith('#')) {
                     slidesData[0].linkUrl = '#sobre-nos';
                 }
@@ -935,18 +929,18 @@
                 };
 
                 const hoje = new Date();
-                hoje.setHours(0, 0, 0, 0); // Normaliza para o início do dia
+                hoje.setHours(0, 0, 0, 0);
 
                 snapshot.docs.forEach(doc => {
                     const data = doc.data();
                     const inicio = data.data_inicio?.toDate();
                     const fim = data.data_fim?.toDate();
 
-                    let statusCalculado = 'proximo'; // Status padrão
+                    let statusCalculado = 'proximo';
 
                     if (inicio && fim) {
                         const fimDoDia = new Date(fim);
-                        fimDoDia.setHours(23, 59, 59, 999); // Considera o dia inteiro
+                        fimDoDia.setHours(23, 59, 59, 999);
 
                         if (hoje >= inicio && hoje <= fimDoDia) {
                             statusCalculado = 'atual';
@@ -959,7 +953,6 @@
 
                 eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
 
-                // LÓGICA DO MAPA ATUALIZADA
                 const eventoAtual = eventos.atual[0];
                 const proximoEvento = eventos.proximo[0];
 
@@ -1006,20 +999,17 @@
                 
                 if (eventos.proximo.length > 0) {
                     html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-yellow-600">Próximos Destinos</h3>';
-                    // ATUALIZAÇÃO: Limita a 1 próximo destino
                     html += eventos.proximo.slice(0, 1).map(e => createEventHTML(e, 'fa-flag-checkered', 'bg-yellow-500')).join('<hr class="my-4">');
                 }
 
                 if (eventos.passado.length > 0) {
                     html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-gray-500">Último Local Visitado</h3>';
-                     // ATUALIZAÇÃO: Limita a 1 local visitado
                     html += eventos.passado.slice(0, 1).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">');
                 }
                 
-                // ATUALIZAÇÃO: Adiciona o botão para ver o itinerário completo
                 html += `<div class="mt-8 text-center">
-                                  <a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a>
-                                     </div>`;
+                                      <a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a>
+                                         </div>`;
 
                 container.innerHTML = html;
 
@@ -1124,13 +1114,110 @@
             });
         };
 
-        // --- NOVA LÓGICA PARA O CARROSSEL AMBULANTE DE ACERVOS ---
+        // --- NOVA LÓGICA PARA O CARROSSEL DE ACERVOS AMBULANTE E INTERATIVO ---
+        const initializeDraggableMarquee = () => {
+            const container = document.querySelector('.marquee-container');
+            const track = document.getElementById('acervos-container');
+            if (!container || !track || track.children.length === 0) return;
+
+            const speedPxPerFrame = 0.5; // Velocidade do scroll automático (ajuste conforme necessário)
+            
+            let isDragging = false;
+            let startX;
+            let currentTranslate = 0;
+            let animationFrameId;
+            let preventClick = false;
+
+            // Remove a animação CSS para que o JS tenha controle total.
+            track.style.animation = 'none';
+
+            const getTranslateX = () => {
+                const style = window.getComputedStyle(track);
+                const matrix = new DOMMatrixReadOnly(style.transform);
+                return matrix.m41;
+            };
+
+            const setTranslateX = (value) => {
+                track.style.transform = `translateX(${value}px)`;
+            };
+
+            const loop = () => {
+                const scrollDistance = track.scrollWidth / 2;
+
+                if (!isDragging) {
+                    currentTranslate -= speedPxPerFrame;
+                }
+
+                if (currentTranslate <= -scrollDistance) {
+                    currentTranslate += scrollDistance;
+                } else if (currentTranslate > 0) {
+                     currentTranslate -= scrollDistance;
+                }
+
+                setTranslateX(currentTranslate);
+                animationFrameId = requestAnimationFrame(loop);
+            };
+
+            const dragStart = (e) => {
+                preventClick = false;
+                isDragging = true;
+                container.classList.add('grabbing');
+                
+                cancelAnimationFrame(animationFrameId);
+
+                startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                currentTranslate = getTranslateX();
+            };
+
+            const dragMove = (e) => {
+                if (!isDragging) return;
+                preventClick = true; // Se o mouse/dedo se move, é um arrasto
+
+                if (e.type === 'touchmove') {
+                    e.preventDefault();
+                }
+
+                const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                const moveX = currentX - startX;
+                setTranslateX(currentTranslate + moveX);
+            };
+
+            const dragEnd = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                container.classList.remove('grabbing');
+                
+                currentTranslate = getTranslateX();
+                requestAnimationFrame(loop);
+            };
+            
+            container.addEventListener('click', (e) => {
+                if (preventClick) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+
+            // Eventos de Mouse
+            container.addEventListener('mousedown', dragStart);
+            window.addEventListener('mousemove', dragMove);
+            window.addEventListener('mouseup', dragEnd);
+            window.addEventListener('mouseleave', () => { if (isDragging) dragEnd(); }); // Garante que solte se sair da janela
+
+            // Eventos de Toque
+            container.addEventListener('touchstart', dragStart, { passive: true });
+            window.addEventListener('touchmove', dragMove, { passive: false });
+            window.addEventListener('touchend', dragEnd);
+
+            loop();
+        };
+
         const duplicateAcervosForMarquee = () => {
             const container = document.getElementById('acervos-container');
-            // Garante que há itens antes de duplicar para evitar conteúdo vazio
             if (container && container.children.length > 0) {
-                // Duplica o conteúdo para criar o efeito de loop infinito
                 container.innerHTML += container.innerHTML;
+                // Chama a nova função depois de duplicar o conteúdo
+                initializeDraggableMarquee();
             }
         };
 
@@ -1156,9 +1243,9 @@
             if (sections.length === 0 || navLinks.length === 0) return;
 
             const observerOptions = {
-                root: null, // relativo ao viewport
-                rootMargin: "-40% 0px -60% 0px", // Uma margem para ativar quando a seção está mais centralizada
-                threshold: 0 // Aciona assim que qualquer parte da seção entra na margem
+                root: null, 
+                rootMargin: "-40% 0px -60% 0px",
+                threshold: 0 
             };
 
             const observer = new IntersectionObserver((entries) => {
@@ -1166,11 +1253,9 @@
                     if (entry.isIntersecting) {
                         const id = entry.target.getAttribute('id');
                         navLinks.forEach(link => {
-                            // Limpa a classe 'active' de todos os links internos
                             if (link.getAttribute('href').startsWith('#')) {
                                 link.classList.remove('active');
                             }
-                            // Adiciona 'active' ao link correspondente
                             if (link.getAttribute('href') === `#${id}`) {
                                 link.classList.add('active');
                             }
@@ -1191,7 +1276,7 @@
             initializeItinerario();
             initializeInteractiveTimeline();
             setupScrollAnimation();
-            initializeActiveNavOnScroll(); // Adicionada a função para navegação dinâmica
+            initializeActiveNavOnScroll();
             
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
             
@@ -1245,12 +1330,10 @@
             
             let tempItems = state.items;
 
-            // Filtra por tema do quiz
             if (searchTerm) {
                 tempItems = tempItems.filter(item => item.tema && item.tema.toLowerCase().includes(searchTerm));
             }
 
-            // Ordena os quizzes
             tempItems.sort((a, b) => {
                 const [field, direction] = sortValue.split('-');
                 
@@ -1301,12 +1384,11 @@
              } else {
                  autocompleteResults.classList.add('hidden');
              }
-        }
+         }
         
         // --- FUNÇÃO DE CARREGAMENTO DE DADOS ATUALIZADA ---
         function carregarQuizzes() {
             try {
-                // Caminho atualizado para a coleção 'quizzes'
                 const quizzesRef = collection(db, `/artifacts/${appId}/public/data/quizzes`);
                 onSnapshot(query(quizzesRef), (querySnapshot) => {
                     state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
