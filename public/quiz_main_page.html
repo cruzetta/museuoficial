@@ -311,11 +311,11 @@
             const percentage = (score / currentQuizQuestions.length) * 100;
             
             const resultsTiers = [
-                { limit: 0, msg: "Não desanime! Que tal explorar nosso acervo para aprender mais?", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3g0aXhpOTI3d3pucnNkdDRiaGJzY2N3aXczbDVpZzVoYzdqd3M0ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l378t23s83ZLxv7bO/giphy.gif" },
+                { limit: 0, msg: "Não desanime! Que tal explorar nosso acervo para aprender mais?", gif: "https://media.giphy.com/media/27EhcDHnlkw1O/giphy.gif" },
                 { limit: 40, msg: "Bom esforço! Você está no caminho certo.", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExejAybzNjcTRvZnczczZmdzNkaG02ajlpcWM0ZWN2bGI5eTJkMGl2ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oKIPm3BynUpUysTHW/giphy.gif" },
                 { limit: 70, msg: "Excelente trabalho! Você conhece bem o assunto.", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExczBucjVqc3g5YWdlYmI3ejM5c3E3ZWp5emI4M2VmM3doZ3M4enE0diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/a0h7sAqON67nO/giphy.gif" },
                 { limit: 99, msg: "Impressionante! Você é um verdadeiro mestre dos games!", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXN6cTN3Y2NqOGc1d2Z5bm5rZGJ0bDR1YjE5b2w3dnpwMm1jYmE5eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g9582DNuQppxC/giphy.gif" },
-                { limit: 100, msg: "PERFEITO! Você acertou todas! Lendário!", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbzdxZzF0ZnM1Znhna3JzYnR4ZW9oM3Y1b25jZzBzbWl1enE5bTMyMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7WTqAduA4dCAaM24/giphy.gif" }
+                { limit: 100, msg: "PERFEITO! Você acertou todas! Lendário!", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3N2bWd2Z2d2bzBqZGc1dWw2b3JtY2w0bW12bDU1dG82eWd2a2gyZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/5VKbvrjxpVJCM/giphy.gif" }
             ];
 
             const result = resultsTiers.find(tier => percentage <= tier.limit) || resultsTiers[resultsTiers.length - 1];
