@@ -11,32 +11,94 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --primary-color: #f59e0b;
-            --primary-hover: #d97706;
-            --dark-header: #111827;
-            --text-dark: #212529;
-            --bg-light: #f8f9fa;
-            --border-color: #dee2e6;
-            --correct-color: #10b981; /* Esmeralda 500 */
-            --wrong-color: #ef4444; /* Vermelho 500 */
+            --primary-color: #fde047; /* Amarelo mais vibrante */
+            --primary-hover: #facc15;
+            --secondary-color: #3b82f6; /* Azul */
+            --dark-bg: #111827;
+            --dark-card: #1f2937;
+            --text-light: #d1d5db;
+            --border-color: #4b5563;
+            --correct-color: #34d399; 
+            --wrong-color: #f87171;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
-        h1, h2, h3 { font-family: 'Inter', sans-serif; font-weight: 600; color: var(--text-dark); }
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; text-align: center; transition: all 0.2s ease-in-out; cursor: pointer; border: 1px solid transparent; }
-        .btn-primary { background-color: var(--primary-color); color: #ffffff; }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-        .btn-primary:disabled { background-color: #fcd34d; cursor: not-allowed; }
-        .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
-        .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
-        #header-logo { height: 120px; width: auto; }
-        .option-btn { width: 100%; text-align: left; background-color: #ffffff; border: 2px solid var(--border-color); padding: 1rem; font-weight: 500; border-radius: 0.5rem; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; }
-        .option-btn:hover { background-color: #f1f5f9; }
-        .option-btn.selected { border-color: var(--primary-color); background-color: #fef3c7; }
-        .option-btn.correct { border-color: var(--correct-color); background-color: #d1fae5; color: #065f46; font-weight: 700; }
-        .option-btn.wrong { border-color: var(--wrong-color); background-color: #fee2e2; color: #991b1b; }
-        .option-btn:disabled { cursor: not-allowed; }
+
+        /* Estilo temático para o corpo da página */
+        body { 
+            font-family: 'Press Start 2P', cursive; 
+            background-color: var(--dark-bg);
+            background-image: radial-gradient(circle at 25px 25px, rgba(255,255,255,0.05) 2%, transparent 0%), radial-gradient(circle at 75px 75px, rgba(255,255,255,0.05) 2%, transparent 0%);
+            background-size: 100px 100px;
+            color: var(--text-light);
+        }
+
+        #header-logo { height: 100px; width: auto; }
+
+        /* Estilo "pixelado" para os botões */
+        .btn {
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
+            padding: 12px 24px;
+            border-radius: 0;
+            border: 2px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            transition: all 0.1s ease-in-out;
+        }
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--border-color);
+        }
+        .btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px var(--border-color);
+        }
+
+        .btn-primary { 
+            background-color: var(--primary-color); 
+            color: var(--dark-bg);
+            border-color: #a16207;
+            box-shadow: 4px 4px 0px #a16207;
+        }
+         .btn-primary:hover { box-shadow: 2px 2px 0px #a16207; }
+         .btn-primary:active { box-shadow: 0px 0px 0px #a16207; }
+
+        .btn-secondary { 
+            background-color: var(--secondary-color); 
+            color: white;
+            border-color: #1e40af;
+            box-shadow: 4px 4px 0px #1e40af;
+        }
+        .btn-secondary:hover { box-shadow: 2px 2px 0px #1e40af; }
+        .btn-secondary:active { box-shadow: 0px 0px 0px #1e40af; }
+        
+        /* Estilo para as caixas de conteúdo */
+        .content-box {
+            background-color: var(--dark-card);
+            border: 4px solid var(--border-color);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Botões de opção com estilo de videogame */
+        .option-btn { 
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            width: 100%; 
+            text-align: left; 
+            background-color: #374151; 
+            border: 2px solid var(--border-color); 
+            padding: 1rem;
+            transition: all 0.2s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        .option-btn:hover:not(:disabled) { background-color: #4b5563; }
+        .option-btn.selected { border-color: var(--primary-color); background-color: #4b5563; }
+        .option-btn.correct { border-color: var(--correct-color); background-color: #10b98120; color: white; font-weight: 700; }
+        .option-btn.wrong { border-color: var(--wrong-color); background-color: #ef444420; color: white; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
         .option-btn .feedback-icon { display: none; }
         .option-btn.correct .feedback-icon.fa-check, .option-btn.wrong .feedback-icon.fa-times { display: inline-block; }
+        
         #progress-bar-inner { transition: width 0.3s ease-in-out; }
     </style>
 </head>
@@ -47,8 +109,8 @@
             <a href="index.html" class="flex-shrink-0">
                 <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
             </a>
-            <a href="index.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
-                <i class="fa-solid fa-arrow-left"></i><span>Voltar ao Início</span>
+            <a href="index.html" class="btn btn-secondary hidden sm:flex text-sm">
+                <i class="fa-solid fa-arrow-left"></i><span>Voltar</span>
             </a>
         </nav>
     </header>
@@ -58,60 +120,59 @@
             <div id="quiz-container" class="w-full max-w-3xl">
                 <div id="quiz-loader" class="text-center py-20">
                     <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
-                    <p class="mt-4 text-xl text-gray-600">A carregar perguntas...</p>
+                    <p class="mt-4 text-xl">A carregar perguntas...</p>
                 </div>
 
-                <div id="error-screen" class="hidden text-center py-20 bg-white rounded-lg shadow-md">
+                <div id="error-screen" class="hidden text-center py-20 content-box">
                     <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
-                    <h2 class="mt-4 text-2xl font-bold">Não foi possível carregar o Quiz</h2>
-                    <p class="text-gray-600 mt-2">Não há perguntas suficientes no nosso banco de dados ou ocorreu um erro. Tente novamente mais tarde.</p>
-                    <a href="index.html" class="btn btn-primary mt-6">Voltar à Página Inicial</a>
+                    <h2 class="mt-4 text-2xl font-bold text-white">Não foi possível carregar o Quiz</h2>
+                    <p class="text-gray-400 mt-2 font-sans">Não há perguntas suficientes ou ocorreu um erro.</p>
+                    <a href="index.html" class="btn btn-primary mt-6">Página Inicial</a>
                 </div>
 
-                <div id="quiz-start-screen" class="hidden text-center py-10 px-6 bg-white rounded-lg shadow-md">
-                    <h1 class="text-4xl font-bold" style="font-family: 'Bungee', cursive;">Desafio do Museu!</h1>
-                    <p class="text-lg text-gray-600 mt-4">Teste seus conhecimentos com <strong>10 perguntas</strong> aleatórias sobre o universo dos games. Preparado?</p>
-                    <button id="start-quiz-btn" class="btn btn-primary mt-8 text-lg" style="font-family: 'Press Start 2P', cursive;">Começar!</button>
+                <div id="quiz-start-screen" class="hidden text-center py-10 px-6 content-box">
+                    <h1 class="text-4xl font-bold text-white" style="font-family: 'Bungee', cursive;">Desafio do Museu!</h1>
+                    <p class="text-lg text-gray-300 mt-4 font-sans">Teste seus conhecimentos com <strong>10 perguntas</strong> sobre o universo dos games. Preparado?</p>
+                    <button id="start-quiz-btn" class="btn btn-primary mt-8 text-lg">Começar!</button>
                 </div>
 
-                <div id="quiz-main-box" class="hidden bg-white rounded-lg shadow-md p-6 sm:p-8">
-                    <!-- Nova Barra de Progresso -->
+                <div id="quiz-main-box" class="hidden content-box p-6 sm:p-8">
                     <div class="mb-4">
-                        <div class="flex justify-between items-center mb-1">
-                            <p id="quiz-progress" class="text-sm font-semibold text-gray-500"></p>
-                            <p id="current-score" class="text-sm font-semibold text-gray-500"></p>
+                        <div class="flex justify-between items-center mb-2 font-sans text-sm">
+                            <p id="quiz-progress" class="font-semibold"></p>
+                            <p id="current-score" class="font-semibold"></p>
                         </div>
-                        <div id="progress-bar" class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div id="progress-bar-inner" class="bg-yellow-400 h-2.5 rounded-full" style="width: 0%"></div>
+                        <div id="progress-bar" class="w-full bg-gray-900 border-2 border-gray-600 h-4 p-0.5">
+                            <div id="progress-bar-inner" class="bg-green-500 h-full" style="width: 0%"></div>
                         </div>
                     </div>
                     
-                    <div id="question-text" class="text-xl sm:text-2xl font-bold mb-6 min-h-[6rem] flex items-center"></div>
-                    <div id="options-container" class="space-y-4 mb-6"></div>
-                    <div class="border-t pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div id="question-text" class="text-lg sm:text-xl font-bold text-white mb-6 min-h-[6rem] flex items-center justify-center text-center leading-relaxed" style="font-family: 'Inter', sans-serif;"></div>
+                    <div id="options-container" class="space-y-3 mb-6"></div>
+                    <div class="border-t-2 border-dashed border-gray-600 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                         <p id="feedback-text" class="h-6 text-lg font-bold"></p>
-                        <button id="action-btn" class="btn btn-primary w-full sm:w-auto">Confirmar Resposta</button>
+                        <button id="action-btn" class="btn btn-primary w-full sm:w-auto text-sm">Confirmar</button>
                     </div>
                 </div>
 
-                <div id="quiz-results-screen" class="hidden text-center py-10 px-6 bg-white rounded-lg shadow-md">
-                    <h2 class="text-3xl font-bold" style="font-family: 'Bungee', cursive;">Quiz Finalizado!</h2>
-                    <p id="final-score" class="text-5xl font-bold my-4 text-[var(--primary-color)]" style="font-family: 'Press Start 2P', cursive;"></p>
+                <div id="quiz-results-screen" class="hidden text-center py-10 px-6 content-box">
+                    <h2 class="text-3xl font-bold text-white" style="font-family: 'Bungee', cursive;">Quiz Finalizado!</h2>
+                    <p id="final-score" class="text-5xl font-bold my-4 text-[var(--primary-color)]"></p>
                     <div id="results-feedback" class="text-center">
                         <img id="result-gif" src="" alt="Resultado do Quiz" class="mx-auto h-48 w-auto mb-4 rounded-lg"/>
-                        <p id="results-message" class="text-xl text-gray-700 font-semibold"></p>
+                        <p id="results-message" class="text-xl text-gray-200 font-semibold font-sans"></p>
                     </div>
                     <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
                         <button id="restart-quiz-btn" class="btn btn-primary">Jogar Novamente</button>
-                        <a href="index.html" class="btn btn-secondary">Voltar ao Início</a>
+                        <a href="index.html" class="btn btn-secondary">Página Inicial</a>
                     </div>
                 </div>
             </div>
         </div>
     </main>
     
-    <footer class="py-8 bg-gray-200 border-t border-gray-300">
-        <div class="container mx-auto text-center text-gray-600">
+    <footer class="py-8 bg-gray-900 border-t-4 border-gray-700 mt-auto">
+        <div class="container mx-auto text-center text-gray-500 font-sans text-sm">
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
@@ -133,7 +194,6 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // --- LÓGICA DO QUIZ ---
         const NUM_QUESTIONS_PER_ROUND = 10;
         let allQuestions = [];
         let currentQuizQuestions = [];
@@ -187,15 +247,15 @@
             selectedOptionElement = null;
             const question = currentQuizQuestions[currentQuestionIndex];
             
-            quizProgress.textContent = `Pergunta ${currentQuestionIndex + 1} de ${currentQuizQuestions.length}`;
-            currentScore.textContent = `Pontuação: ${score}`;
+            quizProgress.textContent = `Pergunta ${currentQuestionIndex + 1} / ${currentQuizQuestions.length}`;
+            currentScore.textContent = `Pontos: ${score}`;
             questionText.innerHTML = question.pergunta_texto;
             updateProgressBar();
             
             optionsContainer.innerHTML = '';
             shuffleArray([...question.opcoes]).forEach(option => {
                 const button = document.createElement('button');
-                button.innerHTML = `<span>${option.texto}</span> <i class="feedback-icon fas fa-check text-green-500"></i><i class="feedback-icon fas fa-times text-red-500"></i>`;
+                button.innerHTML = `<span>${option.texto}</span> <i class="feedback-icon fas fa-check text-green-400"></i><i class="feedback-icon fas fa-times text-red-400"></i>`;
                 button.className = 'option-btn';
                 button.dataset.correct = option.correta;
                 button.addEventListener('click', () => selectAnswer(button));
@@ -203,7 +263,7 @@
             });
             
             feedbackText.textContent = '';
-            actionBtn.textContent = 'Confirmar Resposta';
+            actionBtn.textContent = 'Confirmar';
             actionBtn.disabled = true;
         };
         
@@ -235,15 +295,14 @@
                 if(correctButton) correctButton.classList.add('correct');
             }
             
-            currentScore.textContent = `Pontuação: ${score}`;
+            currentScore.textContent = `Pontos: ${score}`;
             
             if (currentQuestionIndex < currentQuizQuestions.length - 1) {
-                actionBtn.textContent = 'Próxima Pergunta';
+                actionBtn.textContent = 'Próxima';
             } else {
-                actionBtn.textContent = 'Ver Resultados';
+                actionBtn.textContent = 'Resultados';
             }
-            // Atraso para o usuário ver o feedback antes de poder avançar
-            setTimeout(() => { actionBtn.disabled = false; }, 800);
+            setTimeout(() => { actionBtn.disabled = false; }, 1000);
         };
 
         const showResults = () => {
@@ -278,11 +337,8 @@
             displayQuestion();
         };
 
-        // --- LÓGICA DE INICIALIZAÇÃO ---
         const init = async () => {
             try {
-                // *** CORREÇÃO APLICADA AQUI ***
-                // O caminho agora aponta diretamente para o documento único do quiz.
                 const quizDocRef = doc(db, `/artifacts/${appId}/public/data/quizzes/banco_de_perguntas_unico`);
                 const docSnap = await getDoc(quizDocRef);
 
@@ -308,9 +364,10 @@
         document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
         document.getElementById('restart-quiz-btn').addEventListener('click', startQuiz);
         actionBtn.addEventListener('click', () => {
-            if (actionBtn.textContent.includes('Confirmar')) {
+            const actionText = actionBtn.textContent;
+            if (actionText.includes('Confirmar')) {
                 checkAnswer();
-            } else if (actionBtn.textContent.includes('Próxima')) {
+            } else if (actionText.includes('Próxima')) {
                 currentQuestionIndex++;
                 displayQuestion();
             } else {
