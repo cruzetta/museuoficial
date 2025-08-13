@@ -57,6 +57,30 @@
     const addOpcaoButton = document.getElementById('add-opcao-btn');
     const listaPerguntasContainer = document.getElementById('perguntas-lista-container');
 
+    // --- PERGUNTAS PRÉ-DEFINIDAS ---
+    const preloadedQuestions = [
+      { "pergunta_texto": "Qual foi o primeiro console de videogame doméstico comercialmente bem-sucedido?", "opcoes": [ { "texto": "Magnavox Odyssey", "correta": false }, { "texto": "Atari 2600", "correta": true }, { "texto": "Nintendo Entertainment System (NES)", "correta": false }, { "texto": "ColecoVision", "correta": false } ] },
+      { "pergunta_texto": "Em que ano o primeiro jogo da série 'The Legend of Zelda' foi lançado no Japão?", "opcoes": [ { "texto": "1986", "correta": true }, { "texto": "1989", "correta": false }, { "texto": "1991", "correta": false }, { "texto": "1984", "correta": false } ] },
+      { "pergunta_texto": "Qual personagem é o principal mascote da SEGA?", "opcoes": [ { "texto": "Alex Kidd", "correta": false }, { "texto": "Sonic the Hedgehog", "correta": true }, { "texto": "Ristar", "correta": false }, { "texto": "Vectorman", "correta": false } ] },
+      { "pergunta_texto": "O jogo 'Tetris' foi criado em que país?", "opcoes": [ { "texto": "Japão", "correta": false }, { "texto": "Estados Unidos", "correta": false }, { "texto": "União Soviética", "correta": true }, { "texto": "Alemanha", "correta": false } ] },
+      { "pergunta_texto": "Qual console popularizou o uso de CDs como mídia para jogos?", "opcoes": [ { "texto": "Sega Saturn", "correta": false }, { "texto": "Nintendo 64", "correta": false }, { "texto": "3DO", "correta": false }, { "texto": "PlayStation", "correta": true } ] },
+      { "pergunta_texto": "Quem é o criador da série de jogos 'Metal Gear'?", "opcoes": [ { "texto": "Shigeru Miyamoto", "correta": false }, { "texto": "Hideo Kojima", "correta": true }, { "texto": "Yuji Naka", "correta": false }, { "texto": "Hironobu Sakaguchi", "correta": false } ] },
+      { "pergunta_texto": "Qual destes jogos NÃO foi desenvolvido pela Rareware para o Nintendo 64?", "opcoes": [ { "texto": "Banjo-Kazooie", "correta": false }, { "texto": "GoldenEye 007", "correta": false }, { "texto": "Super Mario 64", "correta": true }, { "texto": "Conker's Bad Fur Day", "correta": false } ] },
+      { "pergunta_texto": "O console 'Dreamcast' foi o último a ser lançado por qual empresa?", "opcoes": [ { "texto": "Atari", "correta": false }, { "texto": "SNK", "correta": false }, { "texto": "Sega", "correta": true }, { "texto": "NEC", "correta": false } ] },
+      { "pergunta_texto": "Qual o nome do protagonista principal da série 'Halo'?", "opcoes": [ { "texto": "Marcus Fenix", "correta": false }, { "texto": "Master Chief", "correta": true }, { "texto": "Commander Shepard", "correta": false }, { "texto": "Samus Aran", "correta": false } ] },
+      { "pergunta_texto": "O jogo 'World of Warcraft' pertence a qual gênero?", "opcoes": [ { "texto": "RTS (Estratégia em Tempo Real)", "correta": false }, { "texto": "FPS (Tiro em Primeira Pessoa)", "correta": false }, { "texto": "MMORPG (RPG Online Massivo para Múltiplos Jogadores)", "correta": true }, { "texto": "MOBA (Arena de Batalha Online para Múltiplos Jogadores)", "correta": false } ] },
+      { "pergunta_texto": "Qual console introduziu o controle de movimento como seu principal recurso?", "opcoes": [ { "texto": "PlayStation 3", "correta": false }, { "texto": "Xbox 360", "correta": false }, { "texto": "Nintendo Wii", "correta": true }, { "texto": "Sega Dreamcast", "correta": false } ] },
+      { "pergunta_texto": "Em 'Street Fighter II', qual personagem brasileiro usa eletricidade?", "opcoes": [ { "texto": "Sagat", "correta": false }, { "texto": "Dhalsim", "correta": false }, { "texto": "Blanka", "correta": true }, { "texto": "Zangief", "correta": false } ] },
+      { "pergunta_texto": "Qual foi o primeiro jogo a apresentar o personagem Mario?", "opcoes": [ { "texto": "Super Mario Bros.", "correta": false }, { "texto": "Donkey Kong", "correta": true }, { "texto": "Mario Bros.", "correta": false }, { "texto": "Super Mario World", "correta": false } ] },
+      { "pergunta_texto": "O console 'PlayStation 2' é conhecido por ser um dos mais vendidos de todos os tempos. Qual seu número aproximado de vendas?", "opcoes": [ { "texto": "80 milhões", "correta": false }, { "texto": "100 milhões", "correta": false }, { "texto": "125 milhões", "correta": false }, { "texto": "Mais de 155 milhões", "correta": true } ] },
+      { "pergunta_texto": "Qual destes jogos é um famoso título de 'survival horror'?", "opcoes": [ { "texto": "Final Fantasy VII", "correta": false }, { "texto": "Resident Evil", "correta": true }, { "texto": "Chrono Trigger", "correta": false }, { "texto": "Street Fighter", "correta": false } ] },
+      { "pergunta_texto": "Qual empresa desenvolveu a engine gráfica 'Unreal Engine'?", "opcoes": [ { "texto": "Valve", "correta": false }, { "texto": "id Software", "correta": false }, { "texto": "Epic Games", "correta": true }, { "texto": "Crytek", "correta": false } ] },
+      { "pergunta_texto": "O jogo 'Minecraft' foi originalmente criado por qual desenvolvedor?", "opcoes": [ { "texto": "Mojang", "correta": false }, { "texto": "Markus 'Notch' Persson", "correta": true }, { "texto": "Microsoft", "correta": false }, { "texto": "Electronic Arts", "correta": false } ] },
+      { "pergunta_texto": "Qual console portátil da Nintendo introduziu uma tela 3D sem a necessidade de óculos?", "opcoes": [ { "texto": "Game Boy Advance", "correta": false }, { "texto": "Nintendo DS", "correta": false }, { "texto": "Nintendo 3DS", "correta": true }, { "texto": "Nintendo Switch", "correta": false } ] },
+      { "pergunta_texto": "Qual o nome do fantasma laranja no jogo 'Pac-Man'?", "opcoes": [ { "texto": "Blinky", "correta": false }, { "texto": "Pinky", "correta": false }, { "texto": "Inky", "correta": false }, { "texto": "Clyde", "correta": true } ] },
+      { "pergunta_texto": "Em que ano foi lançado o 'Magnavox Odyssey', considerado o primeiro console de videogame da história?", "opcoes": [ { "texto": "1972", "correta": true }, { "texto": "1977", "correta": false }, { "texto": "1980", "correta": false }, { "texto": "1968", "correta": false } ] }
+    ];
+
     // --- FUNÇÕES DO REPEATER DE OPÇÕES ---
     const addOpcaoItem = (data = {}) => {
         const itemDiv = document.createElement('div');
@@ -131,10 +155,14 @@
     const carregarBancoDePerguntas = async () => {
         try {
             const docSnap = await getDoc(quizDocRef);
-            if (docSnap.exists() && docSnap.data().perguntas) {
+            if (docSnap.exists() && docSnap.data().perguntas && docSnap.data().perguntas.length > 0) {
                 todasAsPerguntas = docSnap.data().perguntas;
             } else {
-                todasAsPerguntas = [];
+                // Se não houver perguntas, carrega as pré-definidas
+                console.log("Banco de perguntas vazio. A carregar perguntas pré-definidas...");
+                todasAsPerguntas = preloadedQuestions;
+                await salvarBancoDePerguntas(); // Salva as novas perguntas no Firebase
+                window.showNotification('20 perguntas pré-definidas foram carregadas no seu quiz!', false);
             }
             renderListaDePerguntas();
             resetarFormulario();
@@ -149,7 +177,10 @@
         submitButton.disabled = true;
         try {
             await setDoc(quizDocRef, { tema: "Banco de Perguntas Principal", perguntas: todasAsPerguntas });
-            window.showNotification('Alterações guardadas com sucesso!');
+            // A notificação de sucesso só é mostrada quando o utilizador salva manualmente
+            if (document.activeElement === submitButton) {
+                window.showNotification('Alterações guardadas com sucesso!');
+            }
             renderListaDePerguntas(); // Re-renderiza a lista para garantir consistência
         } catch (error) {
             console.error("Erro ao guardar perguntas:", error);
