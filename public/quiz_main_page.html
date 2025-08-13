@@ -3,83 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nossos Quizzes - Museu do Videojogo</title>
+    <title>Quiz - Museu do Videojogo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&family=Bungee&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --primary-color: #f59e0b; /* Amarelo/Dourado vibrante (Tailwind amber-500) */
-            --primary-hover: #d97706; /* Tom mais escuro para hover (Tailwind amber-600) */
-            --dark-header: #111827; /* Cinza escuro para o cabeçalho (Tailwind gray-900) */
+            --primary-color: #f59e0b;
+            --primary-hover: #d97706;
+            --dark-header: #111827;
             --text-dark: #212529;
-            --text-light: #495057;
             --bg-light: #f8f9fa;
             --border-color: #dee2e6;
+            --correct-color: #10b981;
+            --wrong-color: #ef4444;
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
         h1, h2, h3 { font-family: 'Inter', sans-serif; font-weight: 600; color: var(--text-dark); }
-        .gallery-card { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .gallery-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; text-align: center; transition: all 0.2s ease-in-out; cursor: pointer; border: 1px solid transparent; }
         .btn-primary { background-color: var(--primary-color); color: #ffffff; }
         .btn-primary:hover { background-color: var(--primary-hover); }
-        .form-input, .form-select { width: 100%; border-radius: 0.375rem; border: 1px solid var(--border-color); padding: 0.5rem 0.75rem; transition: border-color 0.2s, box-shadow 0.2s; }
-        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3); }
-        #autocomplete-results { background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); padding-top: 0.25rem; padding-bottom: 0.25rem; }
-        .autocomplete-item { padding: 0.75rem 1rem; cursor: pointer; color: var(--text-dark); }
-        .autocomplete-item:hover { background-color: var(--bg-light); }
+        .btn-primary:disabled { background-color: #fcd34d; cursor: not-allowed; }
+        .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
+        .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
         #header-logo { height: 120px; width: auto; }
+        .option-btn { width: 100%; text-align: left; background-color: #ffffff; border: 2px solid var(--border-color); padding: 1rem; font-weight: 500; border-radius: 0.5rem; transition: all 0.2s; }
+        .option-btn:hover { background-color: #f1f5f9; }
+        .option-btn.selected { border-color: var(--primary-color); background-color: #fef3c7; }
+        .option-btn.correct { border-color: var(--correct-color); background-color: #d1fae5; color: #065f46; font-weight: 700; }
+        .option-btn.wrong { border-color: var(--wrong-color); background-color: #fee2e2; color: #991b1b; }
+        .option-btn:disabled { cursor: not-allowed; }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased flex flex-col min-h-screen">
 
     <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
         <nav class="container mx-auto px-4 sm:px-6 h-24 flex justify-between items-center gap-4">
             <a href="index.html" class="flex-shrink-0">
                 <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
             </a>
-            <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
-                <div id="search-container" class="relative w-full max-w-lg">
-                    <input type="text" id="searchInput" placeholder="Pesquisar por tema do quiz..." class="form-input w-full py-2 pl-10 pr-4">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><i class="fa-solid fa-search"></i></span>
-                    <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 z-50 hidden"></div>
-                </div>
-            </div>
             <a href="index.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
                 <i class="fa-solid fa-arrow-left"></i><span>Voltar ao Início</span>
             </a>
         </nav>
     </header>
 
-    <main class="pt-12 pb-16">
-        <div class="container mx-auto px-4">
-            <h1 class="text-4xl md:text-5xl font-bold text-center mb-8">Nossos Quizzes</h1>
-            
-            <div class="flex justify-end mb-8">
-                <div class="w-full max-w-xs">
-                    <label for="sort-select" class="block text-sm font-medium mb-1">Ordenar por</label>
-                    <select id="sort-select" class="form-select">
-                        <option value="tema-asc">Ordem Alfabética (A-Z)</option>
-                        <option value="tema-desc">Ordem Alfabética (Z-A)</option>
-                        <option value="perguntas-desc">Mais Perguntas</option>
-                        <option value="perguntas-asc">Menos Perguntas</option>
-                    </select>
+    <main class="flex-grow pt-12 pb-16">
+        <div class="container mx-auto px-4 flex justify-center">
+            <div id="quiz-container" class="w-full max-w-3xl">
+                <div id="quiz-loader" class="text-center py-20">
+                    <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
+                    <p class="mt-4 text-xl text-gray-600">A carregar perguntas...</p>
                 </div>
-            </div>
 
-            <div id="quizzes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <div id="quizzes-loader" class="col-span-full text-center py-20">
-                     <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
-                     <p class="mt-4 text-xl text-gray-600">A carregar quizzes...</p>
+                <div id="error-screen" class="hidden text-center py-20 bg-white rounded-lg shadow-md">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+                    <h2 class="mt-4 text-2xl font-bold">Não foi possível carregar o Quiz</h2>
+                    <p class="text-gray-600 mt-2">Não há perguntas suficientes no nosso banco de dados ou ocorreu um erro. Tente novamente mais tarde.</p>
+                    <a href="index.html" class="btn btn-primary mt-6">Voltar à Página Inicial</a>
+                </div>
+
+                <div id="quiz-start-screen" class="hidden text-center py-10 px-6 bg-white rounded-lg shadow-md">
+                    <h1 class="text-4xl font-bold" style="font-family: 'Bungee', cursive;">Desafio do Museu!</h1>
+                    <p class="text-lg text-gray-600 mt-4">Teste seus conhecimentos com 5 perguntas aleatórias sobre o universo dos games. Preparado?</p>
+                    <button id="start-quiz-btn" class="btn btn-primary mt-8 text-lg" style="font-family: 'Press Start 2P', cursive;">Começar!</button>
+                </div>
+
+                <div id="quiz-main-box" class="hidden bg-white rounded-lg shadow-md p-6 sm:p-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <p id="quiz-progress" class="text-sm font-semibold text-gray-500"></p>
+                        <p id="current-score" class="text-sm font-semibold text-gray-500"></p>
+                    </div>
+                    <div id="question-text" class="text-xl sm:text-2xl font-bold mb-6 min-h-[6rem]"></div>
+                    <div id="options-container" class="space-y-4 mb-6"></div>
+                    <div class="border-t pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <p id="feedback-text" class="h-6 text-lg font-bold"></p>
+                        <button id="action-btn" class="btn btn-primary w-full sm:w-auto">Confirmar Resposta</button>
+                    </div>
+                </div>
+
+                <div id="quiz-results-screen" class="hidden text-center py-10 px-6 bg-white rounded-lg shadow-md">
+                    <h2 class="text-3xl font-bold">Quiz Finalizado!</h2>
+                    <p id="final-score" class="text-5xl font-bold my-4 text-[var(--primary-color)]"></p>
+                    <p id="results-message" class="text-xl text-gray-700"></p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+                        <button id="restart-quiz-btn" class="btn btn-primary">Jogar Novamente</button>
+                        <a href="index.html" class="btn btn-secondary">Voltar ao Início</a>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
     
-    <footer class="py-8 mt-16 bg-gray-200 border-t border-gray-300">
+    <footer class="py-8 bg-gray-200 border-t border-gray-300">
         <div class="container mx-auto text-center text-gray-600">
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
@@ -87,9 +105,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Sua configuração do Firebase (a mesma do outro arquivo)
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
@@ -103,144 +120,171 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // --- STATE & DOM ELEMENTS ---
-        const state = { items: [], filteredItems: [] };
-        const quizzesGrid = document.getElementById('quizzes-grid');
-        const quizzesLoader = document.getElementById('quizzes-loader');
-        const searchInput = document.getElementById('searchInput');
-        const sortSelect = document.getElementById('sort-select');
-        const autocompleteResults = document.getElementById('autocomplete-results');
+        // --- LÓGICA DO QUIZ ---
+        const NUM_QUESTIONS_PER_ROUND = 5;
+        let allQuestions = [];
+        let currentQuizQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOptionElement = null;
 
-        // --- FUNÇÃO DE RENDERIZAÇÃO ATUALIZADA PARA QUIZZES ---
-        function renderQuizzes() {
-            quizzesGrid.innerHTML = '';
-            if (state.filteredItems.length === 0 && quizzesLoader.style.display === 'none') {
-                quizzesGrid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-search-minus text-4xl text-gray-400"></i><p class="mt-4 text-xl text-gray-600">Nenhum quiz encontrado.</p></div>`;
-                return;
+        const loader = document.getElementById('quiz-loader');
+        const errorScreen = document.getElementById('error-screen');
+        const startScreen = document.getElementById('quiz-start-screen');
+        const mainBox = document.getElementById('quiz-main-box');
+        const resultsScreen = document.getElementById('quiz-results-screen');
+        const quizProgress = document.getElementById('quiz-progress');
+        const currentScore = document.getElementById('current-score');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackText = document.getElementById('feedback-text');
+        const actionBtn = document.getElementById('action-btn');
+        const finalScore = document.getElementById('final-score');
+        const resultsMessage = document.getElementById('results-message');
+
+        const showQuizScreen = (screen) => {
+            loader.classList.add('hidden');
+            errorScreen.classList.add('hidden');
+            startScreen.classList.add('hidden');
+            mainBox.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            screen.classList.remove('hidden');
+        };
+
+        const shuffleArray = (array) => {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
             }
-
-            state.filteredItems.forEach(item => {
-                const cardLink = document.createElement('a');
-                cardLink.href = `play-quiz.html?id=${item.id}`; // Link para a página de jogar
-                cardLink.className = 'gallery-card';
-                cardLink.innerHTML = `
-                    <div class="h-48 flex items-center justify-center bg-gray-800 text-amber-400">
-                        <i class="fas fa-brain text-6xl"></i>
-                    </div>
-                    <div class="p-4 flex flex-col flex-grow">
-                        <h3 class="text-lg font-semibold mb-2 text-gray-800">${item.tema || 'Quiz sem tema'}</h3>
-                        <div class="text-sm text-gray-600 mb-4">
-                            <p><i class="fa-solid fa-list-check w-5 text-gray-400"></i> ${item.perguntas?.length || 0} perguntas</p>
-                        </div>
-                        <div class="btn btn-primary w-full mt-auto">
-                            Jogar Quiz
-                            <i class="fas fa-play ml-2"></i>
-                        </div>
-                    </div>
-                `;
-                quizzesGrid.appendChild(cardLink);
-            });
-        }
-
-        // --- FUNÇÕES DE PROCESSAMENTO DE DADOS ATUALIZADAS ---
-        function applyFiltersAndSort() {
-            const searchTerm = searchInput.value.trim().toLowerCase();
-            const sortValue = sortSelect.value;
+            return array;
+        };
+        
+        const selectRandomQuestions = () => {
+            currentQuizQuestions = shuffleArray([...allQuestions]).slice(0, NUM_QUESTIONS_PER_ROUND);
+        };
+        
+        const displayQuestion = () => {
+            selectedOptionElement = null;
+            const question = currentQuizQuestions[currentQuestionIndex];
             
-            let tempItems = state.items;
-
-            // Filtra por tema do quiz
-            if (searchTerm) {
-                tempItems = tempItems.filter(item => item.tema && item.tema.toLowerCase().includes(searchTerm));
-            }
-
-            // Ordena os quizzes
-            tempItems.sort((a, b) => {
-                const [field, direction] = sortValue.split('-');
-                
-                if (field === 'tema') {
-                    const valA = a.tema || '';
-                    const valB = b.tema || '';
-                    return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                }
-                
-                if (field === 'perguntas') {
-                    const valA = a.perguntas?.length || 0;
-                    const valB = b.perguntas?.length || 0;
-                    return direction === 'asc' ? valA - valB : valB - valA;
-                }
-                
-                return 0;
+            quizProgress.textContent = `Pergunta ${currentQuestionIndex + 1} de ${currentQuizQuestions.length}`;
+            currentScore.textContent = `Pontuação: ${score}`;
+            questionText.innerHTML = question.pergunta_texto;
+            
+            optionsContainer.innerHTML = '';
+            // Embaralha as opções também para mais dinamismo
+            shuffleArray([...question.opcoes]).forEach(option => {
+                const button = document.createElement('button');
+                button.innerHTML = option.texto;
+                button.className = 'option-btn';
+                button.dataset.correct = option.correta;
+                button.addEventListener('click', () => selectAnswer(button));
+                optionsContainer.appendChild(button);
             });
-
-            state.filteredItems = tempItems;
-            renderQuizzes();
-            updateAutocomplete(searchTerm);
-        }
+            
+            feedbackText.textContent = '';
+            actionBtn.textContent = 'Confirmar Resposta';
+            actionBtn.disabled = true;
+        };
         
-        function updateAutocomplete(query) {
-             autocompleteResults.innerHTML = '';
-             if (query.length < 1) {
-                 autocompleteResults.classList.add('hidden');
-                 return;
-             }
+        const selectAnswer = (button) => {
+            if (selectedOptionElement) {
+                selectedOptionElement.classList.remove('selected');
+            }
+            button.classList.add('selected');
+            selectedOptionElement = button;
+            actionBtn.disabled = false;
+        };
 
-             const matchedItems = state.items
-                 .filter(item => item.tema && item.tema.toLowerCase().includes(query))
-                 .slice(0, 5);
+        const checkAnswer = () => {
+            actionBtn.disabled = true;
+            Array.from(optionsContainer.children).forEach(btn => btn.disabled = true);
+            
+            const isCorrect = selectedOptionElement.dataset.correct === 'true';
 
-             if (matchedItems.length > 0) {
-                 matchedItems.forEach(item => {
-                     const suggestionDiv = document.createElement('div');
-                     suggestionDiv.className = 'autocomplete-item';
-                     suggestionDiv.textContent = item.tema;
-                     suggestionDiv.onclick = () => {
-                         searchInput.value = item.tema;
-                         autocompleteResults.classList.add('hidden');
-                         applyFiltersAndSort();
-                     };
-                     autocompleteResults.appendChild(suggestionDiv);
-                 });
-                 autocompleteResults.classList.remove('hidden');
-             } else {
-                 autocompleteResults.classList.add('hidden');
-             }
-        }
-        
-        // --- FUNÇÃO DE CARREGAMENTO DE DADOS ATUALIZADA ---
-        function carregarQuizzes() {
+            if (isCorrect) {
+                score++;
+                selectedOptionElement.classList.add('correct');
+                feedbackText.textContent = 'Correto!';
+                feedbackText.style.color = 'var(--correct-color)';
+            } else {
+                selectedOptionElement.classList.add('wrong');
+                feedbackText.textContent = 'Incorreto!';
+                feedbackText.style.color = 'var(--wrong-color)';
+                const correctButton = optionsContainer.querySelector('[data-correct="true"]');
+                if(correctButton) correctButton.classList.add('correct');
+            }
+            
+            currentScore.textContent = `Pontuação: ${score}`;
+            
+            if (currentQuestionIndex < currentQuizQuestions.length - 1) {
+                actionBtn.textContent = 'Próxima Pergunta';
+                actionBtn.disabled = false;
+            } else {
+                actionBtn.textContent = 'Ver Resultados';
+                actionBtn.disabled = false;
+            }
+        };
+
+        const showResults = () => {
+            finalScore.textContent = `${score} / ${currentQuizQuestions.length}`;
+            const percentage = (score / currentQuizQuestions.length) * 100;
+            if (percentage === 100) resultsMessage.textContent = "Incrível! Você acertou todas!";
+            else if (percentage >= 70) resultsMessage.textContent = "Excelente trabalho! Você conhece bem o assunto.";
+            else if (percentage >= 40) resultsMessage.textContent = "Bom esforço! Continue a aprender.";
+            else resultsMessage.textContent = "Não desanime! Tente novamente para melhorar.";
+            
+            showQuizScreen(resultsScreen);
+        };
+
+        const startQuiz = () => {
+            currentQuestionIndex = 0;
+            score = 0;
+            selectRandomQuestions();
+            showQuizScreen(mainBox);
+            displayQuestion();
+        };
+
+        // --- LÓGICA DE INICIALIZAÇÃO ---
+        const init = async () => {
             try {
-                // Caminho atualizado para a coleção 'quizzes'
                 const quizzesRef = collection(db, `/artifacts/${appId}/public/data/quizzes`);
-                onSnapshot(query(quizzesRef), (querySnapshot) => {
-                    state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    if (quizzesLoader) quizzesLoader.style.display = 'none';
-                    applyFiltersAndSort(); 
-                }, (error) => {
-                    console.error("Erro ao carregar os quizzes:", error);
-                    quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar os quizzes.</p>`;
+                const querySnapshot = await getDocs(quizzesRef);
+                
+                allQuestions = [];
+                querySnapshot.forEach(doc => {
+                    const quizData = doc.data();
+                    if (quizData.perguntas && Array.isArray(quizData.perguntas)) {
+                        allQuestions.push(...quizData.perguntas);
+                    }
                 });
-            } catch (error) {
-                console.error("Erro ao configurar o listener dos quizzes:", error);
-                if (quizzesLoader) quizzesLoader.style.display = 'none';
-                quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Ocorreu um erro inesperado.</p>`;
-            }
-        }
-        
-        // --- EVENT LISTENERS ---
-        document.addEventListener('DOMContentLoaded', () => {
-            carregarQuizzes();
-            
-            searchInput.addEventListener('input', () => applyFiltersAndSort());
-            sortSelect.addEventListener('change', applyFiltersAndSort);
 
-            document.addEventListener('click', (e) => {
-                if (!document.getElementById('search-container').contains(e.target)) {
-                    autocompleteResults.classList.add('hidden');
+                if (allQuestions.length >= NUM_QUESTIONS_PER_ROUND) {
+                    showQuizScreen(startScreen);
+                } else {
+                    showQuizScreen(errorScreen);
                 }
-            });
+            } catch (err) {
+                console.error("Erro ao buscar perguntas:", err);
+                showQuizScreen(errorScreen);
+            }
+        };
+
+        // --- EVENT LISTENERS ---
+        document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+        document.getElementById('restart-quiz-btn').addEventListener('click', startQuiz);
+        actionBtn.addEventListener('click', () => {
+            if (actionBtn.textContent.includes('Confirmar')) {
+                checkAnswer();
+            } else if (actionBtn.textContent.includes('Próxima')) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                showResults();
+            }
         });
 
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
