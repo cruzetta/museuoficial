@@ -17,8 +17,8 @@
             --text-dark: #212529;
             --bg-light: #f8f9fa;
             --border-color: #dee2e6;
-            --correct-color: #10b981;
-            --wrong-color: #ef4444;
+            --correct-color: #10b981; /* Esmeralda 500 */
+            --wrong-color: #ef4444; /* Vermelho 500 */
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
         h1, h2, h3 { font-family: 'Inter', sans-serif; font-weight: 600; color: var(--text-dark); }
@@ -29,12 +29,15 @@
         .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
         .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
         #header-logo { height: 120px; width: auto; }
-        .option-btn { width: 100%; text-align: left; background-color: #ffffff; border: 2px solid var(--border-color); padding: 1rem; font-weight: 500; border-radius: 0.5rem; transition: all 0.2s; }
+        .option-btn { width: 100%; text-align: left; background-color: #ffffff; border: 2px solid var(--border-color); padding: 1rem; font-weight: 500; border-radius: 0.5rem; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; }
         .option-btn:hover { background-color: #f1f5f9; }
         .option-btn.selected { border-color: var(--primary-color); background-color: #fef3c7; }
         .option-btn.correct { border-color: var(--correct-color); background-color: #d1fae5; color: #065f46; font-weight: 700; }
         .option-btn.wrong { border-color: var(--wrong-color); background-color: #fee2e2; color: #991b1b; }
         .option-btn:disabled { cursor: not-allowed; }
+        .option-btn .feedback-icon { display: none; }
+        .option-btn.correct .feedback-icon.fa-check, .option-btn.wrong .feedback-icon.fa-times { display: inline-block; }
+        #progress-bar-inner { transition: width 0.3s ease-in-out; }
     </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen">
@@ -67,16 +70,23 @@
 
                 <div id="quiz-start-screen" class="hidden text-center py-10 px-6 bg-white rounded-lg shadow-md">
                     <h1 class="text-4xl font-bold" style="font-family: 'Bungee', cursive;">Desafio do Museu!</h1>
-                    <p class="text-lg text-gray-600 mt-4">Teste seus conhecimentos com 5 perguntas aleatórias sobre o universo dos games. Preparado?</p>
+                    <p class="text-lg text-gray-600 mt-4">Teste seus conhecimentos com <strong>10 perguntas</strong> aleatórias sobre o universo dos games. Preparado?</p>
                     <button id="start-quiz-btn" class="btn btn-primary mt-8 text-lg" style="font-family: 'Press Start 2P', cursive;">Começar!</button>
                 </div>
 
                 <div id="quiz-main-box" class="hidden bg-white rounded-lg shadow-md p-6 sm:p-8">
-                    <div class="flex justify-between items-center mb-4">
-                        <p id="quiz-progress" class="text-sm font-semibold text-gray-500"></p>
-                        <p id="current-score" class="text-sm font-semibold text-gray-500"></p>
+                    <!-- Nova Barra de Progresso -->
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <p id="quiz-progress" class="text-sm font-semibold text-gray-500"></p>
+                            <p id="current-score" class="text-sm font-semibold text-gray-500"></p>
+                        </div>
+                        <div id="progress-bar" class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="progress-bar-inner" class="bg-yellow-400 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
                     </div>
-                    <div id="question-text" class="text-xl sm:text-2xl font-bold mb-6 min-h-[6rem]"></div>
+                    
+                    <div id="question-text" class="text-xl sm:text-2xl font-bold mb-6 min-h-[6rem] flex items-center"></div>
                     <div id="options-container" class="space-y-4 mb-6"></div>
                     <div class="border-t pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                         <p id="feedback-text" class="h-6 text-lg font-bold"></p>
@@ -85,9 +95,12 @@
                 </div>
 
                 <div id="quiz-results-screen" class="hidden text-center py-10 px-6 bg-white rounded-lg shadow-md">
-                    <h2 class="text-3xl font-bold">Quiz Finalizado!</h2>
-                    <p id="final-score" class="text-5xl font-bold my-4 text-[var(--primary-color)]"></p>
-                    <p id="results-message" class="text-xl text-gray-700"></p>
+                    <h2 class="text-3xl font-bold" style="font-family: 'Bungee', cursive;">Quiz Finalizado!</h2>
+                    <p id="final-score" class="text-5xl font-bold my-4 text-[var(--primary-color)]" style="font-family: 'Press Start 2P', cursive;"></p>
+                    <div id="results-feedback" class="text-center">
+                        <img id="result-gif" src="" alt="Resultado do Quiz" class="mx-auto h-48 w-auto mb-4 rounded-lg"/>
+                        <p id="results-message" class="text-xl text-gray-700 font-semibold"></p>
+                    </div>
                     <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
                         <button id="restart-quiz-btn" class="btn btn-primary">Jogar Novamente</button>
                         <a href="index.html" class="btn btn-secondary">Voltar ao Início</a>
@@ -105,7 +118,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
@@ -121,7 +134,7 @@
         const appId = 'museu-cca6d';
 
         // --- LÓGICA DO QUIZ ---
-        const NUM_QUESTIONS_PER_ROUND = 5;
+        const NUM_QUESTIONS_PER_ROUND = 10;
         let allQuestions = [];
         let currentQuizQuestions = [];
         let currentQuestionIndex = 0;
@@ -141,6 +154,8 @@
         const actionBtn = document.getElementById('action-btn');
         const finalScore = document.getElementById('final-score');
         const resultsMessage = document.getElementById('results-message');
+        const resultGif = document.getElementById('result-gif');
+        const progressBarInner = document.getElementById('progress-bar-inner');
 
         const showQuizScreen = (screen) => {
             loader.classList.add('hidden');
@@ -163,6 +178,11 @@
             currentQuizQuestions = shuffleArray([...allQuestions]).slice(0, NUM_QUESTIONS_PER_ROUND);
         };
         
+        const updateProgressBar = () => {
+            const progressPercentage = ((currentQuestionIndex) / currentQuizQuestions.length) * 100;
+            progressBarInner.style.width = `${progressPercentage}%`;
+        };
+
         const displayQuestion = () => {
             selectedOptionElement = null;
             const question = currentQuizQuestions[currentQuestionIndex];
@@ -170,12 +190,12 @@
             quizProgress.textContent = `Pergunta ${currentQuestionIndex + 1} de ${currentQuizQuestions.length}`;
             currentScore.textContent = `Pontuação: ${score}`;
             questionText.innerHTML = question.pergunta_texto;
+            updateProgressBar();
             
             optionsContainer.innerHTML = '';
-            // Embaralha as opções também para mais dinamismo
             shuffleArray([...question.opcoes]).forEach(option => {
                 const button = document.createElement('button');
-                button.innerHTML = option.texto;
+                button.innerHTML = `<span>${option.texto}</span> <i class="feedback-icon fas fa-check text-green-500"></i><i class="feedback-icon fas fa-times text-red-500"></i>`;
                 button.className = 'option-btn';
                 button.dataset.correct = option.correta;
                 button.addEventListener('click', () => selectAnswer(button));
@@ -219,21 +239,30 @@
             
             if (currentQuestionIndex < currentQuizQuestions.length - 1) {
                 actionBtn.textContent = 'Próxima Pergunta';
-                actionBtn.disabled = false;
             } else {
                 actionBtn.textContent = 'Ver Resultados';
-                actionBtn.disabled = false;
             }
+            // Atraso para o usuário ver o feedback antes de poder avançar
+            setTimeout(() => { actionBtn.disabled = false; }, 800);
         };
 
         const showResults = () => {
+            progressBarInner.style.width = '100%';
             finalScore.textContent = `${score} / ${currentQuizQuestions.length}`;
             const percentage = (score / currentQuizQuestions.length) * 100;
-            if (percentage === 100) resultsMessage.textContent = "Incrível! Você acertou todas!";
-            else if (percentage >= 70) resultsMessage.textContent = "Excelente trabalho! Você conhece bem o assunto.";
-            else if (percentage >= 40) resultsMessage.textContent = "Bom esforço! Continue a aprender.";
-            else resultsMessage.textContent = "Não desanime! Tente novamente para melhorar.";
             
+            const resultsTiers = [
+                { limit: 0, msg: "Não desanime! Que tal explorar nosso acervo para aprender mais?", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3g0aXhpOTI3d3pucnNkdDRiaGJzY2N3aXczbDVpZzVoYzdqd3M0ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l378t23s83ZLxv7bO/giphy.gif" },
+                { limit: 40, msg: "Bom esforço! Você está no caminho certo.", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExejAybzNjcTRvZnczczZmdzNkaG02ajlpcWM0ZWN2bGI5eTJkMGl2ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oKIPm3BynUpUysTHW/giphy.gif" },
+                { limit: 70, msg: "Excelente trabalho! Você conhece bem o assunto.", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExczBucjVqc3g5YWdlYmI3ejM5c3E3ZWp5emI4M2VmM3doZ3M4enE0diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/a0h7sAqON67nO/giphy.gif" },
+                { limit: 99, msg: "Impressionante! Você é um verdadeiro mestre dos games!", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXN6cTN3Y2NqOGc1d2Z5bm5rZGJ0bDR1YjE5b2w3dnpwMm1jYmE5eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g9582DNuQppxC/giphy.gif" },
+                { limit: 100, msg: "PERFEITO! Você acertou todas! Lendário!", gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbzdxZzF0ZnM1Znhna3JzYnR4ZW9oM3Y1b25jZzBzbWl1enE5bTMyMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7WTqAduA4dCAaM24/giphy.gif" }
+            ];
+
+            const result = resultsTiers.find(tier => percentage <= tier.limit) || resultsTiers[resultsTiers.length - 1];
+            resultsMessage.textContent = result.msg;
+            resultGif.src = result.gif;
+
             showQuizScreen(resultsScreen);
         };
 
@@ -241,6 +270,10 @@
             currentQuestionIndex = 0;
             score = 0;
             selectRandomQuestions();
+            if (currentQuizQuestions.length < NUM_QUESTIONS_PER_ROUND) {
+                showQuizScreen(errorScreen);
+                return;
+            }
             showQuizScreen(mainBox);
             displayQuestion();
         };
@@ -248,20 +281,22 @@
         // --- LÓGICA DE INICIALIZAÇÃO ---
         const init = async () => {
             try {
-                const quizzesRef = collection(db, `/artifacts/${appId}/public/data/quizzes`);
-                const querySnapshot = await getDocs(quizzesRef);
-                
-                allQuestions = [];
-                querySnapshot.forEach(doc => {
-                    const quizData = doc.data();
+                // *** CORREÇÃO APLICADA AQUI ***
+                // O caminho agora aponta diretamente para o documento único do quiz.
+                const quizDocRef = doc(db, `/artifacts/${appId}/public/data/quizzes/banco_de_perguntas_unico`);
+                const docSnap = await getDoc(quizDocRef);
+
+                if (docSnap.exists()) {
+                    const quizData = docSnap.data();
                     if (quizData.perguntas && Array.isArray(quizData.perguntas)) {
-                        allQuestions.push(...quizData.perguntas);
+                        allQuestions = quizData.perguntas;
                     }
-                });
+                }
 
                 if (allQuestions.length >= NUM_QUESTIONS_PER_ROUND) {
                     showQuizScreen(startScreen);
                 } else {
+                    console.warn(`Perguntas insuficientes. Encontradas: ${allQuestions.length}, Necessárias: ${NUM_QUESTIONS_PER_ROUND}`);
                     showQuizScreen(errorScreen);
                 }
             } catch (err) {
@@ -270,7 +305,6 @@
             }
         };
 
-        // --- EVENT LISTENERS ---
         document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
         document.getElementById('restart-quiz-btn').addEventListener('click', startQuiz);
         actionBtn.addEventListener('click', () => {
