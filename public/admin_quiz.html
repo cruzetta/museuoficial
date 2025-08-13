@@ -4,21 +4,17 @@
         <h2 id="editor-title" class="text-2xl font-bold mb-6">Adicionar Nova Pergunta</h2>
         <form id="form-pergunta-editor" class="space-y-6 bg-gray-50 p-6 rounded-lg border">
             <input type="hidden" id="pergunta-editor-index" value="-1">
-
             <fieldset>
                 <legend class="text-lg font-semibold px-2 mb-2">Pergunta</legend>
                 <textarea id="pergunta-editor-texto" class="w-full" placeholder="Escreva o texto da pergunta aqui..." rows="3" required></textarea>
             </fieldset>
-
             <fieldset>
                 <legend class="text-lg font-semibold px-2 mb-2">Opções de Resposta</legend>
-                <div id="opcoes-repeater-container" class="space-y-3">
-                    </div>
+                <div id="opcoes-repeater-container" class="space-y-3"></div>
                 <button type="button" id="add-opcao-btn" class="mt-4 text-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-md transition-colors">
                     <i class="fas fa-plus mr-1"></i> Adicionar Opção
                 </button>
             </fieldset>
-
             <div class="flex gap-4 pt-4 border-t">
                 <button type="submit" id="save-pergunta-btn" class="bg-green-600 hover:bg-green-700">Adicionar Pergunta</button>
                 <button type="button" id="cancel-edit-btn" class="w-auto hidden">Cancelar Edição</button>
@@ -36,17 +32,13 @@
 
 <script data-tab-script="quizzes">
 {
-    const { db, doc, getDoc, setDoc } = window.firebaseServices;
+    const { db, collection, doc, getDoc, setDoc, getDocs } = window.firebaseServices;
     const { appId } = window.appConfig;
 
-    // --- CONFIGURAÇÃO ---
     const QUIZ_DOC_ID = "banco_de_perguntas_unico";
     const quizDocRef = doc(db, `/artifacts/${appId}/public/data/quizzes`, QUIZ_DOC_ID);
     
-    // --- ESTADO GLOBAL ---
     let todasAsPerguntas = [];
-
-    // --- ELEMENTOS DO DOM ---
     const form = document.getElementById('form-pergunta-editor');
     const editorTitle = document.getElementById('editor-title');
     const perguntaTextoInput = document.getElementById('pergunta-editor-texto');
@@ -57,7 +49,6 @@
     const addOpcaoButton = document.getElementById('add-opcao-btn');
     const listaPerguntasContainer = document.getElementById('perguntas-lista-container');
 
-    // --- FUNÇÕES DO REPEATER DE OPÇÕES ---
     const addOpcaoItem = (data = {}) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'repeater-item-opcao flex items-center gap-2 pl-4';
@@ -70,14 +61,12 @@
         itemDiv.querySelector('.remove-item-btn').addEventListener('click', () => itemDiv.remove());
     };
 
-    // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
     const renderListaDePerguntas = () => {
         listaPerguntasContainer.innerHTML = '';
         if (todasAsPerguntas.length === 0) {
-            listaPerguntasContainer.innerHTML = '<p class="text-gray-500">Nenhuma pergunta encontrada. Adicione uma acima!</p>';
+            listaPerguntasContainer.innerHTML = '<p class="text-gray-500">Nenhuma pergunta encontrada.</p>';
             return;
         }
-
         todasAsPerguntas.forEach((pergunta, index) => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
@@ -87,10 +76,8 @@
                     <button class="edit-btn px-3 py-1 bg-yellow-500 text-white rounded text-xs" data-index="${index}">Editar</button>
                     <button class="delete-btn px-3 py-1 bg-red-600 text-white rounded text-xs" data-index="${index}">Eliminar</button>
                 </div>`;
-            
             itemDiv.querySelector('.edit-btn').addEventListener('click', () => carregarPerguntaParaEdicao(index));
             itemDiv.querySelector('.delete-btn').addEventListener('click', () => apagarPergunta(index));
-            
             listaPerguntasContainer.appendChild(itemDiv);
         });
     };
@@ -104,112 +91,152 @@
         saveButton.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
         saveButton.classList.add('bg-green-600', 'hover:bg-green-700');
         cancelButton.classList.add('hidden');
-        addOpcaoItem();
-        addOpcaoItem();
+        addOpcaoItem(); addOpcaoItem();
     };
 
     const carregarPerguntaParaEdicao = (index) => {
         const pergunta = todasAsPerguntas[index];
         if (!pergunta) return;
-
         resetarFormulario();
         perguntaTextoInput.value = pergunta.pergunta_texto;
         opcoesContainer.innerHTML = '';
         pergunta.opcoes.forEach(opt => addOpcaoItem(opt));
-        
         perguntaIndexInput.value = index;
         editorTitle.textContent = `Editar Pergunta ${index + 1}`;
         saveButton.textContent = 'Atualizar Pergunta';
         saveButton.classList.remove('bg-green-600', 'hover:bg-green-700');
         saveButton.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
         cancelButton.classList.remove('hidden');
-
         window.scrollTo({ top: form.offsetTop - 20, behavior: 'smooth' });
     };
 
-    // --- OPERAÇÕES CRUD (CREATE, READ, UPDATE, DELETE) ---
-    const carregarBancoDePerguntas = async () => {
-        try {
-            const docSnap = await getDoc(quizDocRef);
-            if (docSnap.exists() && docSnap.data().perguntas) {
-                todasAsPerguntas = docSnap.data().perguntas;
-            } else {
-                todasAsPerguntas = [];
-            }
-            renderListaDePerguntas();
-            resetarFormulario();
-        } catch (error) {
-            console.error("Erro ao carregar perguntas:", error);
-            window.showNotification("Erro ao carregar o banco de perguntas.", true);
-        }
-    };
-    
     const salvarBancoDePerguntas = async () => {
-        const submitButton = form.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
+        form.querySelector('button[type="submit"]').disabled = true;
         try {
             await setDoc(quizDocRef, { tema: "Banco de Perguntas Principal", perguntas: todasAsPerguntas });
             window.showNotification('Alterações guardadas com sucesso!');
-            renderListaDePerguntas(); // Re-renderiza a lista para garantir consistência
+            renderListaDePerguntas();
         } catch (error) {
-            console.error("Erro ao guardar perguntas:", error);
             window.showNotification('Erro ao guardar as alterações.', true);
+            console.error("Erro ao guardar:", error);
         } finally {
-            submitButton.disabled = false;
+            form.querySelector('button[type="submit"]').disabled = false;
         }
     };
-
+    
     const apagarPergunta = async (index) => {
-        if (!await window.showConfirmModal("Tem a certeza que deseja eliminar esta pergunta?")) return;
-        
+        if (!await window.showConfirmModal("Tem a certeza?")) return;
         todasAsPerguntas.splice(index, 1);
         await salvarBancoDePerguntas();
-        resetarFormulario(); // Reseta o formulário caso a pergunta apagada estivesse em edição
+        resetarFormulario();
     };
-
-    // --- EVENT LISTENERS ---
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const perguntaTexto = perguntaTextoInput.value.trim();
-        if (!perguntaTexto) {
-            window.showNotification("O texto da pergunta não pode estar vazio.", true);
+    
+    // =======================================================
+    // FUNÇÃO DE MIGRAÇÃO - Executará apenas uma vez
+    // =======================================================
+    const runMigration = async () => {
+        const migrationFlagRef = doc(db, `/artifacts/${appId}/public/data/quizzes/migration_status`);
+        const flagSnap = await getDoc(migrationFlagRef);
+        if (flagSnap.exists() && flagSnap.data().completed) {
+            console.log("Migração de quizzes já foi realizada.");
             return;
         }
+
+        console.log("Iniciando migração de perguntas de quizzes antigos...");
+        window.showNotification("A verificar quizzes antigos para migração...");
+
+        const quizzesCollectionRef = collection(db, `/artifacts/${appId}/public/data/quizzes`);
+        const allQuizzesSnap = await getDocs(quizzesCollectionRef);
+
+        let oldQuestions = [];
+        let newQuestions = [];
+
+        for (const docSnap of allQuizzesSnap.docs) {
+            if (docSnap.id === QUIZ_DOC_ID) {
+                newQuestions = docSnap.data().perguntas || [];
+                continue;
+            }
+            if (docSnap.id === 'migration_status') continue;
+            
+            const data = docSnap.data();
+            if (data.perguntas && Array.isArray(data.perguntas)) {
+                console.log(`Encontradas ${data.perguntas.length} perguntas no quiz antigo: ${data.tema || docSnap.id}`);
+                oldQuestions.push(...data.perguntas);
+            }
+        }
+
+        if (oldQuestions.length === 0) {
+            console.log("Nenhuma pergunta antiga encontrada para migrar.");
+            await setDoc(migrationFlagRef, { completed: true });
+            return;
+        }
+
+        const combinedQuestions = [...newQuestions];
+        const existingQuestionTexts = new Set(newQuestions.map(q => q.pergunta_texto));
+
+        let migratedCount = 0;
+        for (const oldQ of oldQuestions) {
+            if (!existingQuestionTexts.has(oldQ.pergunta_texto)) {
+                combinedQuestions.push(oldQ);
+                migratedCount++;
+            }
+        }
+        
+        console.log(`Total de perguntas após a fusão: ${combinedQuestions.length}`);
+
+        todasAsPerguntas = combinedQuestions; // Atualiza o estado global
+        await setDoc(quizDocRef, { tema: "Banco de Perguntas Principal", perguntas: todasAsPerguntas });
+        await setDoc(migrationFlagRef, { completed: true });
+
+        window.showNotification(`Migração concluída! ${migratedCount} perguntas foram adicionadas.`, false);
+        console.log("Migração concluída com sucesso! Recarregue a página se necessário.");
+    };
+
+    const carregarDadosIniciais = async () => {
+        listaPerguntasContainer.innerHTML = '<p class="text-gray-500">A verificar e carregar perguntas...</p>';
+        await runMigration(); // Executa a migração PRIMEIRO
+        
+        // Agora carrega os dados do banco de perguntas já migrado
+        const docSnap = await getDoc(quizDocRef);
+        if (docSnap.exists() && docSnap.data().perguntas) {
+            todasAsPerguntas = docSnap.data().perguntas;
+        } else {
+            todasAsPerguntas = [];
+        }
+        renderListaDePerguntas();
+        resetarFormulario();
+    };
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const perguntaTexto = perguntaTextoInput.value.trim();
+        if (!perguntaTexto) { return window.showNotification("O texto da pergunta não pode estar vazio.", true); }
         
         const novaPergunta = { pergunta_texto: perguntaTexto, opcoes: [] };
         opcoesContainer.querySelectorAll('.repeater-item-opcao').forEach(item => {
             const textoOpcao = item.querySelector('[data-field="texto"]').value.trim();
             if (textoOpcao) {
-                novaPergunta.opcoes.push({
-                    texto: textoOpcao,
-                    correta: item.querySelector('[data-field="correta"]').checked
-                });
+                novaPergunta.opcoes.push({ texto: textoOpcao, correta: item.querySelector('[data-field="correta"]').checked });
             }
         });
 
         if (novaPergunta.opcoes.length < 2 || !novaPergunta.opcoes.some(o => o.correta)) {
-            window.showNotification("A pergunta deve ter pelo menos 2 opções e uma delas marcada como correta.", true);
-            return;
+            return window.showNotification("A pergunta deve ter pelo menos 2 opções e uma correta.", true);
         }
 
         const index = parseInt(perguntaIndexInput.value, 10);
         if (index > -1) {
-            // Editando pergunta existente
             todasAsPerguntas[index] = novaPergunta;
         } else {
-            // Adicionando nova pergunta
             todasAsPerguntas.push(novaPergunta);
         }
-
         await salvarBancoDePerguntas();
         resetarFormulario();
     });
 
     addOpcaoButton.addEventListener('click', () => addOpcaoItem());
     cancelButton.addEventListener('click', resetarFormulario);
-
-    // --- INICIALIZAÇÃO ---
-    carregarBancoDePerguntas();
+    
+    carregarDadosIniciais();
 }
 </script>
