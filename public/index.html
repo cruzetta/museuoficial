@@ -2,6 +2,7 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <!-- Viewport é essencial para o design responsivo funcionar corretamente -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Museu Itinerante do Videojogo - Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -10,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Lora&family=Orbitron&family=Press+Start+2P&display=swap" rel="stylesheet">
-
 
     <style>
         :root {
@@ -32,7 +32,17 @@
             font-family: 'Inter', sans-serif;
             background-color: #FFFFFF;
             color: var(--color-text);
-            overflow-x: hidden;
+            overflow-x: hidden; /* Previne scroll horizontal */
+        }
+        
+        /* MUDANÇA: Classe para travar o scroll quando o menu mobile estiver aberto */
+        body.overflow-hidden-mobile {
+            overflow: hidden;
+        }
+        @media (min-width: 768px) {
+             body.overflow-hidden-mobile {
+                overflow: auto; /* Garante que em desktop o bloqueio não se aplique */
+            }
         }
 
         h1, h2, h3, .nav-link {
@@ -41,13 +51,22 @@
         }
         
         .section-title {
-            font-size: 2.5rem; /* text-4xl */
-            font-weight: 800; /* Mais peso para destaque */
+            /* MUDANÇA: Tamanho da fonte agora é responsivo */
+            font-size: 2rem; /* Tamanho base para mobile */
+            font-weight: 800;
             text-align: center;
-            margin-bottom: 4rem; /* Mais espaço abaixo do título */
+            margin-bottom: 3rem; /* Menos margem em mobile */
             position: relative;
             color: var(--color-dark);
-            padding-bottom: 1.5rem;
+            padding-bottom: 1rem;
+        }
+        /* MUDANÇA: Media query para aumentar a fonte e margem em telas maiores */
+        @media (min-width: 768px) {
+            .section-title {
+                font-size: 2.5rem; /* text-4xl do Tailwind */
+                margin-bottom: 4rem;
+                padding-bottom: 1.5rem;
+            }
         }
 
         .section-title::after {
@@ -63,7 +82,13 @@
         }
         
         .section-padding {
-            padding: 5rem 1rem;
+            /* MUDANÇA: Padding responsivo */
+            padding: 3.5rem 1rem; /* Padding para mobile */
+        }
+        @media (min-width: 768px) {
+            .section-padding {
+                padding: 5rem 1rem; /* Padding para desktop */
+            }
         }
 
         .content-card {
@@ -132,9 +157,15 @@
         }
         
         #header-logo {
-            height: 100px;
+            /* MUDANÇA: Altura do logo responsiva */
+            height: 60px; /* Logo menor em mobile */
             width: auto;
             transition: transform 0.3s ease;
+        }
+        @media (min-width: 768px) {
+            #header-logo {
+                height: 80px; /* Tamanho maior para desktop */
+            }
         }
         #header-logo:hover {
             transform: scale(1.05);
@@ -162,7 +193,12 @@
         }
         .about-slide {
             flex: 0 0 100%;
-            padding: 1rem;
+            padding: 0 0.5rem; /* Menor padding lateral em mobile */
+        }
+         @media (min-width: 768px) {
+            .about-slide {
+                padding: 1rem;
+            }
         }
         .about-slide-content {
             background-color: var(--color-dark-gray);
@@ -190,22 +226,38 @@
             }
         }
         .about-slide-text-content {
-            padding: 2.5rem;
+            padding: 1.5rem; /* Menos padding em mobile */
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
+         @media (min-width: 768px) {
+             .about-slide-text-content {
+                padding: 2.5rem;
+            }
+        }
         .about-slide-title {
-            font-size: 1.75rem;
+            font-size: 1.5rem; /* Título menor em mobile */
             font-weight: 700;
             color: var(--color-primary);
             margin-bottom: 1rem;
         }
+        @media (min-width: 768px) {
+             .about-slide-title {
+                font-size: 1.75rem;
+            }
+        }
         .about-slide-text {
             font-family: 'Lora', serif;
-            font-size: 1.125rem;
+            font-size: 1rem; /* Texto menor em mobile */
             color: #d1d5db;
-            line-height: 1.8;
+            line-height: 1.7;
+        }
+        @media (min-width: 768px) {
+             .about-slide-text {
+                font-size: 1.125rem;
+                line-height: 1.8;
+            }
         }
         .about-timeline-navigation {
             display: flex;
@@ -218,12 +270,19 @@
             background-color: #fff;
             border: 2px solid var(--border-color);
             color: var(--color-text-light);
-            width: 3.5rem;
-            height: 3.5rem;
+            width: 3rem; /* Botões um pouco menores */
+            height: 3rem;
             border-radius: 50%;
-            font-size: 1.25rem;
+            font-size: 1rem;
             transition: all 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        @media (min-width: 768px) {
+            .about-timeline-nav-button {
+                width: 3.5rem;
+                height: 3.5rem;
+                font-size: 1.25rem;
+            }
         }
         .about-timeline-nav-button:hover:not(:disabled) {
             border-color: var(--color-primary);
@@ -270,10 +329,15 @@
         .timeline-generation-card {
             flex: 0 0 100%;
             max-width: 100%;
-            padding: 1rem;
+            padding: 0.5rem;
             opacity: 0.5;
             transform: scale(0.85);
             transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+         @media (min-width: 768px) {
+            .timeline-generation-card {
+                padding: 1rem;
+            }
         }
         .timeline-generation-card.active {
             opacity: 1;
@@ -304,27 +368,48 @@
             }
         }
         .timeline-text-content {
-            padding: 2rem;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
+        @media (min-width: 768px) {
+            .timeline-text-content {
+                padding: 2rem;
+            }
+        }
         .timeline-generation-title {
-            font-size: 1.125rem;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--color-primary);
         }
+         @media (min-width: 768px) {
+            .timeline-generation-title {
+                font-size: 1.125rem;
+            }
+        }
         .timeline-generation-name {
-            font-size: 2rem;
+            font-size: 1.5rem; /* Nome da geração menor em mobile */
             font-weight: 900;
             margin-bottom: 1rem;
         }
+        @media (min-width: 768px) {
+            .timeline-generation-name {
+                font-size: 2rem;
+            }
+        }
         .timeline-generation-description {
             font-family: 'Lora', serif;
-            font-size: 1rem;
-            line-height: 1.7;
+            font-size: 0.9rem;
+            line-height: 1.6;
             color: #d1d5db;
             margin-bottom: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .timeline-generation-description {
+                font-size: 1rem;
+                line-height: 1.7;
+            }
         }
         .timeline-generation-consoles {
             font-size: 0.875rem;
@@ -335,7 +420,12 @@
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            margin-top: 2.5rem;
+            margin-top: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .timeline-navigation {
+                 margin-top: 2.5rem;
+            }
         }
         .timeline-nav-button {
             background-color: transparent;
@@ -376,17 +466,15 @@
         .marquee-container {
             overflow: hidden;
             position: relative;
-            cursor: grab; /* Mão para indicar que é arrastável */
-            -webkit-user-select: none; /* Previne seleção de texto no Chrome/Safari */
-            -moz-user-select: none; /* Previne seleção de texto no Firefox */
-            -ms-user-select: none; /* Previne seleção de texto no IE */
-            user-select: none; /* Previne seleção de texto */
-            /* Efeito de fade nas laterais para suavizar a entrada e saída dos itens */
+            cursor: grab;
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
             mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
         }
         
-        /* Quando o usuário está arrastando */
         .marquee-container.grabbing {
             cursor: grabbing;
         }
@@ -394,26 +482,37 @@
         .marquee-track {
             display: flex;
             width: fit-content;
-            will-change: transform; /* Otimização para a animação de transform */
-            /* A animação via @keyframes foi removida para dar lugar ao controle por JavaScript */
+            will-change: transform;
         }
         
         .marquee-item {
             flex-shrink: 0;
-            width: 300px;
+            /* MUDANÇA: Largura responsiva para os itens do acervo */
+            width: 80vw; /* Ocupa 80% da largura da tela do celular */
+            max-width: 300px; /* Mantém um tamanho máximo em telas maiores */
             padding: 0 0.75rem;
         }
-        /* =================================================================== */
-
+        @media (min-width: 640px) { /* sm breakpoint do Tailwind */
+             .marquee-item {
+                width: 40vw; /* Mostra mais itens em telas um pouco maiores */
+            }
+        }
+         @media (min-width: 1024px) { /* lg breakpoint */
+             .marquee-item {
+                width: 300px; /* Volta a um valor mais fixo em telas grandes */
+            }
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <header class="sticky top-0 z-50 shadow-lg" style="background-color: var(--color-dark);">
+    <!-- MUDANÇA: Header com altura responsiva (via classes Tailwind) -->
+    <header class="sticky top-0 z-50 shadow-lg h-20 md:h-24" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-4 sm:px-6">
-            <div class="flex justify-between items-center h-24">
+            <!-- MUDANÇA: Altura do flex container ajustada para corresponder ao header -->
+            <div class="flex justify-between items-center h-20 md:h-24">
                 <a href="#home-carousel-container" class="flex-shrink-0">
-                    <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+                    <img id="header-logo" src="https://firebasestorage.googleapis.com/v0/b/museu-cca6d.appspot.com/o/layout%2FLOGO%20MUSEU%20DO%20VIDEOGAME%20LETRAS%20BRANCAS%20(1).png?alt=media&token=381f855a-3502-4859-9065-9158356f141a" alt="Logo Museu do Videogame" onerror="this.onerror=null;this.src='https://placehold.co/200x80/1a1a1a/ffffff?text=Logo+Museu';">
                 </a>
                 <nav id="desktop-nav" class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm">
                     <a href="#sobre-nos" class="nav-link">Sobre Nós</a>
@@ -421,14 +520,15 @@
                     <a href="#noticias" class="nav-link">Notícias</a>
                     <a href="#acervos" class="nav-link">Acervos</a>
                     <a href="#timeline-geracoes" class="nav-link">Gerações</a>
-<a href="quiz_main_page.html" class="nav-link">Quizzes</a>
+                    <a href="quiz_main_page.html" class="nav-link">Quizzes</a>
                 </nav>
                 <button id="mobile-menu-button" class="text-2xl text-white md:hidden"><i class="fa-solid fa-bars"></i></button>
             </div>
         </div>
     </header>
     
-    <div id="mobile-menu" class="hidden fixed top-24 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--color-dark);">
+    <!-- MUDANÇA: Posição do menu ajustada para a nova altura do header -->
+    <div id="mobile-menu" class="hidden fixed top-20 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--color-dark);">
         <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Sobre Nós</a>
         <a href="#itinerario" class="block text-center py-3 text-lg nav-link">Itinerário</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
@@ -441,6 +541,7 @@
 
         <section id="home-carousel-container" class="relative w-full h-[60vh] md:h-[85vh] bg-gray-900 text-white overflow-hidden shadow-lg">
             <div id="carousel-slides" class="relative w-full h-full">
+                <!-- Indicador de carregamento -->
                 <div class="w-full h-full flex items-center justify-center">
                     <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -563,7 +664,7 @@
             </div>
 
             <div id="quizzes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <div id="quizzes-loader" class="text-center py-20">
+                <div id="quizzes-loader" class="text-center py-20 col-span-full">
                     <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
                     <p class="mt-4 text-xl text-gray-600">A carregar quizzes...</p>
                 </div>
@@ -589,6 +690,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, getDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Configuração do Firebase
         var firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
@@ -606,9 +708,17 @@
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         const internalNavLinks = document.querySelectorAll('a[href^="#"]');
-        mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        const body = document.body;
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            // MUDANÇA: Trava/Destrava o scroll do body
+            body.classList.toggle('overflow-hidden-mobile');
+        });
+
         internalNavLinks.forEach(link => {
             link.addEventListener('click', (e) => {
+                // Apenas para links internos da página
                 if (link.getAttribute('href').startsWith('#')) {
                     e.preventDefault();
                     const targetId = link.getAttribute('href');
@@ -619,8 +729,11 @@
                         const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
                         window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                     }
+                    // Fecha o menu mobile se estiver aberto
                     if (!mobileMenu.classList.contains('hidden')) {
                         mobileMenu.classList.add('hidden');
+                        // MUDANÇA: Garante que o scroll seja destravado ao clicar num link
+                        body.classList.remove('overflow-hidden-mobile');
                     }
                 }
             });
@@ -633,7 +746,7 @@
             return `
 <a href="noticia.html?id=${doc.id}" class="content-card group">
     <div class="block h-56 overflow-hidden rounded-t-lg">
-        <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.titulo}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+        <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.titulo}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" onerror="this.onerror=null;this.src='https://placehold.co/400x300/e0e0e0/333333?text=Erro+Imagem';">
     </div>
     <div class="p-5 flex flex-col flex-grow">
          <div class="mb-2">
@@ -641,7 +754,7 @@
              ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
              ${dataFormatada ? `<span class="text-xs text-text-light">${dataFormatada}</span>` : ''}
          </div>
-         <h3 class="text-2xl font-bold mb-3 text-color-dark group-hover:text-primary-color transition-colors">${data.titulo}</h3>
+         <h3 class="text-xl font-bold mb-3 text-color-dark group-hover:text-primary-color transition-colors">${data.titulo}</h3>
          <p class="text-sm text-text-light mb-4 flex-grow">${data.subtitulo || ''}</p>
          <div class="mt-auto pt-4 border-t border-border-color flex justify-end items-center">
              <span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span>
@@ -656,7 +769,7 @@
                 <a href="item_detalhe.html?id=${doc.id}" class="block h-full group" draggable="false">
                     <div class="bg-white rounded-lg shadow-md p-4 h-full flex flex-col items-center justify-center text-center transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-2">
                         <div class="h-48 flex items-center justify-center mb-4">
-                            <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" draggable="false">
+                            <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" draggable="false" onerror="this.onerror=null;this.src='https://placehold.co/200x200/e0e0e0/333333?text=Erro+Imagem';">
                         </div>
                         <h3 class="text-md font-bold text-gray-800">${data.nome}</h3>
                     </div>
@@ -671,7 +784,10 @@
             const collectionRef = q || collection(db, `/artifacts/${appId}/public/data/${name}`);
             onSnapshot(collectionRef, (snapshot) => {
                 container.innerHTML = snapshot.empty ? `<p class="text-gray-500 text-center col-span-full">Nenhum item encontrado.</p>` : snapshot.docs.map(renderer).join('');
-                if (onRender) onRender();
+                if (onRender) onRender(snapshot);
+            }, (error) => {
+                console.error(`Erro ao carregar a coleção ${name}:`, error);
+                container.innerHTML = `<p class="text-red-500 text-center col-span-full">Ocorreu um erro ao carregar os dados.</p>`;
             });
         };
         
@@ -711,12 +827,26 @@
                     ? `<video id="video-${index}" class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" muted playsinline loop></video>`
                     : `<img class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" alt="${titulo || 'Slide do Carrossel'}">`;
 
-                let titleStyles = `font-family: ${tituloEstilo?.fontFamily || 'Inter, sans-serif'}; font-size: ${tituloEstilo?.fontSize || 36}px; color: ${tituloEstilo?.color || '#FFFFFF'}; font-weight: ${tituloEstilo?.fontWeight || 'normal'}; line-height: ${tituloEstilo?.lineHeight || 1.2}; letter-spacing: ${tituloEstilo?.letterSpacing || 0}px; text-transform: ${tituloEstilo?.textTransform || 'none'};`;
-                if (tituloEstilo?.textShadow && tituloEstilo.textShadow !== 'none') {
-                    titleStyles += `text-shadow: ${tituloEstilo.textShadow};`;
-                }
+                // Aplica estilos com fallbacks seguros
+                const safeStyle = (obj, prop, fallback) => (obj && obj[prop]) ? obj[prop] : fallback;
+                let titleStyles = `
+                    font-family: ${safeStyle(tituloEstilo, 'fontFamily', 'Inter, sans-serif')};
+                    font-size: clamp(1.5rem, 5vw, ${safeStyle(tituloEstilo, 'fontSize', 36)}px);
+                    color: ${safeStyle(tituloEstilo, 'color', '#FFFFFF')};
+                    font-weight: ${safeStyle(tituloEstilo, 'fontWeight', 'normal')};
+                    line-height: ${safeStyle(tituloEstilo, 'lineHeight', 1.2)};
+                    letter-spacing: ${safeStyle(tituloEstilo, 'letterSpacing', 0)}px;
+                    text-transform: ${safeStyle(tituloEstilo, 'textTransform', 'none')};
+                    text-shadow: ${safeStyle(tituloEstilo, 'textShadow', 'none')};
+                `;
 
-                let titleContainerStyles = `position: absolute; transform: translate(-50%, -50%); left: ${tituloPosicao?.x || 50}%; top: ${tituloPosicao?.y || 50}%;`;
+                let titleContainerStyles = `
+                    position: absolute;
+                    transform: translate(-50%, -50%);
+                    left: ${safeStyle(tituloPosicao, 'x', 50)}%;
+                    top: ${safeStyle(tituloPosicao, 'y', 50)}%;
+                    width: 90%;
+                `;
                 
                 let buttonHTML = '';
                 if (linkTexto && linkUrl) {
@@ -729,7 +859,7 @@
                     ${mediaElement}
                     <div class="absolute inset-0 bg-black bg-opacity-40"></div>
                     <div class="relative z-10 h-full w-full">
-                        <div style="${titleContainerStyles}" class="text-center">
+                        <div style="${titleContainerStyles}" class="text-center p-4">
                             ${titulo ? `<h2 style="${titleStyles}">${titulo.replace(/\n/g, '<br>')}</h2>` : ''}
                         </div>
                         ${buttonHTML}
@@ -789,10 +919,6 @@
                 const querySnapshot = await getDocs(q);
                 slidesData = querySnapshot.docs.map(doc => doc.data());
                 
-                if (slidesData.length > 0 && slidesData[0].linkUrl && slidesData[0].linkUrl.startsWith('#')) {
-                    slidesData[0].linkUrl = '#sobre-nos';
-                }
-
                 if (slidesData.length === 0) {
                     slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Nenhum slide encontrado.</p></div>';
                     return;
@@ -810,7 +936,7 @@
                     prevButton.classList.remove('hidden');
                     nextButton.classList.remove('hidden');
                     prevButton.addEventListener('click', () => goToSlide((currentIndex - 1 + slidesData.length) % slidesData.length));
-                    nextButton.addEventListener('click', () => goToSlide((currentIndex + 1) % slidesData.length));
+                    nextButton.addEventListener('click', advanceAndReset);
                 }
 
                 goToSlide(0);
@@ -922,12 +1048,7 @@
                     return;
                 }
 
-                const eventos = {
-                    atual: [],
-                    proximo: [],
-                    passado: []
-                };
-
+                const eventos = { atual: [], proximo: [], passado: [] };
                 const hoje = new Date();
                 hoje.setHours(0, 0, 0, 0);
 
@@ -937,7 +1058,6 @@
                     const fim = data.data_fim?.toDate();
 
                     let statusCalculado = 'proximo';
-
                     if (inicio && fim) {
                         const fimDoDia = new Date(fim);
                         fimDoDia.setHours(23, 59, 59, 999);
@@ -991,26 +1111,19 @@
                 }
 
                 let html = '';
-
                 if (eventos.atual.length > 0) {
                     html += '<h3 class="text-xl font-bold border-b pb-2 mb-4 text-green-600">Acontecendo Agora</h3>';
                     html += eventos.atual.map(e => createEventHTML(e, 'fa-map-marker-alt', 'bg-green-500')).join('<hr class="my-4">');
                 }
-                
                 if (eventos.proximo.length > 0) {
                     html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-yellow-600">Próximos Destinos</h3>';
                     html += eventos.proximo.slice(0, 1).map(e => createEventHTML(e, 'fa-flag-checkered', 'bg-yellow-500')).join('<hr class="my-4">');
                 }
-
                 if (eventos.passado.length > 0) {
                     html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-gray-500">Último Local Visitado</h3>';
                     html += eventos.passado.slice(0, 1).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">');
                 }
-                
-                html += `<div class="mt-8 text-center">
-                                      <a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a>
-                                         </div>`;
-
+                html += `<div class="mt-8 text-center"><a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a></div>`;
                 container.innerHTML = html;
 
             }, (error) => {
@@ -1078,8 +1191,8 @@
 
             const goToGeneration = (index) => {
                 currentIndex = index;
-                const track = document.querySelector('.timeline-track');
-                const dots = document.querySelectorAll('.timeline-dot');
+                const track = document.querySelector('#timeline-interactive-container .timeline-track');
+                const dots = document.querySelectorAll('#timeline-interactive-container .timeline-dot');
                 const cards = document.querySelectorAll('.timeline-generation-card');
 
                 if (track) track.style.transform = `translateX(-${currentIndex * 100}%)`;
@@ -1114,13 +1227,13 @@
             });
         };
 
-        // --- NOVA LÓGICA PARA O CARROSSEL DE ACERVOS AMBULANTE E INTERATIVO ---
+        // --- LÓGICA PARA O CARROSSEL DE ACERVOS INTERATIVO ---
         const initializeDraggableMarquee = () => {
             const container = document.querySelector('.marquee-container');
             const track = document.getElementById('acervos-container');
             if (!container || !track || track.children.length === 0) return;
 
-            const speedPxPerFrame = 0.5; // Velocidade do scroll automático (ajuste conforme necessário)
+            const speedPxPerFrame = 0.5;
             
             let isDragging = false;
             let startX;
@@ -1128,7 +1241,6 @@
             let animationFrameId;
             let preventClick = false;
 
-            // Remove a animação CSS para que o JS tenha controle total.
             track.style.animation = 'none';
 
             const getTranslateX = () => {
@@ -1171,8 +1283,9 @@
 
             const dragMove = (e) => {
                 if (!isDragging) return;
-                preventClick = true; // Se o mouse/dedo se move, é um arrasto
+                preventClick = true; 
 
+                // Previne o scroll da página no mobile enquanto arrasta o carrossel
                 if (e.type === 'touchmove') {
                     e.preventDefault();
                 }
@@ -1202,7 +1315,7 @@
             container.addEventListener('mousedown', dragStart);
             window.addEventListener('mousemove', dragMove);
             window.addEventListener('mouseup', dragEnd);
-            window.addEventListener('mouseleave', () => { if (isDragging) dragEnd(); }); // Garante que solte se sair da janela
+            window.addEventListener('mouseleave', () => { if (isDragging) dragEnd(); });
 
             // Eventos de Toque
             container.addEventListener('touchstart', dragStart, { passive: true });
@@ -1212,11 +1325,14 @@
             loop();
         };
 
-        const duplicateAcervosForMarquee = () => {
+        const duplicateAcervosForMarquee = (snapshot) => {
             const container = document.getElementById('acervos-container');
-            if (container && container.children.length > 0) {
-                container.innerHTML += container.innerHTML;
-                // Chama a nova função depois de duplicar o conteúdo
+            if (container && snapshot.docs.length > 0) {
+                // Duplica apenas se houver itens suficientes para preencher a tela
+                const itemWidth = container.querySelector('.marquee-item')?.offsetWidth || 300;
+                if (snapshot.docs.length * itemWidth > window.innerWidth) {
+                    container.innerHTML += container.innerHTML;
+                }
                 initializeDraggableMarquee();
             }
         };
@@ -1253,9 +1369,7 @@
                     if (entry.isIntersecting) {
                         const id = entry.target.getAttribute('id');
                         navLinks.forEach(link => {
-                            if (link.getAttribute('href').startsWith('#')) {
-                                link.classList.remove('active');
-                            }
+                            link.classList.remove('active');
                             if (link.getAttribute('href') === `#${id}`) {
                                 link.classList.add('active');
                             }
@@ -1269,146 +1383,119 @@
             });
         };
 
-        // --- INITIALIZE ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeCarousel();
-            initializeAboutTimeline();
-            initializeItinerario();
-            initializeInteractiveTimeline();
-            setupScrollAnimation();
-            initializeActiveNavOnScroll();
-            
-            loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
-            
-            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome"), limit(15)), duplicateAcervosForMarquee);
-        });
-
         // --- LÓGICA DE CARREGAMENTO DOS QUIZZES ---
-         // --- STATE & DOM ELEMENTS ---
-        const state = { items: [], filteredItems: [] };
-        const quizzesGrid = document.getElementById('quizzes-grid');
-        const quizzesLoader = document.getElementById('quizzes-loader');
-        const searchInput = document.getElementById('searchInput');
-        const sortSelect = document.getElementById('sort-select');
-        const autocompleteResults = document.getElementById('autocomplete-results');
+        const initializeQuizzes = () => {
+            const state = { items: [], filteredItems: [] };
+            const quizzesGrid = document.getElementById('quizzes-grid');
+            const quizzesLoader = document.getElementById('quizzes-loader');
+            const searchInput = document.getElementById('searchInput');
+            const sortSelect = document.getElementById('sort-select');
+            const autocompleteResults = document.getElementById('autocomplete-results');
 
-        // --- FUNÇÃO DE RENDERIZAÇÃO ATUALIZADA PARA QUIZZES ---
-        function renderQuizzes() {
-            quizzesGrid.innerHTML = '';
-            if (state.filteredItems.length === 0 && quizzesLoader.style.display === 'none') {
-                quizzesGrid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-search-minus text-4xl text-gray-400"></i><p class="mt-4 text-xl text-gray-600">Nenhum quiz encontrado.</p></div>`;
-                return;
-            }
+            if (!quizzesGrid) return; // Sai se a seção de quizzes não estiver na página
 
-            state.filteredItems.forEach(item => {
-                const cardLink = document.createElement('a');
-                cardLink.href = `play-quiz.html?id=${item.id}`; // Link para a página de jogar
-                cardLink.className = 'gallery-card';
-                cardLink.innerHTML = `
-                    <div class="h-48 flex items-center justify-center bg-gray-800 text-amber-400">
-                        <i class="fas fa-brain text-6xl"></i>
-                    </div>
-                    <div class="p-4 flex flex-col flex-grow">
-                        <h3 class="text-lg font-semibold mb-2 text-gray-800">${item.tema || 'Quiz sem tema'}</h3>
-                        <div class="text-sm text-gray-600 mb-4">
-                            <p><i class="fa-solid fa-list-check w-5 text-gray-400"></i> ${item.perguntas?.length || 0} perguntas</p>
-                        </div>
-                        <div class="btn btn-primary w-full mt-auto">
-                            Jogar Quiz
-                            <i class="fas fa-play ml-2"></i>
-                        </div>
-                    </div>
-                `;
-                quizzesGrid.appendChild(cardLink);
-            });
-        }
-
-        // --- FUNÇÕES DE PROCESSAMENTO DE DADOS ATUALIZADAS ---
-        function applyFiltersAndSort() {
-            const searchTerm = searchInput.value.trim().toLowerCase();
-            const sortValue = sortSelect.value;
-            
-            let tempItems = state.items;
-
-            if (searchTerm) {
-                tempItems = tempItems.filter(item => item.tema && item.tema.toLowerCase().includes(searchTerm));
-            }
-
-            tempItems.sort((a, b) => {
-                const [field, direction] = sortValue.split('-');
-                
-                if (field === 'tema') {
-                    const valA = a.tema || '';
-                    const valB = b.tema || '';
-                    return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            function renderQuizzes() {
+                quizzesGrid.innerHTML = '';
+                if (state.filteredItems.length === 0) {
+                    quizzesGrid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-search-minus text-4xl text-gray-400"></i><p class="mt-4 text-xl text-gray-600">Nenhum quiz encontrado.</p></div>`;
+                    return;
                 }
-                
-                if (field === 'perguntas') {
-                    const valA = a.perguntas?.length || 0;
-                    const valB = b.perguntas?.length || 0;
-                    return direction === 'asc' ? valA - valB : valB - valA;
-                }
-                
-                return 0;
-            });
 
-            state.filteredItems = tempItems;
-            renderQuizzes();
-            updateAutocomplete(searchTerm);
-        }
-        
-        function updateAutocomplete(query) {
-             autocompleteResults.innerHTML = '';
-             if (query.length < 1) {
-                 autocompleteResults.classList.add('hidden');
-                 return;
-             }
-
-             const matchedItems = state.items
-                 .filter(item => item.tema && item.tema.toLowerCase().includes(query))
-                 .slice(0, 5);
-
-             if (matchedItems.length > 0) {
-                 matchedItems.forEach(item => {
-                     const suggestionDiv = document.createElement('div');
-                     suggestionDiv.className = 'autocomplete-item';
-                     suggestionDiv.textContent = item.tema;
-                     suggestionDiv.onclick = () => {
-                         searchInput.value = item.tema;
-                         autocompleteResults.classList.add('hidden');
-                         applyFiltersAndSort();
-                     };
-                     autocompleteResults.appendChild(suggestionDiv);
-                 });
-                 autocompleteResults.classList.remove('hidden');
-             } else {
-                 autocompleteResults.classList.add('hidden');
-             }
-         }
-        
-        // --- FUNÇÃO DE CARREGAMENTO DE DADOS ATUALIZADA ---
-        function carregarQuizzes() {
-            try {
-                const quizzesRef = collection(db, `/artifacts/${appId}/public/data/quizzes`);
-                onSnapshot(query(quizzesRef), (querySnapshot) => {
-                    state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    if (quizzesLoader) quizzesLoader.style.display = 'none';
-                    applyFiltersAndSort(); 
-                }, (error) => {
-                    console.error("Erro ao carregar os quizzes:", error);
-                    quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar os quizzes.</p>`;
+                state.filteredItems.forEach(item => {
+                    const cardLink = document.createElement('a');
+                    cardLink.href = `play-quiz.html?id=${item.id}`;
+                    cardLink.className = 'content-card group'; // Reutilizando a classe .content-card
+                    cardLink.innerHTML = `
+                        <div class="h-48 flex items-center justify-center bg-gray-800 text-amber-400 rounded-t-lg">
+                            <i class="fas fa-brain text-6xl"></i>
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-800">${item.tema || 'Quiz sem tema'}</h3>
+                            <div class="text-sm text-gray-600 mb-4">
+                                <p><i class="fa-solid fa-list-check w-5 text-gray-400"></i> ${item.perguntas?.length || 0} perguntas</p>
+                            </div>
+                            <div class="btn btn-primary w-full mt-auto">
+                                Jogar Quiz
+                                <i class="fas fa-play ml-2"></i>
+                            </div>
+                        </div>
+                    `;
+                    quizzesGrid.appendChild(cardLink);
                 });
-            } catch (error) {
-                console.error("Erro ao configurar o listener dos quizzes:", error);
-                if (quizzesLoader) quizzesLoader.style.display = 'none';
-                quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Ocorreu um erro inesperado.</p>`;
             }
-        }
-        
-        // --- EVENT LISTENERS ---
-        document.addEventListener('DOMContentLoaded', () => {
-            carregarQuizzes();
+
+            function applyFiltersAndSort() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                const sortValue = sortSelect.value;
+                
+                let tempItems = [...state.items];
+
+                if (searchTerm) {
+                    tempItems = tempItems.filter(item => item.tema && item.tema.toLowerCase().includes(searchTerm));
+                }
+
+                tempItems.sort((a, b) => {
+                    const [field, direction] = sortValue.split('-');
+                    
+                    if (field === 'tema') {
+                        const valA = a.tema || '';
+                        const valB = b.tema || '';
+                        return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    }
+                    
+                    if (field === 'perguntas') {
+                        const valA = a.perguntas?.length || 0;
+                        const valB = b.perguntas?.length || 0;
+                        return direction === 'asc' ? valA - valB : valB - valA;
+                    }
+                    
+                    return 0;
+                });
+
+                state.filteredItems = tempItems;
+                renderQuizzes();
+                updateAutocomplete(searchTerm);
+            }
             
+            function updateAutocomplete(query) {
+                 autocompleteResults.innerHTML = '';
+                 if (query.length < 1) {
+                     autocompleteResults.classList.add('hidden');
+                     return;
+                 }
+
+                 const matchedItems = state.items
+                     .filter(item => item.tema && item.tema.toLowerCase().includes(query))
+                     .slice(0, 5);
+
+                 if (matchedItems.length > 0) {
+                     matchedItems.forEach(item => {
+                         const suggestionDiv = document.createElement('div');
+                         suggestionDiv.className = 'p-2 hover:bg-gray-100 cursor-pointer';
+                         suggestionDiv.textContent = item.tema;
+                         suggestionDiv.onclick = () => {
+                             searchInput.value = item.tema;
+                             autocompleteResults.classList.add('hidden');
+                             applyFiltersAndSort();
+                         };
+                         autocompleteResults.appendChild(suggestionDiv);
+                     });
+                     autocompleteResults.classList.remove('hidden');
+                 } else {
+                     autocompleteResults.classList.add('hidden');
+                 }
+            }
+            
+            const q = query(collection(db, `/artifacts/${appId}/public/data/quizzes`), limit(4));
+            onSnapshot(q, (querySnapshot) => {
+                state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (quizzesLoader) quizzesLoader.style.display = 'none';
+                applyFiltersAndSort(); 
+            }, (error) => {
+                console.error("Erro ao carregar os quizzes:", error);
+                quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar os quizzes.</p>`;
+            });
+
             searchInput.addEventListener('input', () => applyFiltersAndSort());
             sortSelect.addEventListener('change', applyFiltersAndSort);
 
@@ -1417,7 +1504,23 @@
                     autocompleteResults.classList.add('hidden');
                 }
             });
+        }
+
+        // --- INITIALIZE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCarousel();
+            initializeAboutTimeline();
+            initializeItinerario();
+            initializeInteractiveTimeline();
+            setupScrollAnimation();
+            initializeActiveNavOnScroll();
+            initializeQuizzes();
+            
+            // Carrega notícias e acervos
+            loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
+            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome"), limit(15)), duplicateAcervosForMarquee);
         });
+
     </script>
     
 </body>
