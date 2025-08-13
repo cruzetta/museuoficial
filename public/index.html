@@ -35,7 +35,7 @@
             overflow-x: hidden; /* Previne scroll horizontal */
         }
         
-        /* MUDANÇA: Classe para travar o scroll quando o menu mobile estiver aberto */
+        /* Classe para travar o scroll quando o menu mobile estiver aberto */
         body.overflow-hidden-mobile {
             overflow: hidden;
         }
@@ -51,7 +51,7 @@
         }
         
         .section-title {
-            /* MUDANÇA: Tamanho da fonte agora é responsivo */
+            /* Tamanho da fonte agora é responsivo */
             font-size: 2rem; /* Tamanho base para mobile */
             font-weight: 800;
             text-align: center;
@@ -60,7 +60,7 @@
             color: var(--color-dark);
             padding-bottom: 1rem;
         }
-        /* MUDANÇA: Media query para aumentar a fonte e margem em telas maiores */
+        /* Media query para aumentar a fonte e margem em telas maiores */
         @media (min-width: 768px) {
             .section-title {
                 font-size: 2.5rem; /* text-4xl do Tailwind */
@@ -82,7 +82,7 @@
         }
         
         .section-padding {
-            /* MUDANÇA: Padding responsivo */
+            /* Padding responsivo */
             padding: 3.5rem 1rem; /* Padding para mobile */
         }
         @media (min-width: 768px) {
@@ -157,7 +157,7 @@
         }
         
         #header-logo {
-            /* MUDANÇA: Altura do logo responsiva */
+            /* Altura do logo responsiva */
             height: 60px; /* Logo menor em mobile */
             width: auto;
             transition: transform 0.3s ease;
@@ -231,8 +231,8 @@
             flex-direction: column;
             justify-content: center;
         }
-         @media (min-width: 768px) {
-             .about-slide-text-content {
+          @media (min-width: 768px) {
+              .about-slide-text-content {
                 padding: 2.5rem;
             }
         }
@@ -243,7 +243,7 @@
             margin-bottom: 1rem;
         }
         @media (min-width: 768px) {
-             .about-slide-title {
+              .about-slide-title {
                 font-size: 1.75rem;
             }
         }
@@ -254,7 +254,7 @@
             line-height: 1.7;
         }
         @media (min-width: 768px) {
-             .about-slide-text {
+              .about-slide-text {
                 font-size: 1.125rem;
                 line-height: 1.8;
             }
@@ -383,7 +383,7 @@
             font-weight: 700;
             color: var(--color-primary);
         }
-         @media (min-width: 768px) {
+          @media (min-width: 768px) {
             .timeline-generation-title {
                 font-size: 1.125rem;
             }
@@ -487,7 +487,7 @@
         
         .marquee-item {
             flex-shrink: 0;
-            /* MUDANÇA: Largura responsiva para os itens do acervo */
+            /* Largura responsiva para os itens do acervo */
             width: 80vw; /* Ocupa 80% da largura da tela do celular */
             max-width: 300px; /* Mantém um tamanho máximo em telas maiores */
             padding: 0 0.75rem;
@@ -502,14 +502,45 @@
                 width: 300px; /* Volta a um valor mais fixo em telas grandes */
             }
         }
+        
+        /* NOVA CLASSE PARA SOMBRA DE TEXTO */
+        .text-shadow-lg {
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        /* MELHORIA: Estilos para o botão "Voltar ao Topo" */
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--color-primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none; /* Começa escondido */
+            place-items: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 100;
+        }
+        #back-to-top:hover {
+            background-color: var(--color-primary-hover);
+            transform: translateY(-3px);
+        }
+        #back-to-top.show {
+            display: grid;
+        }
+
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- MUDANÇA: Header com altura responsiva (via classes Tailwind) -->
+    <!-- Header com altura responsiva (via classes Tailwind) -->
     <header class="sticky top-0 z-50 shadow-lg h-20 md:h-24" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-4 sm:px-6">
-            <!-- MUDANÇA: Altura do flex container ajustada para corresponder ao header -->
+            <!-- Altura do flex container ajustada para corresponder ao header -->
             <div class="flex justify-between items-center h-20 md:h-24">
                 <a href="#home-carousel-container" class="flex-shrink-0">
                     <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame" onerror="this.onerror=null;this.src='https://placehold.co/200x80/1a1a1a/ffffff?text=Logo+Museu';">
@@ -520,14 +551,16 @@
                     <a href="#noticias" class="nav-link">Notícias</a>
                     <a href="#acervos" class="nav-link">Acervos</a>
                     <a href="#timeline-geracoes" class="nav-link">Gerações</a>
-                    <a href="quiz_main_page.html" class="nav-link">Quizzes</a>
+                    <a href="#quizzes" class="nav-link">Quizzes</a>
                 </nav>
-                <button id="mobile-menu-button" class="text-2xl text-white md:hidden"><i class="fa-solid fa-bars"></i></button>
+                <button id="mobile-menu-button" class="text-2xl text-white md:hidden" aria-label="Abrir menu de navegação">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
             </div>
         </div>
     </header>
     
-    <!-- MUDANÇA: Posição do menu ajustada para a nova altura do header -->
+    <!-- Posição do menu ajustada para a nova altura do header -->
     <div id="mobile-menu" class="hidden fixed top-20 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--color-dark);">
         <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Sobre Nós</a>
         <a href="#itinerario" class="block text-center py-3 text-lg nav-link">Itinerário</a>
@@ -551,10 +584,10 @@
                 </div>
             </div>
         
-            <button id="carousel-prev" class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-3 rounded-full hover:bg-opacity-50 transition-colors z-10 hidden">
+            <button id="carousel-prev" class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-3 rounded-full hover:bg-opacity-50 transition-colors z-10 hidden" aria-label="Slide anterior">
                 <i class="fas fa-chevron-left text-lg"></i>
             </button>
-            <button id="carousel-next" class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-3 rounded-full hover:bg-opacity-50 transition-colors z-10 hidden">
+            <button id="carousel-next" class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-30 p-3 rounded-full hover:bg-opacity-50 transition-colors z-10 hidden" aria-label="Próximo slide">
                 <i class="fas fa-chevron-right text-lg"></i>
             </button>
         
@@ -590,7 +623,8 @@
                             style="border:0;" 
                             allowfullscreen="" 
                             loading="lazy" 
-                            referrerpolicy="no-referrer-when-downgrade">
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Mapa do Itinerário">
                         </iframe>
                     </div>
 
@@ -643,48 +677,68 @@
             </div>
         </section>
 
-        <!-- QUIZZES -->
-        <section id="quizzes" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
-        <div class="container mx-auto">
-            <h1 class="text-4xl md:text-5xl font-bold text-center mb-8">Nossos Quizzes</h1>
-            
-            <div class="flex justify-end mb-8">
-                <div id="search-container" class="w-full max-w-xs relative">
-                    <label for="searchInput" class="block text-sm font-medium mb-1">Buscar Quiz</label>
-                    <input id="searchInput" type="text" class="form-input mb-2 w-full" placeholder="Digite o tema do quiz...">
-                    <div id="autocomplete-results" class="absolute left-0 right-0 bg-white border border-gray-300 rounded shadow-lg z-10 hidden"></div>
-                    <label for="sort-select" class="block text-sm font-medium mb-1 mt-2">Ordenar por</label>
-                    <select id="sort-select" class="form-select">
-                        <option value="tema-asc">Ordem Alfabética (A-Z)</option>
-                        <option value="tema-desc">Ordem Alfabética (Z-A)</option>
-                        <option value="perguntas-desc">Mais Perguntas</option>
-                        <option value="perguntas-asc">Menos Perguntas</option>
-                    </select>
+        <!-- SEÇÃO DE QUIZZES APRIMORADA -->
+        <section id="quizzes" class="relative py-20 md:py-32 bg-black text-white flex items-center justify-center fade-in-section">
+             <!-- Conteúdo da Seção -->
+            <div class="container mx-auto px-4 relative z-10 text-center">
+                <h2 style="font-family: 'Bungee', cursive;" class="text-5xl md:text-7xl font-bold uppercase tracking-wider text-shadow-lg">
+                    <span class="text-yellow-400">Desafio</span> Aceito?
+                </h2>
+                <p class="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-gray-300" style="font-family: 'Orbitron', sans-serif;">
+                    Teste seus conhecimentos sobre a história dos videogames e prove que você é um verdadeiro mestre!
+                </p>
+                <div class="mt-12">
+                    <a href="quiz_main_page.html" class="inline-block bg-yellow-400 text-black font-bold uppercase rounded-lg px-10 py-4 text-lg transform hover:scale-105 transition-transform duration-300 shadow-lg hover:shadow-yellow-400/50" style="font-family: 'Press Start 2P', cursive;">
+                        Começar o Quiz! <i class="fas fa-gamepad ml-2 text-sm"></i>
+                    </a>
                 </div>
             </div>
-
-            <div id="quizzes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <div id="quizzes-loader" class="text-center py-20 col-span-full">
-                    <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
-                    <p class="mt-4 text-xl text-gray-600">A carregar quizzes...</p>
-                </div>
-            </div>
-        </div>
-        <div class="mt-16 text-center"><a href="quiz_main_page.html" class="btn btn-primary">Mais Quizzes</a></div>
         </section>
+        <!-- FIM DA SEÇÃO DE QUIZZES APRIMORADA -->
 
     </main>
 
-    <footer class="py-12 bg-dark-gray">
-        <div class="container mx-auto text-center text-gray-400">
-            <p>© 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
-            <div class="mt-6 space-x-6">
-                <a href="#" class="hover:text-primary-color transition-colors"><i class="fa-brands fa-twitter text-2xl"></i></a>
-                <a href="#" class="hover:text-primary-color transition-colors"><i class="fa-brands fa-instagram text-2xl"></i></a>
-                <a href="#" class="hover:text-primary-color transition-colors"><i class="fa-brands fa-youtube text-2xl"></i></a>
+    <!-- RODAPÉ APRIMORADO -->
+    <footer class="pt-16 pb-8 text-gray-300" style="background-color: var(--color-dark);">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-center md:text-left">
+                <!-- Coluna 1: Sobre -->
+                <div class="md:col-span-2">
+                    <h4 class="text-lg font-bold text-white mb-4">Museu Itinerante do Videojogo</h4>
+                    <p class="text-sm text-gray-400 max-w-md mx-auto md:mx-0">
+                        Preservando e celebrando a rica história dos videogames, levando cultura e diversão para todo o Brasil.
+                    </p>
+                </div>
+                <!-- Coluna 2: Links Rápidos -->
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">Explore</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#sobre-nos" class="text-gray-400 hover:text-primary transition-colors">Sobre Nós</a></li>
+                        <li><a href="#itinerario" class="text-gray-400 hover:text-primary transition-colors">Itinerário</a></li>
+                        <li><a href="#noticias" class="text-gray-400 hover:text-primary transition-colors">Notícias</a></li>
+                        <li><a href="galeria.html" class="text-gray-400 hover:text-primary transition-colors">Galeria Completa</a></li>
+                    </ul>
+                </div>
+                <!-- Coluna 3: Redes Sociais -->
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">Siga-nos</h4>
+                    <div class="flex justify-center md:justify-start space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors" aria-label="Twitter"><i class="fa-brands fa-twitter text-2xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors" aria-label="Instagram"><i class="fa-brands fa-instagram text-2xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors" aria-label="YouTube"><i class="fa-brands fa-youtube text-2xl"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 mt-8 text-center text-sm text-gray-500">
+                <p>© 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
+
+    <!-- Botão Voltar ao Topo -->
+    <a href="#" id="back-to-top" aria-label="Voltar ao topo da página">
+        <i class="fas fa-arrow-up"></i>
+    </a>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -712,7 +766,7 @@
 
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
-            // MUDANÇA: Trava/Destrava o scroll do body
+            // Trava/Destrava o scroll do body
             body.classList.toggle('overflow-hidden-mobile');
         });
 
@@ -732,7 +786,7 @@
                     // Fecha o menu mobile se estiver aberto
                     if (!mobileMenu.classList.contains('hidden')) {
                         mobileMenu.classList.add('hidden');
-                        // MUDANÇA: Garante que o scroll seja destravado ao clicar num link
+                        // Garante que o scroll seja destravado ao clicar num link
                         body.classList.remove('overflow-hidden-mobile');
                     }
                 }
@@ -750,14 +804,14 @@
     </div>
     <div class="p-5 flex flex-col flex-grow">
          <div class="mb-2">
-             ${data.categoria ? `<span class="text-xs font-bold uppercase" style="color: var(--color-primary-hover);">${data.categoria}</span>` : ''}
-             ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
-             ${dataFormatada ? `<span class="text-xs text-text-light">${dataFormatada}</span>` : ''}
+              ${data.categoria ? `<span class="text-xs font-bold uppercase" style="color: var(--color-primary-hover);">${data.categoria}</span>` : ''}
+              ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
+              ${dataFormatada ? `<span class="text-xs text-text-light">${dataFormatada}</span>` : ''}
          </div>
          <h3 class="text-xl font-bold mb-3 text-color-dark group-hover:text-primary-color transition-colors">${data.titulo}</h3>
          <p class="text-sm text-text-light mb-4 flex-grow">${data.subtitulo || ''}</p>
          <div class="mt-auto pt-4 border-t border-border-color flex justify-end items-center">
-             <span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span>
+              <span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span>
          </div>
     </div>
 </a>`;
@@ -765,16 +819,16 @@
         const renderAcervo = (doc) => {
             const data = doc.data();
             return `
-            <div class="marquee-item">
-                <a href="item_detalhe.html?id=${doc.id}" class="block h-full group" draggable="false">
-                    <div class="bg-white rounded-lg shadow-md p-4 h-full flex flex-col items-center justify-center text-center transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-2">
-                        <div class="h-48 flex items-center justify-center mb-4">
-                            <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" draggable="false" onerror="this.onerror=null;this.src='https://placehold.co/200x200/e0e0e0/333333?text=Erro+Imagem';">
+                <div class="marquee-item">
+                    <a href="item_detalhe.html?id=${doc.id}" class="block h-full group" draggable="false">
+                        <div class="bg-white rounded-lg shadow-md p-4 h-full flex flex-col items-center justify-center text-center transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-2">
+                            <div class="h-48 flex items-center justify-center mb-4">
+                                <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" draggable="false" onerror="this.onerror=null;this.src='https://placehold.co/200x200/e0e0e0/333333?text=Erro+Imagem';">
+                            </div>
+                            <h3 class="text-md font-bold text-gray-800">${data.nome}</h3>
                         </div>
-                        <h3 class="text-md font-bold text-gray-800">${data.nome}</h3>
-                    </div>
-                </a>
-            </div>`;
+                    </a>
+                </div>`;
         };
 
         // --- DATA LOADERS ---
@@ -872,6 +926,7 @@
                 indicator.className = "carousel-indicator w-3 h-3 rounded-full bg-white transition-all duration-300";
                 indicator.style.opacity = index === 0 ? '1' : '0.5';
                 indicator.dataset.index = index;
+                indicator.setAttribute('aria-label', `Ir para o slide ${index + 1}`);
                 indicator.addEventListener('click', () => goToSlide(index));
                 return indicator;
             };
@@ -978,11 +1033,11 @@
                         </div>
                     </div>
                     <div class="about-timeline-navigation">
-                        <button id="about-timeline-prev" class="about-timeline-nav-button"><i class="fas fa-arrow-left"></i></button>
+                        <button id="about-timeline-prev" class="about-timeline-nav-button" aria-label="Slide anterior da história"><i class="fas fa-arrow-left"></i></button>
                         <div class="about-timeline-dots">
-                            ${storyData.map((_, index) => `<div class="about-timeline-dot ${index === 0 ? 'active' : ''}" data-index="${index}"></div>`).join('')}
+                            ${storyData.map((_, index) => `<div class="about-timeline-dot ${index === 0 ? 'active' : ''}" data-index="${index}" aria-label="Ir para o slide ${index + 1} da história"></div>`).join('')}
                         </div>
-                        <button id="about-timeline-next" class="about-timeline-nav-button"><i class="fas fa-arrow-right"></i></button>
+                        <button id="about-timeline-next" class="about-timeline-nav-button" aria-label="Próximo slide da história"><i class="fas fa-arrow-right"></i></button>
                     </div>
                 `;
                 
@@ -1165,11 +1220,11 @@
                         </div>
                     </div>
                     <div class="timeline-navigation">
-                        <button id="timeline-prev" class="timeline-nav-button"><i class="fas fa-arrow-left"></i></button>
+                        <button id="timeline-prev" class="timeline-nav-button" aria-label="Geração anterior"><i class="fas fa-arrow-left"></i></button>
                         <div class="timeline-dots">
-                            ${generationsData.map((_, index) => `<div class="timeline-dot ${index === currentIndex ? 'active' : ''}" data-index="${index}"></div>`).join('')}
+                            ${generationsData.map((_, index) => `<div class="timeline-dot ${index === currentIndex ? 'active' : ''}" data-index="${index}" aria-label="Ir para a geração ${index + 1}"></div>`).join('')}
                         </div>
-                        <button id="timeline-next" class="timeline-nav-button"><i class="fas fa-arrow-right"></i></button>
+                        <button id="timeline-next" class="timeline-nav-button" aria-label="Próxima geração"><i class="fas fa-arrow-right"></i></button>
                     </div>
                 `;
                 
@@ -1383,128 +1438,24 @@
             });
         };
 
-        // --- LÓGICA DE CARREGAMENTO DOS QUIZZES ---
-        const initializeQuizzes = () => {
-            const state = { items: [], filteredItems: [] };
-            const quizzesGrid = document.getElementById('quizzes-grid');
-            const quizzesLoader = document.getElementById('quizzes-loader');
-            const searchInput = document.getElementById('searchInput');
-            const sortSelect = document.getElementById('sort-select');
-            const autocompleteResults = document.getElementById('autocomplete-results');
+        // --- LÓGICA DO BOTÃO "VOLTAR AO TOPO" ---
+        const initializeBackToTop = () => {
+            const backToTopButton = document.getElementById('back-to-top');
+            if (!backToTopButton) return;
 
-            if (!quizzesGrid) return; // Sai se a seção de quizzes não estiver na página
-
-            function renderQuizzes() {
-                quizzesGrid.innerHTML = '';
-                if (state.filteredItems.length === 0) {
-                    quizzesGrid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-search-minus text-4xl text-gray-400"></i><p class="mt-4 text-xl text-gray-600">Nenhum quiz encontrado.</p></div>`;
-                    return;
-                }
-
-                state.filteredItems.forEach(item => {
-                    const cardLink = document.createElement('a');
-                    cardLink.href = `play-quiz.html?id=${item.id}`;
-                    cardLink.className = 'content-card group'; // Reutilizando a classe .content-card
-                    cardLink.innerHTML = `
-                        <div class="h-48 flex items-center justify-center bg-gray-800 text-amber-400 rounded-t-lg">
-                            <i class="fas fa-brain text-6xl"></i>
-                        </div>
-                        <div class="p-4 flex flex-col flex-grow">
-                            <h3 class="text-lg font-semibold mb-2 text-gray-800">${item.tema || 'Quiz sem tema'}</h3>
-                            <div class="text-sm text-gray-600 mb-4">
-                                <p><i class="fa-solid fa-list-check w-5 text-gray-400"></i> ${item.perguntas?.length || 0} perguntas</p>
-                            </div>
-                            <div class="btn btn-primary w-full mt-auto">
-                                Jogar Quiz
-                                <i class="fas fa-play ml-2"></i>
-                            </div>
-                        </div>
-                    `;
-                    quizzesGrid.appendChild(cardLink);
-                });
-            }
-
-            function applyFiltersAndSort() {
-                const searchTerm = searchInput.value.trim().toLowerCase();
-                const sortValue = sortSelect.value;
-                
-                let tempItems = [...state.items];
-
-                if (searchTerm) {
-                    tempItems = tempItems.filter(item => item.tema && item.tema.toLowerCase().includes(searchTerm));
-                }
-
-                tempItems.sort((a, b) => {
-                    const [field, direction] = sortValue.split('-');
-                    
-                    if (field === 'tema') {
-                        const valA = a.tema || '';
-                        const valB = b.tema || '';
-                        return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                    }
-                    
-                    if (field === 'perguntas') {
-                        const valA = a.perguntas?.length || 0;
-                        const valB = b.perguntas?.length || 0;
-                        return direction === 'asc' ? valA - valB : valB - valA;
-                    }
-                    
-                    return 0;
-                });
-
-                state.filteredItems = tempItems;
-                renderQuizzes();
-                updateAutocomplete(searchTerm);
-            }
-            
-            function updateAutocomplete(query) {
-                 autocompleteResults.innerHTML = '';
-                 if (query.length < 1) {
-                     autocompleteResults.classList.add('hidden');
-                     return;
-                 }
-
-                 const matchedItems = state.items
-                     .filter(item => item.tema && item.tema.toLowerCase().includes(query))
-                     .slice(0, 5);
-
-                 if (matchedItems.length > 0) {
-                     matchedItems.forEach(item => {
-                         const suggestionDiv = document.createElement('div');
-                         suggestionDiv.className = 'p-2 hover:bg-gray-100 cursor-pointer';
-                         suggestionDiv.textContent = item.tema;
-                         suggestionDiv.onclick = () => {
-                             searchInput.value = item.tema;
-                             autocompleteResults.classList.add('hidden');
-                             applyFiltersAndSort();
-                         };
-                         autocompleteResults.appendChild(suggestionDiv);
-                     });
-                     autocompleteResults.classList.remove('hidden');
-                 } else {
-                     autocompleteResults.classList.add('hidden');
-                 }
-            }
-            
-            const q = query(collection(db, `/artifacts/${appId}/public/data/quizzes`), limit(4));
-            onSnapshot(q, (querySnapshot) => {
-                state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                if (quizzesLoader) quizzesLoader.style.display = 'none';
-                applyFiltersAndSort(); 
-            }, (error) => {
-                console.error("Erro ao carregar os quizzes:", error);
-                quizzesGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar os quizzes.</p>`;
-            });
-
-            searchInput.addEventListener('input', () => applyFiltersAndSort());
-            sortSelect.addEventListener('change', applyFiltersAndSort);
-
-            document.addEventListener('click', (e) => {
-                if (!document.getElementById('search-container').contains(e.target)) {
-                    autocompleteResults.classList.add('hidden');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopButton.classList.add('show');
+                } else {
+                    backToTopButton.classList.remove('show');
                 }
             });
-        }
+
+            backToTopButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        };
 
         // --- INITIALIZE ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -1514,7 +1465,7 @@
             initializeInteractiveTimeline();
             setupScrollAnimation();
             initializeActiveNavOnScroll();
-            initializeQuizzes();
+            initializeBackToTop();
             
             // Carrega notícias e acervos
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
