@@ -1,0 +1,215 @@
+<!-- Conteúdo da Aba Museu na Mídia -->
+<div id="museunamidia-manager" class="form-section bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Gerir Matérias da Mídia</h2>
+    <form id="form-museunamidia" class="space-y-6">
+        <input type="hidden" id="museunamidia-id">
+
+        <fieldset class="border p-4 rounded-md">
+            <legend class="text-lg font-semibold px-2">Informações da Matéria</legend>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div class="md:col-span-2">
+                    <label for="museunamidia-titulo" class="block text-sm font-medium text-gray-700">Título da Matéria</label>
+                    <input type="text" id="museunamidia-titulo" placeholder="Ex: Museu do Videogame é destaque em..." required>
+                </div>
+                <div>
+                    <label for="museunamidia-data_publicacao" class="block text-sm font-medium text-gray-700">Data da Publicação</label>
+                    <input type="date" id="museunamidia-data_publicacao" required>
+                </div>
+                 <div class="md:col-span-2">
+                    <label for="museunamidia-descricao" class="block text-sm font-medium text-gray-700">Breve Descrição (Opcional)</label>
+                    <textarea id="museunamidia-descricao" rows="3" placeholder="Pequeno resumo sobre a matéria."></textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="museunamidia-link_externo" class="block text-sm font-medium text-gray-700">Link Externo da Matéria</label>
+                    <input type="url" id="museunamidia-link_externo" placeholder="https://www.exemplo.com/noticia">
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="border p-4 rounded-md">
+            <legend class="text-lg font-semibold px-2">Arquivo de Mídia</legend>
+            <p class="text-xs text-gray-500 mb-2">Anexe um arquivo (imagem, vídeo, PDF) ou apenas preencha o link externo acima.</p>
+            <div data-upload-container="museunamidia-arquivo" class="pt-2">
+                <input type="hidden" id="museunamidia-arquivo-url">
+                <input type="hidden" id="museunamidia-arquivo-tipo">
+                <div class="upload-preview-wrapper hidden mb-4">
+                    <div class="upload-preview-container rounded-lg overflow-hidden">
+                        <img src="#" alt="Preview da imagem" class="upload-preview rounded-lg">
+                    </div>
+                    <button type="button" class="remove-upload-btn mt-2 text-sm text-red-600 hover:text-red-800">Remover arquivo</button>
+                </div>
+                <div class="upload-drop-zone">
+                    <input type="file" class="upload-file-input hidden" accept="image/*,video/*,application/pdf">
+                    <div class="text-gray-500">
+                        <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                        <p><strong>Arraste e solte</strong> ou <strong>clique para selecionar</strong></p>
+                        <p class="text-xs mt-1">Imagens, Vídeos ou PDFs</p>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        
+        <div id="museunamidia-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4">
+            <div id="museunamidia-upload-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">0%</div>
+        </div>
+
+        <div class="flex gap-4 pt-4">
+            <button type="submit">Guardar Matéria</button>
+            <button type="button" id="cancel-museunamidia-edit" class="w-auto">Cancelar</button>
+        </div>
+    </form>
+    <div class="mt-8">
+        <h3 class="text-xl font-bold mb-4">Matérias Registadas</h3>
+        <div id="museunamidia-lista" class="space-y-4"></div>
+    </div>
+</div>
+
+<script data-tab-script="museunamidia">
+{
+    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, ref, deleteObject, query, orderBy } = window.firebaseServices;
+    const { appId } = window.appConfig;
+
+    const entity = 'museunamidia';
+    const form = document.getElementById(`form-${entity}`);
+    const listContainer = document.getElementById(`${entity}-lista`);
+
+    const clearForm = () => {
+        form.reset();
+        document.getElementById(`${entity}-id`).value = '';
+        window.resetUploadUI('museunamidia-arquivo');
+    };
+
+    const editDoc = async (id) => {
+        clearForm();
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById(`${entity}-id`).value = docSnap.id;
+                
+                ['titulo', 'descricao', 'link_externo'].forEach(field => {
+                    const element = document.getElementById(`${entity}-${field}`);
+                    if (element) element.value = data[field] || '';
+                });
+
+                if (data.data_publicacao?.toDate) {
+                    document.getElementById('museunamidia-data_publicacao').value = data.data_publicacao.toDate().toISOString().split('T')[0];
+                }
+
+                if (data.arquivo_url && data.tipo_arquivo.startsWith('image/')) {
+                    const container = document.querySelector('[data-upload-container="museunamidia-arquivo"]');
+                    container.querySelector('.upload-preview').src = data.arquivo_url;
+                    container.querySelector('.upload-preview-wrapper').classList.remove('hidden');
+                    container.querySelector('.upload-drop-zone').classList.add('hidden');
+                    document.getElementById('museunamidia-arquivo-url').value = data.arquivo_url;
+                    document.getElementById('museunamidia-arquivo-tipo').value = data.tipo_arquivo;
+                }
+
+                window.scrollTo(0, 0);
+            }
+        } catch (error) {
+            console.error(`Erro ao carregar ${entity}:`, error);
+            window.showNotification('Erro ao carregar dados.', true);
+        }
+    };
+    
+    const performDeleteDoc = async (id) => {
+        if (!await window.showConfirmModal()) return;
+        try {
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists() && docSnap.data().arquivo_url) {
+                 const fileRef = ref(storage, docSnap.data().arquivo_url);
+                 await deleteObject(fileRef).catch(err => console.warn("Falha ao apagar ficheiro do Storage:", err));
+            }
+            await deleteDoc(docRef);
+            window.showNotification("Matéria eliminada com sucesso!");
+            clearForm();
+        } catch (error) {
+            console.error(`Erro ao eliminar ${entity}:`, error);
+            window.showNotification("Erro ao eliminar o item.", true);
+        }
+    };
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitButton = form.querySelector('button[type="submit"]');
+        const progressContainer = document.getElementById('museunamidia-upload-progress-container');
+        const progressBar = document.getElementById('museunamidia-upload-progress-bar');
+        submitButton.disabled = true;
+
+        try {
+            const data = {
+                titulo: document.getElementById('museunamidia-titulo').value,
+                descricao: document.getElementById('museunamidia-descricao').value,
+                link_externo: document.getElementById('museunamidia-link_externo').value,
+                data_publicacao: new Date(document.getElementById('museunamidia-data_publicacao').value + "T12:00:00"),
+                arquivo_url: document.getElementById('museunamidia-arquivo-url').value || null,
+                tipo_arquivo: document.getElementById('museunamidia-arquivo-tipo').value || null,
+            };
+
+            const file = window.pendingFiles.get('museunamidia-arquivo');
+            if (file) {
+                progressContainer.classList.remove('hidden');
+                const uploadResult = await window.uploadFile(file, 'museu_na_midia/', (progress) => {
+                    const percent = Math.round(progress * 100);
+                    progressBar.style.width = `${percent}%`;
+                    progressBar.textContent = `${percent}%`;
+                });
+                data.arquivo_url = uploadResult.url;
+                data.tipo_arquivo = uploadResult.type;
+            }
+
+            if (!data.link_externo && !data.arquivo_url) {
+                throw new Error("É necessário fornecer um link externo ou carregar um arquivo.");
+            }
+
+            const id = document.getElementById(`${entity}-id`).value;
+            const path = `/artifacts/${appId}/public/data/${entity}`;
+            
+            if (id) {
+                await updateDoc(doc(db, path, id), data);
+            } else {
+                await addDoc(collection(db, path), data);
+            }
+
+            window.showNotification('Matéria guardada com sucesso!');
+            clearForm();
+        } catch (error) {
+            console.error("Erro ao guardar matéria:", error);
+            window.showNotification(error.message || 'Erro ao guardar os dados.', true);
+        } finally {
+            submitButton.disabled = false;
+            progressContainer.classList.add('hidden');
+        }
+    });
+
+    const q = query(collection(db, `/artifacts/${appId}/public/data/${entity}`), orderBy("data_publicacao", "desc"));
+    onSnapshot(q, (snapshot) => {
+        listContainer.innerHTML = snapshot.empty ? '<p class="text-sm text-gray-500">Nenhuma matéria registada.</p>' : '';
+        const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        docs.forEach(data => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
+            itemDiv.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <p class="font-semibold text-sm truncate pr-4">${data.titulo || 'Matéria sem título'}</p>
+                </div>
+                <div class="flex-shrink-0 flex gap-2">
+                    <button class="edit-btn px-2 py-1 bg-yellow-500 text-white rounded text-xs" data-id="${data.id}">Editar</button>
+                    <button class="delete-btn px-2 py-1 bg-red-600 text-white rounded text-xs" data-id="${data.id}">Eliminar</button>
+                </div>`;
+            listContainer.appendChild(itemDiv);
+        });
+    });
+
+    listContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
+        if (e.target.classList.contains('delete-btn')) performDeleteDoc(e.target.dataset.id);
+    });
+    
+    document.getElementById('cancel-museunamidia-edit').addEventListener('click', clearForm);
+    window.setupUploadComponent(document.querySelector('[data-upload-container="museunamidia-arquivo"]'));
+}
+</script>

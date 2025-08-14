@@ -549,6 +549,7 @@
                     <a href="#sobre-nos" class="nav-link">Sobre Nós</a>
                     <a href="#itinerario" class="nav-link">Itinerário</a>
                     <a href="#noticias" class="nav-link">Notícias</a>
+                    <a href="#museu-na-midia" class="nav-link">Museu Na Mídia</a>
                     <a href="#acervos" class="nav-link">Acervos</a>
                     <a href="#timeline-geracoes" class="nav-link">Gerações</a>
                     <a href="#quiz" class="nav-link">Quiz</a>
@@ -565,6 +566,7 @@
         <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Sobre Nós</a>
         <a href="#itinerario" class="block text-center py-3 text-lg nav-link">Itinerário</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
+        <a href="#museu-na-midia" class="block text-center py-3 text-lg nav-link">Museu Na Mídia</a>
         <a href="#acervos" class="block text-center py-3 text-lg nav-link">Acervos</a>
         <a href="#timeline-geracoes" class="block text-center py-3 text-lg nav-link">Gerações</a>
         <a href="#quiz" class="block text-center py-3 text-lg nav-link">Quiz</a>
@@ -644,6 +646,17 @@
                 <h2 class="section-title">Notícias e Eventos</h2>
                 <div id="noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
                 <div class="mt-16 text-center"><a href="noticias.html" class="btn btn-primary">Ver todas as notícias</a></div>
+            </div>
+        </section>
+
+        <!-- NOVA SEÇÃO: MUSEU NA MÍDIA -->
+        <section id="museu-na-midia" class="section-padding bg-white fade-in-section">
+            <div class="container mx-auto">
+                <h2 class="section-title">Museu Na Mídia</h2>
+                <div id="midia-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Conteúdo da Mídia será carregado aqui -->
+                </div>
+                <div class="mt-16 text-center"><a href="museunamidia.html" class="btn btn-primary">Ver todas as matérias</a></div>
             </div>
         </section>
 
@@ -820,6 +833,39 @@
     </div>
 </a>`;
         }
+
+        const renderMidia = (doc) => {
+            const data = doc.data();
+            let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
+            
+            // Determina o ícone com base no tipo de arquivo ou link
+            let iconHtml = '<i class="fas fa-link text-4xl text-gray-400"></i>'; // Padrão para link
+            if (data.tipo_arquivo) {
+                if (data.tipo_arquivo.startsWith('image/')) {
+                    iconHtml = '<i class="fas fa-image text-4xl text-blue-400"></i>';
+                } else if (data.tipo_arquivo.startsWith('video/')) {
+                    iconHtml = '<i class="fas fa-video text-4xl text-red-400"></i>';
+                } else if (data.tipo_arquivo === 'application/pdf') {
+                    iconHtml = '<i class="fas fa-file-pdf text-4xl text-purple-400"></i>';
+                }
+            }
+
+            return `
+                <a href="${data.link_externo || 'museunamidia.html'}" target="_blank" rel="noopener noreferrer" class="content-card group">
+                    <div class="p-6 flex flex-col flex-grow text-center items-center">
+                        <div class="mb-4">
+                            ${iconHtml}
+                        </div>
+                        ${dataFormatada ? `<span class="text-xs text-text-light mb-2">${dataFormatada}</span>` : ''}
+                        <h3 class="text-lg font-bold mb-3 text-color-dark group-hover:text-primary-color transition-colors">${data.titulo}</h3>
+                        <p class="text-sm text-text-light mb-4 flex-grow">${data.descricao || ''}</p>
+                        <div class="mt-auto pt-4 w-full border-t border-border-color flex justify-center items-center">
+                            <span class="text-sm font-semibold text-primary-color group-hover:underline">Ver Matéria <i class="fas fa-external-link-alt text-xs ml-1"></i></span>
+                        </div>
+                    </div>
+                </a>`;
+        };
+
         const renderAcervo = (doc) => {
             const data = doc.data();
             return `
@@ -1473,6 +1519,7 @@
             
             // Carrega notícias e acervos
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
+            loadCollectionData('museunamidia', 'midia-container', renderMidia, query(collection(db, `/artifacts/${appId}/public/data/museunamidia`), orderBy("data_publicacao", "desc"), limit(3)));
             loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome"), limit(15)), duplicateAcervosForMarquee);
         });
 
