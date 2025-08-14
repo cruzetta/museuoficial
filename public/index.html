@@ -2,6 +2,7 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <!-- Viewport é essencial para o design responsivo funcionar corretamente -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Museu Itinerante do Videojogo - Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -156,14 +157,14 @@
         }
         
         #header-logo {
-            /* Altura do logo responsiva */
-            height: 120px; /* Logo menor em mobile */
+            /* Altura do logo responsiva e corrigida */
+            height: 64px; /* Logo menor para caber no header mobile */
             width: auto;
             transition: transform 0.3s ease;
         }
         @media (min-width: 768px) {
             #header-logo {
-                height: 120px; /* Tamanho maior para desktop */
+                height: 80px; /* Tamanho maior para desktop, ainda dentro do header */
             }
         }
         #header-logo:hover {
@@ -536,18 +537,21 @@
 </head>
 <body class="antialiased">
 
+    <!-- Header com altura responsiva (via classes Tailwind) -->
     <header class="sticky top-0 z-50 shadow-lg h-20 md:h-24" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-4 sm:px-6">
+            <!-- Altura do flex container ajustada para corresponder ao header -->
             <div class="flex justify-between items-center h-20 md:h-24">
-                <a href="#home-carousel-container" class="flex-shrink-0">
+                <a href="#home" class="flex-shrink-0">
                     <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame" onerror="this.onerror=null;this.src='https://placehold.co/200x80/1a1a1a/ffffff?text=Logo+Museu';">
                 </a>
                 <nav id="desktop-nav" class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm">
-                    <a href="#sobre-nos" class="nav-link">Sobre Nós</a>
-                    <a href="#itinerario" class="nav-link">Itinerário</a>
+                    <a href="#home" class="nav-link">Home</a>
+                    <a href="#sobre-nos" class="nav-link">Quem Somos</a>
+                    <a href="#itinerario" class="nav-link">Agenda do Museu</a>
                     <a href="#noticias" class="nav-link">Notícias</a>
-                    <a href="#museu-na-midia" class="nav-link">Museu Na Mídia</a>
-                    <a href="#acervos" class="nav-link">Acervos</a>
+                    <a href="#museu-na-midia" class="nav-link">Museu na Mídia</a>
+                    <a href="#acervos" class="nav-link">Acervo</a>
                     <a href="#timeline-geracoes" class="nav-link">Gerações</a>
                     <a href="#quiz" class="nav-link">Quiz</a>
                 </nav>
@@ -558,20 +562,23 @@
         </div>
     </header>
     
+    <!-- Posição do menu ajustada para a nova altura do header -->
     <div id="mobile-menu" class="hidden fixed top-20 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--color-dark);">
-        <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Sobre Nós</a>
-        <a href="#itinerario" class="block text-center py-3 text-lg nav-link">Itinerário</a>
+        <a href="#home" class="block text-center py-3 text-lg nav-link">Home</a>
+        <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Quem Somos</a>
+        <a href="#itinerario" class="block text-center py-3 text-lg nav-link">Agenda do Museu</a>
         <a href="#noticias" class="block text-center py-3 text-lg nav-link">Notícias</a>
-        <a href="#museu-na-midia" class="block text-center py-3 text-lg nav-link">Museu Na Mídia</a>
-        <a href="#acervos" class="block text-center py-3 text-lg nav-link">Acervos</a>
+        <a href="#museu-na-midia" class="block text-center py-3 text-lg nav-link">Museu na Mídia</a>
+        <a href="#acervos" class="block text-center py-3 text-lg nav-link">Acervo</a>
         <a href="#timeline-geracoes" class="block text-center py-3 text-lg nav-link">Gerações</a>
         <a href="#quiz" class="block text-center py-3 text-lg nav-link">Quiz</a>
     </div>
 
     <main>
 
-        <section id="home-carousel-container" class="relative w-full h-[60vh] md:h-[85vh] bg-gray-900 text-white overflow-hidden shadow-lg">
+        <section id="home" class="relative w-full h-[60vh] md:h-[85vh] bg-gray-900 text-white overflow-hidden shadow-lg">
             <div id="carousel-slides" class="relative w-full h-full">
+                <!-- Indicador de carregamento -->
                 <div class="w-full h-full flex items-center justify-center">
                     <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -593,7 +600,7 @@
 
         <section id="sobre-nos" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
-                <h2 class="section-title !text-white">Nossa História</h2>
+                <h2 class="section-title !text-white">Quem Somos</h2>
                 <div class="max-w-2xl mx-auto -mt-10 mb-6">
                     <audio controls class="w-full">
                         <source src="https://firebasestorage.googleapis.com/v0/b/museu-cca6d.firebasestorage.app/o/Historia%20em%20audio%20do%20museu%20do%20vg.mp3?alt=media&token=61313841-215e-4080-bc2f-2514d02a5b5d" type="audio/mpeg">
@@ -608,8 +615,9 @@
         
         <section id="itinerario" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto">
-                <h2 class="section-title">Nosso Itinerário pelo Brasil</h2>
+                <h2 class="section-title">Agenda do Museu</h2>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <!-- Coluna do Mapa -->
                     <div class="rounded-lg overflow-hidden shadow-lg h-[450px]">
                         <iframe 
                             id="itinerario-mapa"
@@ -624,6 +632,7 @@
                         </iframe>
                     </div>
 
+                    <!-- Coluna de Informações -->
                     <div id="itinerario-lista" class="space-y-6">
                         <div class="text-center p-8">
                             <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
@@ -642,25 +651,32 @@
             </div>
         </section>
 
+        <!-- NOVA SEÇÃO: MUSEU NA MÍDIA -->
         <section id="museu-na-midia" class="section-padding bg-gray-50 fade-in-section" style="background-image: url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23d1d5db%22 fill-opacity=%220.4%22%3E%3Cpath d=%22M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
             <div class="container mx-auto">
-                <h2 class="section-title">Museu Na Mídia</h2>
+                <h2 class="section-title">Museu na Mídia</h2>
                 <div id="midia-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    </div>
+                    <!-- Conteúdo da Mídia será carregado aqui -->
+                </div>
                 <div class="mt-16 text-center"><a href="museunamidia.html" class="btn btn-primary">Ver todas as matérias</a></div>
             </div>
         </section>
 
+        <!-- === SEÇÃO DE ACERVOS ATUALIZADA === -->
         <section id="acervos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
-                <h2 class="section-title">Os Nossos Acervos</h2>
+                <h2 class="section-title">Nosso Acervo</h2>
+                <!-- Container para o carrossel ambulante e interativo -->
                 <div class="marquee-container">
                     <div id="acervos-container" class="marquee-track py-4">
-                        </div>
+                        <!-- Os acervos serão carregados aqui pelo JavaScript -->
+                    </div>
                 </div>
                 <div class="mt-16 text-center"><a href="galeria.html" class="btn btn-primary">Explorar Acervos</a></div>
             </div>
         </section>
+        <!-- ==================================== -->
+
         <section id="timeline-geracoes" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title !text-white">Uma Viagem Pelas Gerações</h2>
@@ -676,8 +692,10 @@
             </div>
         </section>
 
+        <!-- SEÇÃO DE QUIZ APRIMORADA -->
         <section id="quiz" class="relative py-20 md:py-32 bg-black text-white flex items-center justify-center fade-in-section">
-             <div class="container mx-auto px-4 relative z-10 text-center">
+             <!-- Conteúdo da Seção -->
+            <div class="container mx-auto px-4 relative z-10 text-center">
                 <h2 style="font-family: 'Bungee', cursive;" class="text-5xl md:text-7xl font-bold uppercase tracking-wider text-shadow-lg">
                     <span class="text-yellow-400">Desafio</span> Aceito?
                 </h2>
@@ -691,26 +709,32 @@
                 </div>
             </div>
         </section>
-        </main>
+        <!-- FIM DA SEÇÃO DE QUIZ APRIMORADA -->
 
+    </main>
+
+    <!-- RODAPÉ APRIMORADO -->
     <footer class="pt-16 pb-8 text-gray-300" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-center md:text-left">
+                <!-- Coluna 1: Sobre -->
                 <div class="md:col-span-2">
                     <h4 class="text-lg font-bold text-white mb-4">Museu Itinerante do Videojogo</h4>
                     <p class="text-sm text-gray-400 max-w-md mx-auto md:mx-0">
                         Preservando e celebrando a rica história dos videogames, levando cultura e diversão para todo o Brasil.
                     </p>
                 </div>
+                <!-- Coluna 2: Links Rápidos -->
                 <div>
                     <h4 class="text-lg font-bold text-white mb-4">Explore</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#sobre-nos" class="text-gray-400 hover:text-primary transition-colors">Sobre Nós</a></li>
-                        <li><a href="#itinerario" class="text-gray-400 hover:text-primary transition-colors">Itinerário</a></li>
+                        <li><a href="#sobre-nos" class="text-gray-400 hover:text-primary transition-colors">Quem Somos</a></li>
+                        <li><a href="#itinerario" class="text-gray-400 hover:text-primary transition-colors">Agenda do Museu</a></li>
                         <li><a href="#noticias" class="text-gray-400 hover:text-primary transition-colors">Notícias</a></li>
                         <li><a href="galeria.html" class="text-gray-400 hover:text-primary transition-colors">Galeria Completa</a></li>
                     </ul>
                 </div>
+                <!-- Coluna 3: Redes Sociais e Contato -->
                 <div>
                     <h4 class="text-lg font-bold text-white mb-4">Siga Nossas Redes</h4>
                     <div class="flex justify-center md:justify-start space-x-4">
@@ -730,6 +754,7 @@
         </div>
     </footer>
 
+    <!-- Botão Voltar ao Topo -->
     <a href="#" id="back-to-top" aria-label="Voltar ao topo da página">
         <i class="fas fa-arrow-up"></i>
     </a>
