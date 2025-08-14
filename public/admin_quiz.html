@@ -125,8 +125,8 @@
             `).join('');
 
             itemDiv.innerHTML = `
-                <div class="flex justify-between items-start cursor-pointer" data-toggle-details="${submissao.id}">
-                    <div class="flex-grow">
+                <div class="flex justify-between items-start">
+                    <div class="flex-grow cursor-pointer" data-toggle-details="${submissao.id}">
                         <p class="font-bold text-gray-800">${submissao.pergunta_texto}</p>
                         <p class="text-sm text-gray-600 mt-1">Enviado por: <span class="font-semibold">${submissao.autor || 'Anónimo'}</span></p>
                     </div>
@@ -307,21 +307,11 @@
     addOpcaoButton.addEventListener('click', () => addOpcaoItem());
     cancelButton.addEventListener('click', resetarFormulario);
 
+    // CORREÇÃO: Lógica de clique refinada
     listaPendentesContainer.addEventListener('click', (e) => {
         const target = e.target;
-        
-        // Lógica para expandir/recolher
-        const toggleDetailsTarget = target.closest('[data-toggle-details]');
-        if (toggleDetailsTarget) {
-            const id = toggleDetailsTarget.dataset.toggleDetails;
-            const detailsDiv = document.getElementById(`details-${id}`);
-            if (detailsDiv) {
-                detailsDiv.classList.toggle('hidden');
-            }
-            return; // Evita que os botões também acionem o toggle
-        }
 
-        // Lógica para os botões
+        // Prioriza os cliques nos botões
         const buttonTarget = target.closest('button');
         if (buttonTarget) {
             const id = buttonTarget.dataset.id;
@@ -329,6 +319,17 @@
             if (buttonTarget.classList.contains('approve-btn')) aprovarPergunta(id);
             if (buttonTarget.classList.contains('edit-submission-btn')) editarSubmissao(id);
             if (buttonTarget.classList.contains('reject-btn')) rejeitarPergunta(id);
+            return; // Impede que o clique no botão também acione o toggle
+        }
+
+        // Se não foi um botão, verifica se foi na área de toggle
+        const toggleDetailsTarget = target.closest('[data-toggle-details]');
+        if (toggleDetailsTarget) {
+            const id = toggleDetailsTarget.dataset.toggleDetails;
+            const detailsDiv = document.getElementById(`details-${id}`);
+            if (detailsDiv) {
+                detailsDiv.classList.toggle('hidden');
+            }
         }
     });
 
