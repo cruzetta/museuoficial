@@ -22,7 +22,6 @@
             --wrong-color: #f87171;
         }
 
-        /* Estilo temático para o corpo da página */
         body { 
             font-family: 'Press Start 2P', cursive; 
             background-color: var(--dark-bg);
@@ -33,7 +32,6 @@
 
         #header-logo { height: 100px; width: auto; }
 
-        /* Estilo "pixelado" para os botões */
         .btn {
             font-family: 'Press Start 2P', cursive;
             text-transform: uppercase;
@@ -70,14 +68,12 @@
         .btn-secondary:hover { box-shadow: 2px 2px 0px #1e40af; }
         .btn-secondary:active { box-shadow: 0px 0px 0px #1e40af; }
         
-        /* Estilo para as caixas de conteúdo */
         .content-box {
             background-color: var(--dark-card);
             border: 4px solid var(--border-color);
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
 
-        /* Botões de opção com estilo de videogame */
         .option-btn { 
             font-family: 'Inter', sans-serif;
             font-weight: 600;
@@ -100,6 +96,29 @@
         .option-btn.correct .feedback-icon.fa-check, .option-btn.wrong .feedback-icon.fa-times { display: inline-block; }
         
         #progress-bar-inner { transition: width 0.3s ease-in-out; }
+        
+        .submission-form input[type="text"], .submission-form textarea {
+            background-color: #374151;
+            border: 2px solid var(--border-color);
+            color: var(--text-light);
+            padding: 0.75rem;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+        }
+        .submission-form input[type="text"]:focus, .submission-form textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        .submission-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .submission-option input[type="radio"] {
+            width: 1.5rem;
+            height: 1.5rem;
+            accent-color: var(--primary-color);
+        }
     </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen">
@@ -116,7 +135,7 @@
     </header>
 
     <main class="flex-grow pt-12 pb-16">
-        <div class="container mx-auto px-4 flex justify-center">
+        <div class="container mx-auto px-4 flex flex-col items-center gap-16">
             <div id="quiz-container" class="w-full max-w-3xl">
                 <div id="quiz-loader" class="text-center py-20">
                     <i class="fas fa-sync fa-spin text-4xl text-gray-400"></i>
@@ -147,7 +166,8 @@
                         </div>
                     </div>
                     
-                    <div id="question-text" class="text-lg sm:text-xl font-bold text-white mb-6 min-h-[6rem] flex items-center justify-center text-center leading-relaxed" style="font-family: 'Inter', sans-serif;"></div>
+                    <div id="question-text" class="text-lg sm:text-xl font-bold text-white mb-2 min-h-[6rem] flex items-center justify-center text-center leading-relaxed" style="font-family: 'Inter', sans-serif;"></div>
+                    <div id="question-author" class="text-right text-xs italic text-gray-400 font-sans h-4 mb-4"></div>
                     <div id="options-container" class="space-y-3 mb-6"></div>
                     <div class="border-t-2 border-dashed border-gray-600 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                         <p id="feedback-text" class="h-6 text-lg font-bold"></p>
@@ -168,6 +188,42 @@
                     </div>
                 </div>
             </div>
+
+            <div id="submission-container" class="w-full max-w-3xl">
+                <div class="content-box p-6 sm:p-8">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-6" style="font-family: 'Bungee', cursive;">Crie uma Pergunta!</h2>
+                    <p class="text-center font-sans text-gray-400 mb-8">Ajude a expandir o nosso quiz! Envie a sua pergunta e, após aprovação, ela poderá aparecer para todos.</p>
+                    
+                    <div id="submission-success" class="hidden text-center p-6 bg-green-900/50 border-2 border-green-500">
+                        <i class="fas fa-check-circle text-4xl text-green-400"></i>
+                        <h3 class="text-xl font-bold mt-4">Pergunta Enviada!</h3>
+                        <p class="font-sans text-gray-300 mt-2">Obrigado pela sua contribuição! A sua pergunta foi enviada para análise.</p>
+                        <button id="new-submission-btn" class="btn btn-primary mt-6 text-sm">Enviar Outra Pergunta</button>
+                    </div>
+
+                    <form id="submission-form" class="space-y-6 submission-form">
+                        <div>
+                            <label for="submit-name" class="font-sans font-semibold mb-2 block">Seu Nome</label>
+                            <input type="text" id="submit-name" placeholder="Como devemos creditá-lo?" required>
+                        </div>
+                        <div>
+                            <label for="submit-question" class="font-sans font-semibold mb-2 block">A sua Pergunta</label>
+                            <textarea id="submit-question" rows="3" placeholder="Qual é a sua pergunta sobre o mundo dos games?" required></textarea>
+                        </div>
+                        <div>
+                            <label class="font-sans font-semibold mb-2 block">Opções de Resposta (marque a correta)</label>
+                            <div id="submission-options-container" class="space-y-3">
+                            </div>
+                            <button type="button" id="add-submission-option-btn" class="btn btn-secondary mt-4 text-xs">
+                                <i class="fas fa-plus"></i> Adicionar Opção
+                            </button>
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" class="btn btn-primary w-full text-lg">Enviar Pergunta</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </main>
     
@@ -179,7 +235,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
@@ -194,6 +250,7 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
+        // --- LÓGICA DO QUIZ PRINCIPAL ---
         const NUM_QUESTIONS_PER_ROUND = 10;
         let allQuestions = [];
         let currentQuizQuestions = [];
@@ -209,6 +266,7 @@
         const quizProgress = document.getElementById('quiz-progress');
         const currentScore = document.getElementById('current-score');
         const questionText = document.getElementById('question-text');
+        const questionAuthor = document.getElementById('question-author');
         const optionsContainer = document.getElementById('options-container');
         const feedbackText = document.getElementById('feedback-text');
         const actionBtn = document.getElementById('action-btn');
@@ -250,6 +308,14 @@
             quizProgress.textContent = `Pergunta ${currentQuestionIndex + 1} / ${currentQuizQuestions.length}`;
             currentScore.textContent = `Pontos: ${score}`;
             questionText.innerHTML = question.pergunta_texto;
+            
+            // NOVO: Exibe o autor se existir
+            if (question.autor) {
+                questionAuthor.textContent = `Pergunta criada por: ${question.autor}`;
+            } else {
+                questionAuthor.textContent = '';
+            }
+
             updateProgressBar();
             
             optionsContainer.innerHTML = '';
@@ -337,7 +403,7 @@
             displayQuestion();
         };
 
-        const init = async () => {
+        const initQuiz = async () => {
             try {
                 const quizDocRef = doc(db, `/artifacts/${appId}/public/data/quizzes/banco_de_perguntas_unico`);
                 const docSnap = await getDoc(quizDocRef);
@@ -375,7 +441,103 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', init);
+        // --- LÓGICA DO FORMULÁRIO DE SUBMISSÃO ---
+        const submissionForm = document.getElementById('submission-form');
+        const submissionOptionsContainer = document.getElementById('submission-options-container');
+        const addSubmissionOptionBtn = document.getElementById('add-submission-option-btn');
+        const submissionSuccessDiv = document.getElementById('submission-success');
+        const newSubmissionBtn = document.getElementById('new-submission-btn');
+
+        const addSubmissionOption = (isFirst = false) => {
+            const optionCount = submissionOptionsContainer.children.length;
+            const div = document.createElement('div');
+            div.className = 'submission-option';
+            div.innerHTML = `
+                <input type="radio" name="correct-submission-option" value="${optionCount}" ${isFirst ? 'checked' : ''} required>
+                <input type="text" placeholder="Texto da alternativa ${optionCount + 1}" required>
+                <button type="button" class="btn btn-secondary !p-2 !text-xs remove-option-btn ${optionCount < 2 ? 'hidden' : ''}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            submissionOptionsContainer.appendChild(div);
+            div.querySelector('.remove-option-btn').addEventListener('click', () => {
+                div.remove();
+                if (!submissionOptionsContainer.querySelector('input[type="radio"]:checked') && submissionOptionsContainer.children.length > 0) {
+                    submissionOptionsContainer.querySelector('input[type="radio"]').checked = true;
+                }
+            });
+        };
+
+        addSubmissionOptionBtn.addEventListener('click', () => addSubmissionOption());
+
+        submissionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = submissionForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = "A enviar...";
+
+            const name = document.getElementById('submit-name').value.trim();
+            const questionText = document.getElementById('submit-question').value.trim();
+            const options = [];
+            const optionElements = submissionOptionsContainer.querySelectorAll('.submission-option');
+            const correctIndex = submissionForm.querySelector('input[name="correct-submission-option"]:checked').value;
+
+            optionElements.forEach((opt, index) => {
+                const text = opt.querySelector('input[type="text"]').value.trim();
+                if (text) {
+                    options.push({
+                        texto: text,
+                        correta: index == correctIndex
+                    });
+                }
+            });
+
+            if (options.length < 2) {
+                alert("Por favor, forneça pelo menos duas opções de resposta.");
+                submitButton.disabled = false;
+                submitButton.textContent = "Enviar Pergunta";
+                return;
+            }
+
+            try {
+                const submissionData = {
+                    autor: name,
+                    pergunta_texto: questionText,
+                    opcoes: options,
+                    status: 'pendente',
+                    dataEnvio: new Date()
+                };
+                await addDoc(collection(db, `/artifacts/${appId}/public/data/quiz_submissions`), submissionData);
+                
+                submissionForm.classList.add('hidden');
+                submissionSuccessDiv.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Erro ao enviar pergunta: ", error);
+                alert("Ocorreu um erro ao enviar a sua pergunta. Tente novamente.");
+                submitButton.disabled = false;
+                submitButton.textContent = "Enviar Pergunta";
+            }
+        });
+
+        newSubmissionBtn.addEventListener('click', () => {
+             submissionForm.reset();
+             submissionOptionsContainer.innerHTML = '';
+             addSubmissionOption(true);
+             addSubmissionOption();
+             submissionForm.querySelector('button[type="submit"]').disabled = false;
+             submissionForm.querySelector('button[type="submit"]').textContent = "Enviar Pergunta";
+             submissionSuccessDiv.classList.add('hidden');
+             submissionForm.classList.remove('hidden');
+        });
+
+
+        // --- INICIALIZAÇÃO GERAL ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initQuiz();
+            addSubmissionOption(true);
+            addSubmissionOption();
+        });
     </script>
 </body>
 </html>

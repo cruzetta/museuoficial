@@ -1,9 +1,14 @@
 <div id="quiz-manager-container" class="form-section bg-white p-8 rounded-lg shadow-md space-y-12">
 
+    <!-- Editor de Perguntas -->
     <div>
         <h2 id="editor-title" class="text-2xl font-bold mb-6">Adicionar Nova Pergunta</h2>
         <form id="form-pergunta-editor" class="space-y-6 bg-gray-50 p-6 rounded-lg border">
             <input type="hidden" id="pergunta-editor-index" value="-1">
+            <input type="hidden" id="pergunta-submission-id" value="">
+            
+            <!-- NOVO: Display para o autor da pergunta em edição -->
+            <p id="pergunta-autor-display" class="hidden text-sm text-gray-600 font-sans italic"></p>
 
             <fieldset>
                 <legend class="text-lg font-semibold px-2 mb-2">Pergunta</legend>
@@ -12,8 +17,7 @@
 
             <fieldset>
                 <legend class="text-lg font-semibold px-2 mb-2">Opções de Resposta</legend>
-                <div id="opcoes-repeater-container" class="space-y-3">
-                    </div>
+                <div id="opcoes-repeater-container" class="space-y-3"></div>
                 <button type="button" id="add-opcao-btn" class="mt-4 text-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-md transition-colors">
                     <i class="fas fa-plus mr-1"></i> Adicionar Opção
                 </button>
@@ -26,6 +30,15 @@
         </form>
     </div>
 
+    <!-- Seção de Aprovação -->
+    <div>
+        <h2 class="text-2xl font-bold mb-6">Perguntas Enviadas para Aprovação</h2>
+        <div id="perguntas-pendentes-container" class="space-y-4">
+            <p class="text-gray-500">A verificar se existem novas perguntas...</p>
+        </div>
+    </div>
+
+    <!-- Banco de Perguntas Salvas -->
     <div>
         <h2 class="text-2xl font-bold mb-6">Banco de Perguntas Salvas</h2>
         <div id="perguntas-lista-container" class="space-y-4">
@@ -36,52 +49,29 @@
 
 <script data-tab-script="quizzes">
 {
-    const { db, doc, getDoc, setDoc } = window.firebaseServices;
+    const { db, doc, getDoc, setDoc, collection, onSnapshot, addDoc, deleteDoc, updateDoc } = window.firebaseServices;
     const { appId } = window.appConfig;
 
-    // --- CONFIGURAÇÃO ---
     const QUIZ_DOC_ID = "banco_de_perguntas_unico";
     const quizDocRef = doc(db, `/artifacts/${appId}/public/data/quizzes`, QUIZ_DOC_ID);
+    const submissionsCollectionRef = collection(db, `/artifacts/${appId}/public/data/quiz_submissions`);
     
-    // --- ESTADO GLOBAL ---
     let todasAsPerguntas = [];
+    let perguntasPendentes = [];
 
-    // --- ELEMENTOS DO DOM ---
     const form = document.getElementById('form-pergunta-editor');
     const editorTitle = document.getElementById('editor-title');
     const perguntaTextoInput = document.getElementById('pergunta-editor-texto');
     const opcoesContainer = document.getElementById('opcoes-repeater-container');
     const perguntaIndexInput = document.getElementById('pergunta-editor-index');
+    const submissionIdInput = document.getElementById('pergunta-submission-id');
     const saveButton = document.getElementById('save-pergunta-btn');
     const cancelButton = document.getElementById('cancel-edit-btn');
     const addOpcaoButton = document.getElementById('add-opcao-btn');
     const listaPerguntasContainer = document.getElementById('perguntas-lista-container');
+    const listaPendentesContainer = document.getElementById('perguntas-pendentes-container');
+    const autorDisplay = document.getElementById('pergunta-autor-display');
 
-    // --- PERGUNTAS PRÉ-DEFINIDAS ---
-    const preloadedQuestions = [
-      { "pergunta_texto": "Qual foi o primeiro console de videogame doméstico comercialmente bem-sucedido?", "opcoes": [ { "texto": "Magnavox Odyssey", "correta": false }, { "texto": "Atari 2600", "correta": true }, { "texto": "Nintendo Entertainment System (NES)", "correta": false }, { "texto": "ColecoVision", "correta": false } ] },
-      { "pergunta_texto": "Em que ano o primeiro jogo da série 'The Legend of Zelda' foi lançado no Japão?", "opcoes": [ { "texto": "1986", "correta": true }, { "texto": "1989", "correta": false }, { "texto": "1991", "correta": false }, { "texto": "1984", "correta": false } ] },
-      { "pergunta_texto": "Qual personagem é o principal mascote da SEGA?", "opcoes": [ { "texto": "Alex Kidd", "correta": false }, { "texto": "Sonic the Hedgehog", "correta": true }, { "texto": "Ristar", "correta": false }, { "texto": "Vectorman", "correta": false } ] },
-      { "pergunta_texto": "O jogo 'Tetris' foi criado em que país?", "opcoes": [ { "texto": "Japão", "correta": false }, { "texto": "Estados Unidos", "correta": false }, { "texto": "União Soviética", "correta": true }, { "texto": "Alemanha", "correta": false } ] },
-      { "pergunta_texto": "Qual console popularizou o uso de CDs como mídia para jogos?", "opcoes": [ { "texto": "Sega Saturn", "correta": false }, { "texto": "Nintendo 64", "correta": false }, { "texto": "3DO", "correta": false }, { "texto": "PlayStation", "correta": true } ] },
-      { "pergunta_texto": "Quem é o criador da série de jogos 'Metal Gear'?", "opcoes": [ { "texto": "Shigeru Miyamoto", "correta": false }, { "texto": "Hideo Kojima", "correta": true }, { "texto": "Yuji Naka", "correta": false }, { "texto": "Hironobu Sakaguchi", "correta": false } ] },
-      { "pergunta_texto": "Qual destes jogos NÃO foi desenvolvido pela Rareware para o Nintendo 64?", "opcoes": [ { "texto": "Banjo-Kazooie", "correta": false }, { "texto": "GoldenEye 007", "correta": false }, { "texto": "Super Mario 64", "correta": true }, { "texto": "Conker's Bad Fur Day", "correta": false } ] },
-      { "pergunta_texto": "O console 'Dreamcast' foi o último a ser lançado por qual empresa?", "opcoes": [ { "texto": "Atari", "correta": false }, { "texto": "SNK", "correta": false }, { "texto": "Sega", "correta": true }, { "texto": "NEC", "correta": false } ] },
-      { "pergunta_texto": "Qual o nome do protagonista principal da série 'Halo'?", "opcoes": [ { "texto": "Marcus Fenix", "correta": false }, { "texto": "Master Chief", "correta": true }, { "texto": "Commander Shepard", "correta": false }, { "texto": "Samus Aran", "correta": false } ] },
-      { "pergunta_texto": "O jogo 'World of Warcraft' pertence a qual gênero?", "opcoes": [ { "texto": "RTS (Estratégia em Tempo Real)", "correta": false }, { "texto": "FPS (Tiro em Primeira Pessoa)", "correta": false }, { "texto": "MMORPG (RPG Online Massivo para Múltiplos Jogadores)", "correta": true }, { "texto": "MOBA (Arena de Batalha Online para Múltiplos Jogadores)", "correta": false } ] },
-      { "pergunta_texto": "Qual console introduziu o controle de movimento como seu principal recurso?", "opcoes": [ { "texto": "PlayStation 3", "correta": false }, { "texto": "Xbox 360", "correta": false }, { "texto": "Nintendo Wii", "correta": true }, { "texto": "Sega Dreamcast", "correta": false } ] },
-      { "pergunta_texto": "Em 'Street Fighter II', qual personagem brasileiro usa eletricidade?", "opcoes": [ { "texto": "Sagat", "correta": false }, { "texto": "Dhalsim", "correta": false }, { "texto": "Blanka", "correta": true }, { "texto": "Zangief", "correta": false } ] },
-      { "pergunta_texto": "Qual foi o primeiro jogo a apresentar o personagem Mario?", "opcoes": [ { "texto": "Super Mario Bros.", "correta": false }, { "texto": "Donkey Kong", "correta": true }, { "texto": "Mario Bros.", "correta": false }, { "texto": "Super Mario World", "correta": false } ] },
-      { "pergunta_texto": "O console 'PlayStation 2' é conhecido por ser um dos mais vendidos de todos os tempos. Qual seu número aproximado de vendas?", "opcoes": [ { "texto": "80 milhões", "correta": false }, { "texto": "100 milhões", "correta": false }, { "texto": "125 milhões", "correta": false }, { "texto": "Mais de 155 milhões", "correta": true } ] },
-      { "pergunta_texto": "Qual destes jogos é um famoso título de 'survival horror'?", "opcoes": [ { "texto": "Final Fantasy VII", "correta": false }, { "texto": "Resident Evil", "correta": true }, { "texto": "Chrono Trigger", "correta": false }, { "texto": "Street Fighter", "correta": false } ] },
-      { "pergunta_texto": "Qual empresa desenvolveu a engine gráfica 'Unreal Engine'?", "opcoes": [ { "texto": "Valve", "correta": false }, { "texto": "id Software", "correta": false }, { "texto": "Epic Games", "correta": true }, { "texto": "Crytek", "correta": false } ] },
-      { "pergunta_texto": "O jogo 'Minecraft' foi originalmente criado por qual desenvolvedor?", "opcoes": [ { "texto": "Mojang", "correta": false }, { "texto": "Markus 'Notch' Persson", "correta": true }, { "texto": "Microsoft", "correta": false }, { "texto": "Electronic Arts", "correta": false } ] },
-      { "pergunta_texto": "Qual console portátil da Nintendo introduziu uma tela 3D sem a necessidade de óculos?", "opcoes": [ { "texto": "Game Boy Advance", "correta": false }, { "texto": "Nintendo DS", "correta": false }, { "texto": "Nintendo 3DS", "correta": true }, { "texto": "Nintendo Switch", "correta": false } ] },
-      { "pergunta_texto": "Qual o nome do fantasma laranja no jogo 'Pac-Man'?", "opcoes": [ { "texto": "Blinky", "correta": false }, { "texto": "Pinky", "correta": false }, { "texto": "Inky", "correta": false }, { "texto": "Clyde", "correta": true } ] },
-      { "pergunta_texto": "Em que ano foi lançado o 'Magnavox Odyssey', considerado o primeiro console de videogame da história?", "opcoes": [ { "texto": "1972", "correta": true }, { "texto": "1977", "correta": false }, { "texto": "1980", "correta": false }, { "texto": "1968", "correta": false } ] }
-    ];
-
-    // --- FUNÇÕES DO REPEATER DE OPÇÕES ---
     const addOpcaoItem = (data = {}) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'repeater-item-opcao flex items-center gap-2 pl-4';
@@ -94,28 +84,53 @@
         itemDiv.querySelector('.remove-item-btn').addEventListener('click', () => itemDiv.remove());
     };
 
-    // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
     const renderListaDePerguntas = () => {
         listaPerguntasContainer.innerHTML = '';
         if (todasAsPerguntas.length === 0) {
-            listaPerguntasContainer.innerHTML = '<p class="text-gray-500">Nenhuma pergunta encontrada. Adicione uma acima!</p>';
+            listaPerguntasContainer.innerHTML = '<p class="text-gray-500">Nenhuma pergunta encontrada.</p>';
             return;
         }
-
         todasAsPerguntas.forEach((pergunta, index) => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
             itemDiv.innerHTML = `
-                <p class="font-semibold text-sm truncate pr-4">${index + 1}. ${pergunta.pergunta_texto}</p>
+                <div class="flex-grow">
+                    <p class="font-semibold text-sm truncate pr-4">${index + 1}. ${pergunta.pergunta_texto}</p>
+                    ${pergunta.autor ? `<p class="text-xs text-gray-500 italic truncate pr-4">Criado por: ${pergunta.autor}</p>` : ''}
+                </div>
                 <div class="flex-shrink-0 flex gap-2">
                     <button class="edit-btn px-3 py-1 bg-yellow-500 text-white rounded text-xs" data-index="${index}">Editar</button>
                     <button class="delete-btn px-3 py-1 bg-red-600 text-white rounded text-xs" data-index="${index}">Eliminar</button>
                 </div>`;
-            
             itemDiv.querySelector('.edit-btn').addEventListener('click', () => carregarPerguntaParaEdicao(index));
             itemDiv.querySelector('.delete-btn').addEventListener('click', () => apagarPergunta(index));
-            
             listaPerguntasContainer.appendChild(itemDiv);
+        });
+    };
+
+    const renderListaPendente = () => {
+        listaPendentesContainer.innerHTML = '';
+        if (perguntasPendentes.length === 0) {
+            listaPendentesContainer.innerHTML = '<p class="text-gray-500">Nenhuma pergunta pendente de aprovação.</p>';
+            return;
+        }
+        perguntasPendentes.forEach(submissao => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'bg-yellow-50 p-4 rounded-lg border border-yellow-300';
+            itemDiv.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-bold text-gray-800">${submissao.pergunta_texto}</p>
+                        <p class="text-sm text-gray-600 mt-1">Enviado por: <span class="font-semibold">${submissao.autor || 'Anónimo'}</span></p>
+                    </div>
+                    <div class="flex-shrink-0 flex items-center gap-2 ml-4">
+                        <button class="approve-btn px-3 py-1 bg-green-500 text-white rounded text-xs" data-id="${submissao.id}">Aprovar</button>
+                        <button class="edit-submission-btn px-3 py-1 bg-blue-500 text-white rounded text-xs" data-id="${submissao.id}">Editar</button>
+                        <button class="reject-btn px-3 py-1 bg-red-600 text-white rounded text-xs" data-id="${submissao.id}">Rejeitar</button>
+                    </div>
+                </div>
+            `;
+            listaPendentesContainer.appendChild(itemDiv);
         });
     };
 
@@ -123,9 +138,11 @@
         form.reset();
         opcoesContainer.innerHTML = '';
         perguntaIndexInput.value = '-1';
+        submissionIdInput.value = '';
+        autorDisplay.classList.add('hidden');
         editorTitle.textContent = 'Adicionar Nova Pergunta';
         saveButton.textContent = 'Adicionar Pergunta';
-        saveButton.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+        saveButton.classList.remove('bg-yellow-500', 'hover:bg-yellow-600', 'bg-blue-500', 'hover:bg-blue-600');
         saveButton.classList.add('bg-green-600', 'hover:bg-green-700');
         cancelButton.classList.add('hidden');
         addOpcaoItem();
@@ -135,37 +152,32 @@
     const carregarPerguntaParaEdicao = (index) => {
         const pergunta = todasAsPerguntas[index];
         if (!pergunta) return;
-
         resetarFormulario();
         perguntaTextoInput.value = pergunta.pergunta_texto;
         opcoesContainer.innerHTML = '';
         pergunta.opcoes.forEach(opt => addOpcaoItem(opt));
-        
         perguntaIndexInput.value = index;
+        
+        if (pergunta.autor) {
+            autorDisplay.textContent = `Pergunta criada por: ${pergunta.autor}`;
+            autorDisplay.classList.remove('hidden');
+        }
+
         editorTitle.textContent = `Editar Pergunta ${index + 1}`;
         saveButton.textContent = 'Atualizar Pergunta';
         saveButton.classList.remove('bg-green-600', 'hover:bg-green-700');
         saveButton.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
         cancelButton.classList.remove('hidden');
-
         window.scrollTo({ top: form.offsetTop - 20, behavior: 'smooth' });
     };
-
-    // --- OPERAÇÕES CRUD (CREATE, READ, UPDATE, DELETE) ---
+    
     const carregarBancoDePerguntas = async () => {
         try {
             const docSnap = await getDoc(quizDocRef);
-            if (docSnap.exists() && docSnap.data().perguntas && docSnap.data().perguntas.length > 0) {
+            if (docSnap.exists() && docSnap.data().perguntas) {
                 todasAsPerguntas = docSnap.data().perguntas;
-            } else {
-                // Se não houver perguntas, carrega as pré-definidas
-                console.log("Banco de perguntas vazio. A carregar perguntas pré-definidas...");
-                todasAsPerguntas = preloadedQuestions;
-                await salvarBancoDePerguntas(); // Salva as novas perguntas no Firebase
-                window.showNotification('20 perguntas pré-definidas foram carregadas no seu quiz!', false);
             }
             renderListaDePerguntas();
-            resetarFormulario();
         } catch (error) {
             console.error("Erro ao carregar perguntas:", error);
             window.showNotification("Erro ao carregar o banco de perguntas.", true);
@@ -173,35 +185,66 @@
     };
     
     const salvarBancoDePerguntas = async () => {
-        const submitButton = form.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
         try {
-            await setDoc(quizDocRef, { tema: "Banco de Perguntas Principal", perguntas: todasAsPerguntas });
-            // A notificação de sucesso só é mostrada quando o utilizador salva manualmente
-            if (document.activeElement === submitButton) {
-                window.showNotification('Alterações guardadas com sucesso!');
-            }
-            renderListaDePerguntas(); // Re-renderiza a lista para garantir consistência
+            await setDoc(quizDocRef, { perguntas: todasAsPerguntas }, { merge: true });
+            renderListaDePerguntas();
         } catch (error) {
             console.error("Erro ao guardar perguntas:", error);
             window.showNotification('Erro ao guardar as alterações.', true);
-        } finally {
-            submitButton.disabled = false;
         }
     };
 
     const apagarPergunta = async (index) => {
-        if (!await window.showConfirmModal("Tem a certeza que deseja eliminar esta pergunta?")) return;
-        
+        if (!await window.showConfirmModal("Tem a certeza de que deseja eliminar esta pergunta?")) return;
         todasAsPerguntas.splice(index, 1);
         await salvarBancoDePerguntas();
-        resetarFormulario(); // Reseta o formulário caso a pergunta apagada estivesse em edição
+        window.showNotification('Pergunta eliminada com sucesso!');
+        resetarFormulario();
     };
 
-    // --- EVENT LISTENERS ---
+    const aprovarPergunta = async (id) => {
+        const submissao = perguntasPendentes.find(p => p.id === id);
+        if (!submissao) return;
+
+        const novaPergunta = {
+            pergunta_texto: submissao.pergunta_texto,
+            opcoes: submissao.opcoes,
+            autor: submissao.autor || 'Anónimo' // Adiciona o autor
+        };
+        todasAsPerguntas.push(novaPergunta);
+        await salvarBancoDePerguntas();
+        await deleteDoc(doc(submissionsCollectionRef, id));
+        window.showNotification('Pergunta aprovada e adicionada ao quiz!');
+    };
+
+    const rejeitarPergunta = async (id) => {
+        if (!await window.showConfirmModal("Tem a certeza de que deseja rejeitar esta pergunta?")) return;
+        await deleteDoc(doc(submissionsCollectionRef, id));
+        window.showNotification('Sugestão de pergunta rejeitada.');
+    };
+
+    const editarSubmissao = (id) => {
+        const submissao = perguntasPendentes.find(p => p.id === id);
+        if (!submissao) return;
+        resetarFormulario();
+        perguntaTextoInput.value = submissao.pergunta_texto;
+        opcoesContainer.innerHTML = '';
+        submissao.opcoes.forEach(opt => addOpcaoItem(opt));
+        submissionIdInput.value = id;
+        
+        autorDisplay.textContent = `Pergunta enviada por: ${submissao.autor || 'Anónimo'}`;
+        autorDisplay.classList.remove('hidden');
+
+        editorTitle.textContent = `Editar e Aprovar Pergunta`;
+        saveButton.textContent = 'Aprovar e Guardar';
+        saveButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+        saveButton.classList.add('bg-blue-500', 'hover:bg-blue-600');
+        cancelButton.classList.remove('hidden');
+        window.scrollTo({ top: form.offsetTop - 20, behavior: 'smooth' });
+    };
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         const perguntaTexto = perguntaTextoInput.value.trim();
         if (!perguntaTexto) {
             window.showNotification("O texto da pergunta não pode estar vazio.", true);
@@ -225,12 +268,24 @@
         }
 
         const index = parseInt(perguntaIndexInput.value, 10);
-        if (index > -1) {
-            // Editando pergunta existente
-            todasAsPerguntas[index] = novaPergunta;
-        } else {
-            // Adicionando nova pergunta
+        const submissionId = submissionIdInput.value;
+
+        if (submissionId) {
+            const submissaoOriginal = perguntasPendentes.find(p => p.id === submissionId);
+            if (submissaoOriginal) {
+                novaPergunta.autor = submissaoOriginal.autor || 'Anónimo';
+            }
             todasAsPerguntas.push(novaPergunta);
+            await deleteDoc(doc(submissionsCollectionRef, submissionId));
+            window.showNotification('Pergunta editada e aprovada com sucesso!', false);
+        } else if (index > -1) {
+            // Mantém o autor original se estiver a editar uma pergunta já existente
+            novaPergunta.autor = todasAsPerguntas[index].autor || null;
+            todasAsPerguntas[index] = novaPergunta;
+            window.showNotification('Pergunta atualizada com sucesso!', false);
+        } else {
+            todasAsPerguntas.push(novaPergunta);
+            window.showNotification('Nova pergunta adicionada com sucesso!', false);
         }
 
         await salvarBancoDePerguntas();
@@ -240,7 +295,20 @@
     addOpcaoButton.addEventListener('click', () => addOpcaoItem());
     cancelButton.addEventListener('click', resetarFormulario);
 
-    // --- INICIALIZAÇÃO ---
+    listaPendentesContainer.addEventListener('click', (e) => {
+        const id = e.target.dataset.id;
+        if (!id) return;
+        if (e.target.classList.contains('approve-btn')) aprovarPergunta(id);
+        if (e.target.classList.contains('edit-submission-btn')) editarSubmissao(id);
+        if (e.target.classList.contains('reject-btn')) rejeitarPergunta(id);
+    });
+
+    onSnapshot(submissionsCollectionRef, (snapshot) => {
+        perguntasPendentes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderListaPendente();
+    });
+
     carregarBancoDePerguntas();
+    resetarFormulario();
 }
 </script>
