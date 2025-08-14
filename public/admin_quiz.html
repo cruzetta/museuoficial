@@ -7,7 +7,6 @@
             <input type="hidden" id="pergunta-editor-index" value="-1">
             <input type="hidden" id="pergunta-submission-id" value="">
             
-            <!-- NOVO: Display para o autor da pergunta em edição -->
             <p id="pergunta-autor-display" class="hidden text-sm text-gray-600 font-sans italic"></p>
 
             <fieldset>
@@ -117,9 +116,17 @@
         perguntasPendentes.forEach(submissao => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'bg-yellow-50 p-4 rounded-lg border border-yellow-300';
+            
+            const optionsHTML = submissao.opcoes.map(opt => `
+                <li class="flex items-center gap-2 ${opt.correta ? 'font-bold text-green-700' : 'text-gray-600'}">
+                    ${opt.correta ? '<i class="fas fa-check-circle text-green-500"></i>' : '<i class="far fa-circle text-gray-400"></i>'}
+                    <span>${opt.texto}</span>
+                </li>
+            `).join('');
+
             itemDiv.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div>
+                <div class="flex justify-between items-start cursor-pointer" data-toggle-details="${submissao.id}">
+                    <div class="flex-grow">
                         <p class="font-bold text-gray-800">${submissao.pergunta_texto}</p>
                         <p class="text-sm text-gray-600 mt-1">Enviado por: <span class="font-semibold">${submissao.autor || 'Anónimo'}</span></p>
                     </div>
@@ -128,6 +135,12 @@
                         <button class="edit-submission-btn px-3 py-1 bg-blue-500 text-white rounded text-xs" data-id="${submissao.id}">Editar</button>
                         <button class="reject-btn px-3 py-1 bg-red-600 text-white rounded text-xs" data-id="${submissao.id}">Rejeitar</button>
                     </div>
+                </div>
+                <div id="details-${submissao.id}" class="hidden mt-4 pt-4 border-t border-yellow-200">
+                    <h4 class="text-sm font-semibold mb-2 text-gray-700">Alternativas:</h4>
+                    <ul class="space-y-1 text-sm list-none pl-2">
+                        ${optionsHTML}
+                    </ul>
                 </div>
             `;
             listaPendentesContainer.appendChild(itemDiv);
@@ -209,7 +222,7 @@
         const novaPergunta = {
             pergunta_texto: submissao.pergunta_texto,
             opcoes: submissao.opcoes,
-            autor: submissao.autor || 'Anónimo' // Adiciona o autor
+            autor: submissao.autor || 'Anónimo'
         };
         todasAsPerguntas.push(novaPergunta);
         await salvarBancoDePerguntas();
@@ -279,7 +292,6 @@
             await deleteDoc(doc(submissionsCollectionRef, submissionId));
             window.showNotification('Pergunta editada e aprovada com sucesso!', false);
         } else if (index > -1) {
-            // Mantém o autor original se estiver a editar uma pergunta já existente
             novaPergunta.autor = todasAsPerguntas[index].autor || null;
             todasAsPerguntas[index] = novaPergunta;
             window.showNotification('Pergunta atualizada com sucesso!', false);
@@ -296,11 +308,28 @@
     cancelButton.addEventListener('click', resetarFormulario);
 
     listaPendentesContainer.addEventListener('click', (e) => {
-        const id = e.target.dataset.id;
-        if (!id) return;
-        if (e.target.classList.contains('approve-btn')) aprovarPergunta(id);
-        if (e.target.classList.contains('edit-submission-btn')) editarSubmissao(id);
-        if (e.target.classList.contains('reject-btn')) rejeitarPergunta(id);
+        const target = e.target;
+        
+        // Lógica para expandir/recolher
+        const toggleDetailsTarget = target.closest('[data-toggle-details]');
+        if (toggleDetailsTarget) {
+            const id = toggleDetailsTarget.dataset.toggleDetails;
+            const detailsDiv = document.getElementById(`details-${id}`);
+            if (detailsDiv) {
+                detailsDiv.classList.toggle('hidden');
+            }
+            return; // Evita que os botões também acionem o toggle
+        }
+
+        // Lógica para os botões
+        const buttonTarget = target.closest('button');
+        if (buttonTarget) {
+            const id = buttonTarget.dataset.id;
+            if (!id) return;
+            if (buttonTarget.classList.contains('approve-btn')) aprovarPergunta(id);
+            if (buttonTarget.classList.contains('edit-submission-btn')) editarSubmissao(id);
+            if (buttonTarget.classList.contains('reject-btn')) rejeitarPergunta(id);
+        }
     });
 
     onSnapshot(submissionsCollectionRef, (snapshot) => {
