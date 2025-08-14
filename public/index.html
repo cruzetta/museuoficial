@@ -2,6 +2,7 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <!-- Viewport é essencial para o design responsivo funcionar corretamente -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Museu Itinerante do Videojogo - Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -9,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- 'Press Start 2P' é essencial para o novo design da agenda -->
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Lora&family=Orbitron&family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
@@ -405,9 +407,9 @@
             padding-bottom: 80px; /* Espaço acima do chão */
             transition: transform 0.3s;
         }
-
-        .location-node:hover {
-            transform: translateY(-10px); /* Efeito de "pulo" ao passar o mouse */
+        
+        .location-node:not(.status-current):hover {
+             transform: translateY(-10px);
         }
 
         /* Caixa de Informação (Balão) */
@@ -421,9 +423,9 @@
             margin-bottom: 15px;
             box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
             max-width: 90%;
-            /* Permite quebra de linha se o texto for longo */
             white-space: normal; 
             transition: all 0.2s ease;
+            position: relative;
         }
         .location-city {
             font-size: 0.8rem;
@@ -433,10 +435,8 @@
             font-size: 0.6rem;
             color: var(--color-text-light);
         }
-
-        /* === MODIFICAÇÕES SOLICITADAS === */
         .location-venue {
-            font-family: 'Inter', sans-serif; /* Fonte mais legível para detalhes */
+            font-family: 'Inter', sans-serif;
             font-size: 0.7rem;
             color: var(--color-text);
             font-weight: 600;
@@ -445,11 +445,10 @@
             line-height: 1.3;
             letter-spacing: 0.02em;
         }
-
         .location-map-indicator {
-            font-family: 'Inter', sans-serif; /* Fonte legível */
+            font-family: 'Inter', sans-serif;
             font-size: 0.6rem;
-            color: #3b82f6; /* Azul, comum para links */
+            color: #3b82f6;
             margin-top: 8px;
             padding-top: 6px;
             border-top: 2px dashed var(--border-color);
@@ -461,8 +460,6 @@
             opacity: 0.8;
             transition: opacity 0.2s;
         }
-
-        /* Efeito aprimorado para nós que são clicáveis */
         .location-node a {
             text-decoration: none;
             display: block;
@@ -472,14 +469,71 @@
             box-shadow: 6px 6px 0 rgba(0,0,0,0.6), 0 0 10px var(--color-primary);
             transform: scale(1.03);
         }
-
         .location-node a:hover .location-map-indicator {
             opacity: 1;
             color: var(--color-primary-hover);
         }
-        /* === FIM DAS MODIFICAÇÕES === */
 
-
+        /* === MELHORIAS CRIATIVAS PARA STATUS === */
+        .location-status-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            padding: 3px 6px;
+            border-radius: 3px;
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+        .location-status-label.live {
+            background-color: #dc2626; /* red-600 */
+            color: white;
+            animation: pulse-live 1.5s infinite;
+        }
+        @keyframes pulse-live {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+        .location-status-label.next {
+            background-color: var(--game-future);
+            color: white;
+        }
+        .location-status-label.complete {
+            background-color: var(--game-past);
+            color: #333;
+        }
+        .player-arrow {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce-arrow 2s infinite;
+            z-index: 10;
+        }
+        .player-arrow-text {
+            background-color: #000;
+            color: #fff;
+            padding: 4px 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            border-radius: 4px;
+            border: 2px solid #fff;
+            margin-bottom: 4px;
+        }
+        .player-arrow-icon {
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 16px solid #000;
+            margin: 0 auto;
+        }
+        @keyframes bounce-arrow {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-15px); }
+            60% { transform: translateX(-50%) translateY(-8px); }
+        }
         /* Ícones (Gerados via CSS) */
         .location-icon {
             width: 64px;
@@ -490,44 +544,37 @@
             font-size: 32px;
             position: relative;
         }
-
-        /* Status: Passado (Bandeira Capturada) */
-        .status-past .location-icon {
-            width: 16px;
-            height: 64px;
-            background-color: #ccc; /* Mastro */
-        }
-        .status-past .location-icon::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -24px;
-            width: 40px;
-            height: 30px;
-            background-color: var(--game-past); /* Bandeira */
-        }
+        /* Status: Passado (Troféu) */
         .status-past .location-info-box {
             opacity: 0.7;
+            filter: grayscale(50%);
+        }
+        .status-past .location-icon {
+            color: var(--game-past);
+            font-size: 48px;
+        }
+        .status-past .location-icon::before {
+            content: '\f091'; /* Font Awesome Trophy Icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
         }
 
-        /* Status: Atual (Console Pixelado) */
+        /* Status: Atual (Console com Animação) */
         .status-current .location-info-box {
             border-color: var(--game-current);
             animation: pulse-border 2s infinite;
         }
         @keyframes pulse-border {
-            0% { box-shadow: 0 0 5px 0 rgba(255, 215, 0, 0.7); }
-            70% { box-shadow: 0 0 10px 10px rgba(255, 215, 0, 0); }
-            100% { box-shadow: 0 0 5px 0 rgba(255, 215, 0, 0); }
+            0% { box-shadow: 4px 4px 0 rgba(0,0,0,0.5), 0 0 5px 0 rgba(255, 215, 0, 0.7); }
+            70% { box-shadow: 4px 4px 0 rgba(0,0,0,0.5), 0 0 10px 10px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 4px 4px 0 rgba(0,0,0,0.5), 0 0 5px 0 rgba(255, 215, 0, 0); }
         }
-
         .status-current .location-icon {
             background-color: #333;
             border-radius: 8px;
-            box-shadow: inset -4px -4px 0px #666; /* Efeito 3D pixelado */
+            box-shadow: inset -4px -4px 0px #666;
         }
         .status-current .location-icon::before {
-            /* Tela do console */
             content: '';
             position: absolute;
             width: 60%;
@@ -536,18 +583,28 @@
             top: 10%;
             left: 20%;
             border-radius: 4px;
+            animation: blink-screen 3s infinite;
+        }
+        @keyframes blink-screen {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
-        /* Status: Futuro (Bloco de Interrogação) */
+        /* Status: Futuro (Bloco com Animação) */
         .status-future .location-icon {
             background-color: var(--game-future);
             border-radius: 8px;
-            box-shadow: inset -4px -4px 0px var(--game-ground-light); /* Efeito 3D pixelado */
+            box-shadow: inset -4px -4px 0px var(--game-ground-light);
             color: #FFF;
             font-family: 'Press Start 2P', cursive;
+            animation: bobbing-block 2.5s infinite ease-in-out;
         }
         .status-future .location-icon::before {
             content: '?';
+        }
+        @keyframes bobbing-block {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         /* Separador (Cano) */
@@ -807,6 +864,7 @@
 </head>
 <body class="antialiased">
 
+    <!-- Header -->
     <header class="sticky top-0 z-50 shadow-lg h-20 md:h-24" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="flex justify-between items-center h-20 md:h-24">
@@ -830,6 +888,7 @@
         </div>
     </header>
     
+    <!-- Menu Mobile -->
     <div id="mobile-menu" class="hidden fixed top-20 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--color-dark);">
         <a href="#home" class="block text-center py-3 text-lg nav-link">Home</a>
         <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Quem Somos</a>
@@ -843,8 +902,10 @@
 
     <main>
 
+        <!-- Seção Home (Carrossel) -->
         <section id="home" class="relative w-full h-[60vh] md:h-[85vh] bg-gray-900 text-white overflow-hidden shadow-lg">
             <div id="carousel-slides" class="relative w-full h-full">
+                <!-- Indicador de carregamento -->
                 <div class="w-full h-full flex items-center justify-center">
                     <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -864,6 +925,7 @@
             <div id="carousel-indicators" class="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-3 z-10"></div>
         </section>
 
+        <!-- Seção Sobre Nós -->
         <section id="sobre-nos" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title !text-white">Quem Somos</h2>
@@ -879,14 +941,18 @@
             </div>
         </section>
         
+        <!-- === SEÇÃO DE ITINERÁRIO (PIXEL JOURNEY - NOVO) === -->
         <section id="itinerario" class="section-padding bg-white fade-in-section">
             <div class="container mx-auto mb-8">
                 <h2 class="section-title">Agenda do Museu</h2>
                 <h3 class="game-ui-title">A Jornada Pixelada!</h3>
             </div>
             
+            <!-- A Tela do Jogo -->
             <div id="itinerario-game-screen">
+                <!-- O Mundo (Conteúdo dinâmico será carregado aqui) -->
                 <div id="itinerario-world">
+                    <!-- Indicador de Carregamento Inicial -->
                     <div class="w-full flex items-center justify-center h-full" style="min-width: 100vw;">
                          <p class="text-white font-bold" style="font-family: 'Press Start 2P', cursive;">LOADING LEVEL...</p>
                     </div>
@@ -898,6 +964,9 @@
                 <a href="itinerario.html" class="btn btn-primary" style="font-family: 'Press Start 2P', cursive; font-size: 0.7rem;">Ver Lista Completa</a>
             </div>
         </section>
+        <!-- === FIM DA SEÇÃO DE ITINERÁRIO === -->
+
+        <!-- Seção Notícias -->
         <section id="noticias" class="section-padding bg-gray-100 fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Notícias e Eventos</h2>
@@ -906,26 +975,32 @@
             </div>
         </section>
 
+        <!-- Seção Museu na Mídia -->
         <section id="museu-na-midia" class="section-padding bg-gray-50 fade-in-section" style="background-image: url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23d1d5db%22 fill-opacity=%220.4%22%3E%3Cpath d=%22M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
             <div class="container mx-auto">
                 <h2 class="section-title">Museu na Mídia</h2>
                 <div id="midia-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    </div>
+                    <!-- Conteúdo da Mídia será carregado aqui -->
+                </div>
                 <div class="mt-16 text-center"><a href="museunamidia.html" class="btn btn-primary">Ver todas as matérias</a></div>
             </div>
         </section>
 
+        <!-- Seção Acervos -->
         <section id="acervos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Nosso Acervo</h2>
+                <!-- Container para o carrossel ambulante e interativo -->
                 <div class="marquee-container">
                     <div id="acervos-container" class="marquee-track py-4">
-                        </div>
+                        <!-- Os acervos serão carregados aqui pelo JavaScript -->
+                    </div>
                 </div>
                 <div class="mt-16 text-center"><a href="galeria.html" class="btn btn-primary">Explorar Acervos</a></div>
             </div>
         </section>
 
+        <!-- Seção Linha do Tempo Gerações -->
         <section id="timeline-geracoes" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title !text-white">Uma Viagem Pelas Gerações</h2>
@@ -941,8 +1016,10 @@
             </div>
         </section>
 
+        <!-- Seção Quiz -->
         <section id="quiz" class="relative py-20 md:py-32 bg-black text-white flex items-center justify-center fade-in-section">
-             <div class="container mx-auto px-4 relative z-10 text-center">
+             <!-- Conteúdo da Seção -->
+            <div class="container mx-auto px-4 relative z-10 text-center">
                 <h2 style="font-family: 'Bungee', cursive;" class="text-5xl md:text-7xl font-bold uppercase tracking-wider text-shadow-lg">
                     <span class="text-yellow-400">Desafio</span> Aceito?
                 </h2>
@@ -959,15 +1036,18 @@
 
     </main>
 
+    <!-- Rodapé -->
     <footer class="pt-16 pb-8 text-gray-300" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-center md:text-left">
+                <!-- Coluna 1: Sobre -->
                 <div class="md:col-span-2">
                     <h4 class="text-lg font-bold text-white mb-4">Museu Itinerante do Videojogo</h4>
                     <p class="text-sm text-gray-400 max-w-md mx-auto md:mx-0">
                         Preservando e celebrando a rica história dos videogames, levando cultura e diversão para todo o Brasil.
                     </p>
                 </div>
+                <!-- Coluna 2: Links Rápidos -->
                 <div>
                     <h4 class="text-lg font-bold text-white mb-4">Explore</h4>
                     <ul class="space-y-2 text-sm">
@@ -977,6 +1057,7 @@
                         <li><a href="galeria.html" class="text-gray-400 hover:text-primary transition-colors">Galeria Completa</a></li>
                     </ul>
                 </div>
+                <!-- Coluna 3: Redes Sociais e Contato -->
                 <div>
                     <h4 class="text-lg font-bold text-white mb-4">Siga Nossas Redes</h4>
                     <div class="flex justify-center md:justify-start space-x-4">
@@ -996,6 +1077,7 @@
         </div>
     </footer>
 
+    <!-- Botão Voltar ao Topo -->
     <a href="#" id="back-to-top" aria-label="Voltar ao topo da página">
         <i class="fas fa-arrow-up"></i>
     </a>
@@ -1469,23 +1551,39 @@
 
             // Função para gerar o HTML de um nó de localização
             const createLocationNode = (evento, status, id) => {
-                // Adiciona link se houver dados de mapa disponíveis
-                let linkStart = '';
-                let linkEnd = '';
-                let isClickable = false; // Flag para saber se devemos adicionar o indicador
+                let linkStart = '', linkEnd = '', isClickable = false, statusLabelHTML = '';
+                
                 if (evento.link_mapa_embed) {
                      isClickable = true;
-                     // Tenta criar um link visualizável a partir do embed do Google Maps
                      const viewUrl = evento.link_mapa_embed.replace('/embed', '/maps');
-                     // O link envolve o balão e o ícone
                      linkStart = `<a href="${viewUrl}" target="_blank" rel="noopener" title="Ver no mapa: ${evento.local || ''}">`;
                      linkEnd = '</a>';
                 }
 
+                // Adiciona os selos de status
+                switch(status) {
+                    case 'status-current':
+                        statusLabelHTML = `<div class="location-status-label live">AO VIVO</div>`;
+                        break;
+                    case 'status-future':
+                        statusLabelHTML = `<div class="location-status-label next">PRÓXIMA FASE</div>`;
+                        break;
+                    case 'status-past':
+                         statusLabelHTML = `<div class="location-status-label complete">NÍVEL COMPLETO</div>`;
+                        break;
+                }
+
+                // Adiciona a seta do jogador para o evento atual
+                const playerArrowHTML = status === 'status-current' 
+                    ? `<div class="player-arrow"><div class="player-arrow-text">VOCÊ ESTÁ AQUI</div><div class="player-arrow-icon"></div></div>` 
+                    : '';
+
                 return `
                     <div class="location-node ${status}" id="${id}">
+                        ${playerArrowHTML}
                         ${linkStart}
                         <div class="location-info-box">
+                            ${statusLabelHTML}
                             <div class="location-city">${evento.cidade}-${evento.estado}</div>
                             ${evento.local ? `<div class="location-venue">${evento.local}</div>` : ''}
                             <div class="location-date">${formatDate(evento.data_inicio)} até ${formatDate(evento.data_fim)}</div>
@@ -1518,91 +1616,48 @@
                 const hoje = new Date();
                 hoje.setHours(0, 0, 0, 0);
 
-                // Categoriza os eventos baseado na data
-                // Processamos os documentos já ordenados pelo Firebase
                 const allDocs = snapshot.docs.map(doc => doc.data());
 
                 allDocs.forEach(data => {
                     const inicio = data.data_inicio?.toDate();
                     const fim = data.data_fim?.toDate();
-
                     if (inicio && fim) {
                         const fimDoDia = new Date(fim);
                         fimDoDia.setHours(23, 59, 59, 999);
-
-                        if (hoje >= inicio && hoje <= fimDoDia) {
-                            eventos.atual.push(data);
-                        } else if (hoje > fimDoDia) {
-                            eventos.passado.push(data);
-                        } else {
-                            eventos.proximo.push(data);
-                        }
+                        if (hoje >= inicio && hoje <= fimDoDia) eventos.atual.push(data);
+                        else if (hoje > fimDoDia) eventos.passado.push(data);
+                        else eventos.proximo.push(data);
                     }
                 });
 
                 let html = '';
-                let currentEventId = null; // ID do elemento para onde vamos rolar
+                let currentEventId = null;
 
-                // 1. Renderizar Passado
-                eventos.passado.forEach((e, index) => {
-                    html += createLocationNode(e, 'status-past', `past-event-${index}`);
-                });
-
-                // Adicionar separador se houver passado E (atual OU futuro)
-                if (eventos.passado.length > 0 && (eventos.atual.length > 0 || eventos.proximo.length > 0)) {
-                    html += createSpacer();
-                }
-
-                // 2. Renderizar Atual
-                eventos.atual.forEach((e, index) => {
-                    const id = `current-event-${index}`;
+                eventos.passado.forEach((e, i) => { html += createLocationNode(e, 'status-past', `past-${i}`); });
+                if (eventos.passado.length > 0 && (eventos.atual.length > 0 || eventos.proximo.length > 0)) html += createSpacer();
+                eventos.atual.forEach((e, i) => { 
+                    const id = `current-${i}`;
                     html += createLocationNode(e, 'status-current', id);
-                    if (index === 0) currentEventId = id; // Focar no primeiro evento atual
+                    if (i === 0) currentEventId = id;
                 });
-
-                 // Adicionar separador se houver atual E futuro
-                 if (eventos.atual.length > 0 && eventos.proximo.length > 0) {
-                    html += createSpacer();
-                }
-
-                // 3. Renderizar Futuro
-                eventos.proximo.forEach((e, index) => {
-                     const id = `future-event-${index}`;
+                if (eventos.atual.length > 0 && eventos.proximo.length > 0) html += createSpacer();
+                eventos.proximo.forEach((e, i) => {
+                    const id = `future-${i}`;
                     html += createLocationNode(e, 'status-future', id);
-                    // Se não havia evento atual, focar no primeiro evento futuro
-                    if (!currentEventId && index === 0) {
-                        currentEventId = id;
-                    }
+                    if (!currentEventId && i === 0) currentEventId = id;
                 });
 
-                // Adicionar o chão visual (deve cobrir todo o conteúdo gerado)
                 html += `<div class="game-ground"><div class="game-grass-top"></div></div>`;
-
                 worldContainer.innerHTML = html;
 
-                // Scroll automático para o evento atual/próximo
                 if (currentEventId) {
-                    const currentElement = document.getElementById(currentEventId);
-                    if (currentElement) {
-                        // Calcula a posição para centralizar o elemento
-                        const screenWidth = gameScreen.offsetWidth;
-                        const elementOffsetLeft = currentElement.offsetLeft;
-                        const elementWidth = currentElement.offsetWidth;
-                        
-                        const scrollTo = elementOffsetLeft - (screenWidth / 2) + (elementWidth / 2);
-                        
-                        // Usa scroll suave para melhor efeito
-                         gameScreen.scrollTo({
-                            left: scrollTo,
-                            behavior: 'smooth'
-                        });
+                    const el = document.getElementById(currentEventId);
+                    if (el) {
+                        const scrollTo = el.offsetLeft - (gameScreen.offsetWidth / 2) + (el.offsetWidth / 2);
+                        gameScreen.scrollTo({ left: scrollTo, behavior: 'smooth' });
                     }
                 } else if (eventos.passado.length > 0) {
-                    // Se não há eventos atuais ou futuros (está tudo no passado), rola para o final
-                     gameScreen.scrollTo({
-                        left: gameScreen.scrollWidth,
-                        behavior: 'smooth'
-                    });
+                    gameScreen.scrollTo({ left: gameScreen.scrollWidth, behavior: 'smooth' });
                 }
 
             }, (error) => {
