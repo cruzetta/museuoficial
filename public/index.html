@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- 'Press Start 2P' é essencial para o novo design da agenda -->
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Lora&family=Orbitron&family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
@@ -22,6 +23,14 @@
             --color-text: #333333;
             --color-text-light: #666666;
             --border-color: #e0e0e0;
+            /* Novas cores para o Jogo da Agenda */
+            --game-sky: #6B8BFF;
+            --game-ground-dark: #8B4513;
+            --game-ground-light: #D2691E;
+            --game-grass: #00CD00;
+            --game-past: #9E9E9E;
+            --game-current: #FFD700;
+            --game-future: #FFA500; /* Laranja para o bloco ? */
         }
 
         html {
@@ -232,7 +241,7 @@
             justify-content: center;
         }
           @media (min-width: 768px) {
-              .about-slide-text-content {
+             .about-slide-text-content {
                 padding: 2.5rem;
             }
         }
@@ -243,7 +252,7 @@
             margin-bottom: 1rem;
         }
         @media (min-width: 768px) {
-              .about-slide-title {
+             .about-slide-title {
                 font-size: 1.75rem;
             }
         }
@@ -254,7 +263,7 @@
             line-height: 1.7;
         }
         @media (min-width: 768px) {
-              .about-slide-text {
+             .about-slide-text {
                 font-size: 1.125rem;
                 line-height: 1.8;
             }
@@ -310,6 +319,223 @@
             background-color: var(--color-primary);
             transform: scale(1.25);
         }
+
+        /* === NOVOS ESTILOS PARA A AGENDA (PIXEL JOURNEY) === */
+        #itinerario {
+            padding-bottom: 0; /* Removemos o padding inferior para o jogo ir até a borda */
+            overflow: hidden; /* Garante que nada vaze fora da seção */
+        }
+        .game-ui-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--color-dark);
+            /* Efeito de borda grossa no texto */
+            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff;
+        }
+        @media (min-width: 768px) {
+            .game-ui-title {
+                font-size: 2rem;
+            }
+        }
+
+        #itinerario-game-screen {
+            width: 100%;
+            height: 500px;
+            background-color: var(--game-sky);
+            overflow-x: auto;
+            overflow-y: hidden;
+            position: relative;
+            cursor: grab;
+            -webkit-user-select: none; /* Safari */
+            user-select: none; /* Padrão */
+            /* Efeito de Scanlines para parecer TV antiga */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.15) 50%, transparent 50%);
+            background-size: 100% 4px;
+            border-top: 8px solid var(--color-dark);
+        }
+        #itinerario-game-screen.grabbing {
+            cursor: grabbing;
+        }
+
+        #itinerario-world {
+            display: flex;
+            height: 100%;
+            position: relative;
+            width: max-content; /* Permite que o mundo seja mais largo que a tela */
+            /* Garante que os gráficos pixelados fiquem nítidos */
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        /* Chão e Grama (Gerados via CSS) */
+        .game-ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background-color: var(--game-ground-dark);
+            /* Padrão de terra pixelado usando gradientes */
+            background-image: linear-gradient(135deg, var(--game-ground-light) 25%, transparent 25%),
+                              linear-gradient(225deg, var(--game-ground-light) 25%, transparent 25%);
+            background-size: 16px 16px;
+        }
+        .game-grass-top {
+            position: absolute;
+            top: -16px;
+            left: 0;
+            right: 0;
+            height: 16px;
+            background-color: var(--game-grass);
+             /* Padrão de grama pixelado */
+            background-image: linear-gradient(45deg, #00AA00 25%, transparent 25%),
+                              linear-gradient(-45deg, #00AA00 25%, transparent 25%);
+            background-size: 8px 8px;
+        }
+
+        /* Nó de Localização (Checkpoint) */
+        .location-node {
+            position: relative;
+            width: 250px; /* Espaçamento entre locais */
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 80px; /* Espaço acima do chão */
+            transition: transform 0.3s;
+        }
+
+        .location-node:hover {
+            transform: translateY(-10px); /* Efeito de "pulo" ao passar o mouse */
+        }
+
+        /* Caixa de Informação (Balão) */
+        .location-info-box {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #FFF;
+            border: 4px solid var(--color-dark);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+            max-width: 90%;
+            /* Permite quebra de linha se o texto for longo */
+            white-space: normal; 
+        }
+        .location-city {
+            font-size: 0.8rem;
+            color: var(--color-dark);
+            margin-bottom: 5px;
+        }
+        .location-date {
+            font-size: 0.6rem;
+            color: var(--color-text-light);
+        }
+
+        /* Ícones (Gerados via CSS) */
+        .location-icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            position: relative;
+        }
+
+        /* Status: Passado (Bandeira Capturada) */
+        .status-past .location-icon {
+            width: 16px;
+            height: 64px;
+            background-color: #ccc; /* Mastro */
+        }
+        .status-past .location-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -24px;
+            width: 40px;
+            height: 30px;
+            background-color: var(--game-past); /* Bandeira */
+        }
+        .status-past .location-info-box {
+            opacity: 0.7;
+        }
+
+        /* Status: Atual (Console Pixelado) */
+        .status-current .location-info-box {
+            border-color: var(--game-current);
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 5px 0 rgba(255, 215, 0, 0.7); }
+            70% { box-shadow: 0 0 10px 10px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 5px 0 rgba(255, 215, 0, 0); }
+        }
+
+        .status-current .location-icon {
+            background-color: #333;
+            border-radius: 8px;
+            box-shadow: inset -4px -4px 0px #666; /* Efeito 3D pixelado */
+        }
+        .status-current .location-icon::before {
+            /* Tela do console */
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 50%;
+            background-color: var(--game-current);
+            top: 10%;
+            left: 20%;
+            border-radius: 4px;
+        }
+
+        /* Status: Futuro (Bloco de Interrogação) */
+        .status-future .location-icon {
+            background-color: var(--game-future);
+            border-radius: 8px;
+            box-shadow: inset -4px -4px 0px var(--game-ground-light); /* Efeito 3D pixelado */
+            color: #FFF;
+            font-family: 'Press Start 2P', cursive;
+        }
+        .status-future .location-icon::before {
+            content: '?';
+        }
+
+        /* Separador (Cano) */
+        .game-spacer {
+            width: 100px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 64px; /* Acima do chão */
+        }
+        .pipe {
+            width: 80px;
+            height: 96px;
+            background-color: var(--game-grass);
+            border: 4px solid var(--color-dark);
+            position: relative;
+            box-shadow: inset -6px 0 0 rgba(0,0,0,0.2);
+        }
+        .pipe-top {
+            width: 100px;
+            height: 32px;
+            background-color: var(--game-grass);
+            border: 4px solid var(--color-dark);
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset -6px 0 0 rgba(0,0,0,0.2);
+        }
+        /* Fim dos Estilos da Agenda */
+
 
         /* Estilos para a Timeline de Gerações */
         #timeline-interactive-container {
@@ -537,10 +763,9 @@
 </head>
 <body class="antialiased">
 
-    <!-- Header com altura responsiva (via classes Tailwind) -->
+    <!-- Header -->
     <header class="sticky top-0 z-50 shadow-lg h-20 md:h-24" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-4 sm:px-6">
-            <!-- Altura do flex container ajustada para corresponder ao header -->
             <div class="flex justify-between items-center h-20 md:h-24">
                 <a href="#home" class="flex-shrink-0">
                     <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame" onerror="this.onerror=null;this.src='https://placehold.co/200x80/1a1a1a/ffffff?text=Logo+Museu';">
@@ -562,7 +787,7 @@
         </div>
     </header>
     
-    <!-- Posição do menu ajustada para a nova altura do header -->
+    <!-- Menu Mobile -->
     <div id="mobile-menu" class="hidden fixed top-20 left-4 right-4 z-40 p-4 rounded-lg shadow-lg" style="background-color: var(--color-dark);">
         <a href="#home" class="block text-center py-3 text-lg nav-link">Home</a>
         <a href="#sobre-nos" class="block text-center py-3 text-lg nav-link">Quem Somos</a>
@@ -576,6 +801,7 @@
 
     <main>
 
+        <!-- Seção Home (Carrossel) -->
         <section id="home" class="relative w-full h-[60vh] md:h-[85vh] bg-gray-900 text-white overflow-hidden shadow-lg">
             <div id="carousel-slides" class="relative w-full h-full">
                 <!-- Indicador de carregamento -->
@@ -598,6 +824,7 @@
             <div id="carousel-indicators" class="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-3 z-10"></div>
         </section>
 
+        <!-- Seção Sobre Nós -->
         <section id="sobre-nos" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title !text-white">Quem Somos</h2>
@@ -613,36 +840,32 @@
             </div>
         </section>
         
+        <!-- === SEÇÃO DE ITINERÁRIO (PIXEL JOURNEY - NOVO) === -->
         <section id="itinerario" class="section-padding bg-white fade-in-section">
-            <div class="container mx-auto">
+            <div class="container mx-auto mb-8">
                 <h2 class="section-title">Agenda do Museu</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <!-- Coluna do Mapa -->
-                    <div class="rounded-lg overflow-hidden shadow-lg h-[450px]">
-                        <iframe 
-                            id="itinerario-mapa"
-                            src="about:blank" 
-                            width="100%" 
-                            height="100%" 
-                            style="border:0;" 
-                            allowfullscreen="" 
-                            loading="lazy" 
-                            referrerpolicy="no-referrer-when-downgrade"
-                            title="Mapa do Itinerário">
-                        </iframe>
-                    </div>
-
-                    <!-- Coluna de Informações -->
-                    <div id="itinerario-lista" class="space-y-6">
-                        <div class="text-center p-8">
-                            <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
-                            <p class="mt-3 text-gray-600">A carregar próximos destinos...</p>
-                        </div>
+                <h3 class="game-ui-title">A Jornada Pixelada!</h3>
+            </div>
+            
+            <!-- A Tela do Jogo -->
+            <div id="itinerario-game-screen">
+                <!-- O Mundo (Conteúdo dinâmico será carregado aqui) -->
+                <div id="itinerario-world">
+                    <!-- Indicador de Carregamento Inicial -->
+                    <div class="w-full flex items-center justify-center h-full" style="min-width: 100vw;">
+                         <p class="text-white font-bold" style="font-family: 'Press Start 2P', cursive;">LOADING LEVEL...</p>
                     </div>
                 </div>
             </div>
-        </section>
 
+            <div class="container mx-auto mt-8 text-center">
+                <p class="text-sm text-gray-600 mb-4">(Arraste a tela do jogo para navegar pela jornada)</p>
+                <a href="itinerario.html" class="btn btn-primary" style="font-family: 'Press Start 2P', cursive; font-size: 0.7rem;">Ver Lista Completa</a>
+            </div>
+        </section>
+        <!-- === FIM DA SEÇÃO DE ITINERÁRIO === -->
+
+        <!-- Seção Notícias -->
         <section id="noticias" class="section-padding bg-gray-100 fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title">Notícias e Eventos</h2>
@@ -651,7 +874,7 @@
             </div>
         </section>
 
-        <!-- NOVA SEÇÃO: MUSEU NA MÍDIA -->
+        <!-- Seção Museu na Mídia -->
         <section id="museu-na-midia" class="section-padding bg-gray-50 fade-in-section" style="background-image: url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23d1d5db%22 fill-opacity=%220.4%22%3E%3Cpath d=%22M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
             <div class="container mx-auto">
                 <h2 class="section-title">Museu na Mídia</h2>
@@ -662,7 +885,7 @@
             </div>
         </section>
 
-        <!-- === SEÇÃO DE ACERVOS ATUALIZADA === -->
+        <!-- Seção Acervos -->
         <section id="acervos" class="section-padding fade-in-section" style="background-color: var(--color-light-gray);">
             <div class="container mx-auto">
                 <h2 class="section-title">Nosso Acervo</h2>
@@ -675,8 +898,8 @@
                 <div class="mt-16 text-center"><a href="galeria.html" class="btn btn-primary">Explorar Acervos</a></div>
             </div>
         </section>
-        <!-- ==================================== -->
 
+        <!-- Seção Linha do Tempo Gerações -->
         <section id="timeline-geracoes" class="section-padding bg-gray-900 text-white fade-in-section">
             <div class="container mx-auto">
                 <h2 class="section-title !text-white">Uma Viagem Pelas Gerações</h2>
@@ -692,7 +915,7 @@
             </div>
         </section>
 
-        <!-- SEÇÃO DE QUIZ APRIMORADA -->
+        <!-- Seção Quiz -->
         <section id="quiz" class="relative py-20 md:py-32 bg-black text-white flex items-center justify-center fade-in-section">
              <!-- Conteúdo da Seção -->
             <div class="container mx-auto px-4 relative z-10 text-center">
@@ -709,11 +932,10 @@
                 </div>
             </div>
         </section>
-        <!-- FIM DA SEÇÃO DE QUIZ APRIMORADA -->
 
     </main>
 
-    <!-- RODAPÉ APRIMORADO -->
+    <!-- Rodapé -->
     <footer class="pt-16 pb-8 text-gray-300" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-center md:text-left">
@@ -812,7 +1034,7 @@
             });
         });
 
-        // --- RENDERERS ---
+        // --- RENDERERS (Notícias, Mídia, Acervo) ---
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
@@ -823,14 +1045,14 @@
     </div>
     <div class="p-5 flex flex-col flex-grow">
          <div class="mb-2">
-              ${data.categoria ? `<span class="text-xs font-bold uppercase" style="color: var(--color-primary-hover);">${data.categoria}</span>` : ''}
-              ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
-              ${dataFormatada ? `<span class="text-xs text-text-light">${dataFormatada}</span>` : ''}
+             ${data.categoria ? `<span class="text-xs font-bold uppercase" style="color: var(--color-primary-hover);">${data.categoria}</span>` : ''}
+             ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
+             ${dataFormatada ? `<span class="text-xs text-text-light">${dataFormatada}</span>` : ''}
          </div>
          <h3 class="text-xl font-bold mb-3 text-color-dark group-hover:text-primary-color transition-colors">${data.titulo}</h3>
          <p class="text-sm text-text-light mb-4 flex-grow">${data.subtitulo || ''}</p>
          <div class="mt-auto pt-4 border-t border-border-color flex justify-end items-center">
-              <span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span>
+             <span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span>
          </div>
     </div>
 </a>`;
@@ -870,10 +1092,10 @@
                  <a href="${targetUrl}" ${linkTarget} class="group block bg-white p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:rotate-1">
                     <div class="relative">
                         <div class="aspect-w-16 aspect-h-9 rounded-md overflow-hidden mb-4">
-                           ${mediaPreviewHTML}
+                            ${mediaPreviewHTML}
                         </div>
                         <div class="absolute top-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-700">
-                           ${dataFormatada}
+                            ${dataFormatada}
                         </div>
                     </div>
                     <h3 class="text-lg font-bold text-gray-800 group-hover:text-primary-color transition-colors">${data.titulo}</h3>
@@ -1152,20 +1374,120 @@
             });
         };
         
-        // --- LÓGICA DO ITINERÁRIO (ATUALIZADA) ---
+        // --- FUNÇÃO AUXILIAR PARA DRAG-TO-SCROLL (NOVO) ---
+        const initializeDragToScroll = (element) => {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            if (!element) return;
+
+            // Eventos de Mouse
+            element.addEventListener('mousedown', (e) => {
+                isDown = true;
+                element.classList.add('grabbing');
+                startX = e.pageX - element.offsetLeft;
+                scrollLeft = element.scrollLeft;
+            });
+            element.addEventListener('mouseleave', () => {
+                isDown = false;
+                element.classList.remove('grabbing');
+            });
+            element.addEventListener('mouseup', () => {
+                isDown = false;
+                element.classList.remove('grabbing');
+            });
+            element.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - element.offsetLeft;
+                const walk = (x - startX) * 2; // Fator de velocidade do scroll
+                element.scrollLeft = scrollLeft - walk;
+            });
+
+             // Eventos de Toque (para mobile)
+            element.addEventListener('touchstart', (e) => {
+                isDown = true;
+                element.classList.add('grabbing'); 
+                startX = e.touches[0].pageX - element.offsetLeft;
+                scrollLeft = element.scrollLeft;
+            }, { passive: true });
+
+            element.addEventListener('touchend', () => {
+                isDown = false;
+                element.classList.remove('grabbing');
+            });
+
+            element.addEventListener('touchmove', (e) => {
+                if (!isDown) return;
+                // Não chamamos preventDefault aqui para permitir o scroll vertical se o usuário tentar, 
+                // mas o movimento horizontal será capturado. Se quisermos bloquear totalmente o scroll vertical durante o arraste, devemos adicionar lógica para isso.
+                const x = e.touches[0].pageX - element.offsetLeft;
+                const walk = (x - startX) * 2;
+                element.scrollLeft = scrollLeft - walk;
+            }, { passive: true });
+        };
+
+
+        // --- LÓGICA DO ITINERÁRIO (PIXEL JOURNEY - NOVO) ---
         const initializeItinerario = () => {
-            const container = document.getElementById('itinerario-lista');
-            const mapaIframe = document.getElementById('itinerario-mapa');
-            if (!container || !mapaIframe) return;
+            const gameScreen = document.getElementById('itinerario-game-screen');
+            const worldContainer = document.getElementById('itinerario-world');
+            
+            if (!gameScreen || !worldContainer) return;
 
-            const defaultMapSrc = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15251425.13994353!2d-52.91093553125!3d-14.2400732!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9c5a2773a4a749%3A0x82782596c50b343!2sBrasil!5e0!3m2!1spt-BR!2sbr!4v1672857335917!5m2!1spt-BR!2sbr";
+            // Inicializa a funcionalidade de arrastar para rolar
+            initializeDragToScroll(gameScreen);
 
+            // Ordena os eventos do mais antigo para o mais novo
             const q = query(collection(db, `/artifacts/${appId}/public/data/itinerario`), orderBy("data_inicio", "asc"));
+
+            const formatDate = (date) => {
+                if (!date || !date.toDate) return 'A definir';
+                // Formato simplificado para o jogo: DD/MM
+                return date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+            }
+
+            // Função para gerar o HTML de um nó de localização
+            const createLocationNode = (evento, status, id) => {
+                // Adiciona link se houver dados de mapa disponíveis
+                let linkStart = '';
+                let linkEnd = '';
+                if (evento.link_mapa_embed) {
+                     // Tenta criar um link visualizável a partir do embed do Google Maps
+                     const viewUrl = evento.link_mapa_embed.replace('/embed', '/maps');
+                     // O link envolve o balão e o ícone
+                     linkStart = `<a href="${viewUrl}" target="_blank" rel="noopener" title="Ver no mapa: ${evento.local || ''}">`;
+                     linkEnd = '</a>';
+                }
+
+                return `
+                    <div class="location-node ${status}" id="${id}">
+                        ${linkStart}
+                        <div class="location-info-box">
+                            <div class="location-city">${evento.cidade}-${evento.estado}</div>
+                            <div class="location-date">${formatDate(evento.data_inicio)} até ${formatDate(evento.data_fim)}</div>
+                        </div>
+                        <div class="location-icon"></div>
+                        ${linkEnd}
+                    </div>
+                `;
+            }
+
+            // Função para gerar o HTML de um separador (cano)
+            const createSpacer = () => {
+                return `
+                    <div class="game-spacer">
+                        <div class="pipe">
+                            <div class="pipe-top"></div>
+                        </div>
+                    </div>
+                `;
+            }
 
             onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) {
-                    container.innerHTML = '<p class="text-center text-gray-500">Fique atento! Em breve divulgaremos nossos próximos destinos.</p>';
-                    mapaIframe.src = defaultMapSrc;
+                    worldContainer.innerHTML = `<div class="w-full flex items-center justify-center h-full" style="min-width: 100vw;"><p class="text-white font-bold" style="font-family: 'Press Start 2P', cursive; text-align: center;">SEM NOVOS NÍVEIS (Destinos) <br>POR ENQUANTO!</p></div>`;
                     return;
                 }
 
@@ -1173,85 +1495,99 @@
                 const hoje = new Date();
                 hoje.setHours(0, 0, 0, 0);
 
-                snapshot.docs.forEach(doc => {
-                    const data = doc.data();
+                // Categoriza os eventos baseado na data
+                // Processamos os documentos já ordenados pelo Firebase
+                const allDocs = snapshot.docs.map(doc => doc.data());
+
+                allDocs.forEach(data => {
                     const inicio = data.data_inicio?.toDate();
                     const fim = data.data_fim?.toDate();
 
-                    let statusCalculado = 'proximo';
                     if (inicio && fim) {
                         const fimDoDia = new Date(fim);
                         fimDoDia.setHours(23, 59, 59, 999);
 
                         if (hoje >= inicio && hoje <= fimDoDia) {
-                            statusCalculado = 'atual';
+                            eventos.atual.push(data);
                         } else if (hoje > fimDoDia) {
-                            statusCalculado = 'passado';
+                            eventos.passado.push(data);
+                        } else {
+                            eventos.proximo.push(data);
                         }
                     }
-                    eventos[statusCalculado].push(data);
                 });
 
-                eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
-
-                const eventoAtual = eventos.atual[0];
-                const proximoEvento = eventos.proximo[0];
-
-                if (eventoAtual && eventoAtual.link_mapa_embed) {
-                    mapaIframe.src = eventoAtual.link_mapa_embed;
-                } else if (proximoEvento && proximoEvento.link_mapa_embed) {
-                    mapaIframe.src = proximoEvento.link_mapa_embed;
-                } else {
-                    mapaIframe.src = defaultMapSrc;
-                }
-
-                const formatDate = (date) => {
-                    if (!date || !date.toDate) return 'Data a definir';
-                    return date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                }
-
-                const createEventHTML = (evento, icon, colorClass) => {
-                    let mapaLink = '';
-                    if (evento.link_mapa_embed) {
-                        const viewUrl = evento.link_mapa_embed.replace('/embed', '/maps');
-                        mapaLink = `<a href="${viewUrl}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline mt-1 inline-block"><i class="fas fa-map-pin mr-1"></i>Ver no mapa</a>`;
-                    }
-                    return `
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-full ${colorClass} text-white flex items-center justify-center shadow-md">
-                            <i class="fas ${icon} text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-lg">${evento.cidade}, ${evento.estado}</h4>
-                            <p class="text-gray-600 text-sm">${evento.local}</p>
-                            <p class="text-gray-500 text-xs font-semibold mt-1">${formatDate(evento.data_inicio)} - ${formatDate(evento.data_fim)}</p>
-                            ${mapaLink}
-                        </div>
-                    </div>
-                `;
-                }
-
                 let html = '';
-                if (eventos.atual.length > 0) {
-                    html += '<h3 class="text-xl font-bold border-b pb-2 mb-4 text-green-600">Acontecendo Agora</h3>';
-                    html += eventos.atual.map(e => createEventHTML(e, 'fa-map-marker-alt', 'bg-green-500')).join('<hr class="my-4">');
+                let currentEventId = null; // ID do elemento para onde vamos rolar
+
+                // 1. Renderizar Passado
+                eventos.passado.forEach((e, index) => {
+                    html += createLocationNode(e, 'status-past', `past-event-${index}`);
+                });
+
+                // Adicionar separador se houver passado E (atual OU futuro)
+                if (eventos.passado.length > 0 && (eventos.atual.length > 0 || eventos.proximo.length > 0)) {
+                    html += createSpacer();
                 }
-                if (eventos.proximo.length > 0) {
-                    html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-yellow-600">Próximos Destinos</h3>';
-                    html += eventos.proximo.slice(0, 1).map(e => createEventHTML(e, 'fa-flag-checkered', 'bg-yellow-500')).join('<hr class="my-4">');
+
+                // 2. Renderizar Atual
+                eventos.atual.forEach((e, index) => {
+                    const id = `current-event-${index}`;
+                    html += createLocationNode(e, 'status-current', id);
+                    if (index === 0) currentEventId = id; // Focar no primeiro evento atual
+                });
+
+                 // Adicionar separador se houver atual E futuro
+                 if (eventos.atual.length > 0 && eventos.proximo.length > 0) {
+                    html += createSpacer();
                 }
-                if (eventos.passado.length > 0) {
-                    html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-gray-500">Último Local Visitado</h3>';
-                    html += eventos.passado.slice(0, 1).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">');
+
+                // 3. Renderizar Futuro
+                eventos.proximo.forEach((e, index) => {
+                     const id = `future-event-${index}`;
+                    html += createLocationNode(e, 'status-future', id);
+                    // Se não havia evento atual, focar no primeiro evento futuro
+                    if (!currentEventId && index === 0) {
+                        currentEventId = id;
+                    }
+                });
+
+                // Adicionar o chão visual (deve cobrir todo o conteúdo gerado)
+                html += `<div class="game-ground"><div class="game-grass-top"></div></div>`;
+
+                worldContainer.innerHTML = html;
+
+                // Scroll automático para o evento atual/próximo
+                if (currentEventId) {
+                    const currentElement = document.getElementById(currentEventId);
+                    if (currentElement) {
+                        // Calcula a posição para centralizar o elemento
+                        const screenWidth = gameScreen.offsetWidth;
+                        const elementOffsetLeft = currentElement.offsetLeft;
+                        const elementWidth = currentElement.offsetWidth;
+                        
+                        const scrollTo = elementOffsetLeft - (screenWidth / 2) + (elementWidth / 2);
+                        
+                        // Usa scroll suave para melhor efeito
+                         gameScreen.scrollTo({
+                            left: scrollTo,
+                            behavior: 'smooth'
+                        });
+                    }
+                } else if (eventos.passado.length > 0) {
+                    // Se não há eventos atuais ou futuros (está tudo no passado), rola para o final
+                     gameScreen.scrollTo({
+                        left: gameScreen.scrollWidth,
+                        behavior: 'smooth'
+                    });
                 }
-                html += `<div class="mt-8 text-center"><a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a></div>`;
-                container.innerHTML = html;
 
             }, (error) => {
                 console.error("Erro ao carregar itinerário:", error);
-                container.innerHTML = '<p class="text-center text-red-500">Não foi possível carregar o itinerário.</p>';
+                worldContainer.innerHTML = `<div class="w-full flex items-center justify-center h-full" style="min-width: 100vw;"><p class="text-red-500 font-bold" style="font-family: 'Press Start 2P', cursive;">GAME OVER (Erro ao carregar)</p></div>`;
             });
         };
+
 
         // --- LÓGICA DA TIMELINE INTERATIVA DE GERAÇÕES ---
         const initializeInteractiveTimeline = () => {
@@ -1404,15 +1740,20 @@
 
             const dragMove = (e) => {
                 if (!isDragging) return;
-                preventClick = true; 
-
-                // Previne o scroll da página no mobile enquanto arrasta o carrossel
-                if (e.type === 'touchmove') {
-                    e.preventDefault();
-                }
-
+                
                 const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
                 const moveX = currentX - startX;
+
+                // Se o movimento for significativo, consideramos um arraste
+                if (Math.abs(moveX) > 5) {
+                    preventClick = true; 
+                     // Previne o scroll da página no mobile enquanto arrasta o carrossel
+                    if (e.type === 'touchmove') {
+                        // Para garantir que o carrossel seja a prioridade no toque
+                         e.preventDefault();
+                    }
+                }
+
                 setTranslateX(currentTranslate + moveX);
             };
 
@@ -1440,7 +1781,7 @@
 
             // Eventos de Toque
             container.addEventListener('touchstart', dragStart, { passive: true });
-            window.addEventListener('touchmove', dragMove, { passive: false });
+            window.addEventListener('touchmove', dragMove, { passive: false }); // passive: false para usar preventDefault
             window.addEventListener('touchend', dragEnd);
 
             loop();
@@ -1458,7 +1799,7 @@
             }
         };
 
-        // --- Animação de Scroll ---
+        // --- Animação de Scroll, Nav Ativa, Voltar ao Topo ---
         const setupScrollAnimation = () => {
             const sections = document.querySelectorAll('.fade-in-section');
             const observer = new IntersectionObserver((entries) => {
@@ -1472,7 +1813,6 @@
             sections.forEach(section => observer.observe(section));
         };
 
-        // --- LÓGICA DE NAVEGAÇÃO ATIVA COM SCROLL ---
         const initializeActiveNavOnScroll = () => {
             const sections = document.querySelectorAll('main > section[id]');
             const navLinks = document.querySelectorAll('#desktop-nav a.nav-link, #mobile-menu a.nav-link');
@@ -1504,7 +1844,6 @@
             });
         };
 
-        // --- LÓGICA DO BOTÃO "VOLTAR AO TOPO" ---
         const initializeBackToTop = () => {
             const backToTopButton = document.getElementById('back-to-top');
             if (!backToTopButton) return;
@@ -1527,7 +1866,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeCarousel();
             initializeAboutTimeline();
-            initializeItinerario();
+            initializeItinerario(); // Inicializa a nova agenda estilo Jogo
             initializeInteractiveTimeline();
             setupScrollAnimation();
             initializeActiveNavOnScroll();
