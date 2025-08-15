@@ -354,6 +354,7 @@
             background-image: linear-gradient(rgba(0, 0, 0, 0.15) 50%, transparent 50%);
             background-size: 100% 4px;
             border-top: 8px solid var(--color-dark);
+            touch-action: pan-x; /* <<-- ALTERAÇÃO APLICADA AQUI -->> */
         }
         #itinerario-game-screen.grabbing {
             cursor: grabbing;
@@ -1191,18 +1192,18 @@
 
             return `
                  <a href="${targetUrl}" ${linkTarget} class="group block bg-white p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:rotate-1">
-                    <div class="relative">
-                        <div class="aspect-w-16 aspect-h-9 rounded-md overflow-hidden mb-4">
-                            ${mediaPreviewHTML}
-                        </div>
-                        <div class="absolute top-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-700">
-                            ${dataFormatada}
-                        </div>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-800 group-hover:text-primary-color transition-colors">${data.titulo}</h3>
-                    <p class="text-sm text-gray-600 mt-2">${data.descricao || ''}</p>
-                    <span class="text-sm font-semibold text-primary-color mt-4 inline-block">Ver Matéria <i class="fas fa-arrow-right text-xs ml-1"></i></span>
-                </a>`;
+                     <div class="relative">
+                         <div class="aspect-w-16 aspect-h-9 rounded-md overflow-hidden mb-4">
+                             ${mediaPreviewHTML}
+                         </div>
+                         <div class="absolute top-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-700">
+                             ${dataFormatada}
+                         </div>
+                     </div>
+                     <h3 class="text-lg font-bold text-gray-800 group-hover:text-primary-color transition-colors">${data.titulo}</h3>
+                     <p class="text-sm text-gray-600 mt-2">${data.descricao || ''}</p>
+                     <span class="text-sm font-semibold text-primary-color mt-4 inline-block">Ver Matéria <i class="fas fa-arrow-right text-xs ml-1"></i></span>
+                 </a>`;
         };
 
         const renderAcervo = (doc) => {
@@ -1475,29 +1476,33 @@
             });
         };
         
-        // --- FUNÇÃO AUXILIAR PARA DRAG-TO-SCROLL (NOVO) ---
+        // --- FUNÇÃO AUXILIAR PARA DRAG-TO-SCROLL (ATUALIZADA) ---
         const initializeDragToScroll = (element) => {
+            if (!element) return;
+
             let isDown = false;
             let startX;
             let scrollLeft;
 
-            if (!element) return;
-
-            // Eventos de Mouse
+            // Mantemos apenas os eventos de MOUSE para desktop
             element.addEventListener('mousedown', (e) => {
                 isDown = true;
                 element.classList.add('grabbing');
                 startX = e.pageX - element.offsetLeft;
                 scrollLeft = element.scrollLeft;
+                e.preventDefault(); // Previne seleção de texto/imagens ao arrastar
             });
+
             element.addEventListener('mouseleave', () => {
                 isDown = false;
                 element.classList.remove('grabbing');
             });
+
             element.addEventListener('mouseup', () => {
                 isDown = false;
                 element.classList.remove('grabbing');
             });
+
             element.addEventListener('mousemove', (e) => {
                 if (!isDown) return;
                 e.preventDefault();
@@ -1506,27 +1511,7 @@
                 element.scrollLeft = scrollLeft - walk;
             });
 
-             // Eventos de Toque (para mobile)
-            element.addEventListener('touchstart', (e) => {
-                isDown = true;
-                element.classList.add('grabbing'); 
-                startX = e.touches[0].pageX - element.offsetLeft;
-                scrollLeft = element.scrollLeft;
-            }, { passive: true });
-
-            element.addEventListener('touchend', () => {
-                isDown = false;
-                element.classList.remove('grabbing');
-            });
-
-            element.addEventListener('touchmove', (e) => {
-                if (!isDown) return;
-                // Não chamamos preventDefault aqui para permitir o scroll vertical se o usuário tentar, 
-                // mas o movimento horizontal será capturado. Se quisermos bloquear totalmente o scroll vertical durante o arraste, devemos adicionar lógica para isso.
-                const x = e.touches[0].pageX - element.offsetLeft;
-                const walk = (x - startX) * 2;
-                element.scrollLeft = scrollLeft - walk;
-            }, { passive: true });
+            // Os eventos de toque foram removidos pois o CSS 'touch-action: pan-x' agora cuida disso.
         };
 
 
