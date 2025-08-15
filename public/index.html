@@ -354,7 +354,7 @@
             background-image: linear-gradient(rgba(0, 0, 0, 0.15) 50%, transparent 50%);
             background-size: 100% 4px;
             border-top: 8px solid var(--color-dark);
-            touch-action: pan-x; /* <<-- ALTERAÇÃO APLICADA AQUI -->> */
+            /* A propriedade 'touch-action' foi removida para permitir a lógica de JS */
         }
         #itinerario-game-screen.grabbing {
             cursor: grabbing;
@@ -1476,42 +1476,91 @@
             });
         };
         
-        // --- FUNÇÃO AUXILIAR PARA DRAG-TO-SCROLL (ATUALIZADA) ---
+        // --- FUNÇÃO AUXILIAR PARA DRAG-TO-SCROLL (ATUALIZADA E COMBINADA) ---
         const initializeDragToScroll = (element) => {
             if (!element) return;
 
-            let isDown = false;
-            let startX;
-            let scrollLeft;
+            // --- Lógica para Mouse (Desktop) ---
+            let isMouseDown = false;
+            let startX, scrollLeft;
 
-            // Mantemos apenas os eventos de MOUSE para desktop
             element.addEventListener('mousedown', (e) => {
-                isDown = true;
+                isMouseDown = true;
                 element.classList.add('grabbing');
                 startX = e.pageX - element.offsetLeft;
                 scrollLeft = element.scrollLeft;
-                e.preventDefault(); // Previne seleção de texto/imagens ao arrastar
+                e.preventDefault();
             });
 
             element.addEventListener('mouseleave', () => {
-                isDown = false;
+                isMouseDown = false;
                 element.classList.remove('grabbing');
             });
 
             element.addEventListener('mouseup', () => {
-                isDown = false;
+                isMouseDown = false;
                 element.classList.remove('grabbing');
             });
 
             element.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
+                if (!isMouseDown) return;
                 e.preventDefault();
                 const x = e.pageX - element.offsetLeft;
-                const walk = (x - startX) * 2; // Fator de velocidade do scroll
+                const walk = (x - startX) * 2;
                 element.scrollLeft = scrollLeft - walk;
             });
 
-            // Os eventos de toque foram removidos pois o CSS 'touch-action: pan-x' agora cuida disso.
+            // --- Lógica para Toque (Mobile) com Detecção de Direção ---
+            let isTouching = false;
+            let touchStartX, touchStartY;
+            let initialScrollLeft;
+            let scrollDirection = null; // 'horizontal', 'vertical', ou null
+
+            element.addEventListener('touchstart', (e) => {
+                isTouching = true;
+                const touch = e.touches[0];
+                touchStartX = touch.pageX;
+                touchStartY = touch.pageY;
+                initialScrollLeft = element.scrollLeft;
+                scrollDirection = null; // Reseta a direção a cada novo toque
+            }, { passive: true });
+
+            element.addEventListener('touchend', () => {
+                isTouching = false;
+                element.classList.remove('grabbing');
+            }, { passive: true });
+
+            element.addEventListener('touchmove', (e) => {
+                if (!isTouching) return;
+
+                const touch = e.touches[0];
+                const currentX = touch.pageX;
+                const currentY = touch.pageY;
+
+                // Se a direção do scroll ainda não foi decidida
+                if (scrollDirection === null) {
+                    const deltaX = Math.abs(currentX - touchStartX);
+                    const deltaY = Math.abs(currentY - touchStartY);
+
+                    // Espera um movimento mínimo para decidir a direção
+                    if (deltaX > 5 || deltaY > 5) {
+                        if (deltaX > deltaY) {
+                            scrollDirection = 'horizontal';
+                            element.classList.add('grabbing');
+                        } else {
+                            scrollDirection = 'vertical';
+                        }
+                    }
+                }
+
+                // Se a direção for horizontal, executa o scroll e previne o default
+                if (scrollDirection === 'horizontal') {
+                    e.preventDefault();
+                    const walk = currentX - touchStartX;
+                    element.scrollLeft = initialScrollLeft - walk;
+                }
+                // Se a direção for 'vertical', não faz nada, permitindo o scroll da página
+            }, { passive: false }); // passive: false é crucial para e.preventDefault() funcionar
         };
 
 
