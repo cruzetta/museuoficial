@@ -462,7 +462,7 @@
             transform: scale(1.25);
         }
 
-        /* === ESTILOS ATUALIZADOS PARA CARROSSEL DE ACERVOS INTERATIVO === */
+        /* === ESTILOS PARA CARROSSÉIS FLUIDOS (MARQUEE) === */
         .marquee-container {
             overflow: hidden;
             position: relative;
@@ -474,34 +474,26 @@
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
             mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
         }
-        
         .marquee-container.grabbing {
             cursor: grabbing;
         }
-        
         .marquee-track {
             display: flex;
             width: fit-content;
             will-change: transform;
         }
-        
         .marquee-item {
             flex-shrink: 0;
-            /* Largura responsiva para os itens do acervo */
-            width: 80vw; /* Ocupa 80% da largura da tela do celular */
-            max-width: 300px; /* Mantém um tamanho máximo em telas maiores */
             padding: 0 0.75rem;
         }
-        @media (min-width: 640px) { /* sm breakpoint do Tailwind */
-             .marquee-item {
-                width: 40vw; /* Mostra mais itens em telas um pouco maiores */
-            }
-        }
-         @media (min-width: 1024px) { /* lg breakpoint */
-             .marquee-item {
-                width: 300px; /* Volta a um valor mais fixo em telas grandes */
-            }
-        }
+        /* Estilo específico para o carrossel de acervos */
+        .acervo-marquee-item { width: 80vw; max-width: 300px; }
+        @media (min-width: 640px) { .acervo-marquee-item { width: 40vw; } }
+        @media (min-width: 1024px) { .acervo-marquee-item { width: 300px; } }
+        /* Estilo específico para a galeria de fotos do itinerário */
+        .galeria-marquee-item { width: 70vw; max-width: 400px; }
+        @media (min-width: 640px) { .galeria-marquee-item { width: 50vw; max-width: 350px; } }
+        @media (min-width: 1024px) { .galeria-marquee-item { width: 30vw; max-width: 400px; } }
         
         /* NOVA CLASSE PARA SOMBRA DE TEXTO */
         .text-shadow-lg {
@@ -540,7 +532,6 @@
     <!-- Header com altura responsiva (via classes Tailwind) -->
     <header class="sticky top-0 z-50 shadow-lg h-20 md:h-24" style="background-color: var(--color-dark);">
         <div class="container mx-auto px-4 sm:px-6">
-            <!-- Altura do flex container ajustada para corresponder ao header -->
             <div class="flex justify-between items-center h-20 md:h-24">
                 <a href="#home" class="flex-shrink-0">
                     <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame" onerror="this.onerror=null;this.src='https://placehold.co/200x80/1a1a1a/ffffff?text=Logo+Museu';">
@@ -619,13 +610,13 @@
                 <h2 class="section-title">Agenda do Museu</h2>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     
-                    <!-- Coluna do Mapa foi SUBSTITUÍDA pela Galeria de Fotos -->
-                    <div id="itinerario-galeria" class="rounded-lg overflow-hidden shadow-lg h-[450px] bg-gray-100 flex items-center justify-center p-4">
-                        <!-- A galeria de fotos do evento atual será carregada aqui -->
-                         <div class="text-center">
-                             <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
-                             <p class="mt-3 text-gray-600">A verificar galeria de fotos...</p>
-                         </div>
+                    <!-- Coluna da Galeria de Fotos (Carrossel Fluido) -->
+                    <div id="itinerario-galeria-container" class="marquee-container h-[450px]">
+                        <div id="itinerario-galeria-track" class="marquee-track">
+                             <div class="w-full h-full flex items-center justify-center">
+                                 <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
+                             </div>
+                        </div>
                     </div>
 
                     <!-- Coluna de Informações -->
@@ -664,7 +655,7 @@
             <div class="container mx-auto">
                 <h2 class="section-title">Nosso Acervo</h2>
                 <!-- Container para o carrossel ambulante e interativo -->
-                <div class="marquee-container">
+                <div id="acervos-marquee" class="marquee-container">
                     <div id="acervos-container" class="marquee-track py-4">
                         <!-- Os acervos serão carregados aqui pelo JavaScript -->
                     </div>
@@ -760,7 +751,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, getDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuração do Firebase
         var firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
@@ -769,7 +759,6 @@
             messagingSenderId: "555107674356",
             appId: "1:555107674356:web:f38d1703d35831f7ad16a1"
         };
-
         var app = initializeApp(firebaseConfig);
         var db = getFirestore(app);
         var appId = 'museu-cca6d';
@@ -779,16 +768,12 @@
         const mobileMenu = document.getElementById('mobile-menu');
         const internalNavLinks = document.querySelectorAll('a[href^="#"]');
         const body = document.body;
-
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
-            // Trava/Destrava o scroll do body
             body.classList.toggle('overflow-hidden-mobile');
         });
-
         internalNavLinks.forEach(link => {
             link.addEventListener('click', (e) => {
-                // Apenas para links internos da página
                 if (link.getAttribute('href').startsWith('#')) {
                     e.preventDefault();
                     const targetId = link.getAttribute('href');
@@ -799,10 +784,8 @@
                         const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
                         window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                     }
-                    // Fecha o menu mobile se estiver aberto
                     if (!mobileMenu.classList.contains('hidden')) {
                         mobileMenu.classList.add('hidden');
-                        // Garante que o scroll seja destravado ao clicar num link
                         body.classList.remove('overflow-hidden-mobile');
                     }
                 }
@@ -813,88 +796,32 @@
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
-            return `
-<a href="noticia.html?id=${doc.id}" class="content-card group">
-    <div class="block h-56 overflow-hidden rounded-t-lg">
-        <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.titulo}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" onerror="this.onerror=null;this.src='https://placehold.co/400x300/e0e0e0/333333?text=Erro+Imagem';">
-    </div>
-    <div class="p-5 flex flex-col flex-grow">
-         <div class="mb-2">
-              ${data.categoria ? `<span class="text-xs font-bold uppercase" style="color: var(--color-primary-hover);">${data.categoria}</span>` : ''}
-              ${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}
-              ${dataFormatada ? `<span class="text-xs text-text-light">${dataFormatada}</span>` : ''}
-         </div>
-         <h3 class="text-xl font-bold mb-3 text-color-dark group-hover:text-primary-color transition-colors">${data.titulo}</h3>
-         <p class="text-sm text-text-light mb-4 flex-grow">${data.subtitulo || ''}</p>
-         <div class="mt-auto pt-4 border-t border-border-color flex justify-end items-center">
-              <span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span>
-         </div>
-    </div>
-</a>`;
+            return `<a href="noticia.html?id=${doc.id}" class="content-card group"><div class="block h-56 overflow-hidden rounded-t-lg"><img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.titulo}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" onerror="this.onerror=null;this.src='https://placehold.co/400x300/e0e0e0/333333?text=Erro+Imagem';"></div><div class="p-5 flex flex-col flex-grow"><div class="mb-2">${data.categoria ? `<span class="text-xs font-bold uppercase" style="color: var(--color-primary-hover);">${data.categoria}</span>` : ''}${data.categoria && dataFormatada ? `<span class="text-gray-400 mx-2">•</span>` : ''}${dataFormatada ? `<span class="text-xs text-text-light">${dataFormatada}</span>` : ''}</div><h3 class="text-xl font-bold mb-3 text-color-dark group-hover:text-primary-color transition-colors">${data.titulo}</h3><p class="text-sm text-text-light mb-4 flex-grow">${data.subtitulo || ''}</p><div class="mt-auto pt-4 border-t border-border-color flex justify-end items-center"><span class="text-sm font-semibold text-primary-color group-hover:underline">Ler Mais <i class="fas fa-arrow-right text-xs ml-1"></i></span></div></div></a>`;
         };
-
         const renderMidia = (doc) => {
             const data = doc.data();
             let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) || '';
-            
             let mediaPreviewHTML = '';
             let targetUrl = data.link_externo || data.arquivo_url || 'museunamidia.html';
             let linkTarget = (data.link_externo || data.arquivo_url) ? 'target="_blank" rel="noopener noreferrer"' : '';
-
-            // Lógica para criar o preview visual
             if (data.tipo_arquivo && data.tipo_arquivo.startsWith('image/')) {
                 mediaPreviewHTML = `<img src="${data.arquivo_url}" alt="${data.titulo}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" onerror="this.onerror=null;this.src='https://placehold.co/400x300/e0e0e0/333333?text=Erro+Imagem';">`;
             } else {
-                let iconClass = 'fas fa-link text-gray-500';
-                let bgColor = 'bg-gray-200';
+                let iconClass = 'fas fa-link text-gray-500', bgColor = 'bg-gray-200';
                 if (data.tipo_arquivo) {
-                    if (data.tipo_arquivo.startsWith('video/')) {
-                        iconClass = 'fas fa-video text-red-500';
-                        bgColor = 'bg-red-100';
-                    } else if (data.tipo_arquivo === 'application/pdf') {
-                        iconClass = 'fas fa-file-pdf text-purple-500';
-                        bgColor = 'bg-purple-100';
-                    }
+                    if (data.tipo_arquivo.startsWith('video/')) { iconClass = 'fas fa-video text-red-500'; bgColor = 'bg-red-100'; }
+                    else if (data.tipo_arquivo === 'application/pdf') { iconClass = 'fas fa-file-pdf text-purple-500'; bgColor = 'bg-purple-100'; }
                 }
-                mediaPreviewHTML = `
-                    <div class="w-full h-full flex items-center justify-center ${bgColor}">
-                        <i class="${iconClass} text-6xl"></i>
-                    </div>
-                `;
+                mediaPreviewHTML = `<div class="w-full h-full flex items-center justify-center ${bgColor}"><i class="${iconClass} text-6xl"></i></div>`;
             }
-
-            return `
-                 <a href="${targetUrl}" ${linkTarget} class="group block bg-white p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:rotate-1">
-                     <div class="relative">
-                         <div class="aspect-w-16 aspect-h-9 rounded-md overflow-hidden mb-4">
-                            ${mediaPreviewHTML}
-                         </div>
-                         <div class="absolute top-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-700">
-                            ${dataFormatada}
-                         </div>
-                     </div>
-                     <h3 class="text-lg font-bold text-gray-800 group-hover:text-primary-color transition-colors">${data.titulo}</h3>
-                     <p class="text-sm text-gray-600 mt-2">${data.descricao || ''}</p>
-                     <span class="text-sm font-semibold text-primary-color mt-4 inline-block">Ver Matéria <i class="fas fa-arrow-right text-xs ml-1"></i></span>
-                 </a>`;
+            return `<a href="${targetUrl}" ${linkTarget} class="group block bg-white p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:rotate-1"><div class="relative"><div class="aspect-w-16 aspect-h-9 rounded-md overflow-hidden mb-4">${mediaPreviewHTML}</div><div class="absolute top-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-700">${dataFormatada}</div></div><h3 class="text-lg font-bold text-gray-800 group-hover:text-primary-color transition-colors">${data.titulo}</h3><p class="text-sm text-gray-600 mt-2">${data.descricao || ''}</p><span class="text-sm font-semibold text-primary-color mt-4 inline-block">Ver Matéria <i class="fas fa-arrow-right text-xs ml-1"></i></span></a>`;
         };
-
         const renderAcervo = (doc) => {
             const data = doc.data();
-            return `
-                <div class="marquee-item">
-                    <a href="item_detalhe.html?id=${doc.id}" class="block h-full group" draggable="false">
-                        <div class="bg-white rounded-lg shadow-md p-4 h-full flex flex-col items-center justify-center text-center transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-2">
-                            <div class="h-48 flex items-center justify-center mb-4">
-                                <img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" draggable="false" onerror="this.onerror=null;this.src='https://placehold.co/200x200/e0e0e0/333333?text=Erro+Imagem';">
-                            </div>
-                            <h3 class="text-md font-bold text-gray-800">${data.nome}</h3>
-                        </div>
-                    </a>
-                </div>`;
+            return `<div class="marquee-item acervo-marquee-item"><a href="item_detalhe.html?id=${doc.id}" class="block h-full group" draggable="false"><div class="bg-white rounded-lg shadow-md p-4 h-full flex flex-col items-center justify-center text-center transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-2"><div class="h-48 flex items-center justify-center mb-4"><img src="${data.imagem_principal || 'https://placehold.co/400x300/e0e0e0/333333?text=Sem+Imagem'}" alt="${data.nome}" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" draggable="false" onerror="this.onerror=null;this.src='https://placehold.co/200x200/e0e0e0/333333?text=Erro+Imagem';"></div><h3 class="text-md font-bold text-gray-800">${data.nome}</h3></div></a></div>`;
         };
 
-        // --- DATA LOADERS ---
+        // --- DATA LOADER ---
         const loadCollectionData = (name, containerId, renderer, q, onRender) => {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -908,13 +835,12 @@
             });
         };
         
-        // --- LÓGICA DO CARROSSEL (FADE) ---
+        // --- LÓGICA DO CARROSSEL PRINCIPAL (HOME) ---
         const initializeCarousel = async () => {
             const slidesContainer = document.getElementById('carousel-slides');
             const prevButton = document.getElementById('carousel-prev');
             const nextButton = document.getElementById('carousel-next');
             const indicatorsContainer = document.getElementById('carousel-indicators');
-
             if (!slidesContainer) return;
 
             let slidesData = [];
@@ -934,53 +860,23 @@
 
             const renderSlide = (slideData, index) => {
                 const { titulo, mediaUrl, mediaTipo, linkTexto, linkUrl, tituloEstilo, tituloPosicao } = slideData;
-                
                 const slideWrapper = document.createElement('div');
                 slideWrapper.className = "carousel-slide absolute inset-0 transition-opacity duration-1000 ease-in-out";
                 slideWrapper.style.opacity = index === 0 ? '1' : '0';
                 slideWrapper.dataset.index = index;
-                
                 let mediaElement = mediaTipo === 'video'
                     ? `<video id="video-${index}" class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" muted playsinline loop></video>`
                     : `<img class="absolute top-0 left-0 w-full h-full object-cover" src="${mediaUrl}" alt="${titulo || 'Slide do Carrossel'}">`;
-
-                // Aplica estilos com fallbacks seguros
                 const safeStyle = (obj, prop, fallback) => (obj && obj[prop]) ? obj[prop] : fallback;
-                let titleStyles = `
-                    font-family: ${safeStyle(tituloEstilo, 'fontFamily', 'Inter, sans-serif')};
-                    font-size: clamp(1.5rem, 5vw, ${safeStyle(tituloEstilo, 'fontSize', 36)}px);
-                    color: ${safeStyle(tituloEstilo, 'color', '#FFFFFF')};
-                    font-weight: ${safeStyle(tituloEstilo, 'fontWeight', 'normal')};
-                    line-height: ${safeStyle(tituloEstilo, 'lineHeight', 1.2)};
-                    letter-spacing: ${safeStyle(tituloEstilo, 'letterSpacing', 0)}px;
-                    text-transform: ${safeStyle(tituloEstilo, 'textTransform', 'none')};
-                    text-shadow: ${safeStyle(tituloEstilo, 'textShadow', 'none')};
-                `;
-
-                let titleContainerStyles = `
-                    position: absolute;
-                    transform: translate(-50%, -50%);
-                    left: ${safeStyle(tituloPosicao, 'x', 50)}%;
-                    top: ${safeStyle(tituloPosicao, 'y', 50)}%;
-                    width: 90%;
-                `;
-                
+                let titleStyles = `font-family: ${safeStyle(tituloEstilo, 'fontFamily', 'Inter, sans-serif')}; font-size: clamp(1.5rem, 5vw, ${safeStyle(tituloEstilo, 'fontSize', 36)}px); color: ${safeStyle(tituloEstilo, 'color', '#FFFFFF')}; font-weight: ${safeStyle(tituloEstilo, 'fontWeight', 'normal')}; line-height: ${safeStyle(tituloEstilo, 'lineHeight', 1.2)}; letter-spacing: ${safeStyle(tituloEstilo, 'letterSpacing', 0)}px; text-transform: ${safeStyle(tituloEstilo, 'textTransform', 'none')}; text-shadow: ${safeStyle(tituloEstilo, 'textShadow', 'none')};`;
+                let titleContainerStyles = `position: absolute; transform: translate(-50%, -50%); left: ${safeStyle(tituloPosicao, 'x', 50)}%; top: ${safeStyle(tituloPosicao, 'y', 50)}%; width: 90%;`;
                 let buttonHTML = '';
                 if (linkTexto && linkUrl) {
                     const isInternalLink = linkUrl.startsWith('#');
                     const targetAttr = isInternalLink ? '' : 'target="_blank" rel="noopener noreferrer"';
                     buttonHTML = `<div class="absolute bottom-10 left-1/2 -translate-x-1/2"><a href="${linkUrl}" ${targetAttr} class="btn btn-primary">${linkTexto}</a></div>`;
                 }
-
-                slideWrapper.innerHTML = `
-                    ${mediaElement}
-                    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-                    <div class="relative z-10 h-full w-full">
-                        <div style="${titleContainerStyles}" class="text-center p-4">
-                            ${titulo ? `<h2 style="${titleStyles}">${titulo.replace(/\n/g, '<br>')}</h2>` : ''}
-                        </div>
-                        ${buttonHTML}
-                    </div>`;
+                slideWrapper.innerHTML = `${mediaElement}<div class="absolute inset-0 bg-black bg-opacity-40"></div><div class="relative z-10 h-full w-full"><div style="${titleContainerStyles}" class="text-center p-4">${titulo ? `<h2 style="${titleStyles}">${titulo.replace(/\n/g, '<br>')}</h2>` : ''}</div>${buttonHTML}</div>`;
                 return slideWrapper;
             };
 
@@ -996,18 +892,13 @@
 
             const goToSlide = (index) => {
                 if (index < 0 || index >= slidesData.length) return;
-                
                 const slides = slidesContainer.querySelectorAll('.carousel-slide');
                 const indicators = indicatorsContainer.querySelectorAll('.carousel-indicator');
-
                 slides[currentIndex].style.opacity = '0';
                 indicators[currentIndex].style.opacity = '0.5';
-                
                 currentIndex = index;
-                
                 slides[currentIndex].style.opacity = '1';
                 indicators[currentIndex].style.opacity = '1';
-                
                 resetAutoplay();
             };
 
@@ -1016,7 +907,6 @@
             const resetAutoplay = () => {
                 clearTimeout(autoplayTimer);
                 if (slidesData.length <= 1) return;
-
                 const currentSlideData = slidesData[currentIndex];
                 if (currentSlideData.mediaTipo === 'video') {
                     const videoElement = document.getElementById(`video-${currentIndex}`);
@@ -1036,29 +926,23 @@
                 const q = query(collection(db, path), orderBy("ordem", "asc"));
                 const querySnapshot = await getDocs(q);
                 slidesData = querySnapshot.docs.map(doc => doc.data());
-                
                 if (slidesData.length === 0) {
                     slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Nenhum slide encontrado.</p></div>';
                     return;
                 }
-
                 slidesContainer.innerHTML = '';
                 indicatorsContainer.innerHTML = '';
-
                 slidesData.forEach((slide, index) => {
                     slidesContainer.appendChild(renderSlide(slide, index));
                     indicatorsContainer.appendChild(renderIndicator(index));
                 });
-
                 if (slidesData.length > 1) {
                     prevButton.classList.remove('hidden');
                     nextButton.classList.remove('hidden');
                     prevButton.addEventListener('click', () => goToSlide((currentIndex - 1 + slidesData.length) % slidesData.length));
                     nextButton.addEventListener('click', advanceAndReset);
                 }
-
                 goToSlide(0);
-
             } catch (error) {
                 console.error("Erro ao carregar o carrossel:", error);
                 slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p>Ocorreu um erro ao carregar o conteúdo.</p></div>';
@@ -1069,76 +953,33 @@
         const initializeAboutTimeline = () => {
             const container = document.getElementById('about-timeline-container');
             if (!container) return;
-
-            let storyData = [];
-            let currentIndex = 0;
-
+            let storyData = [], currentIndex = 0;
             const render = () => {
-                if (storyData.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500 text-center">A história do museu será adicionada em breve.</p>';
-                    return;
-                }
-
-                container.innerHTML = `
-                    <div class="about-timeline-viewport">
-                        <div class="about-timeline-track">
-                            ${storyData.map(slide => `
-                                <div class="about-slide">
-                                    <div class="about-slide-content">
-                                        <img src="${slide.imagem || 'https://placehold.co/600x400/2c2c2c/f4f4f4?text=Museu'}" alt="${slide.titulo}" class="about-slide-image">
-                                        <div class="about-slide-text-content">
-                                            <h3 class="about-slide-title">${slide.titulo}</h3>
-                                            <p class="about-slide-text">${slide.texto}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div class="about-timeline-navigation">
-                        <button id="about-timeline-prev" class="about-timeline-nav-button" aria-label="Slide anterior da história"><i class="fas fa-arrow-left"></i></button>
-                        <div class="about-timeline-dots">
-                            ${storyData.map((_, index) => `<div class="about-timeline-dot ${index === 0 ? 'active' : ''}" data-index="${index}" aria-label="Ir para o slide ${index + 1} da história"></div>`).join('')}
-                        </div>
-                        <button id="about-timeline-next" class="about-timeline-nav-button" aria-label="Próximo slide da história"><i class="fas fa-arrow-right"></i></button>
-                    </div>
-                `;
-                
+                if (storyData.length === 0) { container.innerHTML = '<p class="text-gray-500 text-center">A história do museu será adicionada em breve.</p>'; return; }
+                container.innerHTML = `<div class="about-timeline-viewport"><div class="about-timeline-track">${storyData.map(slide => `<div class="about-slide"><div class="about-slide-content"><img src="${slide.imagem || 'https://placehold.co/600x400/2c2c2c/f4f4f4?text=Museu'}" alt="${slide.titulo}" class="about-slide-image"><div class="about-slide-text-content"><h3 class="about-slide-title">${slide.titulo}</h3><p class="about-slide-text">${slide.texto}</p></div></div></div>`).join('')}</div></div><div class="about-timeline-navigation"><button id="about-timeline-prev" class="about-timeline-nav-button" aria-label="Slide anterior da história"><i class="fas fa-arrow-left"></i></button><div class="about-timeline-dots">${storyData.map((_, index) => `<div class="about-timeline-dot ${index === 0 ? 'active' : ''}" data-index="${index}" aria-label="Ir para o slide ${index + 1} da história"></div>`).join('')}</div><button id="about-timeline-next" class="about-timeline-nav-button" aria-label="Próximo slide da história"><i class="fas fa-arrow-right"></i></button></div>`;
                 document.getElementById('about-timeline-prev').addEventListener('click', () => updateTimeline(-1));
                 document.getElementById('about-timeline-next').addEventListener('click', () => updateTimeline(1));
-                document.querySelectorAll('.about-timeline-dot').forEach(dot => {
-                    dot.addEventListener('click', (e) => goToSlide(parseInt(e.target.dataset.index, 10)));
-                });
-                
+                document.querySelectorAll('.about-timeline-dot').forEach(dot => dot.addEventListener('click', (e) => goToSlide(parseInt(e.target.dataset.index, 10))));
                 updateButtons();
             };
-
             const goToSlide = (index) => {
                 currentIndex = index;
                 const track = container.querySelector('.about-timeline-track');
                 const dots = container.querySelectorAll('.about-timeline-dot');
-                
-                if (track) {
-                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                }
+                if (track) { track.style.transform = `translateX(-${currentIndex * 100}%)`; }
                 dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
                 updateButtons();
             };
-
             const updateTimeline = (direction) => {
                 const newIndex = currentIndex + direction;
-                if (newIndex >= 0 && newIndex < storyData.length) {
-                    goToSlide(newIndex);
-                }
+                if (newIndex >= 0 && newIndex < storyData.length) { goToSlide(newIndex); }
             };
-
             const updateButtons = () => {
                 const prevBtn = document.getElementById('about-timeline-prev');
                 const nextBtn = document.getElementById('about-timeline-next');
                 if (prevBtn) prevBtn.disabled = currentIndex === 0;
                 if (nextBtn) nextBtn.disabled = currentIndex === storyData.length - 1;
             };
-
             const q = query(collection(db, `/artifacts/${appId}/public/data/sobre-nos`), orderBy("ordem", "asc"));
             onSnapshot(q, (snapshot) => {
                 storyData = snapshot.docs.map(doc => doc.data());
@@ -1152,115 +993,84 @@
         // --- LÓGICA DO ITINERÁRIO (ATUALIZADA) ---
         const initializeItinerario = () => {
             const containerLista = document.getElementById('itinerario-lista');
-            const containerGaleria = document.getElementById('itinerario-galeria'); // Novo contêiner da galeria
-            if (!containerLista || !containerGaleria) return;
+            const galeriaContainer = document.getElementById('itinerario-galeria-container');
+            const galeriaTrack = document.getElementById('itinerario-galeria-track');
+            if (!containerLista || !galeriaContainer || !galeriaTrack) return;
 
-            const renderGaleria = (evento) => {
-                if (evento && evento.galeriaFotos && evento.galeriaFotos.length > 0) {
-                    // Simples grid de fotos. Poderia ser um carrossel mais complexo.
-                    containerGaleria.innerHTML = `
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full h-full overflow-y-auto">
-                            ${evento.galeriaFotos.map(foto => `
-                                <a href="${foto.url}" target="_blank" class="block aspect-square group">
-                                    <img src="${foto.url}" alt="${foto.descricao || 'Foto do evento'}" class="w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null;this.src='https://placehold.co/200x200/e0e0e0/333333?text=Erro+Imagem';">
-                                </a>
-                            `).join('')}
+            const shuffleArray = (array) => {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            };
+
+            const renderGaleriaAleatoria = (fotos) => {
+                if (fotos && fotos.length > 0) {
+                    galeriaTrack.innerHTML = fotos.map(foto => `
+                        <div class="galeria-marquee-item marquee-item">
+                            <div class="aspect-w-4 aspect-h-3 h-full">
+                                <img src="${foto.url}" alt="${foto.descricao || 'Foto do museu'}" draggable="false" class="w-full h-full object-cover rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/400x300/e0e0e0/333333?text=Erro';">
+                            </div>
                         </div>
-                    `;
+                    `).join('');
+                    if (fotos.length > 3) {
+                        galeriaTrack.innerHTML += galeriaTrack.innerHTML;
+                    }
+                    initializeDraggableMarquee(galeriaContainer, galeriaTrack);
                 } else {
-                    containerGaleria.innerHTML = `
-                        <div class="text-center text-gray-500">
-                            <i class="fas fa-camera-retro text-4xl mb-3"></i>
-                            <p>Galeria de fotos em breve.</p>
-                        </div>
-                    `;
+                    galeriaContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center text-center text-gray-500"><i class="fas fa-camera-retro text-4xl mb-3"></i><p>Nenhuma foto nos eventos ainda.</p></div>`;
                 }
             };
 
-            const q = query(collection(db, `/artifacts/${appId}/public/data/itinerario`), orderBy("data_inicio", "asc"));
-
+            const q = query(collection(db, `/artifacts/${appId}/public/data/itinerario`));
             onSnapshot(q, (snapshot) => {
-                if (snapshot.empty) {
-                    containerLista.innerHTML = '<p class="text-center text-gray-500">Fique atento! Em breve divulgaremos nossos próximos destinos.</p>';
-                    renderGaleria(null); // Mostra a mensagem padrão na galeria
-                    return;
-                }
-
-                const eventos = { atual: [], proximo: [], passado: [] };
-                const hoje = new Date();
-                hoje.setHours(0, 0, 0, 0);
-
+                let todasAsFotos = [];
                 snapshot.docs.forEach(doc => {
                     const data = doc.data();
-                    const inicio = data.data_inicio?.toDate();
-                    const fim = data.data_fim?.toDate();
-
-                    let statusCalculado = 'proximo';
-                    if (inicio && fim) {
-                        const fimDoDia = new Date(fim);
-                        fimDoDia.setHours(23, 59, 59, 999);
-
-                        if (hoje >= inicio && hoje <= fimDoDia) {
-                            statusCalculado = 'atual';
-                        } else if (hoje > fimDoDia) {
-                            statusCalculado = 'passado';
-                        }
+                    if (data.galeriaFotos && Array.isArray(data.galeriaFotos)) {
+                        todasAsFotos.push(...data.galeriaFotos);
                     }
-                    eventos[statusCalculado].push(data);
                 });
+                renderGaleriaAleatoria(shuffleArray(todasAsFotos));
 
-                eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
-                
-                // Prioriza o evento atual, senão o próximo, para exibir a galeria
-                const eventoDestaque = eventos.atual[0] || eventos.proximo[0];
-                renderGaleria(eventoDestaque);
-
-                const formatDate = (date) => {
-                    if (!date || !date.toDate) return 'Data a definir';
-                    return date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                if (snapshot.empty) {
+                    containerLista.innerHTML = '<p class="text-center text-gray-500">Fique atento! Em breve divulgaremos nossos próximos destinos.</p>';
+                } else {
+                    const eventos = { atual: [], proximo: [], passado: [] };
+                    const hoje = new Date();
+                    hoje.setHours(0, 0, 0, 0);
+                    snapshot.docs.forEach(doc => {
+                        const data = doc.data();
+                        const inicio = data.data_inicio?.toDate();
+                        const fim = data.data_fim?.toDate();
+                        let statusCalculado = 'proximo';
+                        if (inicio && fim) {
+                            const fimDoDia = new Date(fim);
+                            fimDoDia.setHours(23, 59, 59, 999);
+                            if (hoje >= inicio && hoje <= fimDoDia) statusCalculado = 'atual';
+                            else if (hoje > fimDoDia) statusCalculado = 'passado';
+                        }
+                        eventos[statusCalculado].push(data);
+                    });
+                    
+                    eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
+                    const formatDate = (date) => date?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) || 'Data a definir';
+                    const createEventHTML = (evento, icon, colorClass) => {
+                        let mapaLink = '';
+                        if (evento.link_mapa_embed) {
+                            const viewUrl = evento.link_mapa_embed.replace('/embed', '/maps');
+                            mapaLink = `<a href="${viewUrl}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline mt-1 inline-block"><i class="fas fa-map-pin mr-1"></i>Ver no mapa</a>`;
+                        }
+                        return `<div class="flex items-start gap-4"><div class="flex-shrink-0 w-12 h-12 rounded-full ${colorClass} text-white flex items-center justify-center shadow-md"><i class="fas ${icon} text-xl"></i></div><div><h4 class="font-bold text-lg">${evento.cidade}, ${evento.estado}</h4><p class="text-gray-600 text-sm">${evento.local}</p><p class="text-gray-500 text-xs font-semibold mt-1">${formatDate(evento.data_inicio)} - ${formatDate(evento.data_fim)}</p>${mapaLink}</div></div>`;
+                    };
+                    let html = '';
+                    if (eventos.atual.length > 0) { html += `<h3 class="text-xl font-bold border-b pb-2 mb-4 text-green-600">Acontecendo Agora</h3>${eventos.atual.map(e => createEventHTML(e, 'fa-map-marker-alt', 'bg-green-500')).join('<hr class="my-4">')}`; }
+                    if (eventos.proximo.length > 0) { html += `<h3 class="text-xl font-bold border-b pb-2 my-4 text-yellow-600">Próximos Destinos</h3>${eventos.proximo.slice(0, 1).map(e => createEventHTML(e, 'fa-flag-checkered', 'bg-yellow-500')).join('<hr class="my-4">')}`; }
+                    if (eventos.passado.length > 0) { html += `<h3 class="text-xl font-bold border-b pb-2 my-4 text-gray-500">Último Local Visitado</h3>${eventos.passado.slice(0, 1).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">')}`; }
+                    html += `<div class="mt-8 text-center"><a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a></div>`;
+                    containerLista.innerHTML = html;
                 }
-
-                const createEventHTML = (evento, icon, colorClass) => {
-                    let mapaLink = '';
-                    if (evento.link_mapa_embed) {
-                        const viewUrl = evento.link_mapa_embed.replace('/embed', '/maps');
-                        mapaLink = `<a href="${viewUrl}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline mt-1 inline-block"><i class="fas fa-map-pin mr-1"></i>Ver no mapa</a>`;
-                    }
-                    return `
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-full ${colorClass} text-white flex items-center justify-center shadow-md">
-                            <i class="fas ${icon} text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-lg">${evento.cidade}, ${evento.estado}</h4>
-                            <p class="text-gray-600 text-sm">${evento.local}</p>
-                            <p class="text-gray-500 text-xs font-semibold mt-1">${formatDate(evento.data_inicio)} - ${formatDate(evento.data_fim)}</p>
-                            ${mapaLink}
-                        </div>
-                    </div>
-                    `;
-                }
-
-                let html = '';
-                if (eventos.atual.length > 0) {
-                    html += '<h3 class="text-xl font-bold border-b pb-2 mb-4 text-green-600">Acontecendo Agora</h3>';
-                    html += eventos.atual.map(e => createEventHTML(e, 'fa-map-marker-alt', 'bg-green-500')).join('<hr class="my-4">');
-                }
-                if (eventos.proximo.length > 0) {
-                    html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-yellow-600">Próximos Destinos</h3>';
-                    html += eventos.proximo.slice(0, 1).map(e => createEventHTML(e, 'fa-flag-checkered', 'bg-yellow-500')).join('<hr class="my-4">');
-                }
-                if (eventos.passado.length > 0) {
-                    html += '<h3 class="text-xl font-bold border-b pb-2 my-4 text-gray-500">Último Local Visitado</h3>';
-                    html += eventos.passado.slice(0, 1).map(e => createEventHTML(e, 'fa-history', 'bg-gray-400')).join('<hr class="my-4">');
-                }
-                html += `<div class="mt-8 text-center"><a href="itinerario.html" class="btn btn-primary text-sm">Ver Itinerário Completo</a></div>`;
-                containerLista.innerHTML = html;
-
-            }, (error) => {
-                console.error("Erro ao carregar itinerário:", error);
-                containerLista.innerHTML = '<p class="text-center text-red-500">Não foi possível carregar o itinerário.</p>';
-                renderGaleria(null);
             });
         };
 
@@ -1268,87 +1078,36 @@
         const initializeInteractiveTimeline = () => {
             const container = document.getElementById('timeline-interactive-container');
             if (!container) return;
-
-            let generationsData = [];
-            let currentIndex = 0;
-
+            let generationsData = [], currentIndex = 0;
             const render = () => {
-                if (generationsData.length === 0) {
-                    container.innerHTML = '<p class="text-gray-400">Nenhuma geração encontrada.</p>';
-                    return;
-                }
-
-                container.innerHTML = `
-                    <div class="timeline-viewport">
-                        <div class="timeline-track">
-                            ${generationsData.map(gen => `
-                                <div class="timeline-generation-card">
-                                    <div class="timeline-card-content">
-                                        <img src="${gen.imagem || 'https://placehold.co/600x450/2c2c2c/f4f4f4?text=Sem+Imagem'}" alt="Imagem da ${gen.titulo}" class="timeline-image" onerror="this.onerror=null;this.src='https://placehold.co/600x450/2c2c2c/f4f4f4?text=Imagem+N%C3%A3o+Dispon%C3%ADvel';">
-                                        <div class="timeline-text-content">
-                                            <p class="timeline-generation-title">${gen.titulo} (${gen.anos})</p>
-                                            <h3 class="timeline-generation-name">${gen.nome}</h3>
-                                            <p class="timeline-generation-description">${gen.descricao}</p>
-                                            <p class="timeline-generation-consoles">Marcado por: ${gen.consoles}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div class="timeline-navigation">
-                        <button id="timeline-prev" class="timeline-nav-button" aria-label="Geração anterior"><i class="fas fa-arrow-left"></i></button>
-                        <div class="timeline-dots">
-                            ${generationsData.map((_, index) => `<div class="timeline-dot ${index === currentIndex ? 'active' : ''}" data-index="${index}" aria-label="Ir para a geração ${index + 1}"></div>`).join('')}
-                        </div>
-                        <button id="timeline-next" class="timeline-nav-button" aria-label="Próxima geração"><i class="fas fa-arrow-right"></i></button>
-                    </div>
-                `;
-                
+                if (generationsData.length === 0) { container.innerHTML = '<p class="text-gray-400">Nenhuma geração encontrada.</p>'; return; }
+                container.innerHTML = `<div class="timeline-viewport"><div class="timeline-track">${generationsData.map(gen => `<div class="timeline-generation-card"><div class="timeline-card-content"><img src="${gen.imagem || 'https://placehold.co/600x450/2c2c2c/f4f4f4?text=Sem+Imagem'}" alt="Imagem da ${gen.titulo}" class="timeline-image" onerror="this.onerror=null;this.src='https://placehold.co/600x450/2c2c2c/f4f4f4?text=Imagem+N%C3%A3o+Dispon%C3%ADvel';"><div class="timeline-text-content"><p class="timeline-generation-title">${gen.titulo} (${gen.anos})</p><h3 class="timeline-generation-name">${gen.nome}</h3><p class="timeline-generation-description">${gen.descricao}</p><p class="timeline-generation-consoles">Marcado por: ${gen.consoles}</p></div></div></div>`).join('')}</div></div><div class="timeline-navigation"><button id="timeline-prev" class="timeline-nav-button" aria-label="Geração anterior"><i class="fas fa-arrow-left"></i></button><div class="timeline-dots">${generationsData.map((_, index) => `<div class="timeline-dot ${index === currentIndex ? 'active' : ''}" data-index="${index}" aria-label="Ir para a geração ${index + 1}"></div>`).join('')}</div><button id="timeline-next" class="timeline-nav-button" aria-label="Próxima geração"><i class="fas fa-arrow-right"></i></button></div>`;
                 document.getElementById('timeline-prev').addEventListener('click', () => updateTimeline(-1));
                 document.getElementById('timeline-next').addEventListener('click', () => updateTimeline(1));
-                document.querySelectorAll('.timeline-dot').forEach(dot => {
-                    dot.addEventListener('click', (e) => {
-                        const index = parseInt(e.target.dataset.index, 10);
-                        goToGeneration(index);
-                    });
-                });
-
+                document.querySelectorAll('.timeline-dot').forEach(dot => dot.addEventListener('click', (e) => goToGeneration(parseInt(e.target.dataset.index, 10))));
                 updateButtons();
-                setTimeout(() => {
-                    const initialCard = document.querySelector('.timeline-generation-card');
-                    if(initialCard) initialCard.classList.add('active');
-                }, 50);
+                setTimeout(() => { const initialCard = document.querySelector('.timeline-generation-card'); if(initialCard) initialCard.classList.add('active'); }, 50);
             };
-
             const goToGeneration = (index) => {
                 currentIndex = index;
                 const track = document.querySelector('#timeline-interactive-container .timeline-track');
                 const dots = document.querySelectorAll('#timeline-interactive-container .timeline-dot');
                 const cards = document.querySelectorAll('.timeline-generation-card');
-
                 if (track) track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                
                 dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
                 cards.forEach((card, i) => card.classList.toggle('active', i === currentIndex));
-
                 updateButtons();
             };
-
             const updateTimeline = (direction) => {
                 const newIndex = currentIndex + direction;
-                if (newIndex >= 0 && newIndex < generationsData.length) {
-                    goToGeneration(newIndex);
-                }
+                if (newIndex >= 0 && newIndex < generationsData.length) { goToGeneration(newIndex); }
             };
-
             const updateButtons = () => {
                 const prevBtn = document.getElementById('timeline-prev');
                 const nextBtn = document.getElementById('timeline-next');
                 if (prevBtn) prevBtn.disabled = currentIndex === 0;
                 if (nextBtn) nextBtn.disabled = currentIndex === generationsData.length - 1;
             };
-
             const q = query(collection(db, `/artifacts/${appId}/public/data/geracoes`), orderBy("ordem", "asc"));
             onSnapshot(q, (snapshot) => {
                 generationsData = snapshot.docs.map(doc => doc.data());
@@ -1359,114 +1118,50 @@
             });
         };
 
-        // --- LÓGICA PARA O CARROSSEL DE ACERVOS INTERATIVO ---
-        const initializeDraggableMarquee = () => {
-            const container = document.querySelector('.marquee-container');
-            const track = document.getElementById('acervos-container');
+        // --- LÓGICA PARA O CARROSSEL FLUIDO (MARQUEE) ---
+        const initializeDraggableMarquee = (container, track) => {
             if (!container || !track || track.children.length === 0) return;
-
             const speedPxPerFrame = 0.5;
-            
-            let isDragging = false;
-            let startX;
-            let currentTranslate = 0;
-            let animationFrameId;
-            let preventClick = false;
-
+            let isDragging = false, startX, currentTranslate = 0, animationFrameId, preventClick = false;
             track.style.animation = 'none';
-
-            const getTranslateX = () => {
-                const style = window.getComputedStyle(track);
-                const matrix = new DOMMatrixReadOnly(style.transform);
-                return matrix.m41;
-            };
-
-            const setTranslateX = (value) => {
-                track.style.transform = `translateX(${value}px)`;
-            };
-
+            const getTranslateX = () => new DOMMatrixReadOnly(window.getComputedStyle(track).transform).m41;
+            const setTranslateX = (value) => { track.style.transform = `translateX(${value}px)`; };
             const loop = () => {
                 const scrollDistance = track.scrollWidth / 2;
-
-                if (!isDragging) {
-                    currentTranslate -= speedPxPerFrame;
-                }
-
-                if (currentTranslate <= -scrollDistance) {
-                    currentTranslate += scrollDistance;
-                } else if (currentTranslate > 0) {
-                     currentTranslate -= scrollDistance;
-                }
-
+                if (!isDragging) { currentTranslate -= speedPxPerFrame; }
+                if (currentTranslate <= -scrollDistance) { currentTranslate += scrollDistance; }
+                else if (currentTranslate > 0) { currentTranslate -= scrollDistance; }
                 setTranslateX(currentTranslate);
                 animationFrameId = requestAnimationFrame(loop);
             };
-
             const dragStart = (e) => {
-                preventClick = false;
-                isDragging = true;
-                container.classList.add('grabbing');
-                
+                preventClick = false; isDragging = true; container.classList.add('grabbing');
                 cancelAnimationFrame(animationFrameId);
-
                 startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
                 currentTranslate = getTranslateX();
             };
-
             const dragMove = (e) => {
                 if (!isDragging) return;
-                preventClick = true; 
-
-                // Previne o scroll da página no mobile enquanto arrasta o carrossel
-                if (e.type === 'touchmove') {
-                    e.preventDefault();
-                }
-
+                preventClick = true;
+                if (e.type === 'touchmove') { e.preventDefault(); }
                 const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
-                const moveX = currentX - startX;
-                setTranslateX(currentTranslate + moveX);
+                setTranslateX(currentTranslate + (currentX - startX));
             };
-
             const dragEnd = () => {
                 if (!isDragging) return;
-                isDragging = false;
-                container.classList.remove('grabbing');
-                
+                isDragging = false; container.classList.remove('grabbing');
                 currentTranslate = getTranslateX();
                 requestAnimationFrame(loop);
             };
-            
-            container.addEventListener('click', (e) => {
-                if (preventClick) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            }, true);
-
-            // Eventos de Mouse
+            container.addEventListener('click', (e) => { if (preventClick) { e.preventDefault(); e.stopPropagation(); } }, true);
             container.addEventListener('mousedown', dragStart);
             window.addEventListener('mousemove', dragMove);
             window.addEventListener('mouseup', dragEnd);
             window.addEventListener('mouseleave', () => { if (isDragging) dragEnd(); });
-
-            // Eventos de Toque
             container.addEventListener('touchstart', dragStart, { passive: true });
             window.addEventListener('touchmove', dragMove, { passive: false });
             window.addEventListener('touchend', dragEnd);
-
             loop();
-        };
-
-        const duplicateAcervosForMarquee = (snapshot) => {
-            const container = document.getElementById('acervos-container');
-            if (container && snapshot.docs.length > 0) {
-                // Duplica apenas se houver itens suficientes para preencher a tela
-                const itemWidth = container.querySelector('.marquee-item')?.offsetWidth || 300;
-                if (snapshot.docs.length * itemWidth > window.innerWidth) {
-                    container.innerHTML += container.innerHTML;
-                }
-                initializeDraggableMarquee();
-            }
         };
 
         // --- Animação de Scroll ---
@@ -1479,23 +1174,15 @@
                     }
                 });
             }, { threshold: 0.1 });
-
             sections.forEach(section => observer.observe(section));
         };
 
-        // --- LÓGICA DE NAVEGAÇÃO ATIVA COM SCROLL ---
+        // --- NAVEGAÇÃO ATIVA COM SCROLL ---
         const initializeActiveNavOnScroll = () => {
             const sections = document.querySelectorAll('main > section[id]');
             const navLinks = document.querySelectorAll('#desktop-nav a.nav-link, #mobile-menu a.nav-link');
-            
             if (sections.length === 0 || navLinks.length === 0) return;
-
-            const observerOptions = {
-                root: null, 
-                rootMargin: "-40% 0px -60% 0px",
-                threshold: 0 
-            };
-
+            const observerOptions = { root: null, rootMargin: "-40% 0px -60% 0px", threshold: 0 };
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -1509,25 +1196,17 @@
                     }
                 });
             }, observerOptions);
-
-            sections.forEach(section => {
-                observer.observe(section);
-            });
+            sections.forEach(section => observer.observe(section));
         };
 
-        // --- LÓGICA DO BOTÃO "VOLTAR AO TOPO" ---
+        // --- BOTÃO "VOLTAR AO TOPO" ---
         const initializeBackToTop = () => {
             const backToTopButton = document.getElementById('back-to-top');
             if (!backToTopButton) return;
-
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 300) {
-                    backToTopButton.classList.add('show');
-                } else {
-                    backToTopButton.classList.remove('show');
-                }
+                if (window.scrollY > 300) { backToTopButton.classList.add('show'); }
+                else { backToTopButton.classList.remove('show'); }
             });
-
             backToTopButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1544,13 +1223,18 @@
             initializeActiveNavOnScroll();
             initializeBackToTop();
             
-            // Carrega notícias e acervos
             loadCollectionData('noticias', 'noticias-container', renderNoticia, query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
             loadCollectionData('museunamidia', 'midia-container', renderMidia, query(collection(db, `/artifacts/${appId}/public/data/museunamidia`), orderBy("data_publicacao", "desc"), limit(3)));
-            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome"), limit(15)), duplicateAcervosForMarquee);
+            
+            const acervosContainer = document.getElementById('acervos-marquee');
+            const acervosTrack = document.getElementById('acervos-container');
+            loadCollectionData('acervos', 'acervos-container', renderAcervo, query(collection(db, `/artifacts/${appId}/public/data/acervos`), orderBy("nome"), limit(15)), (snapshot) => {
+                if (acervosTrack && snapshot.docs.length > 3) {
+                    acervosTrack.innerHTML += acervosTrack.innerHTML;
+                }
+                initializeDraggableMarquee(acervosContainer, acervosTrack);
+            });
         });
-
     </script>
-    
 </body>
 </html>

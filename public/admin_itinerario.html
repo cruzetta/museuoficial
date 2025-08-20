@@ -35,17 +35,21 @@
             </div>
         </fieldset>
 
-        <!-- NOVA SEÇÃO: GALERIA DE FOTOS -->
+        <!-- SEÇÃO GALERIA DE FOTOS -->
         <fieldset class="border p-4 rounded-md">
             <legend class="text-lg font-semibold px-2">Galeria de Fotos</legend>
-            <div id="galeria-fotos-repeater" class="space-y-4 pt-2">
+            <div id="itinerario-galeriaFotos-container" class="space-y-3 pt-2">
                 <!-- As fotos serão adicionadas aqui dinamicamente -->
             </div>
-            <button type="button" id="add-foto-btn" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-3 rounded-md transition-colors">
+            <button type="button" data-repeater-add="galeriaFotos" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-3 rounded-md transition-colors">
                 <i class="fas fa-plus mr-2"></i>Adicionar Foto
             </button>
         </fieldset>
-        <!-- FIM DA NOVA SEÇÃO -->
+        <!-- FIM DA SEÇÃO -->
+
+        <div id="itinerario-upload-progress-container" class="hidden mt-4 w-full bg-gray-200 rounded-full h-4">
+            <div id="itinerario-upload-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">0%</div>
+        </div>
 
         <div class="flex gap-4 pt-4">
             <button type="submit">Guardar Local</button>
@@ -60,62 +64,95 @@
 
 <script data-tab-script="itinerario">
 {
-    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, query, orderBy, ref, uploadBytesResumable, getDownloadURL } = window.firebaseServices;
+    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, query, orderBy, ref, deleteObject } = window.firebaseServices;
     const { appId } = window.appConfig;
 
     const entity = 'itinerario';
+    const formContainer = document.getElementById('itinerario-manager');
     const form = document.getElementById(`form-${entity}`);
     const listContainer = document.getElementById(`${entity}-lista`);
-    const repeaterContainer = document.getElementById('galeria-fotos-repeater');
-    const addFotoBtn = document.getElementById('add-foto-btn');
-    
-    // --- LÓGICA DA GALERIA ---
-    const addFotoRepeaterItem = (foto = { url: '', descricao: '' }) => {
-        const itemId = `foto_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const div = document.createElement('div');
-        div.className = 'flex items-center gap-4 p-3 border rounded-md bg-gray-50';
-        div.id = itemId;
-        div.dataset.url = foto.url || '';
 
-        div.innerHTML = `
-            <img src="${foto.url || 'https://placehold.co/100x75/e2e8f0/64748b?text=Preview'}" class="repeater-preview w-24 h-16 object-cover rounded-md border">
+    // --- LÓGICA DO REPETIDOR DE GALERIA (ADAPTADO DE NOTÍCIAS) ---
+    const repeaterTemplates = {
+        galeriaFotos: (uuid) => `
+            <img src="https://placehold.co/100x75/e2e8f0/64748b?text=Preview" class="repeater-preview w-24 h-16 object-cover rounded-md border">
             <div class="flex-grow space-y-2">
-                <input type="file" class="repeater-file-input hidden" accept="image/*">
-                <button type="button" class="repeater-file-button">Escolher Imagem</button>
-                <span class="file-name-display text-xs text-gray-500 italic"></span>
-                <input type="text" class="repeater-input" placeholder="Descrição da foto (opcional)" value="${foto.descricao || ''}">
+                <input type="text" class="repeater-input" data-field="descricao" placeholder="Descrição da foto (opcional)">
+                <div class="flex items-center gap-2">
+                    <input type="file" id="${uuid}" class="hidden" accept="image/*">
+                    <button type="button" class="repeater-file-button">Selecionar Imagem</button>
+                </div>
+                <div class="file-name-display text-xs text-gray-500 italic">Nenhum ficheiro selecionado</div>
             </div>
-            <button type="button" class="repeater-remove-btn text-red-500 hover:text-red-700 p-2"><i class="fas fa-trash-alt"></i></button>
-        `;
-
-        const fileInput = div.querySelector('.repeater-file-input');
-        const fileBtn = div.querySelector('.repeater-file-button');
-        const fileNameDisplay = div.querySelector('.file-name-display');
-        const previewImg = div.querySelector('.repeater-preview');
-
-        fileBtn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => { previewImg.src = event.target.result; };
-                reader.readAsDataURL(file);
-                fileNameDisplay.textContent = file.name;
-                div.dataset.url = ''; // Limpa a URL antiga, pois um novo ficheiro foi selecionado
-            }
-        });
-        div.querySelector('.repeater-remove-btn').addEventListener('click', () => div.remove());
-
-        repeaterContainer.appendChild(div);
+        `
     };
 
-    addFotoBtn.addEventListener('click', () => addFotoRepeaterItem());
-    // --- FIM DA LÓGICA DA GALERIA ---
+    const addRepeaterItem = (type, data = {}) => {
+        const container = document.getElementById(`itinerario-${type}-container`);
+        if (!container) return;
+
+        const uuid = `repeater-file-${crypto.randomUUID()}`;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'repeater-item flex items-center gap-4 p-3 border rounded-md bg-gray-50';
+        itemDiv.setAttribute('data-repeater-type', type);
+        itemDiv.innerHTML = `<div class="flex-grow flex items-center gap-2">${repeaterTemplates[type](uuid)}</div><button type="button" class="remove-item-btn bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"><i class="fas fa-trash"></i></button>`;
+        container.appendChild(itemDiv);
+
+        const fileInput = itemDiv.querySelector(`#${uuid}`);
+        const selectFileButton = itemDiv.querySelector('.repeater-file-button');
+        const removeButton = itemDiv.querySelector('.remove-item-btn');
+
+        selectFileButton.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => handleRepeaterFileSelect(fileInput));
+        removeButton.addEventListener('click', () => {
+            if (window.pendingFiles.has(fileInput.id)) {
+                window.pendingFiles.delete(fileInput.id);
+            }
+            itemDiv.remove();
+        });
+
+        if (data && typeof data === 'object') {
+            if (data.descricao) itemDiv.querySelector('input[data-field="descricao"]').value = data.descricao;
+            if (data.url) {
+                const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+                fileNameDisplay.textContent = 'Imagem existente';
+                fileNameDisplay.dataset.existingUrl = data.url;
+                const previewImg = itemDiv.querySelector('.repeater-preview');
+                previewImg.src = data.url;
+            }
+        }
+    };
+
+    const handleRepeaterFileSelect = (input) => {
+        const file = input.files[0];
+        const itemDiv = input.closest('.repeater-item');
+        if (!itemDiv || !file) return;
+
+        const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+        window.pendingFiles.set(input.id, file);
+        fileNameDisplay.textContent = file.name;
+        fileNameDisplay.dataset.existingUrl = '';
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewImg = itemDiv.querySelector('.repeater-preview');
+            previewImg.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    formContainer.addEventListener('click', (e) => {
+        if (e.target.matches('[data-repeater-add]')) {
+            addRepeaterItem(e.target.dataset.repeaterAdd);
+        }
+    });
+    // --- FIM DA LÓGICA DO REPETIDOR ---
 
     const clearForm = () => {
         form.reset();
         document.getElementById(`${entity}-id`).value = '';
-        repeaterContainer.innerHTML = ''; // Limpa a galeria
+        document.getElementById('itinerario-galeriaFotos-container').innerHTML = '';
+        window.pendingFiles.clear();
     };
 
     const editDoc = async (id) => {
@@ -128,8 +165,7 @@
                 document.getElementById(`${entity}-id`).value = docSnap.id;
                 
                 ['cidade', 'estado', 'local', 'link_mapa_embed'].forEach(field => {
-                    const element = document.getElementById(`${entity}-${field}`);
-                    if (element) element.value = data[field] || '';
+                    document.getElementById(`${entity}-${field}`).value = data[field] || '';
                 });
 
                 if (data.data_inicio?.toDate) {
@@ -139,9 +175,8 @@
                     document.getElementById('itinerario-data_fim').value = data.data_fim.toDate().toISOString().split('T')[0];
                 }
                 
-                // Preenche a galeria
                 if (data.galeriaFotos && Array.isArray(data.galeriaFotos)) {
-                    data.galeriaFotos.forEach(foto => addFotoRepeaterItem(foto));
+                    data.galeriaFotos.forEach(foto => addRepeaterItem('galeriaFotos', foto));
                 }
 
                 window.scrollTo(0, 0);
@@ -155,8 +190,17 @@
     const performDeleteDoc = async (id) => {
         if (!await window.showConfirmModal()) return;
         try {
-            await deleteDoc(doc(db, `/artifacts/${appId}/public/data/${entity}`, id));
-            window.showNotification("Local eliminado com sucesso!");
+            const docRef = doc(db, `/artifacts/${appId}/public/data/${entity}`, id);
+            const docSnap = await getDoc(docRef);
+            if(docSnap.exists() && docSnap.data().galeriaFotos) {
+                const deletePromises = docSnap.data().galeriaFotos.map(foto => {
+                    if(foto.url) return deleteObject(ref(storage, foto.url)).catch(err => console.warn("Falha ao apagar ficheiro:", err));
+                    return Promise.resolve();
+                });
+                await Promise.allSettled(deletePromises);
+            }
+            await deleteDoc(docRef);
+            window.showNotification("Local e suas fotos foram eliminados com sucesso!");
             clearForm();
         } catch (error) {
             console.error(`Erro ao eliminar ${entity}:`, error);
@@ -167,51 +211,55 @@
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = form.querySelector('button[type="submit"]');
+        const progressContainer = document.getElementById('itinerario-upload-progress-container');
+        const progressBar = document.getElementById('itinerario-upload-progress-bar');
         submitButton.disabled = true;
         submitButton.innerHTML = 'A guardar... <i class="fas fa-spinner fa-spin ml-2"></i>';
 
-        try {
-            // Processa a galeria de fotos
-            const galeriaFotos = [];
-            const repeaterItems = repeaterContainer.querySelectorAll('.flex.items-center');
-            
-            const uploadPromises = Array.from(repeaterItems).map(async (item) => {
-                const fileInput = item.querySelector('.repeater-file-input');
-                const descricao = item.querySelector('.repeater-input').value;
-                const existingUrl = item.dataset.url;
-                const file = fileInput.files[0];
+        const data = {
+            cidade: document.getElementById('itinerario-cidade').value,
+            estado: document.getElementById('itinerario-estado').value,
+            local: document.getElementById('itinerario-local').value,
+            link_mapa_embed: document.getElementById('itinerario-link_mapa_embed').value,
+            data_inicio: new Date(document.getElementById('itinerario-data_inicio').value + "T12:00:00"),
+            data_fim: new Date(document.getElementById('itinerario-data_fim').value + "T12:00:00"),
+            galeriaFotos: []
+        };
 
-                if (file) { // Se um novo ficheiro foi selecionado
-                    const storageRef = ref(storage, `${entity}-galeria/${Date.now()}_${file.name}`);
-                    const uploadTask = await uploadBytesResumable(storageRef, file);
-                    const url = await getDownloadURL(uploadTask.ref);
-                    return { url, descricao };
-                } else if (existingUrl) { // Se é uma imagem já existente
-                    return { url: existingUrl, descricao };
-                }
-                return null;
+        document.querySelectorAll('#itinerario-galeriaFotos-container .repeater-item').forEach(itemDiv => {
+            const fileInput = itemDiv.querySelector('input[type="file"]');
+            const fileNameDisplay = itemDiv.querySelector('.file-name-display');
+            data.galeriaFotos.push({
+                descricao: itemDiv.querySelector('[data-field="descricao"]').value.trim(),
+                url: window.pendingFiles.has(fileInput.id) ? null : fileNameDisplay.dataset.existingUrl || null,
+                fileKey: window.pendingFiles.has(fileInput.id) ? fileInput.id : null
             });
-            
-            const uploadedFotos = (await Promise.all(uploadPromises)).filter(Boolean);
+        });
 
-            const data = {
-                cidade: document.getElementById('itinerario-cidade').value,
-                estado: document.getElementById('itinerario-estado').value,
-                local: document.getElementById('itinerario-local').value,
-                link_mapa_embed: document.getElementById('itinerario-link_mapa_embed').value,
-                data_inicio: new Date(document.getElementById('itinerario-data_inicio').value + "T12:00:00"),
-                data_fim: new Date(document.getElementById('itinerario-data_fim').value + "T12:00:00"),
-                galeriaFotos: uploadedFotos // Adiciona o array de fotos
-            };
+        const filesToUpload = data.galeriaFotos.filter(item => item.fileKey);
+        if (filesToUpload.length > 0) {
+            progressContainer.classList.remove('hidden');
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+        }
+        
+        try {
+            const uploadPromises = filesToUpload.map((item, index) => {
+                return window.uploadFile(window.pendingFiles.get(item.fileKey), 'itinerario-galeria/', (progress) => {
+                    // Atualiza a barra de progresso geral
+                    const totalProgress = (((index + progress) / filesToUpload.length) * 100).toFixed(0);
+                    progressBar.style.width = `${totalProgress}%`;
+                    progressBar.textContent = `${totalProgress}%`;
+                }).then(result => { item.url = result.url; }); // A função global retorna um objeto {url, type}
+            });
+
+            await Promise.all(uploadPromises);
+            data.galeriaFotos.forEach(item => delete item.fileKey);
 
             const id = document.getElementById(`${entity}-id`).value;
             const path = `/artifacts/${appId}/public/data/${entity}`;
             
-            if (id) {
-                await updateDoc(doc(db, path, id), data);
-            } else {
-                await addDoc(collection(db, path), data);
-            }
+            await (id ? updateDoc(doc(db, path, id), data) : addDoc(collection(db, path), data));
 
             window.showNotification('Local guardado com sucesso!');
             clearForm();
@@ -221,6 +269,7 @@
         } finally {
             submitButton.disabled = false;
             submitButton.innerHTML = 'Guardar Local';
+            progressContainer.classList.add('hidden');
         }
     });
 

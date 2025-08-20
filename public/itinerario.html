@@ -23,6 +23,23 @@
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 500; text-align: center; transition: all 0.2s; cursor: pointer; border: 1px solid transparent; }
         .btn-secondary { background-color: #e9ecef; color: var(--text-dark); border-color: #ced4da; }
         .btn-secondary:hover { background-color: #dee2e6; border-color: #adb5bd; }
+        
+        /* Estilos para o Lightbox */
+        #lightbox-modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #lightbox-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        #lightbox-image {
+            transition: transform 0.3s ease;
+        }
+        #lightbox-modal.loading #lightbox-image {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -58,6 +75,21 @@
         </div>
     </footer>
 
+    <!-- Lightbox Modal HTML -->
+    <div id="lightbox-modal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[1000] p-4">
+        <div class="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center">
+            <img id="lightbox-image" src="" alt="Visualização ampliada" class="max-w-full max-h-full object-contain rounded-lg">
+            <div id="lightbox-loader" class="absolute inset-0 flex items-center justify-center">
+                <i class="fas fa-spinner fa-spin text-white text-4xl"></i>
+            </div>
+            <p id="lightbox-caption" class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-center text-sm bg-black bg-opacity-50 px-3 py-1 rounded-md"></p>
+        </div>
+        <button id="lightbox-close" class="absolute top-4 right-4 text-white text-4xl leading-none hover:text-gray-300 transition-colors" aria-label="Fechar">&times;</button>
+        <button id="lightbox-prev" class="absolute left-4 top-1/2 -translate-y-1/2 text-white text-3xl bg-black bg-opacity-40 p-3 rounded-full hover:bg-opacity-60 transition-colors" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+        <button id="lightbox-next" class="absolute right-4 top-1/2 -translate-y-1/2 text-white text-3xl bg-black bg-opacity-40 p-3 rounded-full hover:bg-opacity-60 transition-colors" aria-label="Próximo"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -78,6 +110,73 @@
         const container = document.getElementById('itinerario-completo-container');
         const loader = document.getElementById('loader');
 
+        // --- LÓGICA DO LIGHTBOX ---
+        const lightbox = document.getElementById('lightbox-modal');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        const lightboxLoader = document.getElementById('lightbox-loader');
+        const closeBtn = document.getElementById('lightbox-close');
+        const prevBtn = document.getElementById('lightbox-prev');
+        const nextBtn = document.getElementById('lightbox-next');
+
+        let currentGallery = [];
+        let currentIndex = 0;
+        const eventGalleries = new Map();
+
+        function showImage(index) {
+            if (index < 0 || index >= currentGallery.length) return;
+            currentIndex = index;
+            
+            lightboxLoader.style.display = 'flex';
+            lightboxImage.style.opacity = '0';
+
+            const foto = currentGallery[currentIndex];
+            const img = new Image();
+            img.onload = () => {
+                lightboxImage.src = foto.url;
+                lightboxCaption.textContent = foto.descricao || '';
+                lightboxCaption.style.display = foto.descricao ? 'block' : 'none';
+                lightboxLoader.style.display = 'none';
+                lightboxImage.style.opacity = '1';
+            };
+            img.src = foto.url;
+
+            prevBtn.style.display = currentIndex > 0 ? 'block' : 'none';
+            nextBtn.style.display = currentIndex < currentGallery.length - 1 ? 'block' : 'none';
+        }
+
+        function openLightbox(eventId, index) {
+            if (eventGalleries.has(eventId)) {
+                currentGallery = eventGalleries.get(eventId);
+                lightbox.classList.add('visible');
+                document.body.style.overflow = 'hidden';
+                showImage(index);
+            }
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('visible');
+            document.body.style.overflow = 'auto';
+        }
+
+        prevBtn.addEventListener('click', () => showImage(currentIndex - 1));
+        nextBtn.addEventListener('click', () => showImage(currentIndex + 1));
+        closeBtn.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.classList.contains('visible')) {
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+                if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+            }
+        });
+        // --- FIM DA LÓGICA DO LIGHTBOX ---
+
+
         const q = query(collection(db, `/artifacts/${appId}/public/data/itinerario`), orderBy("data_inicio", "asc"));
 
         onSnapshot(q, (snapshot) => {
@@ -87,17 +186,21 @@
                 return;
             }
 
-            const eventos = {
-                atual: [],
-                proximo: [],
-                passado: []
-            };
-
+            const eventos = { atual: [], proximo: [], passado: [] };
             const hoje = new Date();
             hoje.setHours(0, 0, 0, 0);
+            
+            eventGalleries.clear(); // Limpa as galerias antigas
 
             snapshot.docs.forEach(doc => {
                 const data = doc.data();
+                const eventId = doc.id;
+                data.id = eventId; // Adiciona o ID ao objeto de dados
+
+                if (data.galeriaFotos && data.galeriaFotos.length > 0) {
+                    eventGalleries.set(eventId, data.galeriaFotos);
+                }
+
                 const inicio = data.data_inicio?.toDate();
                 const fim = data.data_fim?.toDate();
 
@@ -119,16 +222,15 @@
             const formatDate = (date) => date?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) || 'Data a definir';
 
             const createEventHTML = (evento) => {
-                
                 const galeriaHTML = (evento.galeriaFotos && evento.galeriaFotos.length > 0)
                     ? `
                         <div class="mt-4 pt-4 border-t border-gray-200">
                             <h4 class="text-sm font-semibold text-gray-700 mb-2">Galeria de Fotos:</h4>
                             <div class="flex flex-wrap gap-2">
-                                ${evento.galeriaFotos.map(foto => `
-                                    <a href="${foto.url}" target="_blank" class="block">
+                                ${evento.galeriaFotos.map((foto, index) => `
+                                    <button type="button" class="gallery-thumbnail block focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-color rounded-md" data-event-id="${evento.id}" data-image-index="${index}">
                                         <img src="${foto.url}" alt="${foto.descricao || 'Foto do evento'}" class="w-20 h-20 object-cover rounded-md border-2 border-white shadow-sm hover:scale-105 transition-transform" onerror="this.onerror=null;this.src='https://placehold.co/80x80/e0e0e0/333333?text=Erro';">
-                                    </a>
+                                    </button>
                                 `).join('')}
                             </div>
                         </div>
@@ -136,12 +238,12 @@
                     : '';
 
                 return `
-                    <div class="flex items-start gap-4 py-4 border-b">
-                        <div class="flex-shrink-0 text-center w-24">
+                    <div class="flex flex-col sm:flex-row items-start gap-4 py-4 border-b">
+                        <div class="flex-shrink-0 text-center w-full sm:w-24 mb-4 sm:mb-0">
                             <p class="text-lg font-bold text-gray-800">${evento.data_inicio?.toDate().toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '')}</p>
                             <p class="text-3xl font-bold" style="color:var(--primary-color);">${String(evento.data_inicio?.toDate().getDate()).padStart(2, '0')}</p>
                         </div>
-                        <div class="flex-grow">
+                        <div class="flex-grow w-full">
                             <h3 class="font-bold text-xl">${evento.cidade}, ${evento.estado}</h3>
                             <p class="text-gray-600">${evento.local}</p>
                             <p class="text-gray-500 text-sm mt-1">${formatDate(evento.data_inicio)} - ${formatDate(evento.data_fim)}</p>
@@ -152,28 +254,34 @@
             };
             
             let html = '';
-
             if (eventos.atual.length > 0) {
                 html += '<h2 class="text-3xl font-bold mb-6 text-green-600">Acontecendo Agora</h2>';
                 html += eventos.atual.map(createEventHTML).join('');
             }
-            
             if (eventos.proximo.length > 0) {
                 html += '<h2 class="text-3xl font-bold mt-12 mb-6 text-yellow-600">Próximos Destinos</h2>';
                 html += eventos.proximo.map(createEventHTML).join('');
             }
-
             if (eventos.passado.length > 0) {
                 html += '<h2 class="text-3xl font-bold mt-12 mb-6 text-gray-500">Itinerário Passado</h2>';
                 html += eventos.passado.map(createEventHTML).join('');
             }
-
             container.innerHTML = html;
 
         }, (error) => {
             console.error("Erro ao carregar itinerário:", error);
             loader.style.display = 'none';
             container.innerHTML = '<p class="text-center text-red-500">Não foi possível carregar o itinerário.</p>';
+        });
+
+        // Event listener com delegação
+        container.addEventListener('click', (e) => {
+            const thumbnail = e.target.closest('.gallery-thumbnail');
+            if (thumbnail) {
+                const eventId = thumbnail.dataset.eventId;
+                const imageIndex = parseInt(thumbnail.dataset.imageIndex, 10);
+                openLightbox(eventId, imageIndex);
+            }
         });
     </script>
 </body>
