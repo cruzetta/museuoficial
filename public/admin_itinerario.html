@@ -19,7 +19,7 @@
                     <label for="itinerario-local" class="block text-sm font-medium text-gray-700">Local do Evento</label>
                     <input type="text" id="itinerario-local" placeholder="Ex: Shopping Anália Franco">
                 </div>
-                 <div>
+                <div>
                     <label for="itinerario-data_inicio" class="block text-sm font-medium text-gray-700">Data de Início</label>
                     <input type="date" id="itinerario-data_inicio" required>
                 </div>
@@ -35,6 +35,18 @@
             </div>
         </fieldset>
 
+        <!-- NOVA SEÇÃO: GALERIA DE FOTOS -->
+        <fieldset class="border p-4 rounded-md">
+            <legend class="text-lg font-semibold px-2">Galeria de Fotos</legend>
+            <div id="galeria-fotos-repeater" class="space-y-4 pt-2">
+                <!-- As fotos serão adicionadas aqui dinamicamente -->
+            </div>
+            <button type="button" id="add-foto-btn" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-3 rounded-md transition-colors">
+                <i class="fas fa-plus mr-2"></i>Adicionar Foto
+            </button>
+        </fieldset>
+        <!-- FIM DA NOVA SEÇÃO -->
+
         <div class="flex gap-4 pt-4">
             <button type="submit">Guardar Local</button>
             <button type="button" id="cancel-itinerario-edit" class="w-auto">Cancelar</button>
@@ -48,16 +60,62 @@
 
 <script data-tab-script="itinerario">
 {
-    const { db, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, query, orderBy } = window.firebaseServices;
+    const { db, storage, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDoc, query, orderBy, ref, uploadBytesResumable, getDownloadURL } = window.firebaseServices;
     const { appId } = window.appConfig;
 
     const entity = 'itinerario';
     const form = document.getElementById(`form-${entity}`);
     const listContainer = document.getElementById(`${entity}-lista`);
+    const repeaterContainer = document.getElementById('galeria-fotos-repeater');
+    const addFotoBtn = document.getElementById('add-foto-btn');
+    
+    // --- LÓGICA DA GALERIA ---
+    const addFotoRepeaterItem = (foto = { url: '', descricao: '' }) => {
+        const itemId = `foto_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-4 p-3 border rounded-md bg-gray-50';
+        div.id = itemId;
+        div.dataset.url = foto.url || '';
+
+        div.innerHTML = `
+            <img src="${foto.url || 'https://placehold.co/100x75/e2e8f0/64748b?text=Preview'}" class="repeater-preview w-24 h-16 object-cover rounded-md border">
+            <div class="flex-grow space-y-2">
+                <input type="file" class="repeater-file-input hidden" accept="image/*">
+                <button type="button" class="repeater-file-button">Escolher Imagem</button>
+                <span class="file-name-display text-xs text-gray-500 italic"></span>
+                <input type="text" class="repeater-input" placeholder="Descrição da foto (opcional)" value="${foto.descricao || ''}">
+            </div>
+            <button type="button" class="repeater-remove-btn text-red-500 hover:text-red-700 p-2"><i class="fas fa-trash-alt"></i></button>
+        `;
+
+        const fileInput = div.querySelector('.repeater-file-input');
+        const fileBtn = div.querySelector('.repeater-file-button');
+        const fileNameDisplay = div.querySelector('.file-name-display');
+        const previewImg = div.querySelector('.repeater-preview');
+
+        fileBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => { previewImg.src = event.target.result; };
+                reader.readAsDataURL(file);
+                fileNameDisplay.textContent = file.name;
+                div.dataset.url = ''; // Limpa a URL antiga, pois um novo ficheiro foi selecionado
+            }
+        });
+        div.querySelector('.repeater-remove-btn').addEventListener('click', () => div.remove());
+
+        repeaterContainer.appendChild(div);
+    };
+
+    addFotoBtn.addEventListener('click', () => addFotoRepeaterItem());
+    // --- FIM DA LÓGICA DA GALERIA ---
 
     const clearForm = () => {
         form.reset();
         document.getElementById(`${entity}-id`).value = '';
+        repeaterContainer.innerHTML = ''; // Limpa a galeria
     };
 
     const editDoc = async (id) => {
@@ -69,7 +127,6 @@
                 const data = docSnap.data();
                 document.getElementById(`${entity}-id`).value = docSnap.id;
                 
-                // Removido 'status' do array
                 ['cidade', 'estado', 'local', 'link_mapa_embed'].forEach(field => {
                     const element = document.getElementById(`${entity}-${field}`);
                     if (element) element.value = data[field] || '';
@@ -78,8 +135,13 @@
                 if (data.data_inicio?.toDate) {
                     document.getElementById('itinerario-data_inicio').value = data.data_inicio.toDate().toISOString().split('T')[0];
                 }
-                 if (data.data_fim?.toDate) {
+                if (data.data_fim?.toDate) {
                     document.getElementById('itinerario-data_fim').value = data.data_fim.toDate().toISOString().split('T')[0];
+                }
+                
+                // Preenche a galeria
+                if (data.galeriaFotos && Array.isArray(data.galeriaFotos)) {
+                    data.galeriaFotos.forEach(foto => addFotoRepeaterItem(foto));
                 }
 
                 window.scrollTo(0, 0);
@@ -106,16 +168,40 @@
         e.preventDefault();
         const submitButton = form.querySelector('button[type="submit"]');
         submitButton.disabled = true;
+        submitButton.innerHTML = 'A guardar... <i class="fas fa-spinner fa-spin ml-2"></i>';
 
         try {
-             // Removido 'status' do objeto de dados
-             const data = {
+            // Processa a galeria de fotos
+            const galeriaFotos = [];
+            const repeaterItems = repeaterContainer.querySelectorAll('.flex.items-center');
+            
+            const uploadPromises = Array.from(repeaterItems).map(async (item) => {
+                const fileInput = item.querySelector('.repeater-file-input');
+                const descricao = item.querySelector('.repeater-input').value;
+                const existingUrl = item.dataset.url;
+                const file = fileInput.files[0];
+
+                if (file) { // Se um novo ficheiro foi selecionado
+                    const storageRef = ref(storage, `${entity}-galeria/${Date.now()}_${file.name}`);
+                    const uploadTask = await uploadBytesResumable(storageRef, file);
+                    const url = await getDownloadURL(uploadTask.ref);
+                    return { url, descricao };
+                } else if (existingUrl) { // Se é uma imagem já existente
+                    return { url: existingUrl, descricao };
+                }
+                return null;
+            });
+            
+            const uploadedFotos = (await Promise.all(uploadPromises)).filter(Boolean);
+
+            const data = {
                 cidade: document.getElementById('itinerario-cidade').value,
                 estado: document.getElementById('itinerario-estado').value,
                 local: document.getElementById('itinerario-local').value,
                 link_mapa_embed: document.getElementById('itinerario-link_mapa_embed').value,
                 data_inicio: new Date(document.getElementById('itinerario-data_inicio').value + "T12:00:00"),
-                data_fim: new Date(document.getElementById('itinerario-data_fim').value + "T12:00:00")
+                data_fim: new Date(document.getElementById('itinerario-data_fim').value + "T12:00:00"),
+                galeriaFotos: uploadedFotos // Adiciona o array de fotos
             };
 
             const id = document.getElementById(`${entity}-id`).value;
@@ -134,6 +220,7 @@
             window.showNotification('Erro ao guardar os dados.', true);
         } finally {
             submitButton.disabled = false;
+            submitButton.innerHTML = 'Guardar Local';
         }
     });
 
@@ -146,7 +233,6 @@
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-md border';
             
-            // Lógica para determinar o status dinamicamente para exibição no admin
             const hoje = new Date();
             hoje.setHours(0, 0, 0, 0);
             const inicio = data.data_inicio?.toDate();
@@ -162,11 +248,13 @@
                     status = { text: 'Passado', class: 'bg-gray-200 text-gray-600' };
                 }
             }
+            const photoCount = data.galeriaFotos?.length || 0;
 
             itemDiv.innerHTML = `
                 <div class="flex-grow">
                     <p class="font-semibold text-sm">${data.cidade || 'Local sem nome'}, ${data.estado}</p>
                     <p class="text-xs text-gray-500">${data.local || ''}</p>
+                    <p class="text-xs text-gray-500 mt-1"><i class="fas fa-camera mr-1"></i> ${photoCount} foto(s)</p>
                 </div>
                 <div class="flex-shrink-0 flex items-center gap-4">
                     <span class="text-xs font-bold uppercase px-2 py-1 rounded-full ${status.class}">${status.text}</span>
@@ -180,8 +268,8 @@
     });
 
     listContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('edit-btn')) editDoc(e.target.dataset.id);
-        if (e.target.classList.contains('delete-btn')) performDeleteDoc(e.target.dataset.id);
+        if (e.target.closest('.edit-btn')) editDoc(e.target.closest('.edit-btn').dataset.id);
+        if (e.target.closest('.delete-btn')) performDeleteDoc(e.target.closest('.delete-btn').dataset.id);
     });
     
     document.getElementById('cancel-itinerario-edit').addEventListener('click', clearForm);
