@@ -41,7 +41,7 @@
         }
         @media (min-width: 768px) {
              body.overflow-hidden-mobile {
-                overflow: auto; /* Garante que em desktop o bloqueio não se aplique */
+                 overflow: auto; /* Garante que em desktop o bloqueio não se aplique */
             }
         }
 
@@ -233,8 +233,8 @@
         }
           @media (min-width: 768px) {
               .about-slide-text-content {
-                padding: 2.5rem;
-            }
+                  padding: 2.5rem;
+              }
         }
         .about-slide-title {
             font-size: 1.5rem; /* Título menor em mobile */
@@ -244,8 +244,8 @@
         }
         @media (min-width: 768px) {
               .about-slide-title {
-                font-size: 1.75rem;
-            }
+                  font-size: 1.75rem;
+              }
         }
         .about-slide-text {
             font-family: 'Lora', serif;
@@ -255,9 +255,9 @@
         }
         @media (min-width: 768px) {
               .about-slide-text {
-                font-size: 1.125rem;
-                line-height: 1.8;
-            }
+                  font-size: 1.125rem;
+                  line-height: 1.8;
+              }
         }
         .about-timeline-navigation {
             display: flex;
@@ -490,10 +490,11 @@
         .acervo-marquee-item { width: 80vw; max-width: 300px; }
         @media (min-width: 640px) { .acervo-marquee-item { width: 40vw; } }
         @media (min-width: 1024px) { .acervo-marquee-item { width: 300px; } }
-        /* Estilo específico para a galeria de fotos do itinerário */
-        .galeria-marquee-item { width: 70vw; max-width: 400px; }
-        @media (min-width: 640px) { .galeria-marquee-item { width: 50vw; max-width: 350px; } }
-        @media (min-width: 1024px) { .galeria-marquee-item { width: 30vw; max-width: 400px; } }
+        
+        /* ALTERAÇÃO: Aumentada a largura dos itens da galeria */
+        .galeria-marquee-item { width: 85vw; max-width: 450px; }
+        @media (min-width: 640px) { .galeria-marquee-item { width: 60vw; max-width: 450px; } }
+        @media (min-width: 1024px) { .galeria-marquee-item { width: 40vw; max-width: 500px; } }
         
         /* NOVA CLASSE PARA SOMBRA DE TEXTO */
         .text-shadow-lg {
@@ -611,7 +612,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     
                     <!-- Coluna da Galeria de Fotos (Carrossel Fluido) -->
-                    <div id="itinerario-galeria-container" class="marquee-container h-[450px]">
+                    <div id="itinerario-galeria-container" class="marquee-container">
                         <div id="itinerario-galeria-track" class="marquee-track">
                              <div class="w-full h-full flex items-center justify-center">
                                  <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
@@ -682,7 +683,7 @@
 
         <!-- SEÇÃO DE QUIZ APRIMORADA -->
         <section id="quiz" class="relative py-20 md:py-32 bg-black text-white flex items-center justify-center fade-in-section">
-             <!-- Conteúdo da Seção -->
+              <!-- Conteúdo da Seção -->
             <div class="container mx-auto px-4 relative z-10 text-center">
                 <h2 style="font-family: 'Bungee', cursive;" class="text-5xl md:text-7xl font-bold uppercase tracking-wider text-shadow-lg">
                     <span class="text-yellow-400">Desafio</span> Aceito?
@@ -1007,9 +1008,10 @@
 
             const renderGaleriaAleatoria = (fotos) => {
                 if (fotos && fotos.length > 0) {
+                    // ALTERAÇÃO: Usando a sintaxe moderna do Tailwind para aspect ratio
                     galeriaTrack.innerHTML = fotos.map(foto => `
                         <div class="galeria-marquee-item marquee-item">
-                            <div class="aspect-w-4 aspect-h-3 h-full">
+                            <div class="aspect-[16/9] w-full">
                                 <img src="${foto.url}" alt="${foto.descricao || 'Foto do museu'}" draggable="false" class="w-full h-full object-cover rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/400x300/e0e0e0/333333?text=Erro';">
                             </div>
                         </div>
