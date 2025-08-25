@@ -507,7 +507,7 @@
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                if (data.mediaUrl) {
+                if (data.mediaUrl && typeof data.mediaUrl === 'string') {
                     const fileRef = ref(storage, data.mediaUrl);
                     await deleteObject(fileRef).catch(err => console.warn("Não foi possível apagar o ficheiro do Storage:", err));
                 }
@@ -563,12 +563,14 @@
             const file = window.pendingFiles.get(`${entity}-media`);
             if (file) {
                 progressContainer.classList.remove('hidden');
-                data.mediaUrl = await window.uploadFile(file, 'home_slider/', (progress) => {
+                // CORREÇÃO APLICADA AQUI
+                const uploadResult = await window.uploadFile(file, 'home_slider/', (progress) => {
                     const percent = Math.round(progress * 100);
                     progressBar.style.width = `${percent}%`;
                     progressBar.textContent = `${percent}%`;
                 });
-                data.mediaTipo = file.type.startsWith('video/') ? 'video' : 'imagem';
+                data.mediaUrl = uploadResult.url; // Extrai a URL do objeto retornado
+                data.mediaTipo = uploadResult.type.startsWith('video/') ? 'video' : 'imagem';
                 window.pendingFiles.delete(`${entity}-media`);
             }
 
