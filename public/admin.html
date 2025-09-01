@@ -312,8 +312,10 @@
                     }, 
                     (error) => { console.error("Upload failed:", error); reject(error); }, 
                     async () => {
+                        // <<< ESSA É A CORREÇÃO! >>>
+                        // Agora a função resolve apenas a URL, e não mais um objeto.
                         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                        resolve({url: downloadURL, type: file.type});
+                        resolve(downloadURL);
                     }
                 );
             });

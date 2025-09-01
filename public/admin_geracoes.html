@@ -160,6 +160,7 @@
             const file = window.pendingFiles.get('geracoes-imagem-file');
             if (file) {
                 progressContainer.classList.remove('hidden');
+                // Nenhuma mudança é necessária aqui, pois a função global já foi corrigida.
                 imageUrl = await window.uploadFile(file, 'geracoes/', (progress) => {
                     const percent = Math.round(progress * 100);
                     progressBar.style.width = `${percent}%`;
