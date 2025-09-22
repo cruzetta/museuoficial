@@ -632,20 +632,33 @@
             <div class="container mx-auto">
                 <h2 class="section-title">Agenda do Museu</h2>
 
-                <div class="grid lg:grid-cols-2 gap-12 items-start max-w-6xl mx-auto">
-                    <div>
-                         <div id="itinerario-lista" class="mb-12">
-                            <div class="text-center p-8">
-                                <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
-                                <p class="mt-3 text-gray-600 font-lora">A carregar próximos destinos...</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="hidden lg:block sticky top-28">
+                <!-- Layout Atualizado da Agenda -->
+                <div class="max-w-6xl mx-auto">
+                    <!-- Mapa (Agora visível em telas pequenas) -->
+                    <div class="mb-12 lg:hidden">
                          <h3 class="text-2xl font-lora text-center mb-6 text-gray-700">Estados Visitados</h3>
-                         <div id="map-container" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+                         <div id="map-container-mobile" class="bg-gray-100 p-4 rounded-lg shadow-inner">
                             <p class="text-center p-4">Carregando mapa...</p>
                          </div>
+                    </div>
+
+                    <div class="grid lg:grid-cols-2 gap-12 items-start">
+                        <!-- Coluna da Lista de Eventos -->
+                        <div>
+                             <div id="itinerario-lista" class="mb-12">
+                                <div class="text-center p-8">
+                                    <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
+                                    <p class="mt-3 text-gray-600 font-lora">A carregar próximos destinos...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Coluna do Mapa (Visível apenas em telas grandes) -->
+                        <div class="hidden lg:block sticky top-28">
+                             <h3 class="text-2xl font-lora text-center mb-6 text-gray-700">Estados Visitados</h3>
+                             <div id="map-container-desktop" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+                                <p class="text-center p-4">Carregando mapa...</p>
+                             </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1147,28 +1160,51 @@
             const containerLista = document.getElementById('itinerario-lista');
             const galeriaContainer = document.getElementById('itinerario-galeria-container');
             const galeriaTrack = document.getElementById('itinerario-galeria-track');
-            const mapContainer = document.getElementById('map-container');
+            // Seleciona os dois containers do mapa
+            const mapContainerDesktop = document.getElementById('map-container-desktop');
+            const mapContainerMobile = document.getElementById('map-container-mobile');
 
-            if (!containerLista || !galeriaContainer || !galeriaTrack || !mapContainer) return;
+            if (!containerLista || !galeriaContainer || !galeriaTrack || !mapContainerDesktop || !mapContainerMobile) return;
             
-            // Carrega o SVG do mapa
-            fetch('mapa.html')
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, "text/html");
-                    const svgMap = doc.querySelector("#map");
-                    if (svgMap) {
-                        mapContainer.innerHTML = ''; // Limpa o container
-                        mapContainer.appendChild(svgMap);
-                        // Agora que o mapa está no DOM, podemos buscar os eventos e colorir os estados
-                        fetchAndRenderEvents();
-                    }
-                })
-                .catch(err => {
-                    console.error('Falha ao carregar o SVG do mapa:', err);
-                    mapContainer.innerHTML = "<p>Não foi possível carregar o mapa.</p>";
-                });
+            // Função para carregar e inserir o mapa
+            const loadAndInsertMap = (targetContainer) => {
+                fetch('mapa.html')
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, "text/html");
+                        const svgMap = doc.querySelector("#map");
+                        if (svgMap) {
+                            targetContainer.innerHTML = ''; // Limpa o container
+                            targetContainer.appendChild(svgMap);
+                            return true; // Indica sucesso
+                        }
+                        return false;
+                    })
+                    .then(success => {
+                        if (success) {
+                            // Após o primeiro mapa ser inserido, busca os eventos
+                            // Usamos uma flag para garantir que isso só rode uma vez
+                            if (!window.eventsFetched) {
+                                window.eventsFetched = true;
+                                fetchAndRenderEvents();
+                            } else {
+                                // Se os eventos já foram buscados, apenas colore o mapa
+                                colorMapStates(window.visitedStates || new Set());
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Falha ao carregar o SVG do mapa:', err);
+                        targetContainer.innerHTML = "<p>Não foi possível carregar o mapa.</p>";
+                    });
+            };
+            
+            // Carrega o mapa nos dois containers
+            window.eventsFetched = false; // Flag para controlar a busca de eventos
+            loadAndInsertMap(mapContainerDesktop);
+            loadAndInsertMap(mapContainerMobile);
+
 
             const shuffleArray = (array) => {
                 for (let i = array.length - 1; i > 0; i--) {
@@ -1198,6 +1234,14 @@
                 }
             };
             
+            const colorMapStates = (estados) => {
+                 estados.forEach(sigla => {
+                    // Seleciona o estado em ambos os mapas
+                    const stateElements = document.querySelectorAll(`#state_${sigla}`);
+                    stateElements.forEach(el => el.classList.add('visited'));
+                });
+            };
+
             const fetchAndRenderEvents = () => {
                 const q = query(collection(db, `/artifacts/${appId}/public/data/itinerario`));
                 onSnapshot(q, (snapshot) => {
@@ -1232,13 +1276,10 @@
 
                     renderGaleriaAleatoria(shuffleArray(todasAsFotos));
                     
-                    // Colore os estados visitados no mapa
-                    estadosVisitados.forEach(sigla => {
-                        const stateElement = document.getElementById(`state_${sigla}`);
-                        if (stateElement) {
-                            stateElement.classList.add('visited');
-                        }
-                    });
+                    // Armazena os estados visitados e colore os mapas
+                    window.visitedStates = estadosVisitados;
+                    colorMapStates(estadosVisitados);
+
 
                     if (snapshot.empty) {
                         containerLista.innerHTML = '<p class="text-center text-gray-500 font-lora">Fique atento! Em breve divulgaremos nossos próximos destinos.</p>';
@@ -1558,3 +1599,4 @@
     </script>
 </body>
 </html>
+
