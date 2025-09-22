@@ -809,7 +809,8 @@
         // --- LÓGICA DE NAVEGAÇÃO E HEADER ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
-        const internalNavLinks = document.querySelectorAll('a[href^="#"]');
+        // Seletor mais específico para evitar conflito com o mapa SVG
+        const internalNavLinks = document.querySelectorAll('#main-header a[href^="#"], #mobile-menu a[href^="#"], footer a[href^="#"]');
         const body = document.body;
         const header = document.getElementById('main-header');
 
@@ -1163,6 +1164,19 @@
             // Seleciona os dois containers do mapa
             const mapContainerDesktop = document.getElementById('map-container-desktop');
             const mapContainerMobile = document.getElementById('map-container-mobile');
+
+            // Adiciona um manipulador de cliques para os mapas que impede o comportamento padrão do link de ir para o topo
+            const handleMapClick = (e) => {
+                const stateLink = e.target.closest('.state');
+                if (stateLink) {
+                    e.preventDefault();
+                    // A lógica para mostrar informações do estado pode ser adicionada aqui no futuro.
+                    // Por enquanto, isso apenas corrige o bug de rolagem.
+                }
+            };
+            mapContainerDesktop.addEventListener('click', handleMapClick);
+            mapContainerMobile.addEventListener('click', handleMapClick);
+
 
             if (!containerLista || !galeriaContainer || !galeriaTrack || !mapContainerDesktop || !mapContainerMobile) return;
             
@@ -1599,4 +1613,5 @@
     </script>
 </body>
 </html>
+
 
