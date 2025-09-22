@@ -503,13 +503,36 @@
         #map .state:hover .shape {
             fill: #a0aec0; /* Cinza mais escuro no hover */
         }
-        /* Estilo para estados visitados - será aplicado via JS */
-        #map .state.visited .shape {
-            fill: var(--color-primary); /* Dourado */
+        /* Estilo para estados visitados no passado */
+        #map .model-davi .state.visited .shape {
+            fill: #A0AEC0; /* Cinza quente */
         }
-        #map .state.visited:hover .shape {
-            fill: var(--color-primary-hover); /* Dourado mais escuro */
+        #map .model-davi .state.visited:hover .shape {
+            fill: #718096;
         }
+        /* Estilo para estados futuros */
+        #map .model-davi .state.future .shape {
+            fill: var(--color-primary);
+        }
+        #map .model-davi .state.future:hover .shape {
+            fill: var(--color-primary-hover);
+        }
+        /* Estilo para o estado atual */
+        #map .model-davi .state.current .shape {
+            fill: #48BB78; /* Verde vibrante */
+            animation: pulse-map 1.5s infinite ease-in-out;
+            transform-origin: center center;
+        }
+        #map .model-davi .state.current:hover .shape {
+            fill: #38A169;
+        }
+        /* Animação para o estado atual */
+        @keyframes pulse-map {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         #map .state .label_icon_state {
             fill: #333;
             font-family: 'Inter', sans-serif;
@@ -517,7 +540,9 @@
             font-weight: 600;
             pointer-events: none; /* Impede que o texto capture eventos de clique */
         }
-        #map .state.visited .label_icon_state {
+        #map .model-davi .state.visited .label_icon_state,
+        #map .model-davi .state.future .label_icon_state,
+        #map .model-davi .state.current .label_icon_state {
             fill: var(--color-dark);
         }
 
@@ -1204,7 +1229,7 @@
                                 fetchAndRenderEvents();
                             } else {
                                 // Se os eventos já foram buscados, apenas colore o mapa
-                                colorMapStates(window.visitedStates || new Set());
+                                updateMapStyles(window.itineraryStatesData || { passado: new Set(), atual: new Set(), proximo: new Set() });
                             }
                         }
                     })
@@ -1248,11 +1273,28 @@
                 }
             };
             
-            const colorMapStates = (estados) => {
-                 estados.forEach(sigla => {
-                    // Seleciona o estado em ambos os mapas
-                    const stateElements = document.querySelectorAll(`#state_${sigla}`);
-                    stateElements.forEach(el => el.classList.add('visited'));
+            const updateMapStyles = (estados) => {
+                // Primeiro, reseta todos os estados para o padrão
+                document.querySelectorAll('#map .state').forEach(el => {
+                    el.classList.remove('visited', 'future', 'current');
+                });
+
+                // Aplica a classe para estados passados
+                estados.passado.forEach(sigla => {
+                    document.querySelectorAll(`#state_${sigla}`).forEach(el => el.classList.add('visited'));
+                });
+                
+                // Aplica a classe para estados futuros (sobrescreve 'visited' se necessário)
+                estados.proximo.forEach(sigla => {
+                    document.querySelectorAll(`#state_${sigla}`).forEach(el => el.classList.add('future'));
+                });
+
+                // Aplica a classe para o estado atual (maior prioridade)
+                estados.atual.forEach(sigla => {
+                    document.querySelectorAll(`#state_${sigla}`).forEach(el => {
+                        el.classList.remove('visited', 'future'); // Garante que apenas 'current' seja aplicado
+                        el.classList.add('current');
+                    });
                 });
             };
 
@@ -1261,21 +1303,17 @@
                 onSnapshot(q, (snapshot) => {
                     let todasAsFotos = [];
                     const eventos = { atual: [], proximo: [], passado: [] };
-                    const estadosVisitados = new Set();
+                    const estados = {
+                        passado: new Set(),
+                        atual: new Set(),
+                        proximo: new Set()
+                    };
                     const hoje = new Date();
                     hoje.setHours(0, 0, 0, 0);
 
                     snapshot.docs.forEach(doc => {
                         const data = doc.data();
                         
-                        if (data.estado_sigla) {
-                            estadosVisitados.add(data.estado_sigla.toLowerCase());
-                        }
-
-                        if (data.galeriaFotos && Array.isArray(data.galeriaFotos)) {
-                            todasAsFotos.push(...data.galeriaFotos);
-                        }
-
                         const inicio = data.data_inicio?.toDate();
                         const fim = data.data_fim?.toDate();
                         let statusCalculado = 'proximo';
@@ -1286,14 +1324,24 @@
                             else if (hoje > fimDoDia) statusCalculado = 'passado';
                         }
                         eventos[statusCalculado].push(data);
+
+                        if (data.estado) {
+                            const sigla = data.estado.toLowerCase();
+                             if (statusCalculado === 'atual') estados.atual.add(sigla);
+                             else if (statusCalculado === 'proximo') estados.proximo.add(sigla);
+                             else estados.passado.add(sigla);
+                        }
+
+                        if (data.galeriaFotos && Array.isArray(data.galeriaFotos)) {
+                            todasAsFotos.push(...data.galeriaFotos);
+                        }
                     });
 
                     renderGaleriaAleatoria(shuffleArray(todasAsFotos));
                     
-                    // Armazena os estados visitados e colore os mapas
-                    window.visitedStates = estadosVisitados;
-                    colorMapStates(estadosVisitados);
-
+                    // Armazena os estados e colore os mapas
+                    window.itineraryStatesData = estados;
+                    updateMapStyles(estados);
 
                     if (snapshot.empty) {
                         containerLista.innerHTML = '<p class="text-center text-gray-500 font-lora">Fique atento! Em breve divulgaremos nossos próximos destinos.</p>';
@@ -1613,5 +1661,8 @@
     </script>
 </body>
 </html>
+
+
+
 
 
