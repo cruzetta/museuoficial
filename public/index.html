@@ -147,7 +147,7 @@
 
         /* === NAVEGAÇÃO E HEADER === */
         header {
-            transition: padding 0.3s ease, box-shadow 0.3s ease;
+            transition: box-shadow 0.3s ease;
             padding-top: 10px;
             padding-bottom: 10px;
         }
@@ -187,18 +187,30 @@
         }
 
         #header-logo {
-            height: 60px;
+            height: 90px;
+            margin-top: -15px;
+            margin-bottom: -15px;
             width: auto;
-            transition: height 0.3s ease, opacity 0.3s ease;
+            transition: height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
         }
         @media (min-width: 768px) {
-            #header-logo { height: 80px; }
+            #header-logo {
+                height: 120px;
+                margin-top: -20px;
+                margin-bottom: -20px;
+            }
         }
         header.scrolled #header-logo {
-             height: 50px;
+             height: 75px;
+             margin-top: -12.5px;
+             margin-bottom: -12.5px;
         }
          @media (min-width: 768px) {
-            header.scrolled #header-logo { height: 60px; }
+            header.scrolled #header-logo {
+                height: 90px;
+                margin-top: -15px;
+                margin-bottom: -15px;
+            }
         }
 
         #header-logo:hover { opacity: 0.9; }
@@ -1661,6 +1673,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
