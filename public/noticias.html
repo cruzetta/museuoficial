@@ -87,32 +87,6 @@
         .card-image-wrapper {
             background-color: #ffffff; /* Fundo branco para a imagem */
         }
-        
-        /* Estilos para Tradução */
-        .goog-te-banner-frame { display: none !important; }
-        body { top: 0 !important; }
-        .lang-btn {
-            color: var(--text-light);
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            border: 2px solid var(--border-color);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            background-color: #ffffff;
-        }
-        .lang-btn:hover {
-            color: var(--text-dark);
-            border-color: var(--primary-hover);
-            background-color: #f3f4f6;
-        }
-        .lang-btn.active {
-            color: #ffffff;
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
     </style>
 </head>
 <body class="antialiased">
@@ -132,19 +106,8 @@
     </header>
 
     <main class="container mx-auto px-4 py-16">
-        <div class="text-center mb-4">
-            <h1 class="section-title" style="margin-bottom: 1rem;">Todas as Notícias</h1>
-        </div>
+        <h1 class="section-title">Todas as Notícias</h1>
         
-        <!-- CONTROLES: IDIOMA -->
-        <div class="flex justify-center items-center mb-12">
-            <div id="custom-language-switcher" class="flex items-center space-x-2">
-                <button data-lang="pt" class="lang-btn">PT</button>
-                <button data-lang="en" class="lang-btn">EN</button>
-                <button data-lang="es" class="lang-btn">ES</button>
-            </div>
-        </div>
-
         <div id="todas-noticias-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Estado de carregamento inicial -->
             <div id="loader" class="col-span-full text-center py-20">
@@ -156,8 +119,6 @@
 
     <footer class="py-10 mt-16 bg-gray-800">
         <div class="container mx-auto text-center text-gray-400">
-            <!-- Widget invisível do Google -->
-            <div id="google_translate_element" class="hidden"></div>
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
@@ -187,6 +148,7 @@
             if (data.data_publicacao && data.data_publicacao.toDate) {
                 dataFormatada = data.data_publicacao.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
             }
+            // ✅ CORREÇÃO: Alterado de 'data.imagem' para 'data.imagem_principal'
             return `
                 <a href="noticia.html?id=${doc.id}" class="content-card block">
                     <div class="card-image-wrapper">
@@ -242,9 +204,5 @@
 
         document.addEventListener('DOMContentLoaded', carregarTodasAsNoticias);
     </script>
-    
-    <!-- SCRIPT DO TRADUTOR -->
-    <script type="text/javascript" src="tradutor.js"></script>
 </body>
 </html>
-

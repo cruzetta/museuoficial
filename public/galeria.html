@@ -98,8 +98,9 @@
             box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
         }
         
+        /* ✅ CORREÇÃO: O seletor foi alterado de '.autocomplete-results' para '#autocomplete-results' para aplicar corretamente o estilo ao ID do elemento. */
         #autocomplete-results {
-            background-color: #ffffff;
+            background-color: #ffffff; /* A "parede branca" */
             border: 1px solid var(--border-color);
             border-radius: 0.375rem;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
@@ -116,44 +117,14 @@
         }
         
         #header-logo {
-            height: 120px;
+            height: 120px; /* Ajustado para o novo header */
             width: auto;
-        }
-
-        /* Estilos para Tradução */
-        .goog-te-banner-frame {
-            display: none !important;
-        }
-        body {
-            top: 0 !important;
-        }
-        .lang-btn {
-            color: var(--text-light); /* Cor de texto para fundo claro */
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.75rem; /* Menor para caber melhor */
-            padding: 4px 8px;
-            border: 2px solid var(--border-color);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            background-color: #ffffff; /* Fundo branco */
-        }
-        .lang-btn:hover {
-            color: var(--text-dark);
-            border-color: var(--primary-hover);
-            background-color: #f3f4f6; /* cinza claro no hover */
-        }
-        .lang-btn.active {
-            color: #ffffff;
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- CABEÇALHO ATUALIZADO (SEM TRADUTOR) -->
+    <!-- CABEÇALHO ATUALIZADO COM FUNDO ESCURO -->
     <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
         <nav class="container mx-auto px-4 sm:px-6 h-24 flex justify-between items-center gap-4">
             <!-- Logo do Museu -->
@@ -183,26 +154,16 @@
     <main class="pt-12 pb-16">
         
         <div class="container mx-auto px-4">
-            <!-- TÍTULO DA PÁGINA -->
-            <div class="text-center mb-4">
-                <h1 class="text-4xl md:text-5xl font-bold">Acervo do Museu</h1>
-            </div>
-
-            <!-- CONTROLES: IDIOMA E ORDENAÇÃO -->
-            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                <!-- Seletor de Idiomas -->
-                <div id="custom-language-switcher" class="flex items-center space-x-2">
-                    <button data-lang="pt" class="lang-btn">PT</button>
-                    <button data-lang="en" class="lang-btn">EN</button>
-                    <button data-lang="es" class="lang-btn">ES</button>
-                </div>
-
-                <!-- ÁREA DE ORDENAÇÃO -->
-                <div class="w-full md:w-auto md:max-w-xs">
-                    <label for="sort-select" class="sr-only">Ordenar por</label> <!-- Melhoria de acessibilidade -->
-                    <select id="sort-select" class="form-select" aria-label="Ordenar por">
-                        <option value="lancamento-asc">Mais Antigos</option>
+            <!-- TÍTULO COM DIVISOR -->
+            <h1 class="text-4xl md:text-5xl font-bold text-center mb-8">Acervo do Museu</h1>
+            
+            <!-- ÁREA DE ORDENAÇÃO -->
+            <div class="flex justify-end mb-8">
+                <div class="w-full max-w-xs">
+                    <label for="sort-select" class="block text-sm font-medium mb-1">Ordenar por</label>
+                    <select id="sort-select" class="form-select">
                         <option value="lancamento-desc">Mais Recentes</option>
+                        <option value="lancamento-asc">Mais Antigos</option>
                         <option value="nome-asc">Ordem Alfabética (A-Z)</option>
                         <option value="nome-desc">Ordem Alfabética (Z-A)</option>
                     </select>
@@ -220,11 +181,8 @@
         </div>
     </main>
     
-    <!-- RODAPÉ ATUALIZADO (SEM BOTÕES DE TRADUÇÃO) -->
-    <footer class="py-8 mt-16 bg-gray-800 text-gray-400">
-        <div class="container mx-auto text-center">
-            <!-- Hidden Google Translate Widget (ESSENCIAL) -->
-            <div id="google_translate_element" class="hidden"></div>
+    <footer class="py-8 mt-16 bg-gray-200 border-t border-gray-300">
+        <div class="container mx-auto text-center text-gray-600">
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
@@ -294,18 +252,23 @@
 
         // --- DATA PROCESSING FUNCTIONS ---
         function applyFiltersAndSort() {
-            const searchTerm = searchInput.value.trim();
+            const searchTerm = searchInput.value.trim(); // Remove espaços em branco
             const sortValue = sortSelect.value;
             
             let tempItems = state.items;
 
+            // Filtra os itens com base na nova lógica de busca
             if (searchTerm) {
+                // Cria uma expressão regular para encontrar itens que começam com o termo de busca.
+                // '\b' garante que estamos a verificar o início de uma palavra.
+                // 'i' torna a busca insensível a maiúsculas/minúsculas.
                 const searchRegex = new RegExp('\\b' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
                 tempItems = tempItems.filter(item => 
                     item.nome && searchRegex.test(item.nome)
                 );
             }
 
+            // Ordena os itens filtrados
             tempItems.sort((a, b) => {
                 const [field, direction] = sortValue.split('-');
                 let valA = a[field];
@@ -333,15 +296,17 @@
         
         function updateAutocomplete(query) {
              autocompleteResults.innerHTML = '';
+             // Mostra resultados a partir da primeira letra digitada.
              if (query.length < 1) {
                  autocompleteResults.classList.add('hidden');
                  return;
              }
 
+             // Usa a mesma lógica de regex da filtragem principal.
              const searchRegex = new RegExp('\\b' + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
              const matchedItems = state.items
                 .filter(item => item.nome && searchRegex.test(item.nome))
-                .slice(0, 5);
+                .slice(0, 5); // Limita a 5 sugestões
 
              if (matchedItems.length > 0) {
                  matchedItems.forEach(item => {
@@ -351,7 +316,7 @@
                      suggestionDiv.onclick = () => {
                          searchInput.value = item.nome;
                          autocompleteResults.classList.add('hidden');
-                         applyFiltersAndSort();
+                         applyFiltersAndSort(); // Re-filtra a galeria principal com o item selecionado
                      };
                      autocompleteResults.appendChild(suggestionDiv);
                  });
@@ -386,6 +351,7 @@
             searchInput.addEventListener('input', () => applyFiltersAndSort());
             sortSelect.addEventListener('change', applyFiltersAndSort);
 
+            // Esconde a lista de sugestões se o utilizador clicar fora da área de pesquisa.
             document.addEventListener('click', (e) => {
                 if (!document.getElementById('search-container').contains(e.target)) {
                     autocompleteResults.classList.add('hidden');
@@ -394,8 +360,5 @@
         });
 
     </script>
-    
-    <!-- SCRIPT DO TRADUTOR (ADICIONADO) -->
-    <script type="text/javascript" src="tradutor.js"></script>
 </body>
 </html>

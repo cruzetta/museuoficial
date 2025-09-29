@@ -119,31 +119,6 @@
             height: 1.5rem;
             accent-color: var(--primary-color);
         }
-
-        /* Estilos para Tradução */
-        .goog-te-banner-frame { display: none !important; }
-        body { top: 0 !important; }
-        .lang-btn {
-            color: #d1d5db;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.875rem;
-            padding: 4px 8px;
-            border: 2px solid transparent;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            background-color: transparent;
-        }
-        .lang-btn:hover {
-            color: white;
-            border-color: var(--primary-hover);
-        }
-        .lang-btn.active {
-            color: var(--dark-bg);
-            background-color: var(--primary-color);
-            border-color: #a16207;
-        }
     </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen">
@@ -254,14 +229,6 @@
     
     <footer class="py-8 bg-gray-900 border-t-4 border-gray-700 mt-auto">
         <div class="container mx-auto text-center text-gray-500 font-sans text-sm">
-             <!-- Seletor de Idiomas -->
-            <div id="custom-language-switcher" class="flex items-center justify-center space-x-2 mb-6">
-                <button data-lang="pt" class="lang-btn">PT</button>
-                <button data-lang="en" class="lang-btn">EN</button>
-                <button data-lang="es" class="lang-btn">ES</button>
-            </div>
-            <!-- Widget invisível do Google -->
-            <div id="google_translate_element" class="hidden"></div>
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
@@ -572,9 +539,5 @@
             addSubmissionOption();
         });
     </script>
-    
-    <!-- SCRIPT DO TRADUTOR -->
-    <script type="text/javascript" src="tradutor.js"></script>
 </body>
 </html>
-
