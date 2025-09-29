@@ -98,7 +98,6 @@
             box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
         }
         
-        /* ✅ CORREÇÃO: O seletor foi alterado de '.autocomplete-results' para '#autocomplete-results' para aplicar corretamente o estilo ao ID do elemento. */
         #autocomplete-results {
             background-color: #ffffff; /* A "parede branca" */
             border: 1px solid var(--border-color);
@@ -120,6 +119,39 @@
             height: 120px; /* Ajustado para o novo header */
             width: auto;
         }
+
+        /* === INÍCIO: NOVOS ESTILOS PARA TRADUÇÃO === */
+        /* Remove a barra superior do Google Translate */
+        .goog-te-banner-frame {
+            display: none !important;
+        }
+        body {
+            top: 0 !important; /* Remove o espaço em branco deixado pela barra */
+        }
+        
+        /* Estilos para os nossos botões customizados */
+        .lang-btn {
+            color: #d1d5db; /* text-gray-300 */
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem; /* text-sm */
+            padding: 4px 8px;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            background-color: transparent;
+        }
+        .lang-btn:hover {
+            color: white;
+            border-color: var(--primary-hover);
+        }
+        .lang-btn.active {
+            color: var(--text-dark);
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        /* === FIM: NOVOS ESTILOS PARA TRADUÇÃO === */
     </style>
 </head>
 <body class="antialiased">
@@ -144,10 +176,21 @@
                 </div>
             </div>
 
-            <a href="index.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>Voltar ao Início</span>
-            </a>
+            <div class="flex items-center gap-4">
+                <!-- Container para nossos botões customizados -->
+                <div id="custom-language-switcher" class="flex items-center space-x-2">
+                    <button data-lang="pt" class="lang-btn">PT</button>
+                    <button data-lang="en" class="lang-btn">EN</button>
+                    <button data-lang="es" class="lang-btn">ES</button>
+                </div>
+                <!-- O widget original do Google, que vamos esconder -->
+                <div id="google_translate_element" class="hidden"></div>
+
+                <a href="index.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Voltar ao Início</span>
+                </a>
+            </div>
         </nav>
     </header>
 
@@ -252,23 +295,18 @@
 
         // --- DATA PROCESSING FUNCTIONS ---
         function applyFiltersAndSort() {
-            const searchTerm = searchInput.value.trim(); // Remove espaços em branco
+            const searchTerm = searchInput.value.trim();
             const sortValue = sortSelect.value;
             
             let tempItems = state.items;
 
-            // Filtra os itens com base na nova lógica de busca
             if (searchTerm) {
-                // Cria uma expressão regular para encontrar itens que começam com o termo de busca.
-                // '\b' garante que estamos a verificar o início de uma palavra.
-                // 'i' torna a busca insensível a maiúsculas/minúsculas.
                 const searchRegex = new RegExp('\\b' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
                 tempItems = tempItems.filter(item => 
                     item.nome && searchRegex.test(item.nome)
                 );
             }
 
-            // Ordena os itens filtrados
             tempItems.sort((a, b) => {
                 const [field, direction] = sortValue.split('-');
                 let valA = a[field];
@@ -296,17 +334,15 @@
         
         function updateAutocomplete(query) {
              autocompleteResults.innerHTML = '';
-             // Mostra resultados a partir da primeira letra digitada.
              if (query.length < 1) {
                  autocompleteResults.classList.add('hidden');
                  return;
              }
 
-             // Usa a mesma lógica de regex da filtragem principal.
              const searchRegex = new RegExp('\\b' + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
              const matchedItems = state.items
                 .filter(item => item.nome && searchRegex.test(item.nome))
-                .slice(0, 5); // Limita a 5 sugestões
+                .slice(0, 5);
 
              if (matchedItems.length > 0) {
                  matchedItems.forEach(item => {
@@ -316,7 +352,7 @@
                      suggestionDiv.onclick = () => {
                          searchInput.value = item.nome;
                          autocompleteResults.classList.add('hidden');
-                         applyFiltersAndSort(); // Re-filtra a galeria principal com o item selecionado
+                         applyFiltersAndSort();
                      };
                      autocompleteResults.appendChild(suggestionDiv);
                  });
@@ -351,7 +387,6 @@
             searchInput.addEventListener('input', () => applyFiltersAndSort());
             sortSelect.addEventListener('change', applyFiltersAndSort);
 
-            // Esconde a lista de sugestões se o utilizador clicar fora da área de pesquisa.
             document.addEventListener('click', (e) => {
                 if (!document.getElementById('search-container').contains(e.target)) {
                     autocompleteResults.classList.add('hidden');
@@ -360,5 +395,9 @@
         });
 
     </script>
+    
+    <!-- SCRIPT DO TRADUTOR (ADICIONADO) -->
+    <script type="text/javascript" src="tradutor.js"></script>
 </body>
 </html>
+
