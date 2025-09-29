@@ -58,53 +58,38 @@
         .control-btn:disabled { background-color: #f8f9fa; color: #adb5bd; cursor: not-allowed; border-color: #dee2e6; }
         #media-counter { min-width: 50px; text-align: center; }
         
-        /* Estilo para a mensagem de link copiado */
         #copy-message {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+            opacity: 0; visibility: hidden; pointer-events: none;
         }
-        #copy-message.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        /* === INÍCIO: NOVOS ESTILOS PARA TRADUÇÃO === */
-        /* Remove a barra superior do Google Translate */
-        .goog-te-banner-frame {
-            display: none !important;
-        }
-        body {
-            top: 0 !important; /* Remove o espaço em branco deixado pela barra */
-        }
+        #copy-message.show { opacity: 1; visibility: visible; }
         
-        /* Estilos para os nossos botões customizados */
+        /* Estilos para Tradução */
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
         .lang-btn {
-            color: #d1d5db; /* text-gray-300 */
+            color: var(--text-light);
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 0.875rem; /* text-sm */
+            font-size: 0.75rem;
             padding: 4px 8px;
-            border: 2px solid transparent;
+            border: 2px solid var(--border-color);
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            background-color: transparent;
+            background-color: #ffffff;
         }
         .lang-btn:hover {
-            color: white;
+            color: var(--text-dark);
             border-color: var(--primary-hover);
+            background-color: #f3f4f6;
         }
         .lang-btn.active {
-            color: var(--dark-header);
+            color: #ffffff;
             background-color: var(--primary-color);
             border-color: var(--primary-color);
         }
-        /* === FIM: NOVOS ESTILOS PARA TRADUÇÃO === */
     </style>
 </head>
 <body class="antialiased">
@@ -113,21 +98,11 @@
         <div class="container mx-auto px-4 sm:px-6">
             <div class="flex justify-between items-center h-24">
                 <a href="index.html" class="flex-shrink-0">
-                    <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
+                    <img id="header-logo" src="/imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
                 </a>
-                <div class="flex items-center gap-4">
-                    <!-- Container para nossos botões customizados -->
-                    <div id="custom-language-switcher" class="flex items-center space-x-2">
-                        <button data-lang="pt" class="lang-btn">PT</button>
-                        <button data-lang="en" class="lang-btn">EN</button>
-                        <button data-lang="es" class="lang-btn">ES</button>
-                    </div>
-                    <!-- O widget original do Google, que vamos esconder -->
-                    <div id="google_translate_element" class="hidden"></div>
-                    <a href="noticias.html" class="btn btn-secondary bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
-                        <i class="fas fa-arrow-left mr-2"></i>Voltar para Notícias
-                    </a>
-                </div>
+                <a href="noticias.html" class="btn btn-secondary bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar para Notícias
+                </a>
             </div>
         </div>
     </header>
@@ -146,6 +121,8 @@
 
     <footer class="py-10 mt-16 bg-gray-800">
         <div class="container mx-auto text-center text-gray-400">
+             <!-- Widget invisível do Google -->
+            <div id="google_translate_element" class="hidden"></div>
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
@@ -226,8 +203,7 @@
                 document.body.removeChild(textArea);
             }
         }
-        // --- FIM DAS FUNÇÕES DE COMPARTILHAMENTO ---
-
+        
         function setPositionByIndex() {
             const track = document.getElementById('media-track');
             if (!track) return;
@@ -384,6 +360,13 @@
                                 ${data.subtitulo ? `<p class="text-xl text-gray-500 mt-2 max-w-3xl mx-auto">${data.subtitulo}</p>` : ''}
                                 <div class="text-md mt-4">${metaHTML}</div>
                             </div>
+                            <div class="flex justify-center items-center mb-8">
+                                <div id="custom-language-switcher" class="flex items-center space-x-2">
+                                    <button data-lang="pt" class="lang-btn">PT</button>
+                                    <button data-lang="en" class="lang-btn">EN</button>
+                                    <button data-lang="es" class="lang-btn">ES</button>
+                                </div>
+                            </div>
                             ${mediaSectionHTML}
                             <div class="content-card p-6 md:p-8">
                                 <div class="prose-custom max-w-none">
@@ -421,12 +404,10 @@
                 if(loader) loader.style.display = 'none';
             }
         }
-
+        
         document.addEventListener('DOMContentLoaded', carregarNoticia);
     </script>
-
-    <!-- SCRIPT DO TRADUTOR (ADICIONADO) -->
-    <script type="text/javascript" src="../tradutor.js"></script>
+    <script type="text/javascript" src="/tradutor.js"></script>
 </body>
 </html>
 

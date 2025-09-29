@@ -119,21 +119,15 @@
             height: 1.5rem;
             accent-color: var(--primary-color);
         }
-        /* === INÍCIO: NOVOS ESTILOS PARA TRADUÇÃO === */
-        /* Remove a barra superior do Google Translate */
-        .goog-te-banner-frame {
-            display: none !important;
-        }
-        body {
-            top: 0 !important; /* Remove o espaço em branco deixado pela barra */
-        }
-        
-        /* Estilos para os nossos botões customizados */
+
+        /* Estilos para Tradução */
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
         .lang-btn {
-            color: #d1d5db; /* text-gray-300 */
+            color: #d1d5db;
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 0.875rem; /* text-sm */
+            font-size: 0.875rem;
             padding: 4px 8px;
             border: 2px solid transparent;
             border-radius: 4px;
@@ -148,9 +142,8 @@
         .lang-btn.active {
             color: var(--dark-bg);
             background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            border-color: #a16207;
         }
-        /* === FIM: NOVOS ESTILOS PARA TRADUÇÃO === */
     </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen">
@@ -160,19 +153,9 @@
             <a href="index.html" class="flex-shrink-0">
                 <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
             </a>
-            <div class="flex items-center gap-4">
-                 <!-- Container para nossos botões customizados -->
-                <div id="custom-language-switcher" class="flex items-center space-x-2">
-                    <button data-lang="pt" class="lang-btn">PT</button>
-                    <button data-lang="en" class="lang-btn">EN</button>
-                    <button data-lang="es" class="lang-btn">ES</button>
-                </div>
-                <!-- O widget original do Google, que vamos esconder -->
-                <div id="google_translate_element" class="hidden"></div>
-                <a href="index.html" class="btn btn-secondary hidden sm:flex text-sm">
-                    <i class="fa-solid fa-arrow-left"></i><span>Voltar</span>
-                </a>
-            </div>
+            <a href="index.html" class="btn btn-secondary hidden sm:flex text-sm">
+                <i class="fa-solid fa-arrow-left"></i><span>Voltar</span>
+            </a>
         </nav>
     </header>
 
@@ -271,6 +254,14 @@
     
     <footer class="py-8 bg-gray-900 border-t-4 border-gray-700 mt-auto">
         <div class="container mx-auto text-center text-gray-500 font-sans text-sm">
+             <!-- Seletor de Idiomas -->
+            <div id="custom-language-switcher" class="flex items-center justify-center space-x-2 mb-6">
+                <button data-lang="pt" class="lang-btn">PT</button>
+                <button data-lang="en" class="lang-btn">EN</button>
+                <button data-lang="es" class="lang-btn">ES</button>
+            </div>
+            <!-- Widget invisível do Google -->
+            <div id="google_translate_element" class="hidden"></div>
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
@@ -351,6 +342,7 @@
             currentScore.textContent = `Pontos: ${score}`;
             questionText.innerHTML = question.pergunta_texto;
             
+            // NOVO: Exibe o autor se existir
             if (question.autor) {
                 questionAuthor.textContent = `Pergunta criada por: ${question.autor}`;
             } else {
@@ -580,8 +572,8 @@
             addSubmissionOption();
         });
     </script>
-
-    <!-- SCRIPT DO TRADUTOR (ADICIONADO) -->
+    
+    <!-- SCRIPT DO TRADUTOR -->
     <script type="text/javascript" src="tradutor.js"></script>
 </body>
 </html>

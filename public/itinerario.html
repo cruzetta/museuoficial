@@ -41,38 +41,31 @@
             transform: scale(0.95);
         }
 
-        /* === INÍCIO: NOVOS ESTILOS PARA TRADUÇÃO === */
-        /* Remove a barra superior do Google Translate */
-        .goog-te-banner-frame {
-            display: none !important;
-        }
-        body {
-            top: 0 !important; /* Remove o espaço em branco deixado pela barra */
-        }
-        
-        /* Estilos para os nossos botões customizados */
+        /* Estilos para Tradução */
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
         .lang-btn {
-            color: #d1d5db; /* text-gray-300 */
+            color: var(--text-light);
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 0.875rem; /* text-sm */
+            font-size: 0.75rem;
             padding: 4px 8px;
-            border: 2px solid transparent;
+            border: 2px solid var(--border-color);
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            background-color: transparent;
+            background-color: #ffffff;
         }
         .lang-btn:hover {
-            color: white;
-            border-color: #B88A40; /* primary-hover */
+            color: var(--text-dark);
+            border-color: var(--primary-hover);
+            background-color: #f3f4f6;
         }
         .lang-btn.active {
-            color: #171A21; /* dark */
-            background-color: #D4A356; /* primary */
-            border-color: #D4A356; /* primary */
+            color: #ffffff;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
-        /* === FIM: NOVOS ESTILOS PARA TRADUÇÃO === */
     </style>
 </head>
 <body class="antialiased">
@@ -83,25 +76,26 @@
                 <a href="index.html" class="flex-shrink-0">
                     <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame" onerror="this.onerror=null;this.src='https://placehold.co/200x80/1a1a1a/ffffff?text=Logo+Museu';">
                 </a>
-                <div class="flex items-center gap-4">
-                    <!-- Container para nossos botões customizados -->
-                    <div id="custom-language-switcher" class="flex items-center space-x-2">
-                        <button data-lang="pt" class="lang-btn">PT</button>
-                        <button data-lang="en" class="lang-btn">EN</button>
-                        <button data-lang="es" class="lang-btn">ES</button>
-                    </div>
-                    <!-- O widget original do Google, que vamos esconder -->
-                    <div id="google_translate_element" class="hidden"></div>
-                    <a href="index.html" class="btn btn-secondary bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
-                        <i class="fas fa-home mr-2"></i>Voltar à Página Inicial
-                    </a>
-                </div>
+                <a href="index.html" class="btn btn-secondary bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                    <i class="fas fa-home mr-2"></i>Voltar à Página Inicial
+                </a>
             </div>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-16">
-        <h1 class="text-4xl font-bold text-center mb-12 pb-6 border-b">Itinerário Completo</h1>
+        <div class="text-center mb-4">
+            <h1 class="text-4xl font-bold mb-4">Itinerário Completo</h1>
+        </div>
+        
+        <!-- CONTROLES: IDIOMA -->
+        <div class="flex justify-center items-center mb-12">
+            <div id="custom-language-switcher" class="flex items-center space-x-2">
+                <button data-lang="pt" class="lang-btn">PT</button>
+                <button data-lang="en" class="lang-btn">EN</button>
+                <button data-lang="es" class="lang-btn">ES</button>
+            </div>
+        </div>
 
         <div id="itinerario-completo-container" class="space-y-12">
             <!-- As seções de eventos serão inseridas aqui pelo JavaScript -->
@@ -114,6 +108,8 @@
 
     <footer class="py-10 mt-16 bg-gray-800">
         <div class="container mx-auto text-center text-gray-400">
+            <!-- Widget invisível do Google -->
+            <div id="google_translate_element" class="hidden"></div>
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
@@ -328,7 +324,7 @@
         });
     </script>
     
-    <!-- SCRIPT DO TRADUTOR (ADICIONADO) -->
+    <!-- SCRIPT DO TRADUTOR -->
     <script type="text/javascript" src="tradutor.js"></script>
 </body>
 </html>

@@ -99,7 +99,7 @@
         }
         
         #autocomplete-results {
-            background-color: #ffffff; /* A "parede branca" */
+            background-color: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 0.375rem;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
@@ -116,47 +116,44 @@
         }
         
         #header-logo {
-            height: 120px; /* Ajustado para o novo header */
+            height: 120px;
             width: auto;
         }
 
-        /* === INÍCIO: NOVOS ESTILOS PARA TRADUÇÃO === */
-        /* Remove a barra superior do Google Translate */
+        /* Estilos para Tradução */
         .goog-te-banner-frame {
             display: none !important;
         }
         body {
-            top: 0 !important; /* Remove o espaço em branco deixado pela barra */
+            top: 0 !important;
         }
-        
-        /* Estilos para os nossos botões customizados */
         .lang-btn {
-            color: #d1d5db; /* text-gray-300 */
+            color: var(--text-light); /* Cor de texto para fundo claro */
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 0.875rem; /* text-sm */
+            font-size: 0.75rem; /* Menor para caber melhor */
             padding: 4px 8px;
-            border: 2px solid transparent;
+            border: 2px solid var(--border-color);
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            background-color: transparent;
+            background-color: #ffffff; /* Fundo branco */
         }
         .lang-btn:hover {
-            color: white;
+            color: var(--text-dark);
             border-color: var(--primary-hover);
+            background-color: #f3f4f6; /* cinza claro no hover */
         }
         .lang-btn.active {
-            color: var(--text-dark);
+            color: #ffffff;
             background-color: var(--primary-color);
             border-color: var(--primary-color);
         }
-        /* === FIM: NOVOS ESTILOS PARA TRADUÇÃO === */
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- CABEÇALHO ATUALIZADO COM FUNDO ESCURO -->
+    <!-- CABEÇALHO ATUALIZADO (SEM TRADUTOR) -->
     <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
         <nav class="container mx-auto px-4 sm:px-6 h-24 flex justify-between items-center gap-4">
             <!-- Logo do Museu -->
@@ -176,37 +173,36 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <!-- Container para nossos botões customizados -->
-                <div id="custom-language-switcher" class="flex items-center space-x-2">
-                    <button data-lang="pt" class="lang-btn">PT</button>
-                    <button data-lang="en" class="lang-btn">EN</button>
-                    <button data-lang="es" class="lang-btn">ES</button>
-                </div>
-                <!-- O widget original do Google, que vamos esconder -->
-                <div id="google_translate_element" class="hidden"></div>
-
-                <a href="index.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Voltar ao Início</span>
-                </a>
-            </div>
+            <a href="index.html" class="btn btn-secondary hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Voltar ao Início</span>
+            </a>
         </nav>
     </header>
 
     <main class="pt-12 pb-16">
         
         <div class="container mx-auto px-4">
-            <!-- TÍTULO COM DIVISOR -->
-            <h1 class="text-4xl md:text-5xl font-bold text-center mb-8">Acervo do Museu</h1>
-            
-            <!-- ÁREA DE ORDENAÇÃO -->
-            <div class="flex justify-end mb-8">
-                <div class="w-full max-w-xs">
-                    <label for="sort-select" class="block text-sm font-medium mb-1">Ordenar por</label>
-                    <select id="sort-select" class="form-select">
-                        <option value="lancamento-desc">Mais Recentes</option>
+            <!-- TÍTULO DA PÁGINA -->
+            <div class="text-center mb-4">
+                <h1 class="text-4xl md:text-5xl font-bold">Acervo do Museu</h1>
+            </div>
+
+            <!-- CONTROLES: IDIOMA E ORDENAÇÃO -->
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <!-- Seletor de Idiomas -->
+                <div id="custom-language-switcher" class="flex items-center space-x-2">
+                    <button data-lang="pt" class="lang-btn">PT</button>
+                    <button data-lang="en" class="lang-btn">EN</button>
+                    <button data-lang="es" class="lang-btn">ES</button>
+                </div>
+
+                <!-- ÁREA DE ORDENAÇÃO -->
+                <div class="w-full md:w-auto md:max-w-xs">
+                    <label for="sort-select" class="sr-only">Ordenar por</label> <!-- Melhoria de acessibilidade -->
+                    <select id="sort-select" class="form-select" aria-label="Ordenar por">
                         <option value="lancamento-asc">Mais Antigos</option>
+                        <option value="lancamento-desc">Mais Recentes</option>
                         <option value="nome-asc">Ordem Alfabética (A-Z)</option>
                         <option value="nome-desc">Ordem Alfabética (Z-A)</option>
                     </select>
@@ -224,8 +220,11 @@
         </div>
     </main>
     
-    <footer class="py-8 mt-16 bg-gray-200 border-t border-gray-300">
-        <div class="container mx-auto text-center text-gray-600">
+    <!-- RODAPÉ ATUALIZADO (SEM BOTÕES DE TRADUÇÃO) -->
+    <footer class="py-8 mt-16 bg-gray-800 text-gray-400">
+        <div class="container mx-auto text-center">
+            <!-- Hidden Google Translate Widget (ESSENCIAL) -->
+            <div id="google_translate_element" class="hidden"></div>
             <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
         </div>
     </footer>
@@ -400,4 +399,3 @@
     <script type="text/javascript" src="tradutor.js"></script>
 </body>
 </html>
-
