@@ -642,35 +642,15 @@
             margin-bottom: 1.5rem;
             padding-right: 2rem; /* Espaço para o botão de fechar */
         }
-        #map-popup-cities-list {
-            list-style-type: none;
-            padding: 0;
+        #map-popup-events-container .event-group {
             margin-bottom: 2rem;
-        }
-        #map-popup-cities-list li {
-            padding: 0.75rem 0;
+            padding-bottom: 1.5rem;
             border-bottom: 1px solid var(--border-color);
         }
-        #map-popup-cities-list li:last-child {
+        #map-popup-events-container .event-group:last-child {
             border-bottom: none;
-        }
-        #map-popup-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem;
-        }
-        #map-popup-gallery img {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        #map-popup-gallery img:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            margin-bottom: 0;
+            padding-bottom: 0;
         }
 
         /* === ESTILOS PARA LIGHTBOX DA GALERIA === */
@@ -985,15 +965,8 @@
         <div id="map-popup-content">
             <button id="map-popup-close" aria-label="Fechar pop-up">&times;</button>
             <h2 id="map-popup-title" class="text-3xl"></h2>
-            
-            <h3 class="font-bold text-lg mb-2 font-inter">Cidades e Locais Visitados:</h3>
-            <ul id="map-popup-cities-list">
-                <!-- Cidades serão inseridas aqui via JS -->
-            </ul>
-
-            <h3 class="font-bold text-lg mb-4 font-inter">Galeria de Fotos:</h3>
-            <div id="map-popup-gallery">
-                <!-- Fotos serão inseridas aqui via JS -->
+            <div id="map-popup-events-container">
+                <!-- Eventos (local, data, galeria) serão inseridos aqui via JS -->
             </div>
         </div>
     </div>
@@ -1373,7 +1346,6 @@
         // --- LÓGICA DO ITINERÁRIO (AGENDA, GALERIA E MAPA COM POP-UP) ---
         let itinerarioPorEstado = {};
         const initializeItinerario = () => {
-            // ... (elementos do container)
             const containerLista = document.getElementById('itinerario-lista');
             const galeriaContainer = document.getElementById('itinerario-galeria-container');
             const galeriaTrack = document.getElementById('itinerario-galeria-track');
@@ -1384,8 +1356,7 @@
             const popupOverlay = document.getElementById('map-popup-overlay');
             const popupCloseBtn = document.getElementById('map-popup-close');
             const popupTitle = document.getElementById('map-popup-title');
-            const popupCitiesList = document.getElementById('map-popup-cities-list');
-            const popupGallery = document.getElementById('map-popup-gallery');
+            const popupEventsContainer = document.getElementById('map-popup-events-container');
 
             // --- Lógica do Lightbox ---
             const lightboxOverlay = document.getElementById('lightbox-overlay');
@@ -1448,37 +1419,43 @@
 
             const showStatePopup = (uf) => {
                 const stateData = itinerarioPorEstado[uf];
-                if (!stateData || stateData.cidades.length === 0) return;
+                if (!stateData || stateData.eventos.length === 0) return;
 
                 popupTitle.textContent = stateData.nome;
+                popupEventsContainer.innerHTML = ''; // Clear previous content
 
-                popupCitiesList.innerHTML = stateData.cidades.map(cidade => {
-                    const dataFormatada = cidade.data_inicio ? `${cidade.data_inicio} até ${cidade.data_fim}` : 'Data a definir';
-                     return `
-                        <li>
-                            <strong class="font-inter">${cidade.cidade}</strong>
-                            <p class="text-sm text-gray-600 font-lora">${cidade.local}</p>
-                            <p class="text-xs text-gray-500 font-inter mt-1"><i class="fas fa-calendar-alt mr-1"></i>${dataFormatada}</p>
-                        </li>`
-                }).join('');
+                stateData.eventos.forEach(evento => {
+                    const eventoContainer = document.createElement('div');
+                    eventoContainer.className = 'event-group';
 
-                if (stateData.fotos.length > 0) {
-                    popupGallery.innerHTML = stateData.fotos.map((foto, index) => `
-                        <img src="${foto.url}" alt="${foto.descricao || 'Foto do evento'}" loading="lazy" data-index="${index}">
-                    `).join('');
-                    popupGallery.parentElement.style.display = 'block';
+                    const dataFormatada = evento.data_inicio ? `${evento.data_inicio} até ${evento.data_fim}` : 'Data a definir';
                     
-                    // Adicionar listeners para abrir lightbox
-                    popupGallery.querySelectorAll('img').forEach(img => {
-                        img.addEventListener('click', () => {
-                            openLightbox(stateData.fotos, parseInt(img.dataset.index));
-                        });
-                    });
+                    let eventoHTML = `
+                        <h4 class="font-bold text-xl mb-1 font-inter">${evento.local}, ${evento.cidade}</h4>
+                        <p class="text-sm text-gray-500 font-inter mb-4"><i class="fas fa-calendar-alt mr-1"></i>${dataFormatada}</p>
+                    `;
 
-                } else {
-                    popupGallery.parentElement.style.display = 'none';
-                    popupGallery.innerHTML = '';
-                }
+                    if (evento.fotos.length > 0) {
+                        const galleryId = `gallery-${uf}-${evento.local.replace(/\s+/g, '-')}`;
+                        eventoHTML += `<div id="${galleryId}" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                            ${evento.fotos.map((foto, index) => `
+                                <img src="${foto.url}" alt="${foto.descricao || 'Foto do evento'}" loading="lazy" data-index="${index}" class="w-full h-24 object-cover rounded-md cursor-pointer transition-transform hover:scale-105">
+                            `).join('')}
+                        </div>`;
+                    }
+
+                    eventoContainer.innerHTML = eventoHTML;
+                    popupEventsContainer.appendChild(eventoContainer);
+
+                    // Add lightbox listeners for the newly created gallery
+                    if (evento.fotos.length > 0) {
+                        eventoContainer.querySelectorAll('img').forEach(img => {
+                            img.addEventListener('click', () => {
+                                openLightbox(evento.fotos, parseInt(img.dataset.index));
+                            });
+                        });
+                    }
+                });
                 
                 body.classList.add('modal-open');
                 popupOverlay.classList.add('active');
@@ -1590,7 +1567,6 @@
                     
                     const formatDate = (date) => date?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
 
-
                     snapshot.docs.forEach(doc => {
                         const data = doc.data();
                         const inicio = data.data_inicio?.toDate();
@@ -1609,19 +1585,16 @@
                             const nomeEstado = document.querySelector(`#state_${uf} .label_state`)?.textContent || data.estado.toUpperCase();
 
                             if (!itinerarioPorEstado[uf]) {
-                                itinerarioPorEstado[uf] = { nome: nomeEstado, cidades: [], fotos: [] };
+                                itinerarioPorEstado[uf] = { nome: nomeEstado, eventos: [] };
                             }
                             
-                            itinerarioPorEstado[uf].cidades.push({ 
+                            itinerarioPorEstado[uf].eventos.push({ 
                                 cidade: data.cidade, 
                                 local: data.local,
                                 data_inicio: formatDate(data.data_inicio),
-                                data_fim: formatDate(data.data_fim)
+                                data_fim: formatDate(data.data_fim),
+                                fotos: data.galeriaFotos && Array.isArray(data.galeriaFotos) ? data.galeriaFotos : []
                             });
-
-                            if (data.galeriaFotos && Array.isArray(data.galeriaFotos)) {
-                                itinerarioPorEstado[uf].fotos.push(...data.galeriaFotos);
-                            }
 
                             if (statusCalculado === 'atual') estados.atual.add(uf);
                             else if (statusCalculado === 'proximo') estados.proximo.add(uf);
@@ -1956,5 +1929,4 @@
     </script>
 </body>
 </html>
-
 
