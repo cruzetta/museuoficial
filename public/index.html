@@ -53,7 +53,7 @@
             line-height: 1.2;
         }
 
-        body.overflow-hidden-mobile { overflow: hidden; }
+        body.overflow-hidden-mobile, body.modal-open { overflow: hidden; }
         @media (min-width: 768px) {
             body.overflow-hidden-mobile { overflow: auto; }
         }
@@ -504,7 +504,7 @@
         }
         #back-to-top.show { display: grid; }
 
-        /* === NOVOS ESTILOS PARA O MAPA INTERATIVO === */
+        /* === ESTILOS PARA O MAPA INTERATIVO === */
         #map .state .shape {
             cursor: pointer;
             fill: #ccc; /* Cor padrão dos estados */
@@ -584,6 +584,160 @@
             fill: #FFF;
         }
 
+        /* === NOVOS ESTILOS PARA O POP-UP DO MAPA === */
+        #map-popup-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none; /* Escondido por padrão */
+            place-items: center;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #map-popup-overlay.active {
+            display: grid;
+            opacity: 1;
+        }
+        #map-popup-content {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        #map-popup-overlay.active #map-popup-content {
+            transform: scale(1);
+        }
+        #map-popup-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 2rem;
+            height: 2rem;
+            border: none;
+            background-color: #f1f1f1;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            display: grid;
+            place-items: center;
+        }
+        #map-popup-close:hover {
+            background-color: #e0e0e0;
+            transform: rotate(90deg);
+        }
+        #map-popup-title {
+            font-family: 'Lora', serif;
+            color: var(--color-dark);
+            margin-bottom: 1.5rem;
+            padding-right: 2rem; /* Espaço para o botão de fechar */
+        }
+        #map-popup-cities-list {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 2rem;
+        }
+        #map-popup-cities-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        #map-popup-cities-list li:last-child {
+            border-bottom: none;
+        }
+        #map-popup-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+        #map-popup-gallery img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #map-popup-gallery img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* === ESTILOS PARA LIGHTBOX DA GALERIA === */
+        #lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1001; /* Acima do pop-up principal */
+            display: none;
+            place-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #lightbox-overlay.active {
+            display: grid;
+            opacity: 1;
+        }
+        #lightbox-content {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #lightbox-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            display: grid;
+            place-items: center;
+        }
+        .lightbox-nav:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        #lightbox-prev {
+            left: 1rem;
+        }
+        #lightbox-next {
+            right: 1rem;
+        }
+        #lightbox-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -675,7 +829,7 @@
                     <div class="mb-12 lg:hidden">
                          <h3 class="text-2xl font-lora text-center mb-6 text-gray-700">Estados Visitados</h3>
                          <div id="map-container-mobile" class="bg-gray-100 p-4 rounded-lg shadow-inner">
-                            <p class="text-center p-4">Carregando mapa...</p>
+                             <p class="text-center p-4">Carregando mapa...</p>
                          </div>
                     </div>
 
@@ -683,17 +837,17 @@
                         <!-- Coluna da Lista de Eventos -->
                         <div>
                              <div id="itinerario-lista" class="mb-12">
-                                <div class="text-center p-8">
-                                    <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
-                                    <p class="mt-3 text-gray-600 font-lora">A carregar próximos destinos...</p>
-                                </div>
-                            </div>
+                                 <div class="text-center p-8">
+                                     <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
+                                     <p class="mt-3 text-gray-600 font-lora">A carregar próximos destinos...</p>
+                                 </div>
+                             </div>
                         </div>
                         <!-- Coluna do Mapa (Visível apenas em telas grandes) -->
                         <div class="hidden lg:block sticky top-28">
                              <h3 class="text-2xl font-lora text-center mb-6 text-gray-700">Estados Visitados</h3>
                              <div id="map-container-desktop" class="bg-gray-100 p-4 rounded-lg shadow-inner">
-                                <p class="text-center p-4">Carregando mapa...</p>
+                                 <p class="text-center p-4">Carregando mapa...</p>
                              </div>
                         </div>
                     </div>
@@ -703,9 +857,9 @@
                     <h3 class="text-3xl font-lora text-center mb-10 text-gray-700">Veja como foram nossos eventos</h3>
                     <div id="itinerario-galeria-container" class="marquee-container">
                         <div id="itinerario-galeria-track" class="marquee-track py-4">
-                                <div class="w-full h-full flex items-center justify-center">
-                                <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
-                                </div>
+                             <div class="w-full h-full flex items-center justify-center">
+                             <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
+                             </div>
                         </div>
                     </div>
                 </div>
@@ -826,6 +980,37 @@
         <i class="fas fa-arrow-up"></i>
     </a>
 
+    <!-- INÍCIO: Estrutura do Pop-up do Mapa -->
+    <div id="map-popup-overlay">
+        <div id="map-popup-content">
+            <button id="map-popup-close" aria-label="Fechar pop-up">&times;</button>
+            <h2 id="map-popup-title" class="text-3xl"></h2>
+            
+            <h3 class="font-bold text-lg mb-2 font-inter">Cidades e Locais Visitados:</h3>
+            <ul id="map-popup-cities-list">
+                <!-- Cidades serão inseridas aqui via JS -->
+            </ul>
+
+            <h3 class="font-bold text-lg mb-4 font-inter">Galeria de Fotos:</h3>
+            <div id="map-popup-gallery">
+                <!-- Fotos serão inseridas aqui via JS -->
+            </div>
+        </div>
+    </div>
+    <!-- FIM: Estrutura do Pop-up do Mapa -->
+    
+    <!-- INÍCIO: Estrutura do Lightbox para Galeria de Fotos -->
+    <div id="lightbox-overlay">
+        <div id="lightbox-content">
+            <button id="lightbox-close" class="lightbox-nav">&times;</button>
+            <button id="lightbox-prev" class="lightbox-nav">&#10094;</button>
+            <img id="lightbox-image" src="" alt="Foto do evento em tela cheia">
+            <button id="lightbox-next" class="lightbox-nav">&#10095;</button>
+        </div>
+    </div>
+    <!-- FIM: Estrutura do Lightbox -->
+
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, getDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -846,12 +1031,10 @@
         // --- LÓGICA DE NAVEGAÇÃO E HEADER ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
-        // Seletor mais específico para evitar conflito com o mapa SVG
         const internalNavLinks = document.querySelectorAll('#main-header a[href^="#"], #mobile-menu a[href^="#"], footer a[href^="#"]');
         const body = document.body;
         const header = document.getElementById('main-header');
 
-        // Toggle Menu Mobile
         if (mobileMenuButton) {
             mobileMenuButton.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
@@ -859,7 +1042,6 @@
             });
         }
 
-        // Scroll Suave e Fechar Menu ao Clicar no Link
         internalNavLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 if (link.getAttribute('href').startsWith('#')) {
@@ -880,9 +1062,7 @@
             });
         });
 
-        // Efeito de Scroll do Header
         const initializeHeaderScrollEffect = () => {
-            
             const handleScroll = () => {
                 if (window.scrollY > 50) {
                     header.classList.add('scrolled');
@@ -903,7 +1083,6 @@
 
         // --- RENDERERS ---
 
-        // Renderer de Notícias
         const renderNoticia = (doc) => {
             const data = doc.data();
             let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
@@ -927,7 +1106,6 @@
             </a>`;
         };
 
-        // Renderer de Mídia
         const renderMidia = (doc) => {
             const data = doc.data();
             let dataFormatada = data.data_publicacao?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) || '';
@@ -962,7 +1140,6 @@
             </a>`;
         };
 
-        // Renderer de Acervo
         const renderAcervo = (doc) => {
             const data = doc.data();
             return `
@@ -1193,31 +1370,131 @@
             });
         };
 
-        // --- LÓGICA DO ITINERÁRIO (AGENDA, GALERIA E MAPA) ---
+        // --- LÓGICA DO ITINERÁRIO (AGENDA, GALERIA E MAPA COM POP-UP) ---
+        let itinerarioPorEstado = {};
         const initializeItinerario = () => {
+            // ... (elementos do container)
             const containerLista = document.getElementById('itinerario-lista');
             const galeriaContainer = document.getElementById('itinerario-galeria-container');
             const galeriaTrack = document.getElementById('itinerario-galeria-track');
-            // Seleciona os dois containers do mapa
             const mapContainerDesktop = document.getElementById('map-container-desktop');
             const mapContainerMobile = document.getElementById('map-container-mobile');
 
-            // Adiciona um manipulador de cliques para os mapas que impede o comportamento padrão do link de ir para o topo
-            const handleMapClick = (e) => {
-                const stateLink = e.target.closest('.state');
-                if (stateLink) {
-                    e.preventDefault();
-                    // A lógica para mostrar informações do estado pode ser adicionada aqui no futuro.
-                    // Por enquanto, isso apenas corrige o bug de rolagem.
+            // --- Lógica do Pop-up Principal ---
+            const popupOverlay = document.getElementById('map-popup-overlay');
+            const popupCloseBtn = document.getElementById('map-popup-close');
+            const popupTitle = document.getElementById('map-popup-title');
+            const popupCitiesList = document.getElementById('map-popup-cities-list');
+            const popupGallery = document.getElementById('map-popup-gallery');
+
+            // --- Lógica do Lightbox ---
+            const lightboxOverlay = document.getElementById('lightbox-overlay');
+            const lightboxImage = document.getElementById('lightbox-image');
+            const lightboxCloseBtn = document.getElementById('lightbox-close');
+            const lightboxPrevBtn = document.getElementById('lightbox-prev');
+            const lightboxNextBtn = document.getElementById('lightbox-next');
+            let currentImageIndex = 0;
+            let currentImages = [];
+
+            const openLightbox = (images, startIndex) => {
+                currentImages = images;
+                currentImageIndex = startIndex;
+                updateLightboxImage();
+                lightboxOverlay.classList.add('active');
+                body.classList.add('modal-open'); 
+            };
+
+            const closeLightbox = () => {
+                lightboxOverlay.classList.remove('active');
+                if (!popupOverlay.classList.contains('active')) {
+                   body.classList.remove('modal-open');
                 }
             };
-            mapContainerDesktop.addEventListener('click', handleMapClick);
-            mapContainerMobile.addEventListener('click', handleMapClick);
-
-
-            if (!containerLista || !galeriaContainer || !galeriaTrack || !mapContainerDesktop || !mapContainerMobile) return;
             
-            // Função para carregar e inserir o mapa
+            const updateLightboxImage = () => {
+                if(currentImages.length > 0) {
+                    lightboxImage.src = currentImages[currentImageIndex].url;
+                    lightboxImage.alt = currentImages[currentImageIndex].descricao || "Foto do evento";
+                }
+            };
+
+            const showNextImage = () => {
+                currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+                updateLightboxImage();
+            };
+
+            const showPrevImage = () => {
+                currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+                updateLightboxImage();
+            };
+            
+            lightboxPrevBtn.addEventListener('click', showPrevImage);
+            lightboxNextBtn.addEventListener('click', showNextImage);
+            lightboxCloseBtn.addEventListener('click', closeLightbox);
+            lightboxOverlay.addEventListener('click', (e) => {
+                if (e.target === lightboxOverlay) closeLightbox();
+            });
+
+
+            const closePopup = () => {
+                popupOverlay.classList.remove('active');
+                body.classList.remove('modal-open');
+            };
+
+            popupCloseBtn.addEventListener('click', closePopup);
+            popupOverlay.addEventListener('click', (e) => {
+                if (e.target === popupOverlay) closePopup();
+            });
+
+            const showStatePopup = (uf) => {
+                const stateData = itinerarioPorEstado[uf];
+                if (!stateData || stateData.cidades.length === 0) return;
+
+                popupTitle.textContent = stateData.nome;
+
+                popupCitiesList.innerHTML = stateData.cidades.map(cidade => {
+                    const dataFormatada = cidade.data_inicio ? `${cidade.data_inicio} até ${cidade.data_fim}` : 'Data a definir';
+                     return `
+                        <li>
+                            <strong class="font-inter">${cidade.cidade}</strong>
+                            <p class="text-sm text-gray-600 font-lora">${cidade.local}</p>
+                            <p class="text-xs text-gray-500 font-inter mt-1"><i class="fas fa-calendar-alt mr-1"></i>${dataFormatada}</p>
+                        </li>`
+                }).join('');
+
+                if (stateData.fotos.length > 0) {
+                    popupGallery.innerHTML = stateData.fotos.map((foto, index) => `
+                        <img src="${foto.url}" alt="${foto.descricao || 'Foto do evento'}" loading="lazy" data-index="${index}">
+                    `).join('');
+                    popupGallery.parentElement.style.display = 'block';
+                    
+                    // Adicionar listeners para abrir lightbox
+                    popupGallery.querySelectorAll('img').forEach(img => {
+                        img.addEventListener('click', () => {
+                            openLightbox(stateData.fotos, parseInt(img.dataset.index));
+                        });
+                    });
+
+                } else {
+                    popupGallery.parentElement.style.display = 'none';
+                    popupGallery.innerHTML = '';
+                }
+                
+                body.classList.add('modal-open');
+                popupOverlay.classList.add('active');
+            };
+            
+            const setupMapListeners = (mapContainer) => {
+                const states = mapContainer.querySelectorAll('#map .state');
+                states.forEach(stateElement => {
+                    stateElement.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const uf = stateElement.id.replace('state_', '');
+                        showStatePopup(uf);
+                    });
+                });
+            };
+
             const loadAndInsertMap = (targetContainer) => {
                 fetch('mapa.html')
                     .then(response => response.text())
@@ -1226,21 +1503,19 @@
                         const doc = parser.parseFromString(html, "text/html");
                         const svgMap = doc.querySelector("#map");
                         if (svgMap) {
-                            targetContainer.innerHTML = ''; // Limpa o container
+                            targetContainer.innerHTML = '';
                             targetContainer.appendChild(svgMap);
-                            return true; // Indica sucesso
+                            setupMapListeners(targetContainer);
+                            return true;
                         }
                         return false;
                     })
                     .then(success => {
                         if (success) {
-                            // Após o primeiro mapa ser inserido, busca os eventos
-                            // Usamos uma flag para garantir que isso só rode uma vez
                             if (!window.eventsFetched) {
                                 window.eventsFetched = true;
                                 fetchAndRenderEvents();
                             } else {
-                                // Se os eventos já foram buscados, apenas colore o mapa
                                 updateMapStyles(window.itineraryStatesData || { passado: new Set(), atual: new Set(), proximo: new Set() });
                             }
                         }
@@ -1251,8 +1526,7 @@
                     });
             };
             
-            // Carrega o mapa nos dois containers
-            window.eventsFetched = false; // Flag para controlar a busca de eventos
+            window.eventsFetched = false;
             loadAndInsertMap(mapContainerDesktop);
             loadAndInsertMap(mapContainerMobile);
 
@@ -1286,25 +1560,18 @@
             };
             
             const updateMapStyles = (estados) => {
-                // Primeiro, reseta todos os estados para o padrão
                 document.querySelectorAll('#map .state').forEach(el => {
                     el.classList.remove('visited', 'future', 'current');
                 });
-
-                // Aplica a classe para estados passados
                 estados.passado.forEach(sigla => {
                     document.querySelectorAll(`#state_${sigla}`).forEach(el => el.classList.add('visited'));
                 });
-                
-                // Aplica a classe para estados futuros (sobrescreve 'visited' se necessário)
                 estados.proximo.forEach(sigla => {
                     document.querySelectorAll(`#state_${sigla}`).forEach(el => el.classList.add('future'));
                 });
-
-                // Aplica a classe para o estado atual (maior prioridade)
                 estados.atual.forEach(sigla => {
                     document.querySelectorAll(`#state_${sigla}`).forEach(el => {
-                        el.classList.remove('visited', 'future'); // Garante que apenas 'current' seja aplicado
+                        el.classList.remove('visited', 'future');
                         el.classList.add('current');
                     });
                 });
@@ -1315,17 +1582,17 @@
                 onSnapshot(q, (snapshot) => {
                     let todasAsFotos = [];
                     const eventos = { atual: [], proximo: [], passado: [] };
-                    const estados = {
-                        passado: new Set(),
-                        atual: new Set(),
-                        proximo: new Set()
-                    };
+                    const estados = { passado: new Set(), atual: new Set(), proximo: new Set() };
                     const hoje = new Date();
                     hoje.setHours(0, 0, 0, 0);
 
+                    itinerarioPorEstado = {};
+                    
+                    const formatDate = (date) => date?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || '';
+
+
                     snapshot.docs.forEach(doc => {
                         const data = doc.data();
-                        
                         const inicio = data.data_inicio?.toDate();
                         const fim = data.data_fim?.toDate();
                         let statusCalculado = 'proximo';
@@ -1338,10 +1605,27 @@
                         eventos[statusCalculado].push(data);
 
                         if (data.estado) {
-                            const sigla = data.estado.toLowerCase();
-                             if (statusCalculado === 'atual') estados.atual.add(sigla);
-                             else if (statusCalculado === 'proximo') estados.proximo.add(sigla);
-                             else estados.passado.add(sigla);
+                            const uf = data.estado.toLowerCase();
+                            const nomeEstado = document.querySelector(`#state_${uf} .label_state`)?.textContent || data.estado.toUpperCase();
+
+                            if (!itinerarioPorEstado[uf]) {
+                                itinerarioPorEstado[uf] = { nome: nomeEstado, cidades: [], fotos: [] };
+                            }
+                            
+                            itinerarioPorEstado[uf].cidades.push({ 
+                                cidade: data.cidade, 
+                                local: data.local,
+                                data_inicio: formatDate(data.data_inicio),
+                                data_fim: formatDate(data.data_fim)
+                            });
+
+                            if (data.galeriaFotos && Array.isArray(data.galeriaFotos)) {
+                                itinerarioPorEstado[uf].fotos.push(...data.galeriaFotos);
+                            }
+
+                            if (statusCalculado === 'atual') estados.atual.add(uf);
+                            else if (statusCalculado === 'proximo') estados.proximo.add(uf);
+                            else estados.passado.add(uf);
                         }
 
                         if (data.galeriaFotos && Array.isArray(data.galeriaFotos)) {
@@ -1351,7 +1635,6 @@
 
                     renderGaleriaAleatoria(shuffleArray(todasAsFotos));
                     
-                    // Armazena os estados e colore os mapas
                     window.itineraryStatesData = estados;
                     updateMapStyles(estados);
 
@@ -1359,7 +1642,7 @@
                         containerLista.innerHTML = '<p class="text-center text-gray-500 font-lora">Fique atento! Em breve divulgaremos nossos próximos destinos.</p>';
                     } else {
                         eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
-                        const formatDate = (date) => date?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || 'Data a definir';
+                        const formatDateFull = (date) => date?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || 'Data a definir';
                         
                         const eventStyles = {
                             atual: { color: '#48BB78', bgClass: 'gradient-green', icon: 'fa-map-marker-alt', animationClass: 'icon-pulse', iconAnimationClass: '' },
@@ -1382,7 +1665,7 @@
                                 <div>
                                     <h4 class="font-bold text-xl mb-1 font-inter">${evento.cidade}, ${evento.estado}</h4>
                                     <p class="text-gray-600 text-sm mb-2 font-lora">${evento.local}</p>
-                                    <p class="text-gray-500 text-sm font-semibold mb-2 font-inter">${formatDate(evento.data_inicio)} até ${formatDate(evento.data_fim)}</p>
+                                    <p class="text-gray-500 text-sm font-semibold mb-2 font-inter">${formatDateFull(evento.data_inicio)} até ${formatDateFull(evento.data_fim)}</p>
                                     ${mapaLink}
                                 </div>
                             </div>`;
@@ -1673,10 +1956,5 @@
     </script>
 </body>
 </html>
-
-
-
-
-
 
 
