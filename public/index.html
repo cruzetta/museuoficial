@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Orbitron&family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -44,7 +45,7 @@
         }
 
         p, li, .font-lora {
-            font-family: 'Lora', serif;
+            font-family: 'Roboto', sans-serif;
             font-weight: 400;
         }
 
@@ -65,17 +66,19 @@
         }
 
         .section-title {
-            font-family: 'Lora', serif;
-            font-size: 2.25rem;
-            font-weight: 600;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.75rem; /* Ajustado para fonte pixelada */
+            font-weight: 400; /* Pixel fonts geralmente não têm pesos */
             text-align: center;
             margin-bottom: 3rem;
             position: relative;
             color: var(--color-dark);
             padding-bottom: 0.5rem;
+            text-transform: uppercase; /* Adiciona um estilo de jogo clássico */
+            line-height: 1.4; /* Ajuste para melhor espaçamento */
         }
         @media (min-width: 768px) {
-            .section-title { font-size: 3rem; margin-bottom: 4rem; }
+            .section-title { font-size: 2.25rem; margin-bottom: 4rem; }
         }
 
         .section-title::after {
@@ -322,7 +325,7 @@
         }
 
         .about-slide-title {
-            font-family: 'Lora', serif;
+            font-family: 'Inter', sans-serif; /* Alterado de Lora para Inter */
             font-size: 1.75rem;
             font-weight: 600;
             color: var(--color-primary);
@@ -348,6 +351,7 @@
             color: #fff;
         }
         .timeline-generation-description {
+            font-family: 'Roboto', sans-serif; /* Alterado de Lora */
             font-size: 1rem;
             line-height: 1.7;
             margin-bottom: 1.5rem;
@@ -356,6 +360,7 @@
             font-size: 0.875rem;
             color: #9ca3af;
             font-style: italic;
+            font-family: 'Roboto', sans-serif; /* Alterado de Lora */
         }
 
         .timeline-generation-card {
@@ -637,7 +642,7 @@
             transform: rotate(90deg);
         }
         #map-popup-title {
-            font-family: 'Lora', serif;
+            font-family: 'Inter', sans-serif; /* Alterado de Lora */
             color: var(--color-dark);
             margin-bottom: 1.5rem;
             padding-right: 2rem; /* Espaço para o botão de fechar */
@@ -1929,4 +1934,6 @@
     </script>
 </body>
 </html>
+
+
 
