@@ -3,302 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acervo do Museu - Museu do Videojogo</title>
+    <title>Arquivo Central // Museu do Videojogo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --primary-color: #f59e0b; /* Amarelo/Dourado vibrante */
-            --primary-hover: #d97706;
-            --dark-header: #111827; /* Cinza escuro para o cabeçalho */
-            --text-dark: #212529;
-            --bg-light: #f8f9fa;
-            --border-color: #dee2e6;
-            /* Novas cores para Gamificação */
-            --game-accent: #22c55e; /* Verde para sucesso/descoberta */
-            --game-bg-dark: #1f2937; /* Fundo escuro para o HUD */
+            /* Paleta de Cores Retro-Futurista (Cyberpunk/Outrun) */
+            --bg-main: #050515; /* Preto azulado muito escuro */
+            --terminal-text: #00ff99; /* Verde estilo terminal antigo */
+            --accent-cyan: #00ffff; /* Ciano Néon */
+            --accent-magenta: #ff00ff; /* Magenta Néon */
+            --card-bg: #1a1a3a; /* Fundo dos cartões */
+            --card-border: #333366;
+            --text-dim: #9999cc;
+            --header-bg: #111122;
         }
 
+        /* --- ESTILOS GLOBAIS E TEMA CRT --- */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
+            font-family: 'VT323', monospace; /* Fonte estilo terminal para a maioria do texto */
+            background-color: var(--bg-main);
+            color: var(--text-dim);
+            font-size: 18px; /* VT323 precisa de tamanhos maiores para legibilidade */
         }
 
-        h1, h2, h3 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
+        /* Efeito de Scanlines e Brilho (CRT Overlay) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            /* Scanlines finas */
+            background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 2px, transparent 2px, transparent 4px);
+            pointer-events: none;
+            z-index: 9999;
+            /* Animação sutil de flicker (cintilação) */
+            animation: flicker 0.15s infinite;
         }
 
-        /* Classe utilitária para a fonte de jogo */
+        @keyframes flicker {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        /* Classe para a fonte de jogo 8-bit (Títulos e UI) */
         .pixel-font {
             font-family: 'Press Start 2P', monospace;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            font-size: 12px; /* Press Start 2P funciona melhor em tamanhos menores */
         }
 
-        /* --- ESTILOS DOS CARTÕES (Gamificados) --- */
-        .gallery-card {
-            background-color: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-            position: relative;
-            /* Para animação de entrada */
-            opacity: 0;
-            transform: translateY(20px);
+        /* Efeito de brilho néon para texto */
+        .text-glow-cyan {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 15px rgba(0, 255, 255, 0.3);
         }
-        .gallery-card:hover {
-            transform: translateY(-5px);
-            /* Efeito de brilho dourado "Item Raro" */
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 0 20px rgba(245, 158, 11, 0.3);
-            border-color: var(--primary-color);
+        .text-glow-terminal {
+            color: var(--terminal-text);
+            text-shadow: 0 0 5px rgba(0, 255, 153, 0.5), 0 0 15px rgba(0, 255, 153, 0.3);
+        }
+        .text-glow-magenta {
+            color: var(--accent-magenta);
+            text-shadow: 0 0 5px rgba(255, 0, 255, 0.5), 0 0 15px rgba(255, 0, 255, 0.3);
         }
 
-        /* Animação de entrada suave (Sequential Load) */
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* --- HEADER E NAVEGAÇÃO --- */
+        #header-logo {
+            height: 80px;
+            width: auto;
+            /* Filtro CSS para adaptar o logo branco ao tema néon (Ciano) */
+            filter: brightness(0) saturate(100%) invert(79%) sepia(55%) saturate(5317%) hue-rotate(165deg) brightness(105%) contrast(105%);
         }
 
-        .fade-in-up {
-            animation: fadeInUp 0.5s ease forwards;
-        }
-        
-        /* Indicador de item já descoberto */
-        .discovered-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: var(--game-accent);
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            z-index: 10;
-        }
-
-        /* --- ESTILOS DE BOTÕES E FORMULÁRIOS (Mantidos) --- */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: #ffffff;
-        }
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-        
-        .form-input, .form-select {
-            width: 100%;
-            border-radius: 0.375rem;
-            border: 1px solid var(--border-color);
+        .form-input {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-dim);
             padding: 0.5rem 0.75rem;
         }
-        .form-input:focus, .form-select:focus {
+        .form-input:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
-        
-        #autocomplete-results {
-            background-color: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+
+         #autocomplete-results {
+            background-color: var(--header-bg);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
         .autocomplete-item {
-            padding: 0.75rem 1rem;
+            padding: 0.5rem 1rem;
             cursor: pointer;
         }
         .autocomplete-item:hover {
-            background-color: var(--bg-light);
-        }
-        
-        #header-logo {
-            height: 120px;
-            width: auto;
+            background-color: var(--card-bg);
+            color: var(--accent-cyan);
         }
 
-        /* --- ESTILOS DO HUD (NOVO) --- */
-        #player-hud {
-            background-color: var(--game-bg-dark);
-            color: white;
-            padding: 1rem 0;
-            /* Efeito de scanline sutil no HUD */
-            background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0px, rgba(0, 0, 0, 0.2) 2px, transparent 2px, transparent 4px);
-            border-bottom: 3px solid var(--primary-color);
-            /* Fixa o HUD abaixo do header principal */
+        /* --- MONITOR DE STATUS (Substitui o HUD) --- */
+        #status-monitor {
+            border: 2px solid var(--card-border);
+            background-color: var(--header-bg);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 16px;
+            background-color: var(--terminal-text);
+            width: 0%;
+            transition: width 0.6s ease;
+            /* Efeito de brilho na barra */
+            box-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+        }
+
+
+        /* --- SEÇÕES DA LINHA DO TEMPO (ERAS) --- */
+        .era-section {
+            margin-bottom: 4rem;
+        }
+        .era-header {
+            border-bottom: 2px solid var(--accent-magenta);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* Efeito de brilho magenta na linha */
+            box-shadow: 0 4px 10px -4px rgba(255, 0, 255, 0.3);
+            /* Fixa o cabeçalho da Era ao topo durante a navegação */
             position: sticky;
-            top: 96px; /* Altura do header principal (h-24 = 96px) */
-            z-index: 40;
+            top: 80px; /* Altura do header (h-20 = 80px) */
+            background-color: var(--bg-main);
+            z-index: 30;
+            padding-top: 1rem;
         }
 
-        .hud-item {
+        /* --- ESTILOS DOS CARTÕES (Entradas do Banco de Dados) --- */
+        .gallery-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 0 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
+            position: relative;
+            /* Efeito de "Slot" de cartucho */
+            border-radius: 4px 4px 10px 10px;
+        }
+        
+        .gallery-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2);
+            z-index: 20;
         }
 
-        .hud-label {
-            font-size: 0.6rem;
-            color: var(--primary-color);
-            margin-bottom: 0.25rem;
+        /* Estado "Não Descoberto" - Menos saturado e mais escuro */
+        .gallery-card.undiscovered {
+            filter: grayscale(80%) brightness(0.7);
         }
 
-        .hud-value {
-            font-size: 0.9rem;
+        /* Estado "Descoberto" - Cores normais e destaque */
+        .gallery-card.discovered {
+            filter: grayscale(0%) brightness(1);
+            /* Borda verde sutil quando descoberto */
+            border-color: rgba(0, 255, 153, 0.5);
         }
 
-        /* Barra de progresso de XP */
-        .xp-bar-container {
-            width: 100%;
-            background-color: #4b5563; /* Gray 600 */
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 0.5rem;
+        /* Indicador de Status no Cartão (Visual) */
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            z-index: 10;
         }
-        .xp-bar {
-            height: 8px;
-            background-color: var(--game-accent);
-            width: 0%;
-            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); /* Transição mais dinâmica */
+        .undiscovered .status-indicator {
+            background-color: #555;
+            color: #aaa;
         }
-
-        /* --- ANIMAÇÃO DE GANHO DE XP (NOVO) --- */
-        .xp-notification {
-            position: fixed;
-            color: var(--game-accent);
+        .discovered .status-indicator {
+            background-color: var(--terminal-text);
+            color: var(--bg-main);
             font-weight: bold;
-            pointer-events: none; /* Permite clicar através da notificação */
-            opacity: 1;
-            animation: floatUpAndFade 1.5s forwards;
-            z-index: 1000;
-            text-shadow: 1px 1px 2px black;
         }
 
-        @keyframes floatUpAndFade {
-            0% {
-                opacity: 0;
-                /* Centraliza horizontalmente em relação ao ponto de clique */
-                transform: translate(-50%, 0) scale(0.8);
-            }
-            20% {
-                opacity: 1;
-                transform: translate(-50%, -10px) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -60px) scale(0.5);
-            }
+        .card-image-container {
+            padding: 1rem;
+            background-color: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--card-border);
         }
 
     </style>
 </head>
 <body class="antialiased">
 
-    <header class="sticky top-0 z-50 shadow-md" style="background-color: var(--dark-header);">
-        <nav class="container mx-auto px-4 sm:px-6 h-24 flex justify-between items-center gap-4">
+    <header class="sticky top-0 z-50 shadow-lg" style="background-color: var(--header-bg);">
+        <nav class="container mx-auto px-4 sm:px-6 h-20 flex justify-between items-center gap-4">
             <a href="index.html" class="flex-shrink-0">
                 <img id="header-logo" src="imagens/LOGO MUSEU DO VIDEOGAME LETRAS BRANCAS (1).png" alt="Logo Museu do Videogame">
             </a>
             
             <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
                 <div id="search-container" class="relative w-full max-w-lg">
-                    <input type="text" id="searchInput" placeholder="Pesquisar no acervo..." class="form-input w-full py-2 pl-10 pr-4">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <input type="text" id="searchInput" placeholder=">_ SEARCH ARCHIVE..." class="form-input w-full py-2 pl-10 pr-4 pixel-font text-xs">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                         <i class="fa-solid fa-search"></i>
                     </span>
                     <div id="autocomplete-results" class="absolute left-0 right-0 top-full mt-2 z-50 hidden"></div>
                 </div>
             </div>
 
-            <a href="index.html" class="btn hidden sm:flex bg-gray-700 text-white border-gray-600 hover:bg-gray-600">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>Voltar</span>
+            <a href="index.html" class="hidden sm:flex items-center gap-2 text-sm text-red-500 hover:text-red-400 pixel-font">
+                <i class="fa-solid fa-sign-out-alt"></i>
+                <span>LOGOUT</span>
             </a>
         </nav>
     </header>
 
-    <section id="player-hud">
-        <div class="container mx-auto px-4 flex justify-around items-center">
-            
-            <div class="hud-item">
-                <div class="hud-label pixel-font">Nível</div>
-                <div id="hud-level" class="hud-value pixel-font text-2xl">1</div>
-            </div>
-
-            <div class="hud-item flex-grow max-w-md">
-                <div class="hud-label pixel-font">Experiência (XP)</div>
-                <div id="hud-xp" class="hud-value pixel-font">0 / 100</div>
-                <div class="xp-bar-container">
-                    <div id="xp-progress-bar" class="xp-bar"></div>
-                </div>
-            </div>
-
-            <div class="hud-item">
-                <div class="hud-label pixel-font">Descobertos</div>
-                <div id="hud-discovered" class="hud-value pixel-font">0 / ?</div>
-            </div>
-
-        </div>
-    </section>
-
-
-    <main class="pt-12 pb-16">
+    <main class="pt-8 pb-16">
         
         <div class="container mx-auto px-4">
-            <h1 class="text-4xl md:text-5xl font-bold text-center mb-4">Acervo do Museu</h1>
-            <p class="text-center text-gray-600 mb-12">Explore o acervo para ganhar XP e subir de nível como colecionador!</p>
+            
+            <div class="text-center mb-12">
+                <h1 class="text-3xl md:text-4xl pixel-font text-glow-cyan mb-4">::: ARQUIVO CENTRAL :::</h1>
+                <p class="text-xl text-gray-400">>_ Acesso à Linha do Tempo Iniciado. Explore as Eras.</p>
+            </div>
+
+            <section id="status-monitor">
+                <div class="flex justify-between items-center">
+                    <div class="pixel-font text-sm text-glow-terminal">PROGRESSO GLOBAL DE DESCOBERTA</div>
+                    <div id="hud-discovered" class="pixel-font text-sm">0 / ? ITENS</div>
+                </div>
+                <div class="progress-bar-container mt-4">
+                    <div id="global-progress-bar" class="progress-bar"></div>
+                </div>
+            </section>
 
             
-            <div class="flex justify-end mb-8">
-                <div class="w-full max-w-xs">
-                    <label for="sort-select" class="block text-sm font-medium mb-1">Ordenar por</label>
-                    <select id="sort-select" class="form-select">
-                        <option value="lancamento-desc">Mais Recentes</option>
-                        <option value="lancamento-asc">Mais Antigos</option>
-                        <option value="nome-asc">Ordem Alfabética (A-Z)</option>
-                        <option value="nome-desc">Ordem Alfabética (Z-A)</option>
-                    </select>
+            <div id="gallery-container">
+                <div id="gallery-loader" class="col-span-full text-center py-20">
+                    <i class="fas fa-spinner fa-spin text-4xl text-gray-500"></i>
+                    <p class="mt-4 text-xl text-gray-500">>_ A carregar Linha do Tempo...</p>
+                </div>
+
+                <div id="search-results-container" class="hidden">
+                    <div class="era-header">
+                         <h2 class="text-2xl pixel-font text-glow-cyan">Resultados da Pesquisa</h2>
+                         <button id="clear-search-btn" class="pixel-font text-sm text-red-500 hover:text-red-400">[LIMPAR BUSCA]</button>
+                    </div>
+                    <div id="search-results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
                 </div>
             </div>
 
-            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <div id="gallery-loader" class="col-span-full text-center py-20">
-                    <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
-                    <p class="mt-4 text-xl text-gray-600">A carregar acervo...</p>
-                </div>
-            </div>
         </div>
     </main>
     
-    <footer class="py-8 mt-16 bg-gray-200 border-t border-gray-300">
-        <div class="container mx-auto text-center text-gray-600">
-            <p>&copy; 2025 Museu Itinerante do Videojogo. Todos os direitos reservados.</p>
+    <footer class="py-8 mt-16 bg-gray-900 border-t border-gray-700">
+        <div class="container mx-auto text-center text-gray-500 text-sm pixel-font">
+            <p>&copy; 2025 MUSEU ITINERANTE DO VIDEOJOGO. TERMINAL V1.9.</p>
         </div>
     </footer>
 
@@ -306,6 +287,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Configuração do Firebase (Mantida)
         const firebaseConfig = {
             apiKey: "AIzaSyCvngtKFRtfIJw-8ISyi5iZSvJq3jicP_4",
             authDomain: "museu-cca6d.firebaseapp.com",
@@ -319,255 +301,334 @@
         const db = getFirestore(app);
         const appId = 'museu-cca6d';
 
-        // --- STATE MANAGEMENT ---
+        // --- STATE MANAGEMENT (Simplificado) ---
         const state = {
             items: [],
-            filteredItems: [],
-            // Estado para Gamificação
+            groupedItems: {}, // Armazena itens agrupados por década
             playerData: {
-                xp: 0,
-                level: 1,
-                discoveredItems: new Set() // Usamos Set para armazenar IDs únicos
+                // Focamos apenas na descoberta (Sem XP/Level)
+                discoveredItems: new Set() 
             },
-            totalItemsCount: 0
+            totalItemsCount: 0,
+            isSearching: false
         };
 
         // --- DOM ELEMENTS ---
-        const galleryGrid = document.getElementById('gallery-grid');
+        const galleryContainer = document.getElementById('gallery-container');
         const galleryLoader = document.getElementById('gallery-loader');
         const searchInput = document.getElementById('searchInput');
-        const sortSelect = document.getElementById('sort-select');
         const autocompleteResults = document.getElementById('autocomplete-results');
-        // Elementos do HUD
-        const hudLevel = document.getElementById('hud-level');
-        const hudXp = document.getElementById('hud-xp');
+        const searchResultsContainer = document.getElementById('search-results-container');
+        const searchResultsGrid = document.getElementById('search-results-grid');
+        const clearSearchBtn = document.getElementById('clear-search-btn');
+
+        // Elementos do Monitor de Status
         const hudDiscovered = document.getElementById('hud-discovered');
-        const xpProgressBar = document.getElementById('xp-progress-bar');
+        const globalProgressBar = document.getElementById('global-progress-bar');
 
-        // --- GAMIFICATION LOGIC ---
+        // --- GAMIFICATION LOGIC (Foco em Descoberta) ---
 
-        const XP_PER_DISCOVERY = 15;
-        const BASE_XP_FOR_LEVEL = 80; // Começa um pouco mais fácil
-
-        // Calcula o XP necessário para o próximo nível (Progressão ligeiramente exponencial)
-        function xpNeededForLevel(level) {
-            // Fórmula: BASE * (1.18 ^ (level - 1))
-            return Math.floor(BASE_XP_FOR_LEVEL * Math.pow(1.18, level - 1));
-        }
-
-        // Carrega os dados do jogador do armazenamento local
+        // Carrega os dados do jogador (Simplificado)
         function loadPlayerData() {
-            const savedData = localStorage.getItem('museu_playerData_v3');
+            // Usamos uma chave de armazenamento específica para esta versão imersiva
+            const savedData = localStorage.getItem('museu_archive_discovery_v6');
             if (savedData) {
                 try {
                     const parsedData = JSON.parse(savedData);
-                    state.playerData.xp = parsedData.xp || 0;
-                    state.playerData.level = parsedData.level || 1;
-                    // Converte o array guardado de volta para um Set
                     state.playerData.discoveredItems = new Set(parsedData.discoveredItems || []);
                 } catch (e) {
                     console.error("Erro ao carregar dados do jogador:", e);
                 }
             }
-            updateHUD();
+            updateStatusMonitor();
         }
 
-        // Guarda os dados do jogador no armazenamento local
+        // Guarda os dados do jogador
         function savePlayerData() {
             const dataToSave = {
-                xp: state.playerData.xp,
-                level: state.playerData.level,
-                // Converte o Set para um array antes de guardar em JSON
                 discoveredItems: Array.from(state.playerData.discoveredItems)
             };
-            localStorage.setItem('museu_playerData_v3', JSON.stringify(dataToSave));
+            localStorage.setItem('museu_archive_discovery_v6', JSON.stringify(dataToSave));
         }
 
-        // Atualiza a interface do HUD
-        function updateHUD() {
-            const xpNeeded = xpNeededForLevel(state.playerData.level);
-            hudLevel.textContent = state.playerData.level;
-            hudXp.textContent = `${state.playerData.xp} / ${xpNeeded}`;
-            
+        // Atualiza a interface do Monitor de Status
+        function updateStatusMonitor() {
             const totalDisplay = state.totalItemsCount > 0 ? state.totalItemsCount : '?';
-            hudDiscovered.textContent = `${state.playerData.discoveredItems.size} / ${totalDisplay}`;
+            const discoveredCount = state.playerData.discoveredItems.size;
+            hudDiscovered.textContent = `${discoveredCount} / ${totalDisplay} ITENS`;
             
-            const progress = (state.playerData.xp / xpNeeded) * 100;
-             // Usamos setTimeout para garantir que a barra anima após o carregamento inicial
-             setTimeout(() => {
-                xpProgressBar.style.width = `${Math.min(progress, 100)}%`;
+            let progress = 0;
+            if (state.totalItemsCount > 0) {
+                progress = (discoveredCount / state.totalItemsCount) * 100;
+            }
+
+            // Anima a barra de progresso
+            setTimeout(() => {
+                globalProgressBar.style.width = `${Math.min(progress, 100)}%`;
             }, 100);
+
+            // Atualiza o progresso específico de cada Era (se a timeline estiver visível)
+            if (!state.isSearching) {
+                updateEraProgress();
+            }
         }
 
-        // Mostra a notificação flutuante de XP
-        function showXpNotification(amount, event) {
-            const notification = document.createElement('div');
-            notification.className = 'xp-notification pixel-font text-sm';
-            notification.textContent = `+${amount} XP!`;
-            
-            // Posiciona a notificação perto do clique do rato
-            notification.style.left = `${event.clientX}px`;
-            notification.style.top = `${event.clientY}px`;
-
-            document.body.appendChild(notification);
-
-            // Remove o elemento após a animação terminar
-            notification.addEventListener('animationend', () => {
-                notification.remove();
-            });
-        }
-
-        // Adiciona XP e verifica subida de nível
-        function addXP(amount, event) {
-            state.playerData.xp += amount;
-            showXpNotification(amount, event);
-
-            let leveledUp = false;
-            while (state.playerData.xp >= xpNeededForLevel(state.playerData.level)) {
-                state.playerData.xp -= xpNeededForLevel(state.playerData.level);
-                state.playerData.level++;
-                leveledUp = true;
-            }
-
-            if (leveledUp) {
-                // Potencial local para adicionar uma notificação maior de "Level Up!"
-                console.log("Level Up! New Level:", state.playerData.level);
-            }
-
-            savePlayerData();
-            updateHUD();
-        }
-
-        // Lida com o clique no item (Exploração e Gamificação)
-        function handleItemClick(itemId, event) {
-            // Previne a ação se o utilizador estiver a tentar abrir num novo separador (Ctrl/Cmd+Click)
-             if (event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0) {
-                return;
-            }
-
-            if (!state.playerData.discoveredItems.has(itemId)) {
-                // 1. Impede a navegação imediata
-                event.preventDefault();
-
-                // 2. Processa a gamificação
-                state.playerData.discoveredItems.add(itemId);
-                addXP(XP_PER_DISCOVERY, event);
+        // Atualiza o progresso visual nos cabeçalhos de Era
+        function updateEraProgress() {
+            for (const decade in state.groupedItems) {
+                const eraItems = state.groupedItems[decade];
+                const total = eraItems.length;
+                const discovered = eraItems.filter(item => state.playerData.discoveredItems.has(item.id)).length;
                 
-                // 3. Atualiza visualmente o cartão clicado (para o badge aparecer imediatamente)
-                // Esta abordagem é eficiente pois não requer re-renderizar toda a galeria.
-                const card = event.target.closest('.gallery-card');
-                if (card && !card.querySelector('.discovered-badge')) {
-                    const badge = document.createElement('div');
-                    badge.className = 'discovered-badge';
-                    badge.innerHTML = '<i class="fas fa-check"></i>';
-                    card.appendChild(badge);
+                const progressElement = document.getElementById(`era-progress-${decade}`);
+                if (progressElement) {
+                    progressElement.textContent = `${discovered} / ${total}`;
                 }
-
-                // 4. Navega após um pequeno atraso para o utilizador ver o feedback
-                setTimeout(() => {
-                    window.location.href = `item_detalhe.html?id=${itemId}`;
-                }, 400); // 400ms de atraso
             }
-            // Se já foi descoberto, a navegação ocorre normalmente (o preventDefault não foi chamado)
         }
 
+        // Lida com o clique no item (Marca como descoberto antes de navegar)
+        function handleItemClick(itemId, event) {
+            // Previne a ação se o utilizador estiver a tentar abrir num novo separador
+             if (event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0) {
+                 return;
+            }
 
-        // --- RENDER FUNCTION ---
-        function renderGallery() {
-            galleryGrid.innerHTML = '';
-            if (state.filteredItems.length === 0 && galleryLoader.style.display === 'none') {
-                galleryGrid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-search-minus text-4xl text-gray-400"></i><p class="mt-4 text-xl text-gray-600">Nenhum item encontrado.</p><p class="text-gray-500">Tente ajustar seu termo de busca.</p></div>`;
+            // Se já foi descoberto, navega imediatamente
+            if (state.playerData.discoveredItems.has(itemId)) {
                 return;
             }
 
-            state.filteredItems.forEach((item, index) => {
-                const card = document.createElement('div');
-                // Adiciona a classe de animação e define o atraso sequencial
-                card.className = 'gallery-card fade-in-up';
-                // Limita o atraso para não demorar muito se a lista for longa
-                const delay = Math.min(index * 0.05, 1.5); 
-                card.style.animationDelay = `${delay}s`; 
+            // 1. Impede a navegação imediata
+            event.preventDefault();
 
-                // Verifica se o item já foi descoberto para adicionar o badge
-                const isDiscovered = state.playerData.discoveredItems.has(item.id);
-                const discoveredBadgeHtml = isDiscovered ? `<div class="discovered-badge"><i class="fas fa-check"></i></div>` : '';
+            // 2. Processa a descoberta
+            state.playerData.discoveredItems.add(itemId);
+            savePlayerData();
+            updateStatusMonitor();
+            
+            // 3. Atualiza visualmente o cartão clicado (Feedback Instantâneo)
+            // Encontra o cartão correto usando o atributo data-item-id
+            const card = document.querySelector(`.gallery-card[data-item-id="${itemId}"]`);
+            if (card) {
+                card.classList.remove('undiscovered');
+                card.classList.add('discovered');
+                const indicator = card.querySelector('.status-indicator');
+                if (indicator) {
+                    indicator.textContent = 'OK';
+                }
+            }
 
-                card.innerHTML = `
-                    ${discoveredBadgeHtml}
-                    <div class="p-4 bg-gray-100">
-                         <a href="item_detalhe.html?id=${item.id}" class="block item-link">
-                            <img src="${item.imagem_principal || 'https://placehold.co/400x300/e9ecef/6c757d?text=Sem+Imagem'}" alt="Imagem de ${item.nome || 'Item'}" class="w-full h-48 object-contain transition duration-300 hover:scale-105" onerror="this.onerror=null;this.src='https://placehold.co/400x300/e9ecef/6c757d?text=Imagem+Inv%C3%A1lida';">
+            // 4. Navega após um pequeno atraso para o utilizador ver o feedback visual (transição do filtro CSS)
+            setTimeout(() => {
+                window.location.href = `item_detalhe.html?id=${itemId}`;
+            }, 350); // 350ms de atraso
+        }
+
+        // --- DATA PROCESSING FUNCTIONS (Nova Lógica de Agrupamento) ---
+
+        // Agrupa os itens por década
+        function groupItemsByDecade(items) {
+            const grouped = items.reduce((acc, item) => {
+                let decade = 'Indefinido';
+                if (item.lancamento) {
+                    const year = parseInt(item.lancamento, 10);
+                    if (!isNaN(year) && year > 1900) {
+                        // Calcula a década (ex: 1985 -> 1980)
+                        decade = Math.floor(year / 10) * 10;
+                    }
+                }
+                
+                if (!acc[decade]) {
+                    acc[decade] = [];
+                }
+                acc[decade].push(item);
+                return acc;
+            }, {});
+
+            // Ordena os itens dentro de cada década por ano exato (Ascendente)
+            for (const decade in grouped) {
+                grouped[decade].sort((a, b) => {
+                    const yearA = parseInt(a.lancamento, 10) || 0;
+                    const yearB = parseInt(b.lancamento, 10) || 0;
+                    // Se o ano for igual, ordena por nome
+                    if (yearA === yearB) {
+                        return (a.nome || "").localeCompare(b.nome || "");
+                    }
+                    return yearA - yearB;
+                });
+            }
+
+            return grouped;
+        }
+
+
+        // --- RENDER FUNCTIONS (Reimaginadas) ---
+
+        // Função auxiliar para criar o HTML de um cartão
+        function createCardHTML(item) {
+            const isDiscovered = state.playerData.discoveredItems.has(item.id);
+            const statusClass = isDiscovered ? 'discovered' : 'undiscovered';
+            const statusText = isDiscovered ? 'OK' : '???';
+
+            return `
+                <div class="gallery-card ${statusClass}" data-item-id="${item.id}">
+                    <div class="status-indicator pixel-font">${statusText}</div>
+                    <div class="card-image-container">
+                        <a href="item_detalhe.html?id=${item.id}" class="block item-link">
+                            <img src="${item.imagem_principal || 'https://placehold.co/400x300/333/666?text=NO+DATA'}" alt="Imagem de ${item.nome || 'Item'}" class="w-full h-40 object-contain transition duration-300 hover:scale-105" onerror="this.onerror=null;this.src='https://placehold.co/400x300/333/666?text=ERROR';">
                         </a>
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
-                        <h3 class="text-lg font-semibold mb-2 text-gray-800">${item.nome || 'Item sem nome'}</h3>
-                        <div class="text-sm text-gray-600 mb-4">
-                            ${item.lancamento ? `<p><i class="fa-solid fa-calendar-days w-5 text-gray-400"></i> ${item.lancamento}</p>` : ''}
+                        <h3 class="text-xl mb-2 text-white">${item.nome || '>_Sem nome'}</h3>
+                        <div class="text-lg mb-4">
+                            ${item.lancamento ? `<p class="text-gray-400">[${item.lancamento}]</p>` : ''}
                         </div>
-                        <a href="item_detalhe.html?id=${item.id}" class="btn btn-primary w-full mt-auto item-link">
-                            Explorar Item
-                            <i class="fas fa-arrow-right ml-2"></i>
+                        <a href="item_detalhe.html?id=${item.id}" class="pixel-font text-xs mt-auto text-center py-2 border border-gray-500 hover:border-cyan-400 hover:text-cyan-400 item-link">
+                            ACESSAR REGISTO
                         </a>
                     </div>
-                `;
-                
-                // Adiciona o listener de clique para a lógica de gamificação
-                const links = card.querySelectorAll('.item-link');
-                links.forEach(link => {
-                    link.addEventListener('click', (event) => handleItemClick(item.id, event));
-                });
-
-                galleryGrid.appendChild(card);
-            });
+                </div>
+            `;
         }
 
-        // --- DATA PROCESSING FUNCTIONS (Mantidas) ---
-        function applyFiltersAndSort() {
-            const searchTerm = searchInput.value.trim();
-            const sortValue = sortSelect.value;
-            
-            let tempItems = state.items;
+        // Renderiza a estrutura completa da Linha do Tempo (Eras)
+        function renderTimeline() {
+            // Limpa o container, exceto o loader e os resultados de pesquisa
+            const elementsToKeep = [galleryLoader, searchResultsContainer];
+            Array.from(galleryContainer.children).forEach(child => {
+                if (!elementsToKeep.includes(child)) {
+                    child.remove();
+                }
+            });
 
-            if (searchTerm) {
-                const searchRegex = new RegExp('\\b' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
-                tempItems = tempItems.filter(item => 
-                    item.nome && searchRegex.test(item.nome)
-                );
+            // Ordena as décadas (chaves)
+            const sortedDecades = Object.keys(state.groupedItems).sort((a, b) => {
+                if (a === 'Indefinido') return 1; // Indefinido no final
+                if (b === 'Indefinido') return -1;
+                return parseInt(a, 10) - parseInt(b, 10); // Ordem cronológica ascendente
+            });
+
+            sortedDecades.forEach(decade => {
+                const eraSection = document.createElement('section');
+                eraSection.className = 'era-section';
+                // Adiciona a classe 'hidden' se estivermos em modo de pesquisa (para o caso de os dados atualizarem)
+                if (state.isSearching) {
+                    eraSection.classList.add('hidden');
+                }
+                
+                const title = decade === 'Indefinido' ? 'ERA INDEFINIDA' : `ERA ${decade}s`;
+
+                eraSection.innerHTML = `
+                    <div class="era-header">
+                        <h2 class="text-2xl pixel-font text-white">${title}</h2>
+                        <div id="era-progress-${decade}" class="pixel-font text-sm text-glow-magenta">0 / 0</div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        ${state.groupedItems[decade].map(createCardHTML).join('')}
+                    </div>
+                `;
+
+                galleryContainer.appendChild(eraSection);
+            });
+
+            // Adiciona os listeners de clique aos novos cartões
+            addClickListeners(galleryContainer);
+            updateEraProgress();
+        }
+
+        // Renderiza apenas os resultados da pesquisa
+        function renderSearchResults(filteredItems) {
+            searchResultsGrid.innerHTML = '';
+
+            if (filteredItems.length === 0) {
+                searchResultsGrid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-exclamation-triangle text-4xl text-yellow-500"></i><p class="mt-4 text-xl">>_ Nenhum item encontrado para "${searchInput.value.trim()}".</p></div>`;
+                return;
             }
 
-            tempItems.sort((a, b) => {
-                const [field, direction] = sortValue.split('-');
-                let valA = a[field];
-                let valB = b[field];
-                
-                if (field === 'lancamento') {
-                    valA = parseInt(valA, 10) || 0;
-                    valB = parseInt(valB, 10) || 0;
-                }
+            // Ordena os resultados da pesquisa por nome
+            filteredItems.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
 
-                if (!valA) return 1;
-                if (!valB) return -1;
-
-                if (typeof valA === 'string') {
-                    return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                } else {
-                    return direction === 'asc' ? valA - valB : valB - valA;
-                }
+            filteredItems.forEach(item => {
+                const cardHTML = createCardHTML(item);
+                searchResultsGrid.innerHTML += cardHTML;
             });
 
-            state.filteredItems = tempItems;
-            renderGallery();
-            updateAutocomplete(searchTerm);
+             // Adiciona os listeners de clique aos cartões de pesquisa
+             addClickListeners(searchResultsGrid);
         }
+
+        // Função auxiliar para adicionar listeners de clique
+        function addClickListeners(container) {
+            const links = container.querySelectorAll('.item-link');
+            links.forEach(link => {
+                const card = link.closest('.gallery-card');
+                if (card) {
+                    const itemId = card.getAttribute('data-item-id');
+                    // Adiciona o listener. Como estamos a reconstruir o HTML, não precisamos de nos preocupar com listeners antigos.
+                    link.addEventListener('click', (event) => handleItemClick(itemId, event));
+                }
+            });
+        }
+
+
+        // --- SEARCH FUNCTIONALITY (Adaptada para alternar visualizações) ---
         
+        let searchTimeout = null;
+
+        function handleSearchInput() {
+            // Debounce: Espera 300ms após o utilizador parar de digitar para executar a pesquisa
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                handleSearch();
+            }, 300);
+        }
+
+        function handleSearch() {
+            const searchTerm = searchInput.value.trim();
+            
+            if (searchTerm.length > 0) {
+                state.isSearching = true;
+                // Esconde as seções de Era
+                document.querySelectorAll('.era-section').forEach(el => el.classList.add('hidden'));
+                // Mostra o container de resultados de pesquisa
+                searchResultsContainer.classList.remove('hidden');
+
+                // Lógica de filtragem (pesquisa parcial e insensível a maiúsculas/minúsculas)
+                const searchRegex = new RegExp(searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
+                const filteredItems = state.items.filter(item =>
+                    item.nome && searchRegex.test(item.nome)
+                );
+
+                renderSearchResults(filteredItems);
+                updateAutocomplete(searchTerm);
+
+            } else {
+                clearSearch();
+            }
+        }
+
+        function clearSearch() {
+            state.isSearching = false;
+            searchInput.value = '';
+            // Mostra as seções de Era novamente
+            document.querySelectorAll('.era-section').forEach(el => el.classList.remove('hidden'));
+            // Esconde o container de resultados de pesquisa
+            searchResultsContainer.classList.add('hidden');
+            autocompleteResults.classList.add('hidden');
+            // Garante que o progresso da Era seja atualizado ao sair da pesquisa
+            updateEraProgress();
+        }
+
+        // (Mantida a funcionalidade de autocomplete)
         function updateAutocomplete(query) {
              autocompleteResults.innerHTML = '';
-             if (query.length < 1) {
+             if (query.length < 2) { // Requer pelo menos 2 caracteres
                  autocompleteResults.classList.add('hidden');
                  return;
             }
 
-            const searchRegex = new RegExp('\\b' + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
+            const searchRegex = new RegExp(query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
             const matchedItems = state.items
                 .filter(item => item.nome && searchRegex.test(item.nome))
                 .slice(0, 5);
@@ -575,12 +636,12 @@
             if (matchedItems.length > 0) {
                 matchedItems.forEach(item => {
                     const suggestionDiv = document.createElement('div');
-                    suggestionDiv.className = 'autocomplete-item';
+                    suggestionDiv.className = 'autocomplete-item pixel-font text-xs py-2';
                     suggestionDiv.textContent = item.nome;
                     suggestionDiv.onclick = () => {
                         searchInput.value = item.nome;
                         autocompleteResults.classList.add('hidden');
-                        applyFiltersAndSort();
+                        handleSearch();
                     };
                     autocompleteResults.appendChild(suggestionDiv);
                 });
@@ -590,23 +651,38 @@
             }
         }
         
+        // --- DATA FETCHING ---
         function carregarAcervo() {
             try {
                 const acervosRef = collection(db, `/artifacts/${appId}/public/data/acervos`);
                 onSnapshot(query(acervosRef), (querySnapshot) => {
                     state.items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    state.totalItemsCount = state.items.length; // Atualiza a contagem total
+                    state.totalItemsCount = state.items.length;
+                    
+                    // Processa os dados para agrupar por década
+                    state.groupedItems = groupItemsByDecade(state.items);
+
                     if (galleryLoader) galleryLoader.style.display = 'none';
-                    applyFiltersAndSort(); 
-                    updateHUD(); // Atualiza o HUD com a contagem total correta
+                    
+                    // Renderiza a nova estrutura da Linha do Tempo
+                    renderTimeline();
+                    // Atualiza o Monitor de Status com a contagem total correta
+                    updateStatusMonitor(); 
+
+                    // Se estivermos a meio de uma pesquisa quando os dados atualizam (e.g. Firestore update)
+                    if (state.isSearching) {
+                        handleSearch();
+                    }
+
                 }, (error) => {
                     console.error("Erro ao carregar o acervo:", error);
-                    galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Falha ao carregar o acervo.</p>`;
+                    if (galleryLoader) galleryLoader.style.display = 'none';
+                    galleryContainer.innerHTML = `<p class="col-span-full text-center text-red-500 text-2xl py-20">>_ ERRO CRÍTICO: Falha ao conectar ao banco de dados.</p>`;
                 });
             } catch (error) {
                 console.error("Erro ao configurar o listener do acervo:", error);
                 if (galleryLoader) galleryLoader.style.display = 'none';
-                galleryGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Ocorreu um erro inesperado.</p>`;
+                galleryContainer.innerHTML = `<p class="col-span-full text-center text-red-500 text-2xl py-20">>_ ERRO INESPERADO NO SISTEMA.</p>`;
             }
         }
         
@@ -615,8 +691,9 @@
             loadPlayerData(); // Carrega os dados do jogador primeiro
             carregarAcervo();
             
-            searchInput.addEventListener('input', () => applyFiltersAndSort());
-            sortSelect.addEventListener('change', applyFiltersAndSort);
+            // Usa a função com debounce para o input
+            searchInput.addEventListener('input', () => handleSearchInput());
+            clearSearchBtn.addEventListener('click', () => clearSearch());
 
             document.addEventListener('click', (e) => {
                 if (!document.getElementById('search-container').contains(e.target)) {
