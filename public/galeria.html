@@ -7,129 +7,138 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <!-- FONTES ATUALIZADAS para Inter, Roboto e Press Start 2P (removido VT323) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto:wght@400&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            /* Paleta de Cores Retro-Futurista (Cyberpunk/Outrun) */
-            --bg-main: #050515; /* Preto azulado muito escuro */
-            --terminal-text: #00ff99; /* Verde estilo terminal antigo */
-            --accent-cyan: #00ffff; /* Ciano Néon */
-            --accent-magenta: #ff00ff; /* Magenta Néon */
-            --card-bg: #1a1a3a; /* Fundo dos cartões */
-            --card-border: #333366;
-            --text-dim: #9999cc;
-            --header-bg: #111122;
+            /* === PALETA DE CORES E VARIÁVEIS GLOBAIS (do seu index.html) === */
+            --color-primary: #D4A356; /* Dourado Sofisticado */
+            --color-primary-hover: #B88A40;
+            --color-dark: #171A21; /* Carvão Profundo */
+            --color-accent-blue: #355070; /* Azul Museu */
+            --color-dark-blue: #1a2533;
+            --color-background-light: #F7F6F3; /* Marfim/Off-white */
+            --color-background-gray: #EAE8E4; /* Cinza Claro Quente */
+            --color-text-dark: #2C2C2C;
+            --color-text-light: #6B6B6B;
+            --color-text-on-dark: #EAE8E4;
+            --border-color: rgba(0,0,0,0.1);
+            --shadow-elegant: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+            /* Mapeamento para os nomes antigos para facilitar a transição */
+            --bg-main: var(--color-background-light);
+            --terminal-text: var(--color-text-dark);
+            --accent-cyan: var(--color-primary); /* Dourado como acento principal */
+            --accent-magenta: var(--color-accent-blue); /* Azul Museu para títulos */
+            --card-bg: #ffffff; /* Manter cards brancos como no site principal */
+            --card-border: var(--border-color);
+            --text-dim: var(--color-text-light);
+            --header-bg: var(--color-dark); /* Header escuro, como no site principal */
         }
 
         /* --- ESTILOS GLOBAIS E TEMA CRT --- */
         body {
-            font-family: 'VT323', monospace; /* Fonte estilo terminal para a maioria do texto */
-            background-color: var(--bg-main);
-            color: var(--text-dim);
-            font-size: 18px; /* VT323 precisa de tamanhos maiores para legibilidade */
+            font-family: 'Roboto', sans-serif; /* Fonte ATUALIZADA para Roboto */
+            background-color: var(--bg-main); /* Cor de fundo ATUALIZADA para Marfim */
+            color: var(--color-text-dark); /* Cor do texto ATUALIZADA para Escura */
+            font-size: 16px; /* Tamanho de fonte padrão */
         }
 
-        /* Efeito de Scanlines e Brilho (CRT Overlay) */
+        /* FONTES ATUALIZADAS */
+        p {
+            font-family: 'Roboto', sans-serif;
+        }
+        h1, h2, h3, #searchInput, .status-indicator {
+            font-family: 'Inter', sans-serif; /* Usar Inter para UI e Títulos */
+        }
+
+        /* Efeito de Scanlines e Brilho (CRT Overlay) REMOVIDO */
+        /*
         body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            /* Scanlines finas */
-            background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 2px, transparent 2px, transparent 4px);
-            pointer-events: none;
-            z-index: 9999;
-            /* Animação sutil de flicker (cintilação) */
-            animation: flicker 0.15s infinite;
+            ...
         }
-
         @keyframes flicker {
-            0% { opacity: 0.8; }
-            50% { opacity: 1; }
-            100% { opacity: 0.8; }
+            ...
         }
+        */
 
         /* Classe para a fonte de jogo 8-bit (Títulos e UI) */
         .pixel-font {
-            font-family: 'Press Start 2P', monospace;
+            font-family: 'Press Start 2P', monospace; /* Mantida (igual ao .section-title) */
             text-transform: uppercase;
             letter-spacing: 1.5px;
             font-size: 12px; /* Press Start 2P funciona melhor em tamanhos menores */
         }
 
-        /* Efeito de brilho néon para texto */
+        /* Efeito de brilho néon para texto (Removido brilho, apenas cor) */
         .text-glow-cyan {
-            color: var(--accent-cyan);
-            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 15px rgba(0, 255, 255, 0.3);
+            color: var(--accent-cyan); /* Dourado */
+            text-shadow: none;
         }
         .text-glow-terminal {
-            color: var(--terminal-text);
-            text-shadow: 0 0 5px rgba(0, 255, 153, 0.5), 0 0 15px rgba(0, 255, 153, 0.3);
+            color: var(--terminal-text); /* Texto Escuro */
+            text-shadow: none;
         }
         .text-glow-magenta {
-            color: var(--accent-magenta);
-            text-shadow: 0 0 5px rgba(255, 0, 255, 0.5), 0 0 15px rgba(255, 0, 255, 0.3);
+            color: var(--accent-magenta); /* Azul Museu */
+            text-shadow: none;
         }
 
-        /* --- HEADER E NAVEGAÇÃO --- */
+        /* --- HEADER E NAVEGAÇÃO (Alinhado com o site principal) --- */
         #header-logo {
             height: 80px;
             width: auto;
-            /* Filtro CSS para adaptar o logo branco ao tema néon (Ciano) */
-            filter: brightness(0) saturate(100%) invert(79%) sepia(55%) saturate(5317%) hue-rotate(165deg) brightness(105%) contrast(105%);
+            filter: none; /* REMOVIDO filtro azul (logo já é branco) */
         }
 
         .form-input {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-dim);
+            background-color: #333; /* Fundo escuro para input */
+            border: 1px solid #555;
+            color: var(--color-text-on-dark); /* Texto claro */
             padding: 0.5rem 0.75rem;
         }
         .form-input:focus {
             outline: none;
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            border-color: var(--color-primary); /* Dourado */
+            box-shadow: 0 0 5px rgba(212, 163, 86, 0.5); /* Sombra Dourada */
         }
 
          #autocomplete-results {
-            background-color: var(--header-bg);
-            border: 1px solid var(--card-border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background-color: var(--header-bg); /* Fundo escuro */
+            border: 1px solid #555;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         .autocomplete-item {
             padding: 0.5rem 1rem;
             cursor: pointer;
         }
         .autocomplete-item:hover {
-            background-color: var(--card-bg);
-            color: var(--accent-cyan);
+            background-color: #333;
+            color: var(--color-primary); /* Dourado */
         }
 
         /* --- MONITOR DE STATUS (Substitui o HUD) --- */
         #status-monitor {
-            border: 2px solid var(--card-border);
-            background-color: var(--header-bg);
+            border: 1px solid var(--border-color);
+            background-color: var(--color-background-gray); /* Cinza Quente (do site) */
             padding: 1rem;
             margin-bottom: 2rem;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--shadow-elegant); /* Sombra Elegante (do site) */
         }
 
         .progress-bar-container {
             width: 100%;
-            background-color: var(--card-bg);
+            background-color: #e9ecef;
             border: 1px solid var(--card-border);
             overflow: hidden;
         }
         .progress-bar {
             height: 16px;
-            background-color: var(--terminal-text);
+            background-color: var(--color-primary); /* Dourado */
             width: 0%;
             transition: width 0.6s ease;
-            /* Efeito de brilho na barra */
-            box-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+            box-shadow: 0 0 10px rgba(212, 163, 86, 0.5); /* Sombra Dourada */
         }
 
 
@@ -138,52 +147,50 @@
             margin-bottom: 4rem;
         }
         .era-header {
-            border-bottom: 2px solid var(--accent-magenta);
+            border-bottom: 2px solid var(--color-primary); /* Dourado */
             padding-bottom: 0.5rem;
             margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            /* Efeito de brilho magenta na linha */
-            box-shadow: 0 4px 10px -4px rgba(255, 0, 255, 0.3);
+            box-shadow: none;
             /* Fixa o cabeçalho da Era ao topo durante a navegação */
             position: sticky;
             top: 80px; /* Altura do header (h-20 = 80px) */
-            background-color: var(--bg-main);
+            background-color: var(--bg-main); /* Fundo Marfim */
             z-index: 30;
             padding-top: 1rem;
         }
 
         /* --- ESTILOS DOS CARTÕES (Entradas do Banco de Dados) --- */
         .gallery-card {
-            background-color: var(--card-bg);
+            background-color: var(--card-bg); /* Branco */
             border: 1px solid var(--card-border);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
             position: relative;
-            /* Efeito de "Slot" de cartucho */
             border-radius: 4px 4px 10px 10px;
+            box-shadow: var(--shadow-elegant); /* Sombra Elegante (do site) */
         }
         
         .gallery-card:hover {
             transform: translateY(-5px);
-            border-color: var(--accent-cyan);
-            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2);
+            border-color: var(--color-primary); /* Dourado */
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12); /* Sombra do site principal */
             z-index: 20;
         }
 
         /* Estado "Não Descoberto" - Menos saturado e mais escuro */
         .gallery-card.undiscovered {
-            filter: grayscale(80%) brightness(0.7);
+            filter: grayscale(80%) opacity(0.7);
         }
 
         /* Estado "Descoberto" - Cores normais e destaque */
         .gallery-card.discovered {
-            filter: grayscale(0%) brightness(1);
-            /* Borda verde sutil quando descoberto */
-            border-color: rgba(0, 255, 153, 0.5);
+            filter: none;
+            border-color: var(--color-accent-blue); /* Azul Museu */
         }
 
         /* Indicador de Status no Cartão (Visual) */
@@ -197,19 +204,39 @@
             z-index: 10;
         }
         .undiscovered .status-indicator {
-            background-color: #555;
-            color: #aaa;
+            background-color: #6c757d;
+            color: #ffffff;
         }
         .discovered .status-indicator {
-            background-color: var(--terminal-text);
-            color: var(--bg-main);
+            background-color: var(--color-accent-blue); /* Azul Museu */
+            color: #ffffff;
             font-weight: bold;
         }
 
         .card-image-container {
             padding: 1rem;
-            background-color: rgba(0,0,0,0.3);
+            background-color: #f8f9fa; /* Um cinza bem claro para a imagem */
             border-bottom: 1px solid var(--card-border);
+        }
+
+        /* Estilo para o link "Acessar Registro" (imitando btn-primary) */
+        .item-link {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem; /* text-xs */
+            padding: 0.6rem; /* py-2ish */
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            border-radius: 0.25rem;
+            transition: all 0.3s ease;
+        }
+        .item-link:hover {
+            background-color: var(--color-primary);
+            color: var(--color-dark); /* Texto escuro no botão dourado */
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(212, 163, 86, 0.3);
         }
 
     </style>
@@ -224,7 +251,7 @@
             
             <div class="flex-grow flex justify-center items-center gap-4 px-2 sm:px-4">
                 <div id="search-container" class="relative w-full max-w-lg">
-                    <input type="text" id="searchInput" placeholder=">_ SEARCH ARCHIVE..." class="form-input w-full py-2 pl-10 pr-4 pixel-font text-xs">
+                    <input type="text" id="searchInput" placeholder=">_ PESQUISAR ARQUIVO..." class="form-input w-full py-2 pl-10 pr-4" style="font-family: 'Inter', sans-serif; font-size: 0.875rem;">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                         <i class="fa-solid fa-search"></i>
                     </span>
@@ -232,7 +259,7 @@
                 </div>
             </div>
 
-            <a href="index.html" class="hidden sm:flex items-center gap-2 text-sm text-red-500 hover:text-red-400 pixel-font">
+            <a href="index.html" class="hidden sm:flex items-center gap-2 text-sm hover:text-red-700 pixel-font" style="color: var(--color-text-on-dark); opacity: 0.8;">
                 <i class="fa-solid fa-sign-out-alt"></i>
                 <span>LOGOUT</span>
             </a>
@@ -245,13 +272,13 @@
             
             <div class="text-center mb-12">
                 <h1 class="text-3xl md:text-4xl pixel-font text-glow-cyan mb-4">::: ARQUIVO CENTRAL :::</h1>
-                <p class="text-xl text-gray-400">>_ Acesso à Linha do Tempo Iniciado. Explore as Eras.</p>
+                <p class="text-xl">>_ Acesso à Linha do Tempo Iniciado. Explore as Eras.</p>
             </div>
 
             <section id="status-monitor">
                 <div class="flex justify-between items-center">
                     <div class="pixel-font text-sm text-glow-terminal">PROGRESSO GLOBAL DE DESCOBERTA</div>
-                    <div id="hud-discovered" class="pixel-font text-sm">0 / ? ITENS</div>
+                    <div id="hud-discovered" class="pixel-font text-sm" style="color: var(--color-text-light);">0 / ? ITENS</div>
                 </div>
                 <div class="progress-bar-container mt-4">
                     <div id="global-progress-bar" class="progress-bar"></div>
@@ -268,7 +295,7 @@
                 <div id="search-results-container" class="hidden">
                     <div class="era-header">
                          <h2 class="text-2xl pixel-font text-glow-cyan">Resultados da Pesquisa</h2>
-                         <button id="clear-search-btn" class="pixel-font text-sm text-red-500 hover:text-red-400">[LIMPAR BUSCA]</button>
+                 <button id="clear-search-btn" class="pixel-font text-sm text-red-600 hover:text-red-700">[LIMPAR BUSCA]</button>
                     </div>
                     <div id="search-results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
                 </div>
@@ -277,8 +304,8 @@
         </div>
     </main>
     
-    <footer class="py-8 mt-16 bg-gray-900 border-t border-gray-700">
-        <div class="container mx-auto text-center text-gray-500 text-sm pixel-font">
+    <footer class="py-8 mt-16" style="background-color: var(--color-dark); color: var(--color-text-on-dark);">
+        <div class="container mx-auto text-center opacity-80 text-sm pixel-font">
             <p>&copy; 2025 MUSEU ITINERANTE DO VIDEOJOGO. TERMINAL V1.9.</p>
         </div>
     </footer>
@@ -480,12 +507,12 @@
                         </a>
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
-                        <h3 class="text-xl mb-2 text-white">${item.nome || '>_Sem nome'}</h3>
+                        <h3 class="text-xl mb-2 text-gray-900">${item.nome || '>_Sem nome'}</h3>
                         <div class="text-lg mb-4">
-                            ${item.lancamento ? `<p class="text-gray-400">[${item.lancamento}]</p>` : ''}
+                            ${item.lancamento ? `<p>[${item.lancamento}]</p>` : ''}
                         </div>
-                        <a href="item_detalhe.html?id=${item.id}" class="pixel-font text-xs mt-auto text-center py-2 border border-gray-500 hover:border-cyan-400 hover:text-cyan-400 item-link">
-                            ACESSAR REGISTO
+                        <a href="item_detalhe.html?id=${item.id}" class="item-link mt-auto text-center">
+                            ACESSAR REGISTRO
                         </a>
                     </div>
                 </div>
@@ -521,7 +548,7 @@
 
                 eraSection.innerHTML = `
                     <div class="era-header">
-                        <h2 class="text-2xl pixel-font text-white">${title}</h2>
+                        <h2 class="text-2xl pixel-font text-glow-magenta">${title}</h2>
                         <div id="era-progress-${decade}" class="pixel-font text-sm text-glow-magenta">0 / 0</div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
