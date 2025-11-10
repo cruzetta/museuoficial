@@ -1620,6 +1620,7 @@
                         containerLista.innerHTML = '<p class="text-center text-gray-500 font-lora">Fique atento! Em breve divulgaremos nossos próximos destinos.</p>';
                     } else {
                         eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
+                        eventos.proximo.sort((a, b) => a.data_inicio.toDate() - b.data_inicio.toDate());
                         const formatDateFull = (date) => date?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || 'Data a definir';
                         
                         const eventStyles = {
