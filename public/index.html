@@ -1621,19 +1621,21 @@
                     } else {
                         eventos.passado.sort((a, b) => b.data_inicio.toDate() - a.data_inicio.toDate());
                         eventos.proximo.sort((a, b) => {
-                            const dateA = a.data_inicio?.toDate();
-                            const dateB = b.data_inicio?.toDate();
+          _                 const dateA = a.data_inicio?.toDate();
+                            const dateB = b.data_inicio?.toDate();
 
-                            // Se B não tem data, A vem antes (B vai para o fim)
-                            if (dateA && !dateB) return -1;
-                            // Se A não tem data, B vem antes (A vai para o fim)
-                            if (!dateA && dateB) return 1;
-                            // Se ambos não têm data, ficam como estão
-                            if (!dateA && !dateB) return 0;
-    
-                            // Se ambos têm data, compara
-                            return dateA - dateB;
-                        });
+                            // --- CORREÇÃO ---
+                            // Se A não tem data e B tem, A (sem data) vem PRIMEIRO.
+                            if (!dateA && dateB) return -1;
+                            // Se A tem data e B não tem, A (com data) vem DEPOIS.
+                            if (dateA && !dateB) return 1;
+                            // Se ambos não têm data, ficam como estão
+                            if (!dateA && !dateB) return 0;
+                            // --- FIM DA CORREÇÃO ---
+   
+                            // Se ambos têm data, compara (o mais próximo primeiro)
+                            return dateA - dateB;
+                        });
                         const formatDateFull = (date) => date?.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) || 'Data a definir';
                         
                         const eventStyles = {
