@@ -723,6 +723,23 @@
             height: 40px;
             font-size: 1.5rem;
         }
+
+        /* === ESTILOS PARA BOTAO INTERATIVO (ECONOMIA CIRCULAR) === */
+        @keyframes pulse-donate-btn {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(212, 163, 86, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 8px 25px rgba(212, 163, 86, 0.7);
+            }
+        }
+
+        .btn-donate-interactive {
+            animation: pulse-donate-btn 2.5s infinite ease-in-out;
+        }
+
     </style>
 </head>
 <body class="antialiased">
@@ -741,6 +758,7 @@
                     <a href="#museu-na-midia" class="nav-link">Na Mídia</a>
                     <a href="#acervos" class="nav-link">Acervo</a>
                     <a href="#timeline-geracoes" class="nav-link">Gerações</a>
+                    <a href="#economia-circular" class="nav-link">Economia Circular</a>
                     <a href="#quiz" class="nav-link">Quiz</a>
                 </nav>
                 <button id="mobile-menu-button" class="text-2xl text-white md:hidden" aria-label="Abrir menu de navegação">
@@ -759,6 +777,7 @@
             <a href="#museu-na-midia" class="block text-center py-3 text-lg nav-link">Na Mídia</a>
             <a href="#acervos" class="block text-center py-3 text-lg nav-link">Acervo</a>
             <a href="#timeline-geracoes" class="block text-center py-3 text-lg nav-link">Gerações</a>
+            <a href="#economia-circular" class="block text-center py-3 text-lg nav-link">Economia Circular</a>
             <a href="#quiz" class="block text-center py-3 text-lg nav-link">Quiz</a>
         </div>
     </div>
@@ -903,6 +922,60 @@
                 </div>
             </div>
         </section>
+        
+        <!-- INÍCIO: Nova Seção Economia Circular -->
+        <section id="economia-circular" class="section-padding fade-in-section" style="background-color: var(--color-background-gray);">
+            <div class="container mx-auto">
+                <h2 class="section-title">Economia Circular</h2>
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    
+                    <!-- Coluna de Texto -->
+                    <div class="max-w-xl mx-auto">
+                        <h3 class="text-3xl font-bold mb-6 font-lora" style="color: var(--color-accent-blue);">Mais do que Jogar: Reciclar e Doar</h3>
+                        <p class="mb-4 text-gray-700 font-lora text-lg">
+                            No coração do Museu do Videogame Itinerante bate um forte compromisso com o meio ambiente. Acreditamos no poder da <strong>economia circular</strong>, onde nada se perde e tudo se transforma.
+                        </p>
+                        <p class="mb-4 text-gray-600">
+                            Milhões de consoles, cartuchos e acessórios antigos são descartados anualmente, tornando-se lixo eletrônico que contamina o solo e a água com plásticos e metais pesados.
+                        </p>
+                        <p class="mb-6 text-gray-600">
+                            Ao <strong>doar</strong> seus itens antigos para o museu, você não está apenas preservando a história; você está ativamente participando de um ciclo sustentável. Nós restauramos, preservamos e damos uma nova vida a esses tesouros, educando novas gerações e evitando que se tornem um problema ambiental.
+                        </p>
+                    </div>
+
+                    <!-- Coluna Interativa e Imagem -->
+                    <div class="text-center p-6 bg-white rounded-lg shadow-lg border border-gray-200">
+                        <img src="https://placehold.co/500x300/F7F6F3/355070?text=Reciclar+%26+Preservar" alt="Ilustração de reciclagem e preservação" class="rounded-lg mb-8 w-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/500x300/F7F6F3/355070?text=Imagem+Sustent%C3%A1vel';">
+                        
+                        <h4 class="text-xl font-semibold mb-4 font-inter">Faça parte deste ciclo!</h4>
+                        <p class="text-gray-600 mb-6 font-lora">Tem um console ou jogo antigo? Ajude a preservar a história e o planeta.</p>
+                        
+                        <!-- Botão Interativo -->
+                        <button id="donation-toggle-btn" class="btn btn-primary btn-donate-interactive">
+                            <i class="fas fa-gift mr-2"></i> Quero Doar!
+                        </button>
+
+                        <!-- Conteúdo Oculto -->
+                        <div id="donation-info-box" class="hidden mt-6 p-6 bg-gray-50 rounded-lg shadow-inner border border-gray-200 text-left">
+                            <h5 class="font-bold text-lg mb-3 font-inter text-gray-800">Como funciona a doação?</h5>
+                            <p class="text-sm text-gray-700 mb-4">
+                                Ficamos imensamente gratos pelo seu interesse! O processo é simples:
+                            </p>
+                            <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 mb-4">
+                                <li>Envie um e-mail para nós descrevendo os itens.</li>
+                                <li>Anexe fotos, se possível.</li>
+                                <li>Nossa equipe de curadoria avaliará o material.</li>
+                                <li>Coordenaremos a logística para o recebimento.</li>
+                            </ul>
+                            <a href="mailto:museudovg@gmail.com" class="font-bold text-sm hover:underline" style="color: var(--color-accent-blue);">
+                                <i class="fas fa-envelope mr-1"></i> Enviar e-mail para museudovg@gmail.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- FIM: Nova Seção Economia Circular -->
 
         <section id="quiz" class="relative py-24 md:py-32 text-white flex items-center justify-center fade-in-section" style="background-color: var(--color-dark);">
              <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px); background-size: 60px 60px;"></div>
@@ -1927,6 +2000,22 @@
             setupScrollAnimation();
             initializeActiveNavOnScroll();
 
+            // --- LÓGICA DO BOTÃO INTERATIVO (ECONOMIA CIRCULAR) ---
+            const donationToggleButton = document.getElementById('donation-toggle-btn');
+            const donationInfoBox = document.getElementById('donation-info-box');
+
+            if (donationToggleButton && donationInfoBox) {
+                donationToggleButton.addEventListener('click', () => {
+                    donationInfoBox.classList.toggle('hidden');
+                    // Altera o texto do botão para dar feedback
+                    if (donationInfoBox.classList.contains('hidden')) {
+                        donationToggleButton.innerHTML = '<i class="fas fa-gift mr-2"></i> Quero Doar!';
+                    } else {
+                        donationToggleButton.innerHTML = '<i class="fas fa-times mr-2"></i> Fechar Informações';
+                    }
+                });
+            }
+
             // Carregamento de Dados
             loadCollectionData('noticias', 'noticias-container', renderNoticia,
                 query(collection(db, `/artifacts/${appId}/public/data/noticias`), orderBy("data_publicacao", "desc"), limit(3)));
@@ -1948,6 +2037,3 @@
     </script>
 </body>
 </html>
-
-
-
