@@ -724,6 +724,43 @@
             font-size: 1.5rem;
         }
 
+        /* === ESTILOS PARA FORMULÁRIO DE DOAÇÃO (CUSTOM RADIO) === */
+        #donation-form .radio-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        #donation-form .radio-label {
+            display: block;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        #donation-form .radio-label:hover {
+            border-color: #aaa;
+        }
+        #donation-form input[type="radio"] {
+            display: none; /* Oculta o rádio real */
+        }
+        #donation-form input[type="radio"]:checked + .radio-label {
+            border-color: var(--color-primary);
+            background-color: #fefcf9; /* Um dourado bem claro */
+            color: var(--color-primary-hover);
+            box-shadow: 0 2px 4px rgba(212, 163, 86, 0.2);
+            font-weight: 600;
+        }
+        /* Ajuste para 1 coluna em telas pequenas */
+        @media (max-width: 400px) {
+            #donation-form .radio-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* === ESTILOS PARA BOTAO INTERATIVO (ECONOMIA CIRCULAR) === */
         @keyframes pulse-donate-btn {
             0%, 100% {
@@ -738,6 +775,86 @@
 
         .btn-donate-interactive {
             animation: pulse-donate-btn 2.5s infinite ease-in-out;
+        }
+
+        /* === ESTILOS PARA O POP-UP DE DOAÇÃO === */
+        #donation-popup-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none; /* Escondido por padrão */
+            place-items: center;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #donation-popup-overlay.active {
+            display: grid;
+            opacity: 1;
+        }
+        #donation-popup-content {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px; /* Menor que o do mapa */
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        #donation-popup-overlay.active #donation-popup-content {
+            transform: scale(1);
+        }
+        #donation-popup-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 2rem;
+            height: 2rem;
+            border: none;
+            background-color: #f1f1f1;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            display: grid;
+            place-items: center;
+        }
+        #donation-popup-close:hover {
+            background-color: #e0e0e0;
+            transform: rotate(90deg);
+        }
+        #donation-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+        }
+        #donation-form input[type="text"],
+        #donation-form textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #donation-form input[type="text"]:focus,
+        #donation-form textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(212, 163, 86, 0.3);
+        }
+        #donation-form textarea {
+            min-height: 100px;
+            resize: vertical;
         }
 
     </style>
@@ -959,22 +1076,9 @@
                             <i class="fas fa-gift mr-2"></i> Quero Doar!
                         </button>
 
-                        <!-- Conteúdo Oculto -->
-                        <div id="donation-info-box" class="hidden mt-6 p-6 bg-gray-50 rounded-lg shadow-inner border border-gray-200 text-left">
-                            <h5 class="font-bold text-lg mb-3 font-inter text-gray-800">Como funciona a doação?</h5>
-                            <p class="text-sm text-gray-700 mb-4">
-                                Ficamos imensamente gratos pelo seu interesse! O processo é simples:
-                            </p>
-                            <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 mb-4">
-                                <li>Envie um e-mail para nós descrevendo os itens.</li>
-                                <li>Anexe fotos, se possível.</li>
-                                <li>Nossa equipe de curadoria avaliará o material.</li>
-                                <li>Coordenaremos a logística para o recebimento.</li>
-                            </ul>
-                            <a href="mailto:museudovg@gmail.com" class="font-bold text-sm hover:underline" style="color: var(--color-accent-blue);">
-                                <i class="fas fa-envelope mr-1"></i> Enviar e-mail para museudovg@gmail.com
-                            </a>
-                        </div>
+                        <!-- Conteúdo Oculto (REMOVIDO) -->
+                        <!-- A caixa de informação local foi removida e substituída pelo pop-up -->
+                        
                     </div>
                 </div>
             </div>
@@ -1054,6 +1158,88 @@
     </div>
     <!-- FIM: Estrutura do Pop-up do Mapa -->
     
+    <!-- INÍCIO: Estrutura do Pop-up de DOAÇÃO -->
+    <div id="donation-popup-overlay">
+        <div id="donation-popup-content">
+            <button id="donation-popup-close" aria-label="Fechar pop-up">&times;</button>
+            <h2 id="donation-popup-title" class="text-3xl font-lora mb-6" style="color: var(--color-dark);">Formulário de Doação</h2>
+            
+            <p class="font-lora text-gray-600 mb-6">Preencha os dados abaixo e nossa equipe receberá sua mensagem diretamente no WhatsApp!</p>
+
+            <form id="donation-form" class="space-y-6">
+                <div>
+                    <label for="form-nome">Seu Nome</label>
+                    <input type="text" id="form-nome" name="nome" required placeholder="Seu nome completo">
+                </div>
+                
+                <div>
+                    <label for="form-cidade">Sua Cidade / Estado</label>
+                    <input type="text" id="form-cidade" name="cidade" required placeholder="Ex: Campo Grande / MS">
+                </div>
+
+                <!-- CAMPO DE CONTATO REMOVIDO -->
+
+                <!-- NOVOS CAMPOS INTELIGENTES -->
+                <fieldset>
+                    <legend class="block mb-2 font-semibold" style="font-size: 0.875rem; color: var(--color-text-light);">Qual o tipo de item?</legend>
+                    <div class="radio-group mt-2">
+                        <div>
+                            <input type="radio" id="cat-console" name="categoria" value="Console" class="form-radio" checked>
+                            <label for="cat-console" class="radio-label">🎮 Console</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="cat-jogos" name="categoria" value="Jogos" class="form-radio">
+                            <label for="cat-jogos" class="radio-label">💿 Jogos</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="cat-acessorios" name="categoria" value="Acessórios" class="form-radio">
+                            <label for="cat-acessorios" class="radio-label">🕹️ Acessórios</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="cat-outros" name="categoria" value="Outros" class="form-radio">
+                            <label for="cat-outros" class="radio-label">📚 Outros</label>
+                        </div>
+                    </div>
+                </fieldset>
+                
+                <div>
+                    <label for="form-descricao-itens">Quais itens você gostaria de doar?</label>
+                    <textarea id="form-descricao-itens" name="itens" required placeholder="Ex: Super Nintendo, 2 controles, cartucho do Mario Kart..."></textarea>
+                </div>
+
+                <fieldset>
+                    <legend class="block mb-2 font-semibold" style="font-size: 0.875rem; color: var(--color-text-light);">Qual o estado de conservação?</legend>
+                    <div class="radio-group mt-2">
+                        <div>
+                            <input type="radio" id="cond-ok" name="condicao" value="Funcionando" class="form-radio" checked>
+                            <label for="cond-ok" class="radio-label">👍 Funcionando</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="cond-defeito" name="condicao" value="Com defeitos" class="form-radio">
+                            <label for="cond-defeito" class="radio-label">⚠️ Com defeitos</label>
+                        </div>
+                         <div>
+                            <input type="radio" id="cond-naosei" name="condicao" value="Não testado" class="form-radio">
+                            <label for="cond-naosei" class="radio-label">❓ Não testado</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="cond-quebrado" name="condicao" value="Para peças" class="form-radio">
+                            <label for="cond-quebrado" class="radio-label">🔧 Para peças</label>
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- FIM NOVOS CAMPOS -->
+                
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary w-full md:w-auto">
+                        <i class="fab fa-whatsapp mr-2"></i> Enviar via WhatsApp
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- FIM: Estrutura do Pop-up de DOAÇÃO -->
+
     <!-- INÍCIO: Estrutura do Lightbox para Galeria de Fotos -->
     <div id="lightbox-overlay">
         <div id="lightbox-content">
@@ -1066,7 +1252,7 @@
     <!-- FIM: Estrutura do Lightbox -->
 
 
-    <script type="module">
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, getDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -2006,19 +2192,83 @@
 
             // --- LÓGICA DO BOTÃO INTERATIVO (ECONOMIA CIRCULAR) ---
             const donationToggleButton = document.getElementById('donation-toggle-btn');
-            const donationInfoBox = document.getElementById('donation-info-box');
+            const donationPopupOverlay = document.getElementById('donation-popup-overlay');
+            const donationPopupClose = document.getElementById('donation-popup-close');
+            const donationForm = document.getElementById('donation-form');
 
-            if (donationToggleButton && donationInfoBox) {
+            // Variável para o número do WhatsApp
+            // IMPORTANTE: Substitua pelo número real do museu com código do país (ex: 5511999999999)
+            const WHATSAPP_NUMBER = "556793084334"; 
+
+            // Abrir o pop-up
+            if (donationToggleButton && donationPopupOverlay) {
                 donationToggleButton.addEventListener('click', () => {
-                    donationInfoBox.classList.toggle('hidden');
-                    // Altera o texto do botão para dar feedback
-                    if (donationInfoBox.classList.contains('hidden')) {
-                        donationToggleButton.innerHTML = '<i class="fas fa-gift mr-2"></i> Quero Doar!';
-                    } else {
-                        donationToggleButton.innerHTML = '<i class="fas fa-times mr-2"></i> Fechar Informações';
+                    donationPopupOverlay.classList.add('active');
+                    body.classList.add('modal-open'); 
+                });
+            }
+
+            // Fechar no botão 'X'
+            if (donationPopupClose && donationPopupOverlay) {
+                donationPopupClose.addEventListener('click', () => {
+                    donationPopupOverlay.classList.remove('active');
+                    body.classList.remove('modal-open');
+                });
+            }
+
+            // Fechar clicando fora
+            if (donationPopupOverlay) {
+                donationPopupOverlay.addEventListener('click', (e) => {
+                    if (e.target === donationPopupOverlay) {
+                        donationPopupOverlay.classList.remove('active');
+                        body.classList.remove('modal-open');
                     }
                 });
             }
+
+            // Lidar com o envio do formulário
+            if (donationForm) {
+                donationForm.addEventListener('submit', (e) => {
+                    e.preventDefault(); // Impede o envio tradicional do formulário
+
+                    // 1. Coletar dados do formulário
+                    const nome = document.getElementById('form-nome').value;
+                    const cidade = document.getElementById('form-cidade').value;
+                    // const contato = document.getElementById('form-contato').value; // REMOVIDO
+                    
+                    // Novos campos "inteligentes"
+                    const categoria = document.querySelector('input[name="categoria"]:checked').value;
+                    const descricaoItens = document.getElementById('form-descricao-itens').value;
+                    const condicao = document.querySelector('input[name="condicao"]:checked').value;
+
+
+                    // 2. Formatar a mensagem para o WhatsApp
+                    let message = `Olá, Museu do Videogame! 👋\n\n`;
+                    message += `Vi o site e gostaria de fazer uma doação:\n\n`;
+                    message += `*Nome:* ${nome}\n`;
+                    message += `*Cidade/Estado:* ${cidade}\n\n`;
+                    message += `--- DETALHES DA DOAÇÃO ---\n`;
+                    message += `*Tipo de Item:* ${categoria}\n`;
+                    message += `*Itens:* ${descricaoItens}\n`;
+                    message += `*Estado de Conservação:* ${condicao}\n\n`;
+                    message += `Aguardo seu retorno para combinarmos. Obrigado!`;
+
+                    // 3. Codificar a mensagem para a URL
+                    const whatsappMessage = encodeURIComponent(message);
+
+                    // 4. Criar a URL do WhatsApp
+                    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
+
+                    // 5. Abrir o WhatsApp em uma nova aba
+                    window.open(whatsappUrl, '_blank');
+
+                    // 6. Fechar o pop-up e limpar o formulário
+                    donationPopupOverlay.classList.remove('active');
+                    body.classList.remove('modal-open');
+                    donationForm.reset();
+                });
+            }
+
 
             // Carregamento de Dados
             loadCollectionData('noticias', 'noticias-container', renderNoticia,
